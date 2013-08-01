@@ -861,4 +861,11 @@ HTML;
         }
         return self::$helpers[$app];
     }
+
+    //VADIM CODE START
+    public function backend()
+    {
+        return $this->wa->getConfig()->getBackendUrl(true);
+    }
+    //VADIM CODE END
 }
