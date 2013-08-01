@@ -80,6 +80,9 @@ class webmoneyPayment extends waPayment implements waIPayment
         $hidden_fields['LMI_FAILURE_URL'] = $this->getAdapter()->getBackUrl(waAppPayment::URL_FAIL, $transaction_data);
 
         switch ($this->protocol) {
+            case self::PROTOCOL_PAYMASTER:
+            case self::PROTOCOL_WEBMONEY_LEGACY:
+                break;
             case self::PROTOCOL_WEBMONEY:
             default:
                 unset($hidden_fields['LMI_CURRENCY']);
