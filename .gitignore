@@ -4,3 +4,5 @@ wa-data
 .idea
 wa-log
 *.md5
+wa-content
+wa-config
