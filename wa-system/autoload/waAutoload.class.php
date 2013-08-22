@@ -142,6 +142,8 @@ class waAutoload
 
         'waAutoload'               => 'autoload/waAutoload.class.php',
 
+        'Debug'                  => 'debug/waDebug.class.php',
+
         'waFileCache'              => 'cache/waFileCache.class.php',
         'waMemcachedCache'         => 'cache/waMemcachedCache.class.php',
         'waRuntimeCache'           => 'cache/waRuntimeCache.class.php',

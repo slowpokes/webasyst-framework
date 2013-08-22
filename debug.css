@@ -1,0 +1,20 @@
+.debug{
+    background: #eeeeee;
+}
+
+.debug .debug_obj{
+    border-top: 2px solid #555;
+    padding: 20px;
+    font-family: "Courier New", Courier, monospace;
+    color: #000;
+    font-size: 14px;
+    word-wrap:break-word;
+}
+
+.debug .debug_obj .query{
+
+}
+
+.debug .debug_obj .backtrace{
+    display: none;
+}

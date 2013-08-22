@@ -162,6 +162,7 @@ class waModel
             $table = $this->table;
         }
         if ($table) {
+            Debug::describe($table, $keys); //VADIM CODE
             return $this->adapter->schema($table, $keys);
         } else {
             return array();
@@ -228,7 +229,11 @@ class waModel
     private function run($sql, $unbuffer = false)
     {
         $sql = trim($sql);
+        Debug::queryStart();//VADIM CODE
         $result = $this->adapter->query($sql);
+        if (Debug::enabled()){//VADIM CODE
+            Debug::query($sql, $result, $this->adapter->errorCode(), $this->adapter->error(), debug_backtrace());//VADIM CODE
+        }//VADIM CODE
         if (!$result) {
             $error = "Query Error\nQuery: ".$sql.
                      "\nError: ".$this->adapter->errorCode().
@@ -298,6 +303,11 @@ class waModel
             if (!is_array($params)) {
                 $params = array($params);
             }
+            //VADIM CODE START
+            Debug::sql($sql);
+            $res = $this->prepare($sql)->query($params);
+            return $res;
+            //VADIM CODE END
             return $this->prepare($sql)->query($params);
         }
 
@@ -314,6 +324,9 @@ class waModel
 
                 return $result;
             }
+            else{//VADIM CODE
+                Debug::setCached();//VADIM CODE
+            }//VADIM CODE
             $this->cache = null;
             return $cache;
         }

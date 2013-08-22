@@ -867,5 +867,10 @@ HTML;
     {
         return $this->wa->getConfig()->getBackendUrl(true);
     }
+
+    public function debug(){
+        return Debug::getHtml();
+    }
+
     //VADIM CODE END
 }
