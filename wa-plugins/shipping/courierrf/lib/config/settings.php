@@ -89,114 +89,18 @@ return array(
         'title' => 'Регионы',
         'control_type' => 'RegionRatesControl',
     ),
-    'halfkilocost' => array(
+    'kilocost' => array(
         'value'        => array(1 => 130.90, 2 => 132.70, 3 => 138.10, 4 => 168.20, 5 => 189.50, ),
-        'title'        => 'Стоимость отправки посылки весом до 0.5 килограмм (включительно)',
+        'title'        => 'Стоимость отправки посылки весом до 1 килограмма',
         'description'  => '',
         'control_type' => 'WeightCosts',
     ),
-
-    'overhalfkilocost' => array(
-        'value'        => array(1 => 10.00, 2 => 11.60, 3 => 16.90, 4 => 24.30, 5 => 28.10, ),
-        'title'        => 'Стоимость отправки каждых дополнительных 0.5 килограмм',
+    'delivery_time' => array(
+		'value'		   => array(1 => 1, 2 => 2, 3 => 2, 4 => 3, 5 => 3),
+		'title'        => 'Приблизительное время доставки (в сутках)',
         'description'  => '',
-        'control_type' => 'WeightCosts',
+        'control_type' => 'DeliveryTime',
     ),
-
-    'air'    => array(
-        'value'        => '254.70',
-        'title'        => 'Надбавка за отправление «Авиа»',
-        'description'  => 'Укажите стоимость в рублях',
-        'control_type' => waHtmlControl::INPUT,
-    ),
-    'caution' => array(
-        'value'        => '',
-        'title'        => 'Все посылки отправляются с отметкой «Осторожно»',
-        'description'  => '',
-        'control_type' => waHtmlControl::CHECKBOX,
-    ),
-    'max_weight' => array(
-        'value'        => '20',
-        'title'        => 'Максимальный вес отправления',
-        'description'  => 'Укажите вес в килограммах',
-        'control_type' => waHtmlControl::INPUT,
-    ),
-    'complex_calculation_weight' => array(
-        'value'        => '10',
-        'title'        => 'Вес усложненной тарификации',
-        'description'  => 'Укажите вес в килограммах, начиная с которого к стоимости доставки посылки прибавляется 30% (согласно правилам усложненной тарификации Почты России)',
-        'control_type' => waHtmlControl::INPUT,
-    ),
-    'commission' => array(
-        'value'        => '4',
-        'title'        => 'Плата за сумму объявленной ценности посылки',
-        'description'  => 'Укажите размер комиссии в процентах. Например, укажите 4, если с каждого рубля взимается 4 копейки.',
-        'control_type' => waHtmlControl::INPUT,
-    ),
-
-    'company_name' => array(
-        'value'        => '',
-        'title'        => 'Получатель наложенного платежа (магазин)',
-        'description'  => 'Для юридического лица — полное или краткое наименование; для гражданина — ФИО полностью.',
-        'control_type' => 'text',
-    ),
-
-    'address1' => array(
-        'value'        => '',
-        'title'        => 'Адрес получателя наложенного платежа (магазина), строка 1',
-        'description'  => 'Почтовый адрес получателя наложенного платежа.',
-        'control_type' => 'text',
-    ),
-    'address2' => array(
-        'value'        => '',
-        'title'        => 'Адрес получателя наложенного платежа (магазина), строка 2',
-        'description'  => 'Заполните, если адрес не помещается в одну строку.',
-        'control_type' => 'text',
-    ),
-    'zip' => array(
-        'value'        => '',
-        'title'        => 'Индекс получателя наложенного платежа (магазина)',
-        'description'  => 'Индекс должен состоять ровно из 6 цифр.',
-        'control_type' => 'text',
-    ),
-    'inn'    => array(
-        'value'        => '',
-        'title'        => 'ИНН получателя наложенного платежа (магазина)',
-        'description'  => 'Заполняется только для юридических лиц. 10 цифр.',
-        'control_type' => 'text',
-    ),
-    'bank_kor_number' => array(
-        'value'        => '',
-        'title'        => 'Кор. счет получателя наложенного платежа (магазина)',
-        'description'  => 'Заполняется только для юридических лиц. 20 цифр.',
-        'control_type' => 'text',
-    ),
-    'bank_name' => array(
-        'value'        => '',
-        'title'        => 'Наименование банка получателя наложенного платежа (магазина)',
-        'description'  => 'Заполняется только для юридических лиц.',
-        'control_type' => 'text',
-    ),
-    'bank_account_number' => array(
-        'value'        => '',
-        'title'        => 'Расчетный счет получателя наложенного платежа (магазина)',
-        'description'  => 'Заполняется только для юридических лиц. 20 цифр.',
-        'control_type' => 'text',
-    ),
-    'bik'    => array(
-        'value'        => '',
-        'title'        => 'БИК получателя наложенного платежа (магазина)',
-        'description'  => 'Заполняется только для юридических лиц. 9 цифр.',
-        'control_type' => 'text',
-    ),
-
-    'color'  => array(
-        'value'        => '1',
-        'title'        => 'Печатать желтую полосу',
-        'description'  => '',
-        'control_type' => waHtmlControl::CHECKBOX,
-    ),
-
 );
 
 //EOF
