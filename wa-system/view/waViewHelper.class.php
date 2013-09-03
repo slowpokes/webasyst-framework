@@ -506,7 +506,7 @@ HTML;
                 $field_name = ucfirst($field_id);
             }
         }
-        return '<div class="wa-form">'.
+        return '<div class="wa-form login_form">'. // VADIM CODE
             ($form ? '<form action="'.$this->loginUrl().'" method="post">' : '').'
                 <div class="wa-field">
                     <div class="wa-name">'.$field_name.'</div>
@@ -524,7 +524,7 @@ HTML;
                 <div class="wa-field">
                     <div class="wa-value wa-submit">
                         <input type="hidden" name="wa_auth_login" value="1">
-                        <input type="submit" value="'._ws('Sign In').'"> <a href="'.$this->getUrl('/forgotpassword').'">'._ws('Forgot password?').'</a>
+                        <input type="submit" class="button" value="'._ws('Sign In').'"> <a class="forgot_pass" href="'.$this->getUrl('/forgotpassword').'">'._ws('Forgot password?').'</a>
                     </div>
                 </div>'.
             ($form ? '</form>' : '').'

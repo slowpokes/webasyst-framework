@@ -318,7 +318,7 @@ class waContactForm
                 continue;
             }
 
-            $result .= '<div class="'.$class_field.($f->isRequired() ? ' '.(wa()->getEnv() == 'frontend' ? 'wa-required' : 'required') : '').'"><div class="'.$class_name.'">'.
+            $result .= '<div class="'.$class_field.($f->isRequired() ? ' '.(wa()->getEnv() == 'frontend' ? 'wa-required' : 'required') : '').'" data-id="'.$fid.'"><div class="'.$class_name.'">'. // VADIM CODE
                 $f->getName().'</div><div class="'.$class_value.'">';
             $result .= "\n".$this->html($fid, $with_errors);
             $result .= "\n</div></div>";

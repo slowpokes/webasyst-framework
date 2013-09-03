@@ -299,7 +299,7 @@ class waContactCompositeField extends waContactField
             if ($field instanceof waContactHiddenField) {
                 $result[] = $field->getHTML($params_subfield, $attrs_one);
             } else {
-                $result[] = '<span class="'.($field->isRequired() ? $required_class : '').'field"><span>'.$field->getName().'</span>'.$field->getHTML($params_subfield, $attrs_one).$errors_html.'</span>';
+                $result[] = '<div class="'.($field->isRequired() ? $required_class : '').'wa-field" data-id="'.$params_subfield['parent'].'.'.$field->getId().'"><div class="wa-name">'.$field->getName().'</div><div class="wa-value">'.$field->getHTML($params_subfield, $attrs_one).$errors_html.'</div></div>'; // VADIM CODE
             }
         }
         return implode($result);
