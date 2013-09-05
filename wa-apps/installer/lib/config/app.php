@@ -5,7 +5,7 @@ return array(
 	'prefix' => 'installer',
 	'img' => 'img/installer.png',
 	'mobile' => false,
-	'version' => '1.1.1',
+	'version' => '1.1.2',
 	'critical'=>'1.1.1',
 	'system'=>true,
 	'vendor'=>'webasyst',
