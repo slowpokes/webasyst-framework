@@ -872,5 +872,9 @@ HTML;
         return Debug::getHtml();
     }
 
+    public function cityBlock(){
+        return "Ваш город: <span class='city_name'>Москва</span>";
+    }
+
     //VADIM CODE END
 }
