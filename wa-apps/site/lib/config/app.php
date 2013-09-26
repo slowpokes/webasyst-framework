@@ -10,7 +10,7 @@ return array(
     ),
     'frontend' => true,
     'version'=>'2.1.0',
-    'critical'=>'2.0.0',
+    'critical'=>'2.1.0',
     'vendor' => 'webasyst',
     'system' => true,
     'rights' => true,
