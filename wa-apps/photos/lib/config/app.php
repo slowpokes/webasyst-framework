@@ -9,12 +9,13 @@ return array(
     'plugins'=>true,
     'pages' => true,
     'mobile' => true,
-    'version'=>'1.0.1',
+    'version'=>'1.1.0',
     'vendor'=>'webasyst',
     'img' => 'img/photos.png',
     'icon'=>array(
-        16=>'img/photos16.png',
-        24=>'img/photos24.png',
-        48=>'img/photos.png',
+        16 => 'img/photos16.png',
+        24 => 'img/photos24.png',
+        48 => 'img/photos.png',
+        96 => 'img/photos96.png',
      )
 );

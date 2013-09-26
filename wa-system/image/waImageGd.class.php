@@ -341,7 +341,7 @@ class waImageGd extends waImage
                         list ($width, $height) = array($height, $width);
                     }
                     $offset = $this->calcWatermarkOffset($width, $height, $align);
-                    $offset = $this->watermarkOffsetFix($offset, $width, $height, $text_orientation);
+                    $offset = $this->watermarkOffsetFix($offset, $width, $height, $align, $text_orientation);
                     $color = imagecolorallocatealpha($this->image, $font_color['r'], $font_color['g'], $font_color['b'], $font_color['a']);
                     imagettftext($this->image, $font_size, $text_orientation == self::ORIENTATION_VERTICAL ? 90 : 0, $offset[0], $offset[1], $color, $font_file, $text);
                 } else {
@@ -359,7 +359,7 @@ class waImageGd extends waImage
                 if ($text_orientation == self::ORIENTATION_VERTICAL) {
                     list ($width, $height) = array($height, $width);
                 }
-                $offset = $this->calcWatermarkOffset($width, $height, $align);
+                $offset = $this->calcWatermarkOffset($width, $height, $align, $text_orientation);
                 if ($text_orientation == self::ORIENTATION_VERTICAL) {
                     imagestring_rotate($this->image, $font, 90, $offset[0], $offset[1], $text, $font_color['r'], $font_color['g'], $font_color['b'], $font_color['a']);
                 } else {
@@ -391,13 +391,19 @@ class waImageGd extends waImage
         return $offset;
     }
 
-    private function watermarkOffsetFix($offset, $width, $height, $orientation)
+    private function watermarkOffsetFix($offset, $width, $height, $align, $orientation)
     {
         if ($orientation == self::ORIENTATION_HORIZONTAL) {
             $offset[1] += $height;
+            if ($align == self::ALIGN_BOTTOM_LEFT || $align == self::ALIGN_BOTTOM_RIGHT) {
+                $offset[1] -= $height/4;
+            }
         } else {
             $offset[0] += $width;
             $offset[1] += $height;
+            if ($align == self::ALIGN_BOTTOM_RIGHT) {
+                $offset[0] -= $width/4;
+            }
         }
         return $offset;
     }
