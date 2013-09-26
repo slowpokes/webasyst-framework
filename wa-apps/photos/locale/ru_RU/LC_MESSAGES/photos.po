@@ -1307,6 +1307,12 @@ msgid ""
 "either a number (max number of photos to be returned) or a pair of offset, "
 "limit (start from and the max number of records to be returned)"
 msgstr ""
+"Возвращает массив списка изображений по заданным критериям, например, <em>"
+"\"tag/vacations\"</em>, <em>\"album/12\"</em>, <em>\"id/1,5,7\"</em>. "
+"Параметр <em>size</em> обозначает размер эскиза. Параметр <em>limit</em> "
+"используется по аналогии с MySQL: либо одно число (макс. кол-во "
+"изображений), либо пара чисел «смещение, ограничение» (т. е. номер первого "
+"изображения и общее максимальное количество)."
 
 #: /wa-apps/photos/lib/config/site.php:124
 msgid "Latest uploaded photos"
@@ -1331,3 +1337,77 @@ msgstr ""
 #: /wa-apps/photos/themes/custom/content.html:64
 msgid "More"
 msgstr "Еще"
+
+#: /wa-apps/photos/templates/actions/photo/PhotoList.html:34
+msgid "Remove from album"
+msgstr "Исключить из альбома"
+
+#: /wa-apps/photos/templates/actions/photo/PhotoList.html:60
+msgid ""
+"Photos in this list are sorted <strong>by upload time</strong>. Sort order "
+"cannot be set manually here."
+msgstr ""
+"В этом списке фотографии отсортированы <strong>по времени загрузки</strong>. "
+"Вручную задать порядок сортировки в этом списке нельзя."
+
+#: /wa-apps/photos/templates/actions/photo/PhotoList.html:61
+msgid ""
+"Photos in this list are sorted <strong>by rating</strong>. Sort order cannot "
+"be set manually here."
+msgstr ""
+"В этом списке фотографии отсортированы <strong>по оценке</strong>. Вручную "
+"задать порядок сортировки в этом списке нельзя."
+
+#: /wa-apps/photos/templates/actions/photo/PhotoList.html:62
+msgid ""
+"You do not have sufficient access rights to alter photos sort order in this "
+"list."
+msgstr ""
+"У вас недостаточно прав доступа для изменения порядка сортировки фотографий "
+"в этом списке."
+
+#: /wa-apps/photos/templates/layouts/Default.html:402
+msgid "Popular tags"
+msgstr "Популярные теги"
+
+#: /wa-apps/photos/lib/actions/upload/photosUploadPhoto.controller.php:96
+msgid "Save error"
+msgstr "Ошибка сохранения"
+
+#: /wa-apps/photos/themes/sidebar/footer.html:4
+msgid ""
+"We are using <a href=\"http://www.webasyst.com/store/app/photos/\">Webasyst "
+"Photos</a>"
+msgstr ""
+"Мы используем <a href=\"http://www.webasyst.ru/store/app/photos/\">Webasyst "
+"Фото</a>"
+
+#: /wa-apps/photos/themes/vk/footer.html:4
+msgid ""
+"We are using <a href=\"http://www.webasyst.com/store/app/photos/\" target="
+"\"_blank\">Webasyst Photos</a>"
+msgstr ""
+"Мы используем <a href=\"http://www.webasyst.ru/store/app/photos/\" target="
+"\"_blank\">Webasyst Фото</a>"
+
+#: /wa-apps/photos/templates/actions/settings/Settings.html:118
+msgid "Thumbnail quality"
+msgstr "Качество эскизов"
+
+#: /wa-apps/photos/templates/actions/settings/Settings.html:122
+msgid ""
+"JPEG compression quality for photo thumbnails. From 0 (min quality, min file "
+"size) to 100 (max quality, max file size). 90 is recommended."
+msgstr ""
+"Коэффициент качества сжатия JPEG при создании эскизов изображений. От 0 "
+"(минимальное качество, минимальный размер файлов) до 100 (максимальное "
+"качество, максимальный размер файлов). Рекомендуемое значение — 90."
+
+#: /wa-apps/photos/templates/actions/plugins/Plugins.html:26
+msgid "Browse for new plugins"
+msgstr "Поиск плагинов"
+
+#: /wa-apps/photos/templates/actions/plugins/Plugins.html:29
+msgid "Use Installer to install new plugins from the Webasyst Store"
+msgstr ""
+"Устанавливайте плагины из магазина Webasyst с помощью приложения «Инсталлер»"

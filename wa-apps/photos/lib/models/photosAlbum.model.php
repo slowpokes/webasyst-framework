@@ -43,7 +43,11 @@ class photosAlbumModel extends waModel
         return $id;
     }
 
-
+    public function getByName($name)
+    {
+        $sql = "SELECT * FROM ".$this->table." WHERE name LIKE '%".$this->escape($name, 'like')."%'";
+        return $this->query($sql)->fetchAll();
+    }
     /**
      *
      * @deprecated
@@ -329,11 +333,11 @@ class photosAlbumModel extends waModel
 
         if ($data['parent_id']) {
             $parent = $this->getById($data['parent_id']);
-            $full_url = trim($parent['full_url'], '/').'/'.$data['url'];
+            $full_url = trim($parent['full_url'], '/').'/'.$url;
         } else {
             $full_url = $url;
         }
-
+        
         $this->updateById($id, array(
             'url' => $url,
             'full_url' => $full_url
@@ -415,22 +419,45 @@ class photosAlbumModel extends waModel
      */
     public function update($id, $data)
     {
+        $item = $this->getById($id);
+        if (!$item) {
+            return false;
+        }
         if (isset($data['url'])) {
             $url = $data['url'];
             unset($data['url']);
         }
+        
+        if (!isset($data['status'])) {
+            $data['status'] = $item['status'];
+        }
+        
         if ($data['status'] <= 0) {
             $data['full_url'] = null;
+            if (!isset($data['hash'])) {
+                $data['hash'] = md5(uniqid(time(), true));
+            }
         } else {
             unset($data['full_url']);
         }
-
+        
         $this->updateById($id, $data);
         if ($data['status'] <= 0) {
             $this->privateDescendants($id);
         } elseif (isset($url)) {
             $this->updateUrl($id, $url);
+        } else {
+            $item = $this->getById($id);
+            if (!$item['url']) {
+                $url = suggestUniqueUrl(photosPhoto::suggestUrl($item['name']));
+                $this->updateUrl($id, $url);
+            } else if (!$item['full_url']) {
+                $this->updateUrl($id, $item['url']);
+            }
         }
+        
+        return true;
+        
     }
 
     /**
@@ -486,6 +513,7 @@ class photosAlbumModel extends waModel
         $childcrumbs = array();
         foreach ($result as $album) {
             $childcrumbs[] = array(
+                'id' => $album['id'],
                 'name' => $escape ? photosPhoto::escape($album['name']) : $album['name'],
                 'full_url' => photosFrontendAlbum::getLink($album),
                 'note' => $escape ? photosPhoto::escape($album['note']) : $album['note']
@@ -559,6 +587,8 @@ class photosAlbumModel extends waModel
                 }
             }
         }
+        
+        return true;
     }
 
     public function deleteByField($field, $value = null) {

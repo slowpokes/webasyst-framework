@@ -8,11 +8,14 @@ class waPageActions extends waActions
     protected $ibutton = true;
 
     protected $options = array(
-        'codemirror' => true,
         'container' => true,
         'show_url' => false,
         'save_panel' => true,
-        'js' => true,
+        'js' => array(
+            'ace' => true,
+            'editor' => true,
+            'storage' => false
+        ),
         'is_ajax' => false,
         'data' => array()
     );
@@ -166,7 +169,8 @@ class waPageActions extends waActions
         foreach ($pages as $page) {
             $html .= '<li class="drag-newposition"></li>';
             $html .= '<li class="dr" id="page-'.$page['id'].'">'.
-            '<a class="wa-page-link" href="'.$prefix_url.$page['id'].'"><span class="count"><i class="icon10 add wa-page-add"></i></span><i class="icon16 notebook"></i>'.
+            (!empty($page['childs']) ? '<i class="icon16 darr expander overhanging"></i>' : '').'<i class="icon16 notebook"></i>'.
+            '<a class="wa-page-link" href="'.$prefix_url.$page['id'].'"><span class="count"><i class="icon10 add wa-page-add"></i></span>'.
             htmlspecialchars($page['name']).
             ' <span class="hint">/'.htmlspecialchars($page['full_url']).'</span>';
             if (!$page['status']) {
@@ -529,8 +533,7 @@ class waPageActions extends waActions
         $app_id = waRequest::get('app');
         $file = waRequest::get('file');
         $vars = array();
-        if ($app_id) {
-            $app = wa()->getAppInfo($app_id);
+        if ($app_id && $app = wa()->getAppInfo($app_id)) {
             $path = $this->getConfig()->getAppsPath($app_id, 'lib/config/site.php');
             if (file_exists($path)) {
                 $site = include($path);

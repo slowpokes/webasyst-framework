@@ -92,14 +92,14 @@ class photosPhoto
 
     public static function generateThumbs($photo, $sizes = array())
     {
-        $wa = wa();
-
         $photo_path = self::getPhotoPath($photo);
         $apply_sharp = wa('photos')->getConfig()->getOption('sharpen');
 
         $main_thumbnail_size = photosPhoto::getBigPhotoSize();
         $main_thumbnail_path = self::getPhotoThumbPath($photo, $main_thumbnail_size);
 
+        $quality = wa('photos')->getConfig()->getSaveQuality();
+        
         foreach ((array)$sizes as $size) {
             if ($size == $main_thumbnail_size) {
                 continue;
@@ -115,14 +115,14 @@ class photosPhoto
             if (!$image) {
                 continue;
             }
-            $image->save(self::getPhotoThumbPath($photo, $size));
+            $image->save(self::getPhotoThumbPath($photo, $size), $quality);
         }
 
         // sharp for mail thumbnail
         if ($apply_sharp) {
             $image = waImage::factory($main_thumbnail_path);
             $image->sharpen(self::SHARP_AMOUNT);
-            $image->save();
+            $image->save(null, $quality);
         }
         clearstatcache();
     }
@@ -408,6 +408,9 @@ class photosPhoto
                 $attributes['style'] .= 'width: '.(int)$real_sizes['width'].'px; height: '.(int)$real_sizes['height'].'px; ';
             }
         }
+        if (!isset($attributes['alt'])) {
+            $attributes['alt'] = '';
+        }
         $photo['src'] = photosPhoto::getPhotoUrl($photo, $size, true);
         if ($photo['edit_datetime']) {
             $photo['src'] .= '?'.strtotime($photo['edit_datetime']);
@@ -423,7 +426,7 @@ class photosPhoto
         return "<img src=\"{$photo['src']}\" {$attr}>";   // use everywhere only one type of quotes
     }
 
-    public static function getEmbedPhotoListContext($hash, $size, $limit = null)
+    public static function getEmbedPhotoListContext($hash, $size, $limit = null, $context = null)
     {
         $link = photosCollection::getFrontendLink($hash);
         $collection = new photosCollection($hash);
@@ -504,6 +507,27 @@ class photosPhoto
         return wa('photos')->getConfig()->getSize('mobile');
     }
 
+    public static function getRatingHtml($rating, $size = 10, $show_when_zero = false)
+    {
+        $rating = round($rating * 2) / 2;
+        if (!$rating && !$show_when_zero) {
+            return '';
+        }
+        $html = '';
+        for ($i = 1; $i <= 5; $i += 1) {
+            $html .= '<i class="icon'.$size.' star';
+            if ($i > $rating) {
+                if ($i - $rating == 0.5) {
+                    $html .= '-half';
+                } else {
+                    $html .= '-empty';
+                }
+            }
+            $html .= '"></i>';
+        }
+        return $html;
+    }
+    
     public static function escape($data)
     {
         if (is_array($data)) {
