@@ -882,7 +882,20 @@ HTML;
     }
 
     public function cityBlock(){
-        return "Ваш город: <span class='city_name'>Москва</span>";
+        $geoip = new Geoip();
+        $city = $geoip->getCity();
+        if($city)
+            return "Ваш город: <span class='city_name'>$city</span>";
+        return "";
+    }
+
+    public function geoData(){
+        $geoip = new Geoip();
+        $data = $geoip->getData();
+        if($data){
+            return "putGeoData('{$data['city']}', {$data['region']})";
+        }
+        return '';
     }
 
     //VADIM CODE END
