@@ -1,12 +1,12 @@
 <?php
 
 // настройки для подключения к БД
-/*
+
 $SERVER = 'localhost';
 $DB_NAME = 'bd9'; // название базы данных
 $DB_USER = 'bd9'; // имя пользователя бд
 $DB_PASS = 'bd9MySQL'; // пароль
-*/
+
 
 /*
 $SERVER = 'localhost';
