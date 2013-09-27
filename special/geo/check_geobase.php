@@ -1,11 +1,19 @@
 <?php
 
 // настройки для подключения к БД
+/*
 $SERVER = 'localhost';
 $DB_NAME = 'bd9'; // название базы данных
 $DB_USER = 'bd9'; // имя пользователя бд
 $DB_PASS = 'bd9MySQL'; // пароль
+*/
 
+/*
+$SERVER = 'localhost';
+$DB_NAME = 'vbd9'; // название базы данных
+$DB_USER = 'root'; // имя пользователя бд
+$DB_PASS = 'root'; // пароль
+*/
 
 
 // Соединяемся с базой данных
@@ -41,17 +49,24 @@ function get_data($ip)
     if(empty($ip))
     exit('Передайте функции IP');
     $long_ip = ip2long($ip);
-    $q = mysql_query("SELECT * FROM `geo_base` WHERE `long_ip1`<='$long_ip' AND `long_ip2`>='$long_ip' LIMIT 1");
+    $sql = "SELECT * FROM `geo_base` WHERE `long_ip1`<='$long_ip' AND `long_ip2`>='$long_ip' LIMIT 1";
+    echo "$sql\n";
+    $q = mysql_query($sql);
     $data = false;
     if (mysql_num_rows($q))
     {
         $res1 = mysql_fetch_assoc($q);
-        $q = mysql_query("SELECT * FROM `geo_cities` WHERE `city_id`='$res1[city_id]' LIMIT 1");
+        $sql = "SELECT * FROM `geo_cities` WHERE `city_id`='$res1[city_id]' LIMIT 1";
+        echo "$sql\n";
+        $q = mysql_query($sql);
         if (mysql_num_rows($q))
         {
             $res2 = mysql_fetch_assoc($q);
             $data = array_merge($res1, $res2);            
         }
+    }
+    else{
+        echo "ERROR:".mysql_error();
     }
     return $data;
 }
