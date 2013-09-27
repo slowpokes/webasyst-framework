@@ -31,7 +31,9 @@ include('geo.php');
 $geo = new Geo(); // запускаем класс
 $ip = $geo->get_ip(); // получаем ip адрес
 
+$ip = '188.244.45.3';
 
+echo "got ip $ip\n";
 
 function get_data($ip)
 {
@@ -58,6 +60,7 @@ $data = get_data($ip); // запускаем функцию и получем д
 
 if(!$data)
 {
+    echo "ip в базе не найден\n";
     // если функция вернула false. значит ip не найден в базе данных
 }else
 {

@@ -115,17 +115,20 @@
             
             if (isset($_SERVER['HTTP_X_REAL_IP']))
                 $ipa[] = $_SERVER['HTTP_X_REAL_IP'];
-
-            print_r($ipa);
             
             // проверяем ip-адреса на валидность начиная с приоритетного.
             foreach($ipa as $ips)
             {
                 //  если ip валидный обрываем цикл, назначаем ip адрес и возвращаем его
+                echo "check $ips\n";
                 if($this->is_valid_ip($ips))
                 {                    
                     $ip = $ips;
+                    echo "$ips valid\n";
                     break;
+                }
+                else{
+                    echo "$ips not valid\n";
                 }
             }
             return $ip;
