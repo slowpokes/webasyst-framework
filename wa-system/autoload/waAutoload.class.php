@@ -144,6 +144,8 @@ class waAutoload
         'waAutoload'               => 'autoload/waAutoload.class.php',
 
         'Debug'                  => 'debug/waDebug.class.php',
+        'Geoip'                    => 'geoip/waGeoip.class.php',
+        'GeoipModel'               => 'geoip/waGeoip.model.php',
 
         'waFileCache'              => 'cache/waFileCache.class.php',
         'waMemcachedCache'         => 'cache/waMemcachedCache.class.php',
