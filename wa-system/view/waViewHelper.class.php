@@ -529,12 +529,14 @@ HTML;
                 <div class="wa-field">
                     <div class="wa-value wa-submit">
                         <input type="hidden" name="wa_auth_login" value="1">
-                        <input type="submit" value="'._ws('Sign In').'">
+                        <input type="submit" class="button" value="'._ws('Sign In').'">
+                    </div>
+                </div>
+                <div class="wa-field">
                         &nbsp;
                         <a href="'.$this->getUrl('/forgotpassword').'">'._ws('Forgot password?').'</a>
                         &nbsp;
                         <a href="'.$this->getUrl('/signup').'">'._ws('Sign up').'</a>
-                    </div>
                 </div>'.
             ($form ? '</form>' : '').'
         </div>';
@@ -553,8 +555,11 @@ HTML;
         </div>
         <div class="wa-field">
             <div class="wa-value wa-submit">
-                <input type="submit" value="'._ws('Reset password').'"> <a href="'.$this->getUrl('/login').'">'._ws('I remember it now!').'</a>
+                <input type="submit" value="'._ws('Reset password').'" class="button" >
             </div>
+        </div>
+        <div class="wa-field">
+            <a href="'.$this->getUrl('/login').'">'._ws('I remember it now!').'</a>
         </div>
     </form>
 </div>';
@@ -676,7 +681,7 @@ HTML;
             $html .= '</div></div>';
         }
         $html .= '<div class="wa-field"><div class="wa-value wa-submit">
-            <input type="submit" value="'._ws('Sign Up').'"> '.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
+            <input type="submit" class="button" value="'._ws('Sign Up').'"> <br><br>'.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
         </div></div>';
         $html .= '</form></div>';
         return $html;
