@@ -16,42 +16,32 @@ class installerAppsInfoAction extends waViewAction
 {
     public function execute()
     {
-        $extended = false;
+        if (!waRequest::get('_')) {
+            $this->setLayout(new installerBackendLayout());
+        }
         $this->view->assign('action', 'update');
-        $update_counter = 0;
-        $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
-
-
         $this->view->assign('error', false);
-        $app = null;
+
         try {
-            $app_list = installerHelper::getApps($messages, $update_counter);
             $slug = waRequest::get('slug');
-            $vendor = waRequest::get('vendor');
-            $edition = waRequest::get('edition');
+            $options = array(
+                'vendor'       => waRequest::get('vendor', '', waRequest::TYPE_STRING_TRIM),
+                'edition'      => waRequest::get('edition', '', waRequest::TYPE_STRING_TRIM),
+                'action'       => true,
+                'requirements' => true,
+            );
+            $this->view->assign('app', $app = installerHelper::getInstaller()->getItemInfo($slug, $options));
+            $this->view->assign('title', sprintf(_w('Application "%s"'), $app['name']));
 
-            foreach ($app_list as $info) {
-                if (($info['slug'] == $slug) && ($info['vendor'] == $vendor) && ($info['edition'] == $edition)) {
-                    $app = $info;
-                    break;
-                }
-            }
-            if (!$app) {
-                throw new waException(_w('Application not found'));
-            }
-
-        } catch(Exception $ex) {
-            $msg = installerMessage::getInstance()->raiseMessage($ex->getMessage(), installerMessage::R_FAIL);
-            $this->redirect(array('module'=>'apps', 'msg'=>$msg));
+        } catch (Exception $ex) {
+            $this->view->assign('error', $ex->getMessage());
         }
 
-
         $this->view->assign('identity_hash', installerHelper::getHash());
-        $this->view->assign('messages', $messages);
-        $this->view->assign('update_counter', $update_counter);
-
-        $this->view->assign('app', $app);
-        $this->view->assign('title', sprintf(_w('Application "%s"'), $app['name']));
+        $this->view->assign('domain', installerHelper::getDomain());
+        if (!empty($app['is_premium']) && ($app['theme'] == 'premium')) {
+            $this->setTemplate(preg_replace('@(\.html)$@', 'Premium$1', $this->getTemplate()));
+        }
     }
 }
 //EOF

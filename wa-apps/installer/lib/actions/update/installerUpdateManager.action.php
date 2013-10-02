@@ -14,102 +14,191 @@
 
 class installerUpdateManagerAction extends waViewAction
 {
+
+    private $vendors = array();
+    private $module = 'update';
+
+    private $urls;
+
+    private function init()
+    {
+        $url = parse_url($r = waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
+        if (preg_match('/(^|&)module=(update|apps|plugins)($|&)/', $url, $matches)) {
+            $this->module = $matches[2];
+        }
+        if (installerHelper::isDeveloper()) {
+            if (waRequest::request('install')) {
+                $msg = _w('Unable to install application (developer version is on)');
+            } else {
+                $msg = _w('Unable to install application (developer version is on)');
+            }
+            $this->redirect(array(
+                'module' => $this->module,
+                'msg'    => installerMessage::getInstance()->raiseMessage($msg.$r, 'fail'),
+            ));
+        }
+    }
+
     public function execute()
     {
-        $module = 'update';
-        $url = parse_url(waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
-        if (preg_match('/(^|&)module=(update|apps|plugins)($|&)/', $url, $matches)) {
-            $module = $matches[2];
-        }
+        $this->init();
+
         try {
             $updater = new waInstaller(waInstaller::LOG_TRACE);
-            $state = $updater->getState();
+            $state = 0 && $updater->getState();
             if (!isset($state['stage_status']) || (($state['stage_name'] != waInstaller::STAGE_NONE) && ($state['heartbeat'] > (waInstaller::TIMEOUT_RESUME + 5))) || (($state['stage_name'] == waInstaller::STAGE_UPDATE) && ($state['heartbeat'])) || (($state['stage_status'] == waInstaller::STATE_ERROR) && ($state['heartbeat'])) || (($state['stage_name'] == waInstaller::STAGE_NONE) && ($state['heartbeat'] === false))) {
                 $updater->setState();
-                $this->view->assign('action', 'update');
-                $app_ids = waRequest::request('app_id');
-                $default_info = array('vendor' => waInstallerApps::VENDOR_SELF, 'edition' => '');
+                $state = $updater->getState();
 
-                $vendors = array();
-                if ($app_ids && is_array($app_ids)) {
-                    foreach ($app_ids as $app_id => & $info) {
-                        if (!is_array($info)) {
-                            if (strpos($info, ':') === false) {
-                                $vendor = $info;
-                                $edition = '';
-                            } else {
-                                list($vendor, $edition) = explode(':', $info, 2);
-                            }
-                            $info = array('vendor' => $vendor, 'edition' => $edition);
-                        } else {
-                            $info = array_merge($info, $default_info);
-                        }
-                        $vendors[] = $info['vendor'];
-                        unset($info);
-                    }
-                } else {
-                    $app_ids = array();
-                }
+                $apps = installerHelper::getInstaller();
 
-                $vendors = array_unique($vendors);
-                if (!$vendors) {
-                    $vendors = array();
-                }
-
-                $model = new waAppSettingsModel();
-                $license = $model->get('webasyst', 'license', false);
-                $locale = wa()->getLocale();
-                $apps = new waInstallerApps($license, $locale);
-                $app_list = $vendors ? $apps->getApplicationsList(false, $vendors) : array();
-                $model->ping();
+                $items = $apps->getUpdates(null, $this->getItemsList());
                 $queue_apps = array();
-                foreach ($app_list as & $info) {
-                    $app_id = $info['slug'];
+                $execute_actions = array(
+                    waInstallerApps::ACTION_INSTALL,
+                    waInstallerApps::ACTION_CRITICAL_UPDATE,
+                    waInstallerApps::ACTION_UPDATE,
+                );
 
-                    if ($app_id == 'installer') {
-                        $info['name'] = _w('Webasyst Framework');
-                    }
-                    if (isset($app_ids[$app_id])) {
-                        if (installerHelper::equals($app_ids[$app_id], $info)) {
-                            $queue_apps[] = $info;
+                foreach ($items as $app_id => $info) {
+                    if (!empty($info['download_url']) && in_array($info['action'], $execute_actions)) {
+                        $info['subject'] = 'app';
+                        if ($app_id == 'installer') {
+                            foreach ($info['download_url'] as $target => $url) {
+                                $_info = $info;
+                                $_info['download_url'] = $url;
+                                $_info['name'] = _w('Webasyst Framework').' ('.$target.')';
+                                $this->add($target, $_info);
+                                $queue_apps[$target] = $_info;
+                                unset($_info);
+                            }
+                        } else {
+                            $target = 'wa-apps/'.$app_id;
+                            $this->add($target, $info, $app_id);
+                            $queue_apps[$target] = $info;
                         }
                     }
 
-                    if (!empty($info['extras'])) {
-                        foreach ($info['extras'] as $type => & $extras) {
-                            foreach ($extras as $extra_id => & $extras_info) {
-                                $extras_id = $extras_info['slug'];
-                                $extras_info['name'] .= " ({$info['name']})";
-                                if (isset($app_ids[$extras_id]) && installerHelper::equals($app_ids[$extras_id], $extras_info)) {
-                                    $queue_apps[] = $extras_info;
+                    foreach (array('themes', 'plugins') as $type) {
+                        if (!empty($info[$type]) && is_array($info[$type])) {
+                            foreach ($info[$type] as $extra_id => $extras_info) {
+                                if (!empty($extras_info['download_url']) && in_array($extras_info['action'], $execute_actions)) {
+                                    $extras_info['subject'] = 'app_'.$type;
+                                    if (!empty($info['name'])) {
+                                        $extras_info['name'] .= " ({$info['name']})";
+                                    }
+                                    if (($type == 'themes') && is_array($extras_info['download_url'])) {
+                                        foreach ($extras_info['download_url'] as $target => $url) {
+                                            $__info = $extras_info;
+                                            $__info['download_url'] = $url;
+                                            $__info['slug'] = preg_replace('@^wa-apps/@', '', $target);
+                                            $__info['app'] = preg_replace('@^wa-apps/([^/]+)/.+$@', '$1', $target);
+                                            if (!isset($queue_apps[$target])) {
+                                                $this->add($target, $__info);
+                                                $queue_apps[$target] = $__info;
+                                            }
+                                        }
+                                    } else {
+                                        if (strpos($app_id, '/')) {
+                                            //XXXX
+                                            $target = $app_id.'/'.$extra_id;
+                                        } else {
+                                            $target = 'wa-apps/'.$app_id.'/'.$type.'/'.$extra_id;
+                                        }
+                                        $this->add($target, $extras_info, $target);
+                                        $queue_apps[$target] = $extras_info;
+                                    }
+
+
                                 }
                             }
-                            unset($extras_info);
                         }
-                        unset($extras);
                     }
                     unset($info);
                 }
 
-                $system_list = $apps->getSystemList();
-                foreach ($system_list as $item) {
-                    if (!empty($item['subject']) && ($item['subject'] == 'systemplugins') && isset($app_ids[$item['slug']])) {
-                        $queue_apps[] = $item;
-                    }
-                }
                 if (!$queue_apps) {
                     throw new waException(_w('Please select items for update'));
                 }
-                $this->view->assign('queue_apps', $queue_apps);
 
-                $this->view->assign('apps', $app_list);
-                $this->view->assign('install', waRequest::request('install'));
+                if (!waRequest::get('_')) {
+                    $this->setLayout(new installerBackendLayout());
+                    $this->getLayout()->assign('no_ajax', true);
+                }
+
+                $this->view->assign('action', 'update');
+                $this->view->assign('queue_apps', $queue_apps);
+                $install = waRequest::request('install');
+                $this->view->assign('install', !empty($install) ? 'install' : '');
                 $this->view->assign('title', _w('Updates'));
+                $this->view->assign('thread_id', $state['thread_id']);
+                $this->view->assign('return_url', waRequest::post('return_url'));
+                $cache = new waSerializeCache($this->getApp().'.'.$state['thread_id']);
+                $cache->set($this->urls);
             } else {
-                $this->redirect(array('module' => $module, 'msg' => installerMessage::getInstance()->raiseMessage(_w('Update is already in progress. Please wait while previous update session is finished before starting update session again.'), 'fail')));
+                $msg = _w('Update is already in progress. Please wait while previous update session is finished before starting update session again.');
+                $this->redirect(array(
+                    'module' => $this->module,
+                    'msg'    => installerMessage::getInstance()->raiseMessage($msg, installerMessage::R_FAIL),
+                ));
             }
         } catch (Exception $ex) {
-            $this->redirect(array('module' => $module, 'msg' => installerMessage::getInstance()->raiseMessage($ex->getMessage(), installerMessage::R_FAIL)));
+            $this->redirect(array(
+                'module' => $this->module,
+                'msg'    => installerMessage::getInstance()->raiseMessage($ex->getMessage(), installerMessage::R_FAIL),
+            ));
+        }
+    }
+
+    private function getItemsList()
+    {
+        $app_ids = waRequest::request('app_id');
+        $default_info = array('vendor' => waInstallerApps::VENDOR_SELF, 'edition' => '');
+
+        if ($app_ids && is_array($app_ids)) {
+            foreach ($app_ids as & $info) {
+                if (!is_array($info)) {
+                    if (strpos($info, ':') === false) {
+                        $vendor = $info;
+                        $edition = '';
+                    } else {
+                        list($vendor, $edition) = explode(':', $info, 2);
+                    }
+                    $info = array('vendor' => $vendor, 'edition' => $edition);
+                } else {
+                    $info = array_merge($info, $default_info);
+                }
+                $this->vendors[] = $info['vendor'];
+                unset($info);
+            }
+        } else {
+            $app_ids = array();
+        }
+
+        $this->vendors = array_unique($this->vendors);
+        return $app_ids;
+    }
+
+    protected function add($target, $info, $item_id = null)
+    {
+        $this->urls[$target] = array(
+            'source' => $info['download_url'],
+            'target' => $target,
+            'slug'   => $target,
+            'md5'    => !empty($info['md5']) ? $info['md5'] : null,
+        );
+
+        if ($item_id) {
+            $this->urls[$target] = array_merge($this->urls[$target], array(
+                'slug'    => $item_id,
+                'pass'    => false && ($this->getAppId() != $item_id),
+                'name'    => $info['name'],
+                'icon'    => $info['icon'],
+                'update'  => !empty($info['installed']),
+                'subject' => empty($info['subject']) ? 'system' : $info['subject'],
+                'edition' => empty($info['edition']) ? true : $info['edition'],
+            ));
+
         }
     }
 }

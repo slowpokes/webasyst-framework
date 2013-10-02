@@ -16,23 +16,31 @@ class installerAppsAction extends waViewAction
 {
     public function execute()
     {
-        $extended = false;
-        $this->view->assign('action', 'update');
-        $this->view->assign('error', false);
+        if (!waRequest::get('_')) {
+            $this->setLayout(new installerBackendLayout());
+        }
 
-        $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
-        $update_counter = null;
-        $this->view->assign('apps', installerHelper::getApps($messages, $update_counter));
-
-        installerHelper::checkUpdates($messages);
-
-        $this->view->assign('identity_hash', installerHelper::getHash());
-        $this->view->assign('messages', $messages);
-        $model = new waAppSettingsModel();
-        $this->view->assign('update_counter', $model->get($this->getApp(), 'update_counter'));
-
-        $this->view->assign('extended', $extended);
-        $this->view->assign('title', _w('Installer'));
+        $options = array(
+            'local'  => false, //retrieve only server info
+            'filter' => (array)waRequest::get('filter'),
+        );
+        try {
+            $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
+            $this->view->assign('apps', $apps = installerHelper::getInstaller()->getApps($options));
+            $vendor_name = null;
+            if (!empty($options['filter']['vendor']) && empty($vendor_name)) {
+                foreach ($apps as $app) {
+                    if (!empty($app['vendor_name'])) {
+                        $vendor_name = $app['vendor_name'];
+                        break;
+                    }
+                }
+            }
+            $this->view->assign('vendor_name', $vendor_name);
+        } catch (Exception $ex) {
+            $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
+            $this->view->assign('messages', $messages);
+        }
     }
 }
 //EOF

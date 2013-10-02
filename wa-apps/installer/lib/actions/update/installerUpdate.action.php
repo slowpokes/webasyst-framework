@@ -16,40 +16,43 @@ class installerUpdateAction extends waViewAction
 {
     public function execute()
     {
-        $this->view->assign('action', 'update');
+        $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
+
         $counter = array(
             'total'      => 0,
             'applicable' => 0,
             'payware'    => 0,
         );
-        $app_list = array();
-
-        $this->view->assign('error', false);
-        $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
+        $items = array();
         try {
-            $app_list = installerHelper::getApps($messages, $counter);
-            foreach ($app_list as & $info) {
-                if ($info['slug'] == 'installer') {
-                    $info['name'] = _w('Webasyst Framework');
-                    break;
-                }
-            }
-            unset($info);
-            $plugin_list = installerHelper::getSystemPlugins($messages, $counter);
+
+            $items = installerHelper::getUpdates();
+            $counter = installerHelper::getUpdatesCounter(null);
+            if (isset($items['installer'])) {
+                $items['installer']['name'] = _w('Webasyst Framework');
+            };
         } catch (Exception $ex) {
             $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
         }
 
         installerHelper::checkUpdates($messages);
+        if (!waRequest::get('_')) {
+            $this->setLayout(new installerBackendLayout());
+            if ($messages) {
+                $this->getLayout()->assign('messages', $messages);
+            }
+            $this->getLayout()->assign('update_counter', $counter['total']);
+            $this->getLayout()->assign('no_ajax', true);
+        } else {
+            $this->view->assign('messages', $messages);
+        }
 
-        $this->view->assign('messages', $messages);
-        //$this->view->assign('install_counter', $model->get($this->getApp(), 'install_counter'));
-        $this->getConfig()->setCount($counter['total'] ? $counter['total'] : null);
+        $this->view->assign('error', false);
         $this->view->assign('update_counter', $counter['total']);
         $this->view->assign('update_counter_applicable', $counter['applicable']);
-        $this->view->assign('apps', $app_list);
-        $this->view->assign('plugins', $plugin_list);
-        $this->view->assign('identity_hash', installerHelper::getHash());
+        $this->view->assign('items', $items);
+        $this->view->assign('domain', installerHelper::getDomain());
+
         $this->view->assign('title', _w('Updates'));
     }
 }

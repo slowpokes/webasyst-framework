@@ -14,83 +14,43 @@
 
 class installerAppsRemoveAction extends waViewAction
 {
+    /**
+     * @var waInstallerApps
+     */
+    private $apps;
+    private $options = array(
+        'log'    => false,
+        'config' => false,
+    );
+
     function execute()
     {
-        $module = 'apps';
-        $url = parse_url(waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
-        if (preg_match('/(^|&)module=(update|apps|plugins)($|&)/', $url, $matches)) {
-            $module = $matches[2];
-        }
-
         $app_ids = waRequest::get('app_id');
         try {
-            if (!$app_ids || !is_array($app_ids)) {
-                throw new waException(_w('Application not found'));
-            }
-            $vendors = array();
-            foreach ($app_ids as $app_id=>&$info) {
-                if (!is_array($info)) {
-                    $info = array('vendor'=>$info);
-                }
-                $vendors[] = $info['vendor'];
-                unset($info);
-            }
-            $vendors = array_unique($vendors);
-
-            $apps = new waInstallerApps();
-            $app_list = $apps->getApplicationsList(true, $vendors);
-            $deleted_apps = array();
-
             if (installerHelper::isDeveloper()) {
                 throw new waException(_w('Unable to delete application (developer version is on)'));
             }
+
+            if (!$app_ids || !is_array($app_ids)) {
+                throw new waException(_w('Application not found'));
+            }
+            foreach ($app_ids as &$info) {
+                if (!is_array($info)) {
+                    $info = array('vendor' => $info);
+                }
+            }
+            unset($info);
+
+            $this->apps = new waInstallerApps();
+            $app_list = $this->apps->getApps(array('installed' => true));
+            $deleted_apps = array();
             foreach ($app_list as $info) {
                 $app_id = $info['slug'];
                 if (isset($app_ids[$app_id]) && ($app_ids[$app_id]['vendor'] == $info['vendor'])) {
-                    if (isset($info['system']) && $info['system']) {
+                    if (!empty($info['installed']['system'])) {
                         throw new waException(sprintf(_w('Can not delete system application "%s"'), $info['name']));
                     }
-                    $apps->updateRoutingConfig($app_id, false);
-                    $apps->updateAppConfig($app_id, null);
-                    //remove db tables and etc
-
-                    $paths = array();
-
-                    $app_instance = waSystem::getInstance($app_id);
-                    $plugins = $app_instance->getConfig()->getPlugins();
-                    foreach ($plugins as $plugin_id => $plugin) {
-                        if ($plugin && ($plugin_instance = $app_instance->getPlugin($plugin_id))) {
-                            $plugin_instance->uninstall();
-                        }
-                        $apps->updateAppPluginsConfig($app_id, $plugin_id, null);
-
-                        //wa-apps/$app_id/plugins/$slug
-                        $paths[] = wa()->getAppPath("plugins/{$plugin_id}", $app_id);
-                        foreach ($paths as $path) {
-                            waFiles::delete($path, true);
-                        }
-                        $paths = array();
-                    }
-
-                    $app_instance->getConfig()->uninstall();
-                    //XXX called at uninstall
-                    //$paths[] = wa()->getAppCachePath(null, $app_id);//wa-cache/apps/$app_id/
-                    $paths[] = wa()->getTempPath(null, $app_id);//wa-cache/temp/$app_id/
-                    $paths[] = wa()->getAppCachePath(null, $app_id);//wa-cache/apps/$app_id/
-
-                    $paths[] = wa()->getDataPath(null, true, $app_id);//wa-data/public/$app_id/
-                    $paths[] = wa()->getDataPath(null, false, $app_id);//wa-data/protected/$app_id/
-                    //XXX uncomplete code
-                    //$paths[] = wa()->   null, false, $app_id);//wa-log/$app_id/
-                    //XXX uncomplete code
-                    //$paths[] = wa()->getAppPath(null, $app_id);//wa-config/$app_id/
-
-                    $paths[] = wa()->getAppPath(null, $app_id);//wa-apps/$app_id/
-
-                    foreach ($paths as $path) {
-                        waFiles::delete($path, true);
-                    }
-                    $deleted_apps[] = $info['name'];
+                    $deleted_apps[] = $this->deleteApp($app_id);
                 }
             }
             if (!$deleted_apps) {
@@ -99,12 +59,72 @@ class installerAppsRemoveAction extends waViewAction
             $message = _w('Application %s has been deleted', 'Applications %s have been deleted', min(2, count($deleted_apps)), false);
             $message = sprintf($message, implode(', ', $deleted_apps));
             $msg = installerMessage::getInstance()->raiseMessage($message);
-            $this->redirect(array('module'=>$module, 'msg'=>$msg));
-        } catch(Exception $ex) {
+        } catch (Exception $ex) {
             $msg = installerMessage::getInstance()->raiseMessage($ex->getMessage(), installerMessage::R_FAIL);
-            $this->redirect(array('module'=>$module, 'msg'=>$msg));
+        }
+        //'module' => installerHelper::getModule(),
+        $this->redirect(array('msg' => $msg));
+    }
+
+    private function deleteApp($app_id)
+    {
+        //remove db tables and etc
+
+        $paths = array();
+
+        /**
+         * @var waAppConfig
+         */
+        $app = SystemConfig::getAppConfig($app_id);
+        $info = $app->getInfo();
+        $system = wa($app_id);
+
+        /**
+         * @var waAppConfig $config;
+         */
+        $config = $system->getConfig();
+
+        if (!empty($info['plugins'])) {
+            $plugins = $config->getPlugins();
+            foreach ($plugins as $plugin => $enabled) {
+                if ($enabled && ($plugin_instance = $system->getPlugin($plugin))) {
+                    $plugin_instance->uninstall();
+                }
+                $this->apps->updateAppPluginsConfig($app_id, $plugin, null);
+
+                //wa-apps/$app_id/plugins/$slug
+                $paths[] = wa()->getAppPath("plugins/".$plugin, $app_id);
+                while ($path = array_shift($paths)) {
+                    waFiles::delete($path, true);
+                }
+                $paths = array();
+            }
         }
 
+        $config->uninstall();
+        $this->apps->updateAppConfig($app_id, null);
+        $paths[] = wa()->getTempPath(null, $app_id); //wa-cache/temp/$app_id/
+        $paths[] = wa()->getAppCachePath(null, $app_id); //wa-cache/apps/$app_id/
+
+        $paths[] = wa()->getDataPath(null, true, $app_id); //wa-data/public/$app_id/
+        $paths[] = wa()->getDataPath(null, false, $app_id); //wa-data/protected/$app_id/
+        if ($this->options['log']) {
+            $paths[] = wa()->getAppPath(null, false, $app_id); //wa-log/$app_id/
+        }
+        if ($this->options['config']) {
+            $paths[] = wa()->getAppPath(null, $app_id); //wa-config/$app_id/
+        }
+
+        $paths[] = wa()->getAppPath(null, $app_id); //wa-apps/$app_id/
+
+        foreach ($paths as $path) {
+            try {
+                waFiles::delete($path, true);
+            } catch (waException $ex) {
+                //TODO log it
+            }
+        }
+        return $info['name'];
     }
 }
 //EOF

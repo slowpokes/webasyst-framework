@@ -16,43 +16,99 @@ class installerThemesViewAction extends waViewAction
 {
     public function execute()
     {
+
         $filter = array();
 
         $filter['enabled'] = true;
         $filter['extras'] = 'themes';
 
-        $app = false;
-        $messages = array();
-        $applications = installerHelper::getApps($messages, $update_counter, $filter);
+        $options = array(
+            'installed' => true,
+        );
+        $applications = installerHelper::getInstaller()->getApps($options, $filter);
+
 
         $search = array();
 
-        $search['slug'] = $app_id = waRequest::get('slug');
-        $search['vendor'] = waRequest::get('vendor', 'webasyst');
-        $themes = wa()->getThemes($search['slug']);
+        $search['slug'] = array($app_id = waRequest::get('slug'));
+        $search['slug'] = array_unique($search['slug']);
 
-        if (array_filter($search, 'strlen') && ($app = installerHelper::search($applications, $search))) {
-            foreach($app['extras']['themes'] as $id => $info) {
-                if(!isset($themes[$id])) {
-                    $themes[$id] = new waTheme($id,$search['slug'], true);
-                    $themes[$id]['name'] = $info['name'];
-                    $themes[$id]['description'] = $info['description'];
-                }
-                if(!empty($info['payware'])) {
-                    $themes[$id]['payware'] = $info['payware'];
-                }
-                if(!empty($info['img'])) {
-                    $themes[$id]['cover'] = $info['img'];
+        $search['vendor'] = waRequest::get('vendor', 'webasyst');
+        $installer = installerHelper::getInstaller();
+
+
+        $options = array(
+            'local'     => true,
+            'apps'      => true,
+            'filter'    => (array)waRequest::get('filter'),
+            'inherited' => array_keys($applications),
+        );
+        $list = $installer->getExtras($search['slug'], 'themes', $options);
+        /**
+         * @var $themes waTheme[]
+         */
+        $themes = array();
+        $inherited = array();
+        foreach ($list as $id => $item_list) {
+            if (!empty($item_list['themes'])) {
+                foreach ($item_list['themes'] as $theme_id => $theme) {
+                    if (($id == $app_id) || !empty($theme['inherited'][$app_id])) {
+                        $themes[$theme_id] = new waTheme($theme_id, $app_id, true);
+                        $themes[$theme_id]['name'] = empty($theme['name']) ? $theme_id : $theme['name'];
+                        $themes[$theme_id]['description'] = empty($theme['description']) ? '' : $theme['description'];
+
+                        if (!empty($theme['price'])) {
+                            $themes[$theme_id]['price'] = $theme['price'];
+                        }
+                        if (isset($theme['commercial'])) {
+                            $themes[$theme_id]['commercial'] = $theme['commercial'];
+                        }
+                        if (!empty($theme['icon'])) {
+                            $themes[$theme_id]['cover'] = $theme['icon'];
+                        }
+                        if (!isset($inherited[$theme_id])) {
+                            $inherited[$theme_id] = array();
+                        }
+
+                        if (!empty($theme['inherited'])) {
+                            $inherited[$theme_id] = array_merge($inherited[$theme_id], $theme['inherited']);
+                        }
+
+                        if (!isset($inherited[$theme_id][$id])) {
+                            $inherited[$theme_id][$id] = array(
+                                'slug' => $id.'/themes/'.$theme_id,
+                            );
+                        }
+                    } else {
+                        if (!isset($inherited[$theme_id])) {
+                            $inherited[$theme_id] = array();
+                        }
+
+                        if (!empty($theme['inherited'])) {
+                            $inherited[$theme_id] = array_merge($inherited[$theme_id], $theme['inherited']);
+                        }
+                    }
                 }
             }
-
-            $this->view->assign('themes', $themes);
-            $this->view->assign('messages', $messages);
-            $this->view->assign('app_id', $app_id);
-            $this->view->assign('app', $app);
-            $this->view->assign('slug', $search['slug']);
-            $this->view->assign('vendor', $search['vendor']);
         }
+        foreach ($themes as $theme_id => &$theme) {
+            $theme['inherited'] = $inherited[$theme_id];
+        }
+
+        $app = $installer->getItemInfo($app_id);
+
+        $this->view->assign('themes', $themes);
+        $this->view->assign('app_id', $app_id);
+        $this->view->assign('app', $app);
+        $this->view->assign('slug', $search['slug']);
+        $this->view->assign('vendor', $search['vendor']);
+        $return_url = waRequest::get('return_url', waRequest::server('HTTP_REFERER'));
+        if ($return_hash = waRequest::get('return_hash')) {
+            if ($return_hash = preg_replace('@^#@', '', $return_hash)) {
+                $return_url .= '#'.$return_hash;
+            }
+        }
+        $this->view->assign('return_url', $return_url);
     }
 }
 //EOF

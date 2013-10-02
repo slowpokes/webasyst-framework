@@ -20,7 +20,7 @@ class installerPluginsRemoveAction extends installerExtrasRemoveAction
         $this->extras_type = 'plugins';
     }
 
-    protected function removeExtras($app_id, $extras_id, $info)
+    protected function removeExtras($app_id, $extras_id)
     {
         try {
             $paths = array();

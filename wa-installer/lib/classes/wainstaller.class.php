@@ -61,6 +61,7 @@ class waInstaller
 
     private $log_level;
     private $log_handler;
+    private $env;
 
     private static $root_path;
     private static $update_path;
@@ -92,10 +93,11 @@ class waInstaller
         $this->thread_id = $thread_id ? $thread_id : self::makeThread();
 
         if (!self::$registered) {
-            ini_set('unserialize_callback_func', 'spl_autoload_call');
-            ini_set('include_path', './');
-            if (false === spl_autoload_register(array('waInstaller', 'autoload'))) {
-                throw new Exception(sprintf('Unable to register %s::autoload as an autoloading method.', get_class(self::getInstance())));
+            @ini_set('unserialize_callback_func', 'spl_autoload_call');
+            @ini_set('include_path', './');
+            $method = array(__CLASS__, 'autoload');
+            if (false === spl_autoload_register($method)) {
+                throw new Exception(sprintf('Unable to register %s::%s  as an autoloading method.', $method[0], $method[1]));
             } else {
                 self::$registered = true;
             }
@@ -128,95 +130,32 @@ class waInstaller
      * @todo partial copy
      *
      * @throws Exception
-     * @param $update_list <pre>array(
-     * 		'source'=>uri|path string,
-     * 		'md5'=>string,
-     * 		'target'=>string,
-     * )</pre>
-     * @return array()
+     * @param $update_list array[][string]string
+     * @param $update_list[]['source'] array[][string]string Source path or URI
+     * @param $update_list[]['target'] array[][string]string Target path
+     * @param $update_list[]['slug'] array[][string]string Update item slug ()
+     * @param $update_list[]['md5'] array[][string]string MD5 of source archive (optional)
+     *
+     * @return array[][string]mixed
+     * @return array[]['skipped']boolean
+     * @return array[]['source']mixed
+     * @return array[]['source']mixed
+     * @return array[]['source']mixed
+     * @return array[]['source']mixed
+     * @return array[]['source']mixed
+     * @return array[]['source']mixed
      */
     public function update($update_list)
     {
+        $update_path = self::$update_path.$this->thread_id.'/';
+        $download_path = $update_path.'download/';
         try {
-            $update_path = self::$update_path.$this->thread_id.'/';
-            $download_path = $update_path.'download/';
-
-            $targets = array();
-            foreach ($update_list as & $update) {
-                $update['target'] = self::formatPath($update['target']).'/';
-                $update['target'] = preg_replace('@(^|/)\.\./@', '/', $update['target']);
-                $update['extract_path'] = $update_path.'update/'.$update['target'];
-                if (!isset($update['pass'])) {
-                    $update['pass'] = false;
-                }
-                if (!isset($update['skipped'])) {
-                    $update['skipped'] = false;
-                }
-                $founded = false;
-                foreach ($targets as $id => $target) {
-                    if (strpos($target, $update['target']) === 0) {
-                        $founded = true;
-                        if (strlen($target) > strlen($update['target'])) {
-                            $targets[$id] = $update['target'];
-                        }
-                        break;
-
-                    } elseif (strpos($update['target'], $target) === 0) {
-                        $founded = true;
-                        break;
-                    }
-
-                }
-                if (!$founded) {
-                    $targets[] = $update['target'];
-                }
-                unset($update);
-            }
-
-            foreach ($update_list as & $update) {
-                $update['dependent'] = false;
-                foreach ($targets as $id => $target) {
-                    if (strpos($update['target'], $target) === 0) {
-                        if (strlen($target) < strlen($update['target'])) {
-                            $update['dependent'] = true;
-                        }
-                        break;
-                    }
-
-                }
-                unset($update);
-            }
-
-            $this->writeLog(__METHOD__.' tree', self::LOG_DEBUG, array('targets' => $targets, 'update_list' => $update_list));
-
-            #sort
-            uasort($update_list, array(__CLASS__, 'sortUpdateList'));
-
-            $session_id = session_id();
-            if ($session_id) {
-                if (function_exists('wa') && method_exists($wa = wa(), 'getStorage')) {
-                    $wa->getStorage()->close();
-                } else {
-                    session_write_close();
-                }
-            }
-
-            if ($this->log_level >= self::LOG_DEBUG) {
-                $this->writeLog('callback', self::LOG_DEBUG, self::debug_backtrace_custom());
-            }
-
-            $error_level = error_reporting();
-            $display_errors = ini_get('display_errors');
-            $error_reporting = ini_get('error_reporting');
-            @ini_set('display_errors', true);
-            @ini_set('error_reporting', E_ALL & ~E_NOTICE);
-            error_reporting(E_ALL & ~E_NOTICE);
-            ignore_user_abort(true);
-
-            $this->writeLog('Register error handler', self::LOG_TRACE, ob_start(__CLASS__.'::obHandler'));
-            self::$ob_skip = false;
+            $this->formatUpdateList($update_list, $update_path);
+            $this->envSet();
 
             $resume = false;
+
+            self::$ob_skip = false;
 
             //TODO write statistics into stage operations
 
@@ -324,32 +263,26 @@ class waInstaller
             //$this->current_stage = 'update_'.self::STATE_COMPLETE;
             //$this->current_chunk_id = 'total';
             //$this->setState();
-            $this->writeLog(__METHOD__, self::LOG_DEBUG, array('source' => $update_list));
+            $this->writeLog(__METHOD__, self::LOG_DEBUG, compact('update_list'));
             self::$ob_skip = true;
-            error_reporting($error_level);
-            @ini_set('display_errors', $display_errors);
-            @ini_set('error_reporting', $error_reporting);
-            if ($session_id) {
-                if ($wa) {
-                    $wa->getStorage()->open();
-                } else {
-                    session_start();
-                }
-            }
+            $this->envReset();
             return $update_list;
         } catch (Exception $ex) {
             $this->cleanupPath($update_path, true);
-            $this->writeLog($ex->getMessage(), self::LOG_WARNING, array('source' => $update_list));
-            if ($session_id) {
-                if ($wa) {
-                    $wa->getStorage()->open();
-                } else {
-                    session_start();
-                }
-            }
+            $this->writeLog($ex->getMessage(), self::LOG_WARNING, compact('update_list'));
+            $this->envReset();
             self::$ob_skip = true;
             throw $ex;
         }
+    }
+
+    /**
+     *
+     * @todo complete code
+     */
+    public function verify()
+    {
+
     }
 
     public function flush()
@@ -384,10 +317,110 @@ class waInstaller
         return ($a['pass'] < $b['pass']) ? -1 : 1;
     }
 
+    private function envSet()
+    {
+        $this->env = array();
+        $this->env['session_id'] = session_id();
+        if ($this->env['session_id']) {
+            if (function_exists('wa') && method_exists($wa = wa(), 'getStorage')) {
+                $wa->getStorage()->close();
+            } else {
+                session_write_close();
+            }
+        }
+
+        if ($this->log_level >= self::LOG_DEBUG) {
+            $this->writeLog('callback', self::LOG_DEBUG, self::debug_backtrace_custom());
+        }
+
+        $this->env['error_level'] = error_reporting();
+        $this->env['display_errors'] = ini_get('display_errors');
+        $this->env['error_reporting'] = ini_get('error_reporting');
+        @ini_set('display_errors', true);
+        @ini_set('error_reporting', E_ALL & ~E_NOTICE);
+        error_reporting(E_ALL & ~E_NOTICE);
+        ignore_user_abort(true);
+        $this->writeLog('Register ob error handler', self::LOG_TRACE, ob_start(__CLASS__.'::obHandler'));
+    }
+
+    private function envReset()
+    {
+        error_reporting($this->env['error_level']);
+        @ini_set('display_errors', $this->env['display_errors']);
+        @ini_set('error_reporting', $this->env['error_reporting']);
+        if ($this->env['session_id']) {
+            if (function_exists('wa') && method_exists($wa = wa(), 'getStorage')) {
+                $wa->getStorage()->open();
+            } else {
+                session_start();
+            }
+        }
+    }
+
+    private function formatUpdateList(&$update_list, $update_path)
+    {
+        $targets = array();
+        foreach ($update_list as & $update) {
+            $update['target'] = self::formatPath($update['target']).'/';
+            $update['target'] = preg_replace('@(^|/)\.\./@', '/', $update['target']);
+            $update['extract_path'] = $update_path.'update/'.$update['target'];
+            if (!isset($update['pass'])) {
+                $update['pass'] = false;
+            }
+            if (!isset($update['skipped'])) {
+                $update['skipped'] = false;
+            }
+
+            $founded = false;
+            foreach ($targets as $id => $target) {
+                if (strpos($target, $update['target']) === 0) {
+                    $founded = true;
+                    if (strlen($target) > strlen($update['target'])) {
+                        $targets[$id] = $update['target'];
+                    }
+                    break;
+
+                } elseif (strpos($update['target'], $target) === 0) {
+                    $founded = true;
+                    break;
+                }
+
+            }
+            if (!$founded) {
+                $targets[] = $update['target'];
+            }
+            unset($update);
+        }
+
+        foreach ($update_list as & $update) {
+            $update['dependent'] = false;
+            foreach ($targets as $target) {
+                if (strpos($update['target'], $target) === 0) {
+                    if (strlen($target) < strlen($update['target'])) {
+                        $update['dependent'] = true;
+                    }
+                    break;
+                }
+
+            }
+            unset($update);
+        }
+
+        $this->writeLog(__METHOD__.' tree', self::LOG_DEBUG, array(
+            'targets'     => $targets,
+            'update_list' => $update_list,
+        ));
+
+        #sort
+        uasort($update_list, array(__CLASS__, 'sortUpdateList'));
+        return $targets;
+    }
+
     /**
      *
      * @param $action
      * @param $pass
+     * @throws Exception
      * @return mixed
      */
     private function run($action, $pass)
@@ -397,12 +430,11 @@ class waInstaller
             $allowed_methods = get_class_methods(__CLASS__);
         }
         $args = func_get_args();
-        $action = array_shift($args);
-        $pass = array_shift($args);
+        $args = array_slice($args, 2);
         try {
             $method_name = 'stage'.ucfirst($action);
             if (!in_array($method_name, $allowed_methods)) {
-                throw new Excpetion("Not allowed stage {$action}");
+                throw new Exception("Not allowed stage {$action}");
             }
             $this->current_stage = $action.'_'.self::STATE_HEARTBEAT;
             $this->setState();
@@ -434,8 +466,9 @@ class waInstaller
      * Prepare paths for update
      * @todo optional check file changes
      * @param $download_path
-     * @param $extrac_path
+     * @param $extract_path
      * @param $target_path
+     * @internal param $extrac_path
      * @return int
      */
     private function stagePrepare($download_path, $extract_path, $target_path)
@@ -464,8 +497,8 @@ class waInstaller
     }
 
     /**
-     * @todo exctract download code into separate class and add more wrappers
-     * (http,https,ftp,svn and other storages) support as primary or plugins
+     * @todo extract download code into separate class and add more wrappers
+     * (http,https,ftp,svn and other sources) support as primary or plugins
      * @throws Exception
      * @param $source_file
      * @param $temporary_path
@@ -474,23 +507,24 @@ class waInstaller
      */
     private function stageDownload($source_file, $temporary_path, $md5 = null)
     {
+        $header_md5 = null;
+        $target_file = null;
+        $real_content_length = null;
         try {
-            $header_md5 = null;
-
             if (preg_match('@^https?://@', $source_file) && $this->curlAvailable()) {
                 try {
-                    list($target_file, $content_length) = $this->downloadCurl($source_file, $temporary_path);
+                    list($target_file, $content_length, $header_md5) = $this->downloadCurl($source_file, $temporary_path);
                 } catch (Exception $ex) {
                     $this->writeLog($ex->getMessage(), self::LOG_ERROR);
-                    //attemp to download via fopen
-                    list($target_file, $content_length, $header_md5) = $this->downloadStandart($source_file, $temporary_path);
+                    //attempt to download via standard wrapper
+                    list($target_file, $content_length, $header_md5) = $this->downloadStandard($source_file, $temporary_path);
                 }
             } else {
-                list($target_file, $content_length, $header_md5) = $this->downloadStandart($source_file, $temporary_path);
+                list($target_file, $content_length, $header_md5) = $this->downloadStandard($source_file, $temporary_path);
             }
 
-            //TODO check target file size (and retry to download it if uncomplete)
-            if ($content_length && ($real_content_length = filesize($target_file)) && ($content_length != $real_content_length)) {
+            //TODO check target file size (and retry to download it if incomplete)
+            if (!empty($content_length) && ($real_content_length = filesize($target_file)) && ($content_length != $real_content_length)) {
                 throw new Exception(sprintf(_w("Invalid file size. Expected %d but get %d"), $content_length, $real_content_length));
             }
 
@@ -501,9 +535,11 @@ class waInstaller
                 $this->writeLog('Invalid server response while file download', self::LOG_ERROR, $message);
                 throw new Exception(_w('Invalid server response while file download'));
             }
-            if ($header_md5) {
-                if (($header_md5 != $md5) && $md5) {
+            if ($header_md5 && ($header_md5 != $md5)) {
+                if ($md5) {
                     $this->writeLog(sprintf(_w('MD5 hash are changed from %s to %s'), $md5, $header_md5), self::LOG_WARNING);
+                } else {
+                    $this->writeLog(sprintf(_w('MD5 hash %s get from header'), $header_md5), self::LOG_TRACE);
                 }
                 $md5 = $header_md5;
             }
@@ -511,6 +547,8 @@ class waInstaller
             //check MD5 file hash
             if ($md5 && ($real_md5 = md5_file($target_file)) && (strcasecmp($md5, $real_md5) != 0)) {
                 throw new Exception(sprintf(_w("Invalid file md5 hash. Expected %s but get %s"), $md5, $real_md5));
+            } elseif (empty($md5)) {
+                $this->writeLog(sprintf(_w('MD5 hash missed for file %s'), $source_file), self::LOG_WARNING);
             }
             return $target_file;
         } catch (Exception $ex) {
@@ -522,35 +560,36 @@ class waInstaller
         }
     }
 
-    private function downloadStandart($source_file, $temporary_path)
+    private function downloadStandard($source, $temporary_path)
     {
         $source_stream = null;
         $target_stream = null;
+        $md5 = null;
         try {
             $this->writeLog(__METHOD__.' :download via fopen', self::LOG_TRACE);
             /**
              * @var integer describe download file size
              */
             $content_length = 0;
-            $target_file = null;
+            $target = null;
             //TODO calculate estimated time / speed
             //TODO allow resume downloading
-            $name = md5(preg_replace('/(\?.*$)/', '', $source_file));
+            $name = md5(preg_replace('/(\?.*$)/', '', $source));
 
             $default_socket_timeout = @ini_set('default_socket_timeout', self::TIMEOUT_SOCKET);
             //TODO use file_exists for local sources
-            $source_stream = @fopen($source_file, 'r');
+            $source_stream = @fopen($source, 'r');
             @ini_set('default_socket_timeout', $default_socket_timeout);
 
             if (!$source_stream) {
                 $hint = 'for details see update log;';
-                if (preg_match('@^([a-z\.]+)://@', $source_file, $matches)) {
+                if (preg_match('@^([a-z\.]+)://@', $source, $matches)) {
                     $wrappers = stream_get_wrappers();
                     if (!in_array($matches[1], $wrappers)) {
                         $hint .= " Stream {$matches[1]} not supported;";
                     }
                 }
-                if (preg_match('@^https?://@', $source_file) && !ini_get('allow_url_fopen')) {
+                if (preg_match('@^https?://@', $source) && !ini_get('allow_url_fopen')) {
                     $hint .= " PHP ini option 'allow_url_fopen' are disabled;";
                 }
 
@@ -564,13 +603,20 @@ class waInstaller
                     }
                 }
 
-                throw new Exception("Error while opening source stream [{$source_file}]. Hint: {$hint}");
+                throw new Exception("Error while opening source stream [{$source}]. Hint: {$hint}");
             } elseif (!empty($http_response_header)) {
                 //XXX ????
                 foreach ($http_response_header as $header) {
+                    $this->writeLog(__METHOD__, self::LOG_DEBUG, $header);
                     if (preg_match('@^X-license:\s+(\w+)$@i', $header, $matches)) {
                         waInstallerApps::setGenericOptions(array('license_key' => $matches[1]));
-                        break;
+                    } elseif (preg_match('@^Content-MD5:\s+(.+)$@i', $header, $matches)) {
+                        if (preg_match('@^[0-9A-F]{32}$@', $matches[1])) {
+                            $md5 = strtolower($matches[1]);
+                        } elseif ($matches = unpack('H*', base64_decode($matches[1])))
+                            if (preg_match('@^[0-9A-F]{32}$@i', $matches[1])) {
+                                $md5 = strtolower($matches[1]);
+                            }
                     }
                 }
             }
@@ -579,17 +625,17 @@ class waInstaller
 
             if (stream_is_local($source_stream)) {
                 fclose($source_stream);
-                $target_file = $source_file;
-                $this->writeLog(__METHOD__.' :Source file is local', self::LOG_TRACE, $target_file);
+                $target = $source;
+                $this->writeLog(__METHOD__.' :Source file is local', self::LOG_TRACE, $target);
             } else {
                 //TODO check target path rights
-                $target_file = self::formatPath(self::$root_path.$temporary_path.'/'.$name.'');
+                $target = self::formatPath(self::$root_path.$temporary_path.'/'.$name.'');
                 $this->mkdir($temporary_path);
-                $target_stream = @fopen($target_file, 'wb');
+                $target_stream = @fopen($target, 'wb');
                 if (!$target_stream) {
-                    throw new Exception("Error while write temporal download file {$target_file}");
+                    throw new Exception("Error while write temporal download file {$target}");
                 }
-                $this->writeLog(__METHOD__.' :Source file is distant', self::LOG_TRACE, array('source' => $source_file, 'target' => $target_file));
+                $this->writeLog(__METHOD__.' :Source file is distant', self::LOG_TRACE, array('source' => $source, 'target' => $target));
 
                 //{{Read source properties
                 list($content_length, $download_content_length, $buf) = $this->getStreamInfo($source_stream);
@@ -606,11 +652,11 @@ class waInstaller
                     if ($delta) {
                         $download_content_length += $delta;
                         if ($retry_counter) {
-                            $this->writeLog(__METHOD__.' complete server data transfer', self::LOG_TRACE, array('content_length' => $content_length, 'download_content_length' => $download_content_length, 'retry_counter' => $retry_counter, 'delta' => $delta));
+                            $this->writeLog(__METHOD__.' complete server data transfer', self::LOG_TRACE, compact('content_length', 'download_content_length', 'retry_counter', 'delta'));
                             $retry_counter = 0;
                         }
                     } else {
-                        $this->writeLog(__METHOD__.' wait server data transfer', self::LOG_TRACE, array('content_length' => $content_length, 'download_content_length' => $download_content_length, 'retry_counter' => $retry_counter, 'delta' => $delta));
+                        $this->writeLog(__METHOD__.' wait server data transfer', self::LOG_TRACE, compact('content_length', 'download_content_length', 'retry_counter', 'delta'));
                         sleep(3);
                     }
                     $performance = $this->setState(array('stage_current_value' => $download_content_length, 'debug' => $download_chunk_size));
@@ -622,7 +668,7 @@ class waInstaller
                 fclose($source_stream);
                 fclose($target_stream);
             }
-            return array($target_file, $content_length);
+            return array($target, $content_length, $md5);
         } catch (Exception $ex) {
             //write state and error message
             if ($source_stream && is_resource($source_stream)) {
@@ -635,31 +681,34 @@ class waInstaller
         }
     }
 
-    private function downloadCurl($source_file, $temporary_path)
+    private function downloadCurl($source, $temporary_path)
     {
+        $target_stream = null;
         try {
-            $name = md5(preg_replace('/(\?.*)$/', '', $source_file));
-            $target_file = self::formatPath(self::$root_path.$temporary_path.'/'.$name);
-            $this->writeLog(__METHOD__.' :download via cURL', self::LOG_TRACE, array('source' => $source_file, 'target' => $target_file));
+            $name = md5(preg_replace('/(\?.*)$/', '', $source));
+            $target = self::formatPath(self::$root_path.$temporary_path.'/'.$name);
+            $this->writeLog(__METHOD__.' :download via cURL', self::LOG_TRACE, compact('source', 'target'));
             $this->mkdir($temporary_path);
-            $target_stream = @fopen($target_file, 'wb');
+            $target_stream = @fopen($target, 'wb');
             if (!$target_stream) {
-                throw new Exception("Error while write temporal download file {$target_file}");
+                throw new Exception("Error while write temporal download file {$target}");
             }
 
             $content_length = 0;
             $download_content_length = 0;
-            $ch = $this->getCurl($source_file);
+            $header_md5 = null;
+            $ch = $this->getCurl($source);
 
             $this->stage_data_stack = array(
                 'stream'              => & $target_stream,
                 'stage_value'         => & $content_length,
                 'stage_current_value' => & $download_content_length,
+                'stream_md5'          => & $header_md5,
             );
 
-            $res = curl_exec($ch);
+            curl_exec($ch);
             if ($errno = curl_errno($ch)) {
-                $message = "Curl error: {$errno}# ".curl_error($ch)." at [{$source_file}]";
+                $message = "Curl error: {$errno}# ".curl_error($ch)." at [{$source}]";
                 throw new Exception($message);
             }
 
@@ -673,9 +722,9 @@ class waInstaller
 
             $this->setState(array('stage_value' => $content_length, 'stage_current_value' => $download_content_length));
 
-            return array($target_file, $content_length);
+            return array($target, $content_length, $header_md5);
         } catch (Exception $ex) {
-            if ($ch) {
+            if (!empty($ch)) {
                 curl_close($ch);
             }
             if ($target_stream && is_resource($target_stream)) {
@@ -703,14 +752,13 @@ class waInstaller
 
     public function curlWriteHandler($ch, $chunk)
     {
-        $size = 0;
-        if ($this->stage_data_stack['stream'] && is_resource($this->stage_data_stack['stream'])) {
-            $size = fwrite($this->stage_data_stack['stream'], $chunk);
-            $this->stage_data_stack['stage_current_value'] += $size;
-            $this->writeLog(__METHOD__, self::LOG_DEBUG, curl_getinfo($ch));
-        } else {
+
+        if (!$this->stage_data_stack['stream'] || !is_resource($this->stage_data_stack['stream'])) {
             throw new Exception('Invalid write stream');
         }
+        $size = fwrite($this->stage_data_stack['stream'], $chunk);
+        $this->stage_data_stack['stage_current_value'] += $size;
+        $this->writeLog(__METHOD__, self::LOG_DEBUG, curl_getinfo($ch));
         $state_data = array(
             'stage_value'         => $this->stage_data_stack['stage_value'],
             'stage_current_value' => $this->stage_data_stack['stage_current_value'],
@@ -719,26 +767,47 @@ class waInstaller
         return $size;
     }
 
+    /**
+     * @param $ch object
+     * @param $header
+     * @return int
+     */
     public function curlHeaderHandler($ch, $header)
     {
-        $this->writeLog(__METHOD__, self::LOG_DEBUG, $header);
         $header_matches = null;
-        if (preg_match('/content-length:\s*(\d+)/i', $header, $header_matches)) {
+        $field = false;
+        if (preg_match('@content-length:\s*\b(\d+)\b@i', $header, $header_matches)) {
             $this->stage_data_stack['stage_value'] = intval($header_matches[1]);
+            $field = 'stage_value';
+        } elseif (preg_match('@^content-md5:\s+(.+)$@i', $header, $header_matches)) {
+            if (preg_match('@^[0-9A-F]{32}$@', $header_matches[1])) {
+                $this->stage_data_stack['stream_md5'] = strtolower($header_matches[1]);
+                $field = 'stream_md5';
+            } elseif ($header_matches = unpack('H*', base64_decode($header_matches[1])))
+                if (preg_match('@^[0-9A-F]{32}$@i', $header_matches[1])) {
+                    $this->stage_data_stack['stream_md5'] = strtolower($header_matches[1]);
+                    $field = 'stream_md5';
+                }
+        }
+        if ($field) {
+            $value = $this->stage_data_stack[$field];
+            $this->writeLog(__METHOD__, self::LOG_DEBUG, compact('header', 'header_matches', 'value'));
         }
         return strlen($header);
     }
 
     /**
      * @todo add more types support (tar.gz - new or backup, svn and etc)
-     * @throws Exception
+     *
      * @param $compressed_file
      * @param $target_path
+     * @param string $base_path
+     * @throws Exception
      * @return boolean
      */
     private function stageExtract($compressed_file, $target_path, $base_path = '')
     {
-        $this->writeLog(__METHOD__, self::LOG_TRACE, array('compressed_file' => $compressed_file, 'target_path' => $target_path, 'base_path' => $base_path));
+        $this->writeLog(__METHOD__, self::LOG_TRACE, compact('compressed_file', 'target_path', 'base_path'));
 
         //TODO test open archive
         //TODO check write permissions/file contents
@@ -764,6 +833,12 @@ class waInstaller
         return $result;
     }
 
+    /**
+     * Get path size
+     * @param string $source_path
+     * @throws Exception
+     * @return int
+     */
     private function checkRequiredSpace($source_path)
     {
         $source_size = 0;
@@ -773,7 +848,7 @@ class waInstaller
             throw new Exception(_w("Invalid file permissions").' '.$source_path);
         }
         $disk_free_space = disk_free_space(self::$root_path);
-        $this->writeLog(__FUNCTION__, self::LOG_TRACE, array('disk_free_space' => $disk_free_space, 'total_copy_size' => $source_size));
+        $this->writeLog(__FUNCTION__, self::LOG_TRACE, compact('disk_free_space', 'source_size'));
         if ($disk_free_space && ($source_size > $disk_free_space)) {
             throw new Exception("Not enough disk space. Required at least {$source_size} but get {$disk_free_space}");
         }
@@ -784,6 +859,10 @@ class waInstaller
      * Copy current version into temp path
      * @param $source_path
      * @param $target_path
+     * @param int $source_size
+     * @param int $mode
+     * @param int $level
+     * @throws Exception
      * @return boolean
      */
     private function stageCopy($source_path, $target_path, $source_size = 0, $mode = 0777, $level = 0)
@@ -793,7 +872,7 @@ class waInstaller
         static $copied_size = 0;
         static $last_copied_size = 0;
         static $chunk_size = 1048576;
-        $this->writeLog(__METHOD__, self::LOG_TRACE, array('source_path' => $source_path, 'target_path' => $target_path, 'source_size' => $source_size));
+        $this->writeLog(__METHOD__, self::LOG_TRACE, compact('source_path', 'target_path', 'source_size'));
         if (!$level) {
             $copied_size = 0;
             $last_copied_size = 0;
@@ -824,7 +903,7 @@ class waInstaller
                                 }
                             } elseif (is_link($source)) {
                                 //TODO copy symlink for new path
-                                } else {
+                            } else {
                                 if (!file_exists($destiny)) { //skip file move on resume
                                     if (@copy($source, $destiny)) {
                                         if (false) {
@@ -836,7 +915,7 @@ class waInstaller
                                     } else {
                                         if (file_exists($destiny) && (filesize($source) === 0)) {
                                             //It's ok - it's windows
-                                            } else {
+                                        } else {
                                             throw new Exception("error on copy from {$source_path}/{$path} to {$target_path}/{$path}");
                                         }
                                     }
@@ -858,12 +937,13 @@ class waInstaller
                 closedir($dir);
                 return true;
             } catch (Exception $ex) {
-                if ($dir && is_resource($dir)) {
+                if (!empty($dir) && is_resource($dir)) {
                     closedir($dir);
                 }
                 throw $ex;
             }
         }
+        return false;
     }
 
     private function getSpaceUsage($path, &$size)
@@ -882,7 +962,7 @@ class waInstaller
                                 if (is_dir($full_path)) {
                                     if ($path_name == '.svn') {
                                         //throw new Exception("Update at developer instance are disabled\n (<b>{$file_path}</b> founded)");
-                                        }
+                                    }
                                     if ($this->skipPath($path_name)) {
 
                                     } else {
@@ -890,7 +970,7 @@ class waInstaller
                                     }
                                 } elseif (is_link($full_path)) {
                                     //skip symlinks
-                                    } else {
+                                } else {
                                     $size += filesize($full_path);
                                 }
                             } else {
@@ -905,12 +985,12 @@ class waInstaller
                     closedir($dir);
                 } elseif (is_link($full_path)) {
                     //skip symlinks
-                    } else {
+                } else {
                     $size += filesize($full_path);
                 }
             }
         } catch (Exception $ex) {
-            if ($dir && is_resource($dir)) {
+            if (!empty($dir) && is_resource($dir)) {
                 closedir($dir);
             }
             throw $ex;
@@ -922,13 +1002,14 @@ class waInstaller
      * @param $source_path string
      * @param $target_path string
      * @param $store_prev boolean
+     * @throws Exception
      * @return string backup directory paty
      */
     private function stageReplace($source_path, $target_path, $store_prev = false)
     {
         $target_path = self::formatPath($target_path);
         $source_path = self::formatPath($source_path);
-        $this->writeLog(__METHOD__, self::LOG_TRACE, array('source_path' => $source_path, 'target_path' => $target_path, 'store_prev' => $store_prev));
+        $this->writeLog(__METHOD__, self::LOG_TRACE, compact('source_path', 'target_path', 'store_prev'));
         $backup_path = false;
         $prev_backup_path = false;
         try {
@@ -960,7 +1041,7 @@ class waInstaller
             if ($backup_path) {
                 $this->mkdir(preg_replace('@/[^/]+[/\\\\]+$@', '/', $backup_path.'/'));
                 if ($this->rename($target_path, $backup_path)) {
-                    $this->writeLog(__METHOD__.' backup current version code', self::LOG_TRACE, array('backup_path' => $backup_path));
+                    $this->writeLog(__METHOD__.' backup current version code', self::LOG_TRACE, compact('backup_path'));
                     if ((strpos($target_path, '.') !== false) && file_exists(self::$root_path.'.'.$target_path.'.md5')) {
 
                     }
@@ -970,7 +1051,7 @@ class waInstaller
             }
             if (strpos($target_path, '.') === false) {
                 if ($this->rename($source_path, $target_path)) {
-                    $this->writeLog(__METHOD__.' replace current version code', self::LOG_TRACE, array('target_path' => $target_path));
+                    $this->writeLog(__METHOD__.' replace current version code', self::LOG_TRACE, compact('target_path'));
                 } else {
                     //roll back rename
                     if ($backup_path) {
@@ -1007,14 +1088,14 @@ class waInstaller
         $result = false;
         if (@rename(self::$root_path.$oldname, self::$root_path.$newname) || sleep(3) || @rename(self::$root_path.$oldname, self::$root_path.$newname)) {
             $result = true;
-            $this->writeLog(__METHOD__.' replace current version code', self::LOG_TRACE, array('oldname' => $oldname, 'newname' => $newname));
+            $this->writeLog(__METHOD__.' replace current version code', self::LOG_TRACE, compact('oldname', 'newname'));
         }
         return $result;
     }
 
     private function stageCleanup($paths)
     {
-        foreach ((array) $paths as $path => $skip_directory) {
+        foreach ((array)$paths as $path => $skip_directory) {
             if (!is_bool($skip_directory)) {
                 $path = $skip_directory;
                 $skip_directory = false;
@@ -1029,21 +1110,20 @@ class waInstaller
         return true;
     }
 
+    /**
+     *
+     * Verify extracted files hashes
+     * @param string $path
+     * @param boolean $purge_obsolete_files
+     * @param array $hash
+     * @return bool
+     * @throws Exception
+     */
     private function stageVerify($path, $purge_obsolete_files = false, $hash = array())
     {
         try {
             $path = self::formatPath($path);
-            $hash_path = self::$root_path.$path.'/'.self::HASH_PATH;
-            if (file_exists($hash_path)) {
-                if ($hashes = explode("\n", file_get_contents($hash_path))) {
-                    foreach ($hashes as $line) {
-                        if ($line && preg_match('/^([0-9a-f]{32})\s+\*(.*)$/', $line, $matches)) {
-                            $hash[$path.'/'.$matches[2]] = $matches[1];
-                        }
-                    }
-                    $this->writeLog(var_export($hash, true), self::LOG_DEBUG);
-                }
-            }
+            $hash = $this->getHash($path, $hash);
             $dir = opendir(self::$root_path.$path);
             while (false !== ($name = readdir($dir))) {
                 if (($name != '.') && ($name != '..')) {
@@ -1060,6 +1140,7 @@ class waInstaller
                                 }
                             } else {
                                 $this->writeLog("File {$relative_path} is obsolete", self::LOG_WARNING);
+                                /* optional (re)move obsolete files */
                                 if ($purge_obsolete_files) {
                                     $this->writeLog("File {$relative_path} deleted ".(@unlink($file) ? 'success' : 'fail'), self::LOG_WARNING);
                                 }
@@ -1073,7 +1154,7 @@ class waInstaller
             closedir($dir);
             return true;
         } catch (Exception $ex) {
-            if ($dir && is_resource($dir)) {
+            if (!empty($dir) && is_resource($dir)) {
                 closedir($dir);
             }
             throw $ex;
@@ -1097,7 +1178,8 @@ class waInstaller
     /**
      *
      * @param $paths
-     * @param $skip_directory
+     * @param bool $skip_directory
+     * @throws Exception
      * @return void
      */
     private function cleanupPath($paths, $skip_directory = false)
@@ -1106,7 +1188,7 @@ class waInstaller
         if (!$timestamp) {
             $timestamp = microtime(true);
         }
-        foreach ((array) $paths as $path) {
+        foreach ((array)$paths as $path) {
             try {
 
                 if (file_exists(self::$root_path.$path)) {
@@ -1132,7 +1214,7 @@ class waInstaller
                     }
                 }
             } catch (Exception $ex) {
-                if ($dir && is_resource($dir)) {
+                if (!empty($dir) && is_resource($dir)) {
                     closedir($dir);
                 }
                 throw $ex;
@@ -1143,7 +1225,7 @@ class waInstaller
     /**
      * Get current state details
      * @return array
-     * @todo use structrure for returned data
+     * @todo use structure for returned data
      */
     public function getState()
     {
@@ -1161,11 +1243,11 @@ class waInstaller
         $path = self::$root_path.self::PATH_STATE;
         if (file_exists($path)) {
             if (($data = file_get_contents($path)) && ($data = base64_decode($data, true))) {
-                $state = array_merge($state, (array) unserialize($data));
+                $state = array_merge($state, (array)unserialize($data));
             } elseif (sleep(1) || ($data = file_get_contents($path)) && ($data = base64_decode($data, true))) {
-                $state = array_merge($state, (array) unserialize($data));
+                $state = array_merge($state, (array)unserialize($data));
             } elseif (sleep(1) || ($data = file_get_contents($path)) && ($data = base64_decode($data, true))) {
-                $state = array_merge($state, (array) unserialize($data));
+                $state = array_merge($state, (array)unserialize($data));
             } else {
                 $state['stage_name'] = self::STAGE_NONE;
                 $state['stage_status'] = self::STATE_ERROR;
@@ -1196,7 +1278,7 @@ class waInstaller
         if (isset($state['stage_value']) && isset($state['stage_current_value']) && ($state['stage_current_value'] > 0) && ($state['stage_value'] > 0)) {
             $state['stage_estimated_time'] = $state['stage_elapsed_time'] * $state['stage_value'] / $state['stage_current_value'];
             //$state['stage_estimated_time'] -= $state['stage_elapsed_time'];
-            } else {
+        } else {
             $state['stage_estimated_time'] = false;
         }
 
@@ -1244,9 +1326,9 @@ class waInstaller
 
     /**
      *
-     * @param $state
-     * @param $state_params
-     * @return unknown_type
+     * @param array $state_params
+     * @internal param $state
+     * @return float
      */
     public function setState($state_params = array())
     {
@@ -1351,11 +1433,11 @@ class waInstaller
         $fstate = array();
         if (file_exists($path)) {
             if (($data = file_get_contents($path)) && ($data = base64_decode($data, true))) {
-                $fstate = (array) unserialize($data);
+                $fstate = (array)unserialize($data);
             }
         }
         //HACK for PHP < 5.2.14 - json_encode work incorrect for float
-        $res = array_walk_recursive($fstate, create_function('&$val, $key', '$val = preg_match("/^-?\d+(\.|,)\d+$/",$val)?intval($val):$val;'));
+        array_walk_recursive($fstate, create_function('&$val, $key', '$val = preg_match("/^-?\d+(\.|,)\d+$/",$val)?intval($val):$val;'));
         switch ($mode) {
             case 'stage':
                 $state_ = array();
@@ -1380,8 +1462,8 @@ class waInstaller
                     }
                 }
                 $state__ = array();
-                foreach ($state_ as $stage => $stages) {
-                    foreach ($stages as $app => $info) {
+                foreach ($state_ as $stages) {
+                    foreach ($stages as $info) {
                         $state__[] = $info;
                     }
                 }
@@ -1397,8 +1479,7 @@ class waInstaller
 
     private function skipPath($path)
     {
-        return false;
-        return (preg_match('/(\.update$|\.backup$|\.backup\.[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}-[\d]{2}-[\d]{2}$)/', $path) ? true : false);
+        return false && (preg_match('/(\.update$|\.backup$|\.backup\.[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}-[\d]{2}-[\d]{2}$)/', $path) ? true : false);
     }
 
     private static function formatPath($path)
@@ -1407,69 +1488,87 @@ class waInstaller
         return preg_replace('@([/\\\\]+)$@', '', $path);
     }
 
+    private function getHash($path, $hash = array())
+    {
+
+        $hash_path = self::$root_path.$path.'/'.self::HASH_PATH;
+        if (file_exists($hash_path)) {
+            if ($hashes = explode("\n", file_get_contents($hash_path))) {
+                foreach ($hashes as $line) {
+                    if ($line && preg_match('/^([0-9a-f]{32})\s+\*(.*)$/', $line, $matches)) {
+                        $hash[$path.'/'.$matches[2]] = $matches[1];
+                    }
+                }
+                $this->writeLog(var_export($hash, true), self::LOG_DEBUG);
+            }
+        }
+        return $hash;
+    }
+
     private function writeLog($message, $log_level = self::LOG_WARNING, $debug_data = null)
     {
         static $log_counter = 0;
+        $names = array(
+            self::LOG_DEBUG   => 'DEBUG',
+            self::LOG_TRACE   => 'TRACE',
+            self::LOG_WARNING => 'WARNING',
+            self::LOG_ERROR   => 'ERROR',
+        );
         if ($log_level >= $this->log_level) {
             $this->mkdir(dirname(self::PATH_LOG));
+            $log_level_name = isset($names[$log_level]) ? $names[$log_level] : '-';
             //TODO add date log modifier
             if ($this->log_handler || ($this->log_handler = fopen(self::$root_path.self::PATH_LOG, ($this->log_level > self::LOG_DEBUG ? 'w' : 'a')))) {
-                $log_level_name = '';
-                switch ($log_level) {
-                    case self::LOG_DEBUG:
-                        $log_level_name = 'DEBUG';
-                        break;
-                    case self::LOG_TRACE:
-                        $log_level_name = 'TRACE';
-                        break;
-                    case self::LOG_WARNING:
-                        $log_level_name = 'WARNING';
-                        break;
-                    case self::LOG_ERROR:
-                        $log_level_name = 'ERROR';
-                        break;
-                    default:
-                        $log_level_name = '-';
-                        break;
+                $memory_usage = function_exists('memory_get_usage') ? sprintf('%0.2fMb', memory_get_usage() / 1048576) : 'unknown';
+                $memory_peak = function_exists('memory_get_peak_usage') ? sprintf('%0.2fMb', memory_get_peak_usage() / 1048576) : 'unknown';
+                if ($debug_data) {
+                    $debug_data = "\n{".str_repeat('-', 60)."\n".var_export($debug_data, true)."\n}".str_repeat('-', 60);
                 }
+                fwrite($this->log_handler, date('c').sprintf('%05d', ++$log_counter)."\t{$this->thread_id}\t{$log_level_name}\t{$memory_usage}\t{$memory_peak}\t{$this->current_stage}\n{$message}".$debug_data."\n");
             }
-            $memory_usage = function_exists('memory_get_usage') ? sprintf('%0.2fMb', memory_get_usage() / 1048576) : 'unknown';
-            $memory_peak = function_exists('memory_get_peak_usage') ? sprintf('%0.2fMb', memory_get_peak_usage() / 1048576) : 'unknown';
-            fwrite($this->log_handler, date('c').sprintf('%05d', ++$log_counter)."\t{$this->thread_id}\t{$log_level_name}\t{$memory_usage}\t{$memory_peak}\t{$this->current_stage}\n{$message}".($debug_data ? ("\n{".str_repeat('-', 60)."\n".var_export($debug_data, true)."\n}".str_repeat('-', 60)) : '')."\n");
         }
     }
 
     private function protect($path)
     {
         if (preg_match('`^(wa-data/protected|wa-log|wa-cache|wa-config)/`', $path, $matches)) {
-            $htaccess_path = $matches[1].'/.htaccess';
-            if (!file_exists(self::$root_path.$htaccess_path)) {
-                if ($fp = fopen(self::$root_path.$htaccess_path, 'w')) {
+            $htaccess = $matches[1].'/.htaccess';
+            if (!file_exists(self::$root_path.$htaccess)) {
+                if ($fp = fopen(self::$root_path.$htaccess, 'w')) {
                     fwrite($fp, "Deny from all\n");
                     fclose($fp);
-                    $this->writeLog(__METHOD__, self::LOG_DEBUG, array('path' => $path, 'file' => $htaccess_path));
+                    $this->writeLog(__METHOD__, self::LOG_DEBUG, compact('path', 'htaccess'));
                 } else {
-                    $this->writeLog(__METHOD__, self::LOG_ERROR, array('path' => $path, 'file' => $htaccess_path));
+                    $this->writeLog(__METHOD__, self::LOG_ERROR, compact('path', 'htaccess'));
                     throw new Exception("Error while attempt protect {$path}");
                 }
             }
         }
     }
 
-    private function mkdir($target_path, $mode = 0777)
+    private function mkdir($pathname, $mode = 0777)
     {
-        if (!file_exists(self::$root_path.$target_path)) {
-            if (!mkdir(self::$root_path.$target_path, $mode & 0777, true)) {
-                throw new Exception("Error on make dir {$target_path}");
-            } else {
-                $this->writeLog(__METHOD__, self::LOG_DEBUG, array('path' => $target_path, 'mode' => $mode));
-                $this->protect($target_path);
-            }
-        } elseif (!is_dir(self::$root_path.$target_path)) {
-            throw new Exception("Error on make dir {$target_path} - it's a file");
+        $success = false;
+        try {
+            if (!file_exists(self::$root_path.$pathname)) {
+                if (!mkdir(self::$root_path.$pathname, $mode & 0777, true)) {
+                    throw new Exception("Error on make dir {$pathname}");
+                } else {
+                    $this->writeLog(__METHOD__, self::LOG_DEBUG, compact('pathname', 'mode'));
+                    $success = true;
+                    $this->protect($pathname);
+                }
+            } elseif (!is_dir(self::$root_path.$pathname)) {
+                throw new Exception("Error on make dir {$pathname} - it's a file");
 
-        } elseif (!is_writable(self::$root_path.$target_path)) {
-            throw new Exception("Error on access {$target_path} write forbidden");
+            } elseif (!is_writable(self::$root_path.$pathname)) {
+                throw new Exception("Error on access {$pathname} write forbidden");
+            }
+        } catch (Exception $e) {
+            if (!$success) {
+                $this->writeLog(__METHOD__, self::LOG_ERROR, compact('pathname', 'mode'));
+            }
+            throw $e;
         }
     }
 
@@ -1494,7 +1593,7 @@ class waInstaller
         if (count($performance_data[$stage]) > $stack_length) {
             array_shift($performance_data[$stage]);
             $calculated_chunk = array_sum($performance_data[$stage]) / $stack_length;
-            $this->writeLog(__METHOD__, self::LOG_DEBUG, array($current_chunk, $calculated_chunk, $performance_data, $stack_length));
+            $this->writeLog(__METHOD__, self::LOG_DEBUG, compact('current_chunk', 'calculated_chunk', 'performance_data', 'stack_length'));
             $calculated_chunk = min($calculated_chunk, $current_chunk * 2);
             $calculated_chunk = max($calculated_chunk, $current_chunk / 2);
         } else {
@@ -1533,15 +1632,15 @@ class waInstaller
             $curl_options = array();
         }
         $curl_default_options = array(
-            CURLOPT_HEADER => 0,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_TIMEOUT => self::TIMEOUT_SOCKET * 60,
-            CURLOPT_CONNECTTIMEOUT => self::TIMEOUT_SOCKET,
+            CURLOPT_HEADER            => 0,
+            CURLOPT_RETURNTRANSFER    => 1,
+            CURLOPT_TIMEOUT           => self::TIMEOUT_SOCKET * 60,
+            CURLOPT_CONNECTTIMEOUT    => self::TIMEOUT_SOCKET,
             CURLE_OPERATION_TIMEOUTED => self::TIMEOUT_SOCKET * 60,
             CURLOPT_DNS_CACHE_TIMEOUT => 3600,
-            CURLOPT_BINARYTRANSFER => true,
-            CURLOPT_WRITEFUNCTION => array(&$this, 'curlWriteHandler'),
-            CURLOPT_HEADERFUNCTION => array(&$this, 'curlHeaderHandler'),
+            CURLOPT_BINARYTRANSFER    => true,
+            CURLOPT_WRITEFUNCTION     => array(&$this, 'curlWriteHandler'),
+            CURLOPT_HEADERFUNCTION    => array(&$this, 'curlHeaderHandler'),
         );
 
         if ((version_compare(PHP_VERSION, '5.4', '>=') || !ini_get('safe_mode')) && !ini_get('open_basedir')) {
@@ -1553,19 +1652,13 @@ class waInstaller
             }
         }
         $curl_options[CURLOPT_URL] = $url;
-        $options_fields = array(
-            'host'     => 'PROXY_HOST',
-            'port'     => 'PROXY_PORT',
-            'user'     => 'PROXY_USER',
-            'password' => 'PROXY_PASS',
-        );
         $options = array();
 
-        if (isset($options['host']) && strlen($options['host'])) {
+        if (!empty($options['host'])) {
             $curl_options[CURLOPT_HTTPPROXYTUNNEL] = true;
-            $curl_options[CURLOPT_PROXY] = sprintf("%s%s", $options['host'], (isset($options['port']) && $options['port']) ? ':'.$options['port'] : '');
+            $curl_options[CURLOPT_PROXY] = sprintf("%s%s", $options['host'], !empty($options['port']) ? ':'.$options['port'] : '');
 
-            if (isset($options['user']) && strlen($options['user'])) {
+            if (!empty($options['user'])) {
                 $curl_options[CURLOPT_PROXYUSERPWD] = sprintf("%s:%s", $options['user'], $options['password']);
             }
         }
@@ -1592,8 +1685,9 @@ class waInstaller
         }
 
         $header_matches = null;
+        $content_length = null;
         foreach ($headers as $header) {
-            if (preg_match('/content-length:\s*(\d+)/i', $header, $header_matches)) {
+            if (preg_match('@content-length:\s*\b(\d+)\b@i', $header, $header_matches)) {
                 $content_length = intval($header_matches[1]);
                 break;
             }
@@ -1601,7 +1695,7 @@ class waInstaller
 
         $status = 200;
         $status_description = 'none';
-        //check server responce codes (500/404/403/302/301/etc)
+        //check server response codes (500/404/403/302/301/etc)
         foreach ($headers as $header) {
             if (preg_match('@http/\d+\.\d+\s+(\d+)\s+(.+)$@i', $header, $header_matches)) {
                 $status = intval($header_matches[1]);
@@ -1618,6 +1712,7 @@ class waInstaller
             'headers'          => $headers,
             'content_length'   => $content_length,
             'status'           => "{$status} ({$status_description})",
+            'seekable'         => $stream_seekable,
         );
 
         $this->writeLog(__METHOD__.' :Source file headers', self::LOG_DEBUG, $debug_data);
@@ -1693,7 +1788,7 @@ class waInstaller
                             $args[] = 'Array('.count($arg).')';
                         } else {
                             //$args[] = var_export($arg,true);
-                            }
+                        }
                     }
                     $backtrace_item['function'] = $backtrace_item['class'].$backtrace_item['type'].$backtrace_item['function'].'('.implode(', ', $args).')';
                     unset($backtrace_item['class']);
@@ -1710,4 +1805,3 @@ class waInstaller
         return $backtrace;
     }
 }
-?>

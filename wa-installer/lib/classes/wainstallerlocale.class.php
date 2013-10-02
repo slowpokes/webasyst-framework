@@ -39,7 +39,7 @@ class waInstallerLocale
 
     private function detect()
     {
-        $lang = isset($_POST['lang']) ? $_POST['lang'] : (isset($_GET['lang']) ? $_GET['lang'] : false);
+        $lang = !empty($_POST['lang']) ? $_POST['lang'] : (!empty($_GET['lang']) ? $_GET['lang'] : false);
 
         $locales = self::listAvailable();
         if ($lang) {
@@ -114,8 +114,8 @@ class waInstallerLocale
         $string = isset(self::$strings[$this->locale][$string]) ? self::$strings[$this->locale][$string] : $string;
         if (count($args)) {
             $args[0] = $string;
-            if ($formated = @call_user_func_array('sprintf', $args)) {
-                $string = $formated;
+            if ($formatted = @call_user_func_array('sprintf', $args)) {
+                $string = $formatted;
             } else {
                 $string = implode(', ', $args);
             }

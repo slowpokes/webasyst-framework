@@ -20,12 +20,12 @@ class installerThemesRemoveAction extends installerExtrasRemoveAction
         $this->extras_type = 'themes';
     }
 
-    protected function removeExtras($app_id, $extras_id, $info)
+    protected function removeExtras($app_id, $extras_id)
     {
 
         $paths = array();
         $paths[] = wa()->getTempPath(null, $app_id);//wa-cache/temp/$app_id/
-        //wa-apps/$app_id/extrass/$slug
+        //wa-apps/$app_id/extras/$slug
         $paths[] = wa()->getAppPath("{$this->extras_type}/{$extras_id}", $app_id);
         $paths[] = wa()->getAppCachePath(null, $app_id);//wa-cache/apps/$app_id/
 

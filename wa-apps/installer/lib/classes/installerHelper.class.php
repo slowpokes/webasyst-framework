@@ -12,6 +12,8 @@ class installerHelper
      */
     private static $installer;
 
+    private static $counter;
+
     /**
      *
      * @return waInstallerApps
@@ -22,14 +24,31 @@ class installerHelper
             self::$model = new waAppSettingsModel();
         }
         if (!self::$installer) {
-            self::$installer = new waInstallerApps(self::$model->get('webasyst', 'license', false), wa()->getLocale(), 600, waRequest::get('refresh') ? true : false);
+            $license = self::$model->get('webasyst', 'license', false);
+            $ttl = 600;
+            $locale = wa()->getSetting('locale', wa()->getLocale(), 'webasyst');
+            self::$installer = new waInstallerApps($license, $locale, $ttl, !!waRequest::get('refresh'));
         }
         return self::$installer;
     }
 
+    /**
+     *
+     * Get hash of installed framework
+     * @return string
+     */
     public static function getHash()
     {
         return self::getInstaller()->getHash();
+    }
+
+    /**
+     * Get current domain name
+     * @return string
+     */
+    public static function getDomain()
+    {
+        return self::getInstaller()->getDomain();
     }
 
     public static function checkUpdates(&$messages)
@@ -51,115 +70,58 @@ class installerHelper
 
     }
 
-    public static function getApps(&$messages, &$update_counter = null, $filter = array())
+    /**
+     *
+     * @param array $filter
+     * @param array[string]string $filter['extras'] select apps with specified extras type
+     * @return array
+     * @throws Exception
+     */
+    public static function getApps($filter = array())
     {
-        if ($update_counter !== null) {
-            $update_counter = is_array($update_counter) ? array_merge(array_fill_keys(array('total', 'applicable', 'payware'), 0), $update_counter) : intval($update_counter);
-        }
-        $app_list = array();
-
-        try {
-            $app_list = self::getInstaller()->getApplicationsList(false, array(), wa()->getDataPath('images', true), $messages);
-            self::$model->ping();
-            if ($update_counter !== null) {
-                $minimize = is_array($update_counter) ? true : false;
-                $update_counter = waInstallerApps::getUpdateCount($app_list, $minimize, $update_counter);
-                self::$model->ping();
-
-            }
-
-        } catch (Exception $ex) {
-            if ($messages === null) {
-                throw $ex;
-            } else {
-                $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
-            }
-        }
-
-        foreach ($app_list as $key => & $item) {
-            if ($item['slug'] == 'developer') {
-                $item['downloadable'] = $item['current'] ? true : false;
-                break;
-            }
-        }
-        unset($item);
-
-        if ($filter) {
-            foreach ($app_list as $key => & $item) {
-
-                if (!empty($filter['enabled']) && empty($item['enabled']) && empty($item['current'])) { //not present
-                    unset($app_list[$key]);
-                    continue;
-                }
-
-                if (!empty($filter['extras'])) {
-                    $extras = $filter['extras'];
-                    if (empty($item['current'][$extras]) || empty($item['extras'][$extras])) { //themes not supported or not available
-                        unset($app_list[$key]);
-                        continue;
-                    }
-                }
-
-            }
-            unset($item);
-        }
-        return $app_list;
+        return self::getInstaller()->getApps(array(), $filter);
     }
 
-    public static function getSystemPlugins(&$messages, &$update_counter = null, $filter = array())
+    public static function getUpdatesCounter($field = 'total')
     {
-        if ($update_counter !== null) {
-            $update_counter = is_array($update_counter) ? array_merge(array_fill_keys(array('total', 'applicable', 'payware'), 0), $update_counter) : intval($update_counter);
+        if (empty(self::$counter)) {
+            self::getUpdates();
         }
-        try {
-            $items = self::getInstaller()->getSystemList();
-            $types = array();
+        return $field ? self::$counter[$field] : self::$counter;
+    }
 
-            $icons = array(
-                'sms'      => 'icon16 mobile',
-                'payment'  => 'icon16 dollar',
-                'shipping' => 'icon16 box',
-            );
-            $translate = array(
-                'sms'      => _w('SMS'),
-                'payment'  => _w('Payment'),
-                'shipping' => _w('Shipping'),
+    public static function getUpdates($vendor = null)
+    {
+        static $items = null;
+        if ($items === null) {
+            self::$counter = array(
+                'total'      => 0,
+                'applicable' => 0,
+                'payware'    => 0,
             );
 
-            foreach ($items as $id => $item) {
-                if (!empty($item['subject']) && ($item['subject'] == 'systemplugins')) {
-                    $t = $item['type_slug'];
-                    if (empty($types[$t])) {
-                        $types[$t] = array(
-                            'name'    => isset($translate[$t]) ? $translate[$t] : null,
-                            'icon'    => isset($icons[$t]) ? $icons[$t] : null,
-                            'plugins' => array(),
-                        );
+            $items = self::getInstaller()->getUpdates($vendor);
+            foreach ($items as $item) {
+                if (isset($item['version'])) {
+                    ++self::$counter['total'];
+                    if (!empty($item['applicable'])) {
+                        ++self::$counter['applicable'];
                     }
-                    $types[$t]['plugins'][$item['id']] = $item;
-
+                }
+                foreach (array('themes', 'plugins') as $extras) {
+                    if (isset($item[$extras])) {
+                        self::$counter['total'] += count($item[$extras]);
+                        foreach ($item[$extras] as $extras_item) {
+                            if (!empty($extras_item['applicable'])) {
+                                ++self::$counter['applicable'];
+                            }
+                        }
+                    }
                 }
             }
-            $minimize = is_array($update_counter) ? true : false;
-            foreach ($types as & $items) {
-                if ($update_counter !== null) {
-                    $update_counter = waInstallerApps::getUpdateCount($items['plugins'], $minimize, $update_counter);
-                    self::$model->ping();
-                }
-            }
-
-            self::$model->ping();
-            unset($items);
-        } catch(Exception $ex) {
-            if ($messages === null) {
-                throw $ex;
-            } else {
-                $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
-            }
-            $types = array();
+            wa('installer')->getConfig()->setCount(self::$counter['total'] ? self::$counter['total'] : null);
         }
-
-        return $types;
+        return $items;
     }
 
     public static function isDeveloper()
@@ -185,25 +147,33 @@ class installerHelper
      * Search first entry condition
      * @param array $items
      * @param array $filter
+     * @param bool $return_key
      * @return mixed
      */
-    public static function search($items, $filter)
+    public static function &search($items, $filter, $return_key = false)
     {
-        $match = null;
-        foreach ($items as & $item) {
+        $matches = array();
+
+        foreach ($items as $key => $item) {
             $matched = true;
             foreach ($filter as $field => $value) {
-                if ($value && ($item[$field] != $value)) {
-                    $matched = false;
-                    break;
+                if ($value) {
+                    if (is_array($value)) {
+                        if (!in_array($item[$field], $value)) {
+                            $matched = false;
+                            break;
+                        }
+                    } elseif ($item[$field] != $value) {
+                        $matched = false;
+                        break;
+                    }
                 }
             }
             if ($matched) {
-                $match = $item;
-                break;
+                $matches[] = $return_key ? $key : $items[$key];
             }
         }
-        return $match;
+        return $matches;
     }
 
     /**
@@ -227,5 +197,32 @@ class installerHelper
         }
 
         return $equals;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getModule()
+    {
+        $module = 'apps';
+        $url = parse_url(waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
+        if (preg_match('/(^|&)module=(update|apps|plugins)($|&)/', $url, $matches)) {
+            $module = $matches[2];
+        }
+        return $module;
+    }
+
+    /**
+     * @param Exception $ex
+     * @param $messages
+     * @throws Exception
+     */
+    private static function handleException($ex, &$messages)
+    {
+        if ($messages === null) {
+            throw $ex;
+        } else {
+            $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
+        }
     }
 }

@@ -22,7 +22,7 @@ class installerSettingsRemoveAction extends waViewAction
             if ($settings) {
                 $model = new waAppSettingsModel();
                 $changed = false;
-                foreach ((array)$settings as $setting) {
+                foreach ((array) $settings as $setting) {
                     if (in_array($setting, array('auth_form_background'))) {
                         if ($value = $model->get('webasyst', $setting)) {
                             waFiles::delete(wa()->getDataPath($value, true, 'webasyst'));
@@ -34,19 +34,19 @@ class installerSettingsRemoveAction extends waViewAction
                     $model->set('webasyst', $setting, false);
                 }
                 if ($changed) {
-                    $message[] =_w('Settings saved');
+                    $message[] = _w('Settings saved');
                 }
             }
             $params = array(
-				'module'=>'settings',
-				'msg'=>installerMessage::getInstance()->raiseMessage(implode(', ', $message)),
+                'module' => 'settings',
+                'msg'    => installerMessage::getInstance()->raiseMessage(implode(', ', $message)),
             );
             $this->redirect($params);
-        } catch(waException $ex) {
+        } catch (waException $ex) {
             $msg = installerMessage::getInstance()->raiseMessage($ex->getMessage(), installerMessage::R_FAIL);
             $params = array(
-				'module'=>'settings',
-				'msg'=>$msg
+                'module' => 'settings',
+                'msg'    => $msg
             );
             $this->redirect($params);
         }

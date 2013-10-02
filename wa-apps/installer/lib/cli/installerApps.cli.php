@@ -5,7 +5,8 @@ class installerAppsCli extends waCliController
     {
         $params = waRequest::param();
         $installer = new waInstallerApps();
-        $list = $installer->getApplicationsList(true);
+        $list = $installer->getVersions();
+        //TODO check it
         $fields = array();
         if (isset($params['full'])) {
             $fields = array(
@@ -16,11 +17,11 @@ class installerAppsCli extends waCliController
         }
         $apps = array();
         foreach ($list as $item) {
-            if (!empty($item['enabled']) && !empty($item['current'])) {
-                if ($id = ifset($item['current']['id'])) {
+            if (!empty($item['enabled']) && !empty($item['installed'])) {
+                if ($id = ifset($item['installed']['id'])) {
                     $apps[$id] = array();
                     foreach ($fields as $field => $name) {
-                        $apps[$id][$field] = ifset($item['current'][$field]);
+                        $apps[$id][$field] = ifset($item['installed'][$field]);
                     }
                 }
 

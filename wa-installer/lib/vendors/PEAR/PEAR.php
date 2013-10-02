@@ -417,7 +417,7 @@ class PEAR
     /**
      * This method checks unsets an error code if available
      *
-     * @param mixed error code
+     * @param mixed $error_code
      * @return bool true if the error code was unset, false otherwise
      * @access private
      * @since PHP 4.3.0
@@ -588,7 +588,9 @@ class PEAR
      * message, code and userinfo are enough.
      *
      * @param string $message
-     *
+     * @param null $code
+     * @param null $userinfo
+     * @return PEAR_Error
      */
     function &throwError($message = null,
                          $code = null,
@@ -1117,4 +1119,3 @@ class PEAR_Error
  * c-basic-offset: 4
  * End:
  */
-?>

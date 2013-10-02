@@ -22,12 +22,11 @@ class installerSettingsClearCacheController extends waJsonController
             waFiles::protect($path_cache);
             $app_path = waConfig::get('wa_path_apps');
 
-            $apps = new waInstallerApps();
 
-			$app_list = $apps->getApplicationsList(true);
+            $app_list = array();
+            //XXX check it
             foreach ($app_list as $app) {
-
-                if (isset($app['enabled']) && $app['enabled']) {
+                if (!empty($app['installed'])) {
                     $path_cache = $app_path.'/'.$app['slug'].'/js/compiled';
                     waFiles::delete($path_cache, true);
                 }

@@ -23,7 +23,6 @@ class installerSettingsAction extends waViewAction
             //'auth_type'				=> 'login',
             'auth_form_background'         => null,
             'auth_form_background_stretch' => 1,
-            //'license'=>'',
             'locale'                       => 'ru_RU',
             'email'                        => '',
             'rememberme'                   => 1,
@@ -45,10 +44,9 @@ class installerSettingsAction extends waViewAction
         $flush = false;
         $message = array();
         try {
-            $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
             foreach ($settings as $setting => & $value) {
                 if (waRequest::post() && !in_array($setting, array('auth_form_background'))) {
-                    $post_value = waRequest::post($setting, '', 'string_trim');
+                    $post_value = waRequest::post($setting, '', waRequest::TYPE_STRING_TRIM);
                     if (!is_null($post_value)) {
                         $model->set('webasyst', $setting, $post_value);
                         $changed = true;
@@ -71,10 +69,8 @@ class installerSettingsAction extends waViewAction
                     $value = isset($config_values[$setting]) ? $config_values[$setting] : false;
                     switch ($type) {
                         case 'boolean':
-                            {
-                                $value = $value ? true : false;
-                                break;
-                            }
+                            $value = $value ? true : false;
+                            break;
                     }
                     if (!isset($config[$setting]) || ($config[$setting] !== $value)) {
                         $config[$setting] = $value;
@@ -153,6 +149,9 @@ class installerSettingsAction extends waViewAction
                 $params = array();
                 $params['module'] = 'settings';
                 $params['msg'] = installerMessage::getInstance()->raiseMessage(implode(', ', $message));
+                if ($t = waRequest::get('_')) {
+                    $params['_'] = $t;
+                }
                 $this->redirect($params);
             }
 
@@ -164,23 +163,31 @@ class installerSettingsAction extends waViewAction
             );
             if ($message) {
                 //$params['success'] = base64_encode(implode(', ', $message));
-                }
+            }
             $this->redirect($params);
         }
 
-        $this->view->assign('update_counter', $model->get($this->getApp(), 'update_counter'));
-        //$this->view->assign('install_counter', $model->get($this->getApp(), 'install_counter'));
-        $apps = wa()->getApps();
-        $version = $apps['installer']['version'];
-        if (abs(time() - $apps['installer']['build']) > 2) {
-            $version .= '.'.$apps['installer']['build'];
+        if (!waRequest::get('_')) {
+            $this->setLayout(new installerBackendLayout());
+            $this->getLayout()->assign('no_ajax', true);
+        } else {
+            $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
+            $this->view->assign('messages', $messages);
+        }
+
+        $installer_info = array(
+            'build'   => time(),
+            'version' => '1.0.1',
+        );
+        $version = $installer_info['version'];
+        if (abs(time() - $installer_info['build']) > 2) {
+            $version .= '.'.$installer_info['build'];
         }
         $this->view->assign('version', $version);
 
         $this->view->assign('settings', $settings);
         $this->view->assign('config', $config);
         $this->view->assign('action', 'settings');
-        $this->view->assign('messages', $messages);
         $locales = waSystem::getInstance()->getConfig()->getLocales('name');
         $this->view->assign('locales', $locales);
         $this->view->assign('title', _w('Settings'));

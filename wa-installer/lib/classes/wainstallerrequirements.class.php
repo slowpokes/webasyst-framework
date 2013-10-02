@@ -51,26 +51,21 @@ class waInstallerRequirements
      */
     public static function test($case, &$requirement)
     {
-        static $config = array();
         $subject = null;
         if (strpos($case, '.') !== false) {
             list($case, $subject) = explode('.', $case, 2);
         }
-        $method = 'test'.ucfirst($case);
-        $class = ucfirst($method).'Requirements';
-        if (false && class_exists($class) && is_subclass_of($class, 'iTestRequirements')) {
-            /**
-             * @todo try to use extendable class tests
-             */
-        } else {
-            $instance = self::getInstance();
-            if (!method_exists($instance, $method)) {
-
-                $method = 'testDefault';
-                $subject = $case;
-            }
-            return $instance->{$method}($subject, $requirement);
+        if (empty($subject) && !empty($requirement['subject'])) {
+            $subject = $requirement['subject'];
         }
+        $method = 'test'.ucfirst($case);
+
+        $instance = self::getInstance();
+        if (!method_exists($instance, $method)) {
+            $method = 'testDefault';
+            $subject = $case;
+        }
+        return $instance->$method($subject, $requirement);
     }
 
     public function __call($name, $args)
@@ -84,7 +79,7 @@ class waInstallerRequirements
 
     private function app_version($app_id)
     {
-        strtolower($app_id);
+        $app_id = preg_replace('@\\/@', '', strtolower($app_id));
         $path = $this->root.'wa-apps/'.$app_id.'/lib/config/app.php';
         $build_path = $this->root.'wa-apps/'.$app_id.'/lib/config/build.php';
         $version = false;
@@ -123,20 +118,20 @@ class waInstallerRequirements
 
     private function testDefault($subject, &$requirement)
     {
-        $requirement['passed'] = !$requirement['strict'];
+        $requirement['passed'] = empty($requirement['strict']);
         $requirement['note'] = false;
         $requirement['warning'] = _w('Please install updates for the proper verification requirements');
-        self::setDefaultDescription($requirement, array('Unknown requirement case %s', $subject), '');
+        self::setDefaultDescription($requirement, array('Unknown requirement case %s', htmlentities($subject, ENT_QUOTES, 'utf-8'), ''));
         return $requirement['passed'];
     }
 
     private function testPhpini($subject, &$requirement)
     {
-        $requirement['passed'] = !$requirement['strict'];
+        $requirement['passed'] = empty($requirement['strict']);
         $requirement['note'] = false;
         $requirement['warning'] = false;
         if ($subject) {
-            self::setDefaultDescription($requirement, array('PHP setting %s', $subject), '');
+            self::setDefaultDescription($requirement, array('PHP setting %s', htmlentities($subject, ENT_QUOTES, 'utf-8')), '');
             $value = ini_get($subject);
             if (isset($requirement['value'])) {
                 if (strtolower($value) == 'on') {
@@ -144,12 +139,11 @@ class waInstallerRequirements
                 } elseif (strtolower($value) == 'off') {
                     $value = false;
                 }
-                if (preg_match('/^(<|<=|=|>|>=)(\d+.*)$/', $requirement['value'], $matches)) {
-                    $relevation = $matches[1];
-                    $requirement['value'] = $matches[2];
-                    if (!version_compare($value, $requirement['value'], $relevation)) {
-                        $format = $requirement['strict'] ? _w('setting has value %s but should be %s') : _w('setting has value %s but recommended %s');
-                        $requirement['warning'] = sprintf($format, var_export($value, true), $relevation.$requirement['value']);
+                $relation = $this->getRelation($requirement['value'], true);
+                if ($relation) {
+                    if (!version_compare($value, $requirement['value'], $relation)) {
+                        $format = !empty($requirement['strict']) ? _w('setting has value %s but should be %s') : _w('setting has value %s but recommended %s');
+                        $requirement['warning'] = sprintf($format, var_export($value, true), $relation.$requirement['value']);
                     } else {
                         $requirement['passed'] = true;
                         if ($value === true) {
@@ -161,7 +155,7 @@ class waInstallerRequirements
                         }
                     }
                 } elseif ($value != $requirement['value']) {
-                    $format = $requirement['strict'] ? _w('setting has value %s but should be %s') : _w('setting has value %s but recommended %s');
+                    $format = !empty($requirement['strict']) ? _w('setting has value %s but should be %s') : _w('setting has value %s but recommended %s');
                     $requirement['warning'] = sprintf($format, var_export($value, true), $requirement['value']);
                 } else {
                     $requirement['passed'] = true;
@@ -191,22 +185,18 @@ class waInstallerRequirements
 
     private function testPhp($subject, &$requirement)
     {
-        $requirement['passed'] = !$requirement['strict'];
+        $requirement['passed'] = empty($requirement['strict']);
         $requirement['note'] = false;
         $requirement['warning'] = false;
         if ($subject) {
-            self::setDefaultDescription($requirement, array('PHP extension %s', $subject), '');
+            self::setDefaultDescription($requirement, array('PHP extension %s', htmlentities($subject, ENT_QUOTES, 'utf-8')), '');
             if (extension_loaded($subject)) {
                 $version = phpversion($subject);
                 if (isset($requirement['version'])) {
-                    $relevation = '>=';
-                    if (preg_match('/^(<|<=|=|>|>=)(\d+.*)$/', $requirement['version'], $matches)) {
-                        $relevation = $matches[1];
-                        $requirement['version'] = $matches[2];
-                    }
-                    if (!version_compare($version, $requirement['version'], $relevation)) {
-                        $format = $requirement['strict'] ? _w('extension %s has %s version but should be %s %s') : _w('extension %s has %s version but recomended is %s %s');
-                        $requirement['warning'] = sprintf($format, $subject, $version, $relevation, $requirement['version']);
+                    $relation = $this->getRelation($requirement['version']);
+                    if (!version_compare($version, $requirement['version'], $relation)) {
+                        $format = !empty($requirement['strict']) ? _w('extension %s has %s version but should be %s %s') : _w('extension %s has %s version but recomended is %s %s');
+                        $requirement['warning'] = sprintf($format, $subject, $version, $relation, $requirement['version']);
                     } else {
                         if ($version) {
                             $requirement['note'] = $version;
@@ -223,13 +213,9 @@ class waInstallerRequirements
             self::setDefaultDescription($requirement, 'PHP version', '');
             $version = PHP_VERSION;
             if (isset($requirement['version'])) {
-                $relevation = '>=';
-                if (preg_match('/^(<|<=|=|>|>=)(\d+.*)$/', $requirement['version'], $matches)) {
-                    $relevation = $matches[1];
-                    $requirement['version'] = $matches[2];
-                }
-                if (!version_compare($version, $requirement['version'], $relevation)) {
-                    $requirement['warning'] = sprintf(_w('PHP has version %s but should be %s %s'), $version, $relevation, $requirement['version']);
+                $relation = $this->getRelation($requirement['version']);
+                if (!version_compare($version, $requirement['version'], $relation)) {
+                    $requirement['warning'] = sprintf(_w('PHP has version %s but should be %s %s'), $version, $relation, $requirement['version']);
                 } else {
                     if ($version) {
                         $requirement['note'] = $version;
@@ -248,22 +234,18 @@ class waInstallerRequirements
         if (isset($requirement['update']) && !$requirement['update']) {
             $requirement['strict'] = false;
         }
-        $requirement['passed'] = !$requirement['strict'];
-        self::setDefaultDescription($requirement, array('Version of %s', ucfirst($subject)), '');
+        $requirement['passed'] = empty($requirement['strict']);
+        self::setDefaultDescription($requirement, array('Version of %s', htmlentities(ucfirst($subject), ENT_QUOTES, 'utf-8')), '');
         $requirement['note'] = false;
         $requirement['warning'] = false;
         $version = $this->app_version($subject);
         if ($version !== false) {
             if (isset($requirement['version'])) {
-                $relevation = '>=';
-                if (preg_match('/^(<|<=|=|>|>=)(\d+.*)$/', $requirement['version'], $matches)) {
-                    $relevation = $matches[1];
-                    $requirement['version'] = $matches[2];
-                }
-                if (!version_compare($version, $requirement['version'], $relevation)) {
-                    $format = $requirement['strict'] ? _w('%s has %s version but should be %s %s') : _w('%s has %s version but recomended is %s %s');
-                    $relevation = _w($relevation);
-                    $requirement['warning'] = sprintf($format, _w(ucfirst($subject)), $version, $relevation, $requirement['version']);
+                $relation = $this->getRelation($requirement['version']);
+                if (!version_compare($version, $requirement['version'], $relation)) {
+                    $format = !empty($requirement['strict']) ? _w('%s has %s version but should be %s %s') : _w('%s has %s version but recomended is %s %s');
+                    $relation = _w($relation);
+                    $requirement['warning'] = sprintf($format, _w(ucfirst($subject)), $version, $relation, $requirement['version']);
                 } else {
                     if ($version) {
                         $requirement['note'] = $version;
@@ -283,7 +265,9 @@ class waInstallerRequirements
         $requirement['passed'] = true;
         $requirement['note'] = false;
         $requirement['warning'] = false;
-        $folders = explode('|', $folders);
+        if (!is_array($folders)) {
+            $folders = explode('|', $folders);
+        }
         $bad_folders = array();
         $good_folders = array();
         self::setDefaultDescription($requirement, 'Files access rights');
@@ -295,7 +279,7 @@ class waInstallerRequirements
                 if (is_writeable($path) || is_link($path)) {
                     $good_folders[] = $folder;
                 } else {
-                    if ($requirement['strict']) {
+                    if (!empty($requirement['strict'])) {
                         $requirement['passed'] = false;
                     }
                     $bad_folders[] = $folder;
@@ -306,26 +290,26 @@ class waInstallerRequirements
         }
 
         if ($bad_folders) {
-            $requirement['warning'] .= sprintf(_w('%s should be writeable'), implode(', ', $bad_folders));
+            $requirement['warning'] .= sprintf(_w('%s should be writable'), implode(', ', $bad_folders));
         }
 
         if ($good_folders) {
-            $requirement['note'] .= sprintf(_w('%s is writeable'), implode(', ', $good_folders));
+            $requirement['note'] .= sprintf(_w('%s is writable'), implode(', ', $good_folders));
         }
     }
 
     private function testServer($subject, &$requirement)
     {
 
-        $requirement['passed'] = !$requirement['strict'];
+        $requirement['passed'] = empty($requirement['strict']);
         $requirement['note'] = false;
         $requirement['warning'] = false;
-        $requirement['value'] = !$requirement['strict'];
+        $requirement['value'] = empty($requirement['strict']);
 
         $server = (isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '').(isset($_SERVER['SERVER_SIGNATURE']) ? $_SERVER['SERVER_SIGNATURE'] : '');
 
         if ($subject) { //check server module
-            self::setDefaultDescription($requirement, array('Server module %s', $subject));
+            self::setDefaultDescription($requirement, array('Server module %s', htmlentities($subject, ENT_QUOTES, 'utf-8')));
             if (function_exists('apache_get_modules')) {
                 if (in_array($subject, apache_get_modules())) {
                     $requirement['note'] = _w('server module loaded');
@@ -354,18 +338,19 @@ class waInstallerRequirements
     /**
      *
      * Verify MD5 hashes
-     * @param unknown_type $subject
+     * @param string $pattern
      * @param array $requirement
      */
-    private function testMd5($subject, &$requirement)
+    private function testMd5($pattern, &$requirement)
     {
 
-        $requirement['passed'] = !$requirement['strict'];
+        $requirement['passed'] = empty($requirement['strict']);
         $requirement['note'] = false;
         $requirement['warning'] = false;
         $md5_path = $this->root.'.files.md5';
 
-        if ($subject) { //check files by mask
+        if ($pattern) { //check files by mask
+
             self::setDefaultDescription($requirement, 'Files checksum');
             $metacharacters = array('?', '+', '.', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$', '@');
             foreach ($metacharacters as & $char) {
@@ -381,9 +366,9 @@ class waInstallerRequirements
 
             $cleanup_pattern = '@({'.implode('|', $metacharacters).')@';
             $command_pattern = '@({'.implode('|', $commandcharacters).')@';
-            $subject = preg_replace($cleanup_pattern, '\\\\$1', $subject);
-            $subject = preg_replace($command_pattern, '.$1', $subject);
-            $hash_pattern = "@^([\da-f]{32})\s+\*({$subject})$@m";
+            $pattern = preg_replace($cleanup_pattern, '\\\\$1', $pattern);
+            $pattern = preg_replace($command_pattern, '.$1', $pattern);
+            $hash_pattern = "@^([\da-f]{32})\s+\*({$pattern})$@m";
             if (file_exists($md5_path)) {
                 $hashes = file_get_contents($md5_path);
                 if (preg_match_all($hash_pattern, $hashes, $file_matches)) {
@@ -394,15 +379,15 @@ class waInstallerRequirements
                             $md5_hash = md5_file($path);
                             if ($file_matches[1][$id] != $md5_hash) {
                                 $requirement['warning'] .= "\n{$file} corrupted";
-                                $requirement['passed'] = !$requirement['strict'] && $requirement['passed'];
+                                $requirement['passed'] = empty($requirement['strict']) && $requirement['passed'];
                             }
                         } else {
                             $requirement['warning'] .= "\n{$file} missed";
-                            $requirement['passed'] = !$requirement['strict'] && $requirement['passed'];
+                            $requirement['passed'] = empty($requirement['strict']) && $requirement['passed'];
                         }
                     }
                 } else {
-                    $requirement['warning'] = 'local arhcives not founded';
+                    $requirement['warning'] = 'local archives not founded';
                     $requirement['passed'] = true;
                 }
             } else {
@@ -414,7 +399,17 @@ class waInstallerRequirements
                 $requirement['passed'] = true;
             }
         } else {
-            $requirement['note'] = 'unclomplete case';
+            $requirement['note'] = 'incomplete case';
         }
+    }
+
+    private function getRelation(&$version, $strict = false)
+    {
+        $relation = $strict ? false : '>=';
+        if (preg_match('/^(<|<=|=|>|>=)\s*(\d+.*)$/', $version, $matches)) {
+            $relation = $matches[1];
+            $version = $matches[2];
+        }
+        return $relation;
     }
 }

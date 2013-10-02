@@ -65,8 +65,8 @@ return array(
 		=>'Installation guide',
 	'install_quide_url'
 		=>'http://www.webasyst.com/framework/docs/installation/',
-	'Extracting Webasyst arhcive...'
-		=> 'Extracting Webasyst arhcive...',
+	'Extracting Webasyst archive...'
+		=> 'Extracting Webasyst archive...',
 	'Check available updates'
 		=> 'Check available updates',
 
@@ -105,7 +105,7 @@ return array(
 		=>'PHP extension: %s',
 	'extension %s has %s version but should be %s %s'
 		=>'%1$s version %3$s%4$s is required (installed version is %2$s).',
-	'extension %s has %s version but recomended is %s %s'
+	'extension %s has %s version but recommended is %s %s'
 		=>'Recommended %1$s version is %3$s%4$s (installed version is %2$s).',
 	'extension %s not loaded'
 		=>'Extension “%s” is not loaded.',
@@ -123,7 +123,7 @@ return array(
 		=>'%s, version',
 	'%s has %s version but should be %s %s'
 		=>'Version %1$s %3$s%4$s is required (installed version is %2$s).',
-	'%s has %s version but recomended is %s %s'
+	'%s has %s version but recommended is %s %s'
 		=>'Suggested version is %1$s %3$s%4$s (installed version is %2$s).',
 	'%s not installed'
 		=>'Application “%s” has not been installed.',
@@ -132,9 +132,9 @@ return array(
 
 	'Files access rights'
 		=>'File and folder access rights',
-	'%s should be writeable'
+	'%s should be writable'
 		=>'The following files and folders should be available for writing: %s.',
-	'%s is writeable'
+	'%s is writable'
 		=>'The required files and folders are available for writing: %s.',
 
 	'Files checksum'
@@ -157,7 +157,7 @@ return array(
 	'Use friendly URLs'
 		=>'User-friendly URLs will be supported',
 	'Check archives and files checksum'
-		=>'Validation of Webasyst system file and app archive checksums',
+		=>'Validation of Webasyst system file and app archive checksum',
 	'Check folder rights for install&amp;update'
 		=>'Minimal file and folder access rights required for installing Webasyst updates and new apps',
 	'Get updates information from update servers'

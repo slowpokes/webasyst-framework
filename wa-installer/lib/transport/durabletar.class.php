@@ -1,9 +1,9 @@
 <?php
 
-if(!class_exists('PEAR')){
+if (!class_exists('PEAR')) {
     throw new Exception('Class PEAR required');
 }
-if(!class_exists('Archive_Tar')){
+if (!class_exists('Archive_Tar')) {
     throw new Exception('Class Archive_Tar required');
 }
 
@@ -16,26 +16,29 @@ class DurableTar extends Archive_Tar implements Serializable
     private $stateHandler;
     private $performanceHandler;
     private $target_path;
-    /*
-     * @param    string  $p_tarname  The name of the tar archive to create
-     * @param    string  $p_compress can be null, 'gz' or 'bz2'. This
+
+    /**
+     * @param    string $p_tarname  The name of the tar archive to create
+     * @param    string $p_compress can be null, 'gz' or 'bz2'. This
      *                   parameter indicates if gzip or bz2 compression
      *                   is required.  For compatibility reason the
      *                   boolean value 'true' means 'gz'.
+     * @param int $resumeOffset
+     * @param $tarSize
      * @access public
      */
-    function __construct($p_tarname,$p_compress = null,$resumeOffset = 0,$tarSize)
+    function __construct($p_tarname, $p_compress = null, $resumeOffset = 0, $tarSize)
     {
         $this->tarSize = $tarSize;
         $this->resumeOffset = $resumeOffset;
-        return parent::Archive_Tar($p_tarname,$p_compress);
+        return parent::Archive_Tar($p_tarname, $p_compress);
     }
 
     public function serialize()
     {
         $data = array(
-			'tarSize'=>$this->tarSize,
-			'resumeOffset'=>$this->resumeOffset,
+            'tarSize'      => $this->tarSize,
+            'resumeOffset' => $this->resumeOffset,
         );
         return serialize($data);
     }
@@ -45,14 +48,13 @@ class DurableTar extends Archive_Tar implements Serializable
 
     }
 
-
     private function resume()
     {
 
-        if($this->resumeOffset>1){
+        if ($this->resumeOffset > 1) {
             $this->setState($this->resumeOffset);
             $this->_jumpBlock($this->resumeOffset);
-        }else{
+        } else {
             $this->_getSize();
         }
         $this->setState($this->resumeOffset);
@@ -61,7 +63,7 @@ class DurableTar extends Archive_Tar implements Serializable
 
     function _extractList($p_path, &$p_list_detail, $p_mode, $p_file_list, $p_remove_path)
     {
-        if($p_mode == 'complete'){
+        if ($p_mode == 'complete') {
             $this->target_path = $p_path;
             $this->resume();
         }
@@ -72,18 +74,20 @@ class DurableTar extends Archive_Tar implements Serializable
         $ofset = null;
         if (is_resource($this->_file)) {
             if ($p_len === null)
-            $p_len = 512;
+                $p_len = 512;
 
-            if ($this->_compress_type == 'gz'){
-                $ofset = @gztell($this->_file)/$p_len;
-            }else if ($this->_compress_type == 'bz2') {
-                // ----- Replace missing bztell() and bzseek()
-                $ofset = 0;
-            } else if ($this->_compress_type == 'none'){
-                $ofset = @ftell($this->_file)/$p_len;
-            }else{
-                $this->_error('Unknown or missing compression type ('.$this->_compress_type.')');
-            }
+            if ($this->_compress_type == 'gz') {
+                $ofset = @gztell($this->_file) / $p_len;
+            } else
+                if ($this->_compress_type == 'bz2') {
+                    //Replace missing bztell() and bzseek()
+                    $ofset = 0;
+                } else
+                    if ($this->_compress_type == 'none') {
+                        $ofset = @ftell($this->_file) / $p_len;
+                    } else {
+                        $this->_error('Unknown or missing compression type ('.$this->_compress_type.')');
+                    }
         }
         return floor($ofset);
     }
@@ -91,18 +95,19 @@ class DurableTar extends Archive_Tar implements Serializable
     function _getSize($p_len = null)
     {
         static $count = 0;
-        if($this->tarSize)return;
+        if ($this->tarSize)
+            return;
         $currentBlock = $this->_getOffset($p_len);
-        while(strlen(parent::_readBlock($p_len))){
-            $this->_jumpBlock(1024/*4096*/);
+        while (strlen(parent::_readBlock($p_len))) {
+            $this->_jumpBlock(1024 /*4096*/);
             $tarSize = $this->_getOffset($p_len);
-            if($tarSize>0){
+            if ($tarSize > 0) {
                 $this->tarSize = $tarSize;
-            }else{
+            } else {
                 break;
             }
-            if(++$count>128){
-                $count=0;
+            if (++$count > 128) {
+                $count = 0;
                 $this->setState($this->resumeOffset);
             }
         }
@@ -113,15 +118,17 @@ class DurableTar extends Archive_Tar implements Serializable
     function _rewind()
     {
         if (is_resource($this->_file)) {
-            if ($this->_compress_type == 'gz'){
+            if ($this->_compress_type == 'gz') {
                 @gzrewind($this->_file);
-            }else if ($this->_compress_type == 'bz2') {
-                // ----- Replace missing bztell() and bzseek()
-            } else if ($this->_compress_type == 'none'){
-                @rewind($this->_file);
-            }else{
-                $this->_error('Unknown or missing compression type ('.$this->_compress_type.')');
-            }
+            } else
+                if ($this->_compress_type == 'bz2') {
+                    //Replace missing bztell() and bzseek()
+                } else
+                    if ($this->_compress_type == 'none') {
+                        @rewind($this->_file);
+                    } else {
+                        $this->_error('Unknown or missing compression type ('.$this->_compress_type.')');
+                    }
         }
         return true;
     }
@@ -133,17 +140,12 @@ class DurableTar extends Archive_Tar implements Serializable
         static $block_performance = 32;
         $v_result = parent::_readHeader($v_binary_data, $v_header);
 
-        if($v_result&&$this->resumeMode&&((++$count>$block_performance)||$is_first)){
-            $this->lastOffset = $this->_getOffset()-1;
-            $data = array(
-				'filename'=>$v_header['filename'],
-            //'md5'=>md5_file($this->target_path.'/'.$v_header['filename']),
-				'size'=>$v_header['size'],
-            );
+        if ($v_result && $this->resumeMode && ((++$count > $block_performance) || $is_first)) {
+            $this->lastOffset = $this->_getOffset() - 1;
             $performance = $this->setState($this->lastOffset);
-            if($is_first){
+            if ($is_first) {
                 $is_first = false;
-            }else{
+            } else {
                 $count = 0;
                 $block_performance = $performance;
             }
@@ -153,45 +155,41 @@ class DurableTar extends Archive_Tar implements Serializable
 
     public function setStateHandler($callback)
     {
-        if(is_callable($callback)||true){
-            $this->stateHandler = &$callback;
-        }else{
+        if (is_callable($callback) || true) {
+            $this->stateHandler =& $callback;
+        } else {
             throw new Exception("Invalid callback state handler");
         }
     }
 
     public function setPerformanceHandler($callback)
     {
-        if(is_callable($callback)||true){
-            $this->performanceHandler = &$callback;
-        }else{
+        if (is_callable($callback) || true) {
+            $this->performanceHandler =& $callback;
+        } else {
             throw new Exception("Invalid callback state handler");
         }
     }
 
-
-
-
-    private function setState($offset,$debug = null)
+    private function setState($offset, $debug = null)
     {
         static $block_performance = 32;
         $state_data = array(
-        //	'stage_name'=>'extract',
-			'resume'=>array(
-				'offset'=>$offset,
-				'tar_size'=>$this->tarSize,
-        ),
-			'stage_current_value'=>$this->lastOffset*512,
-			'stage_value'=>$this->tarSize*512,
-			'debug'=>array('block_performance'=>$block_performance,'additional'=>$debug),
+            //'stage_name'=>'extract',
+            'resume'              => array(
+                'offset'   => $offset,
+                'tar_size' => $this->tarSize,
+            ),
+            'stage_current_value' => $this->lastOffset * 512,
+            'stage_value'         => $this->tarSize * 512,
+            'debug'               => array('block_performance' => $block_performance, 'additional' => $debug),
         );
-        if($this->stateHandler){
-            $performance = call_user_func($this->stateHandler,$state_data);
-            if($this->performanceHandler){
-                $block_performance = call_user_func($this->performanceHandler,$block_performance,$performance/(8*512),'extract',8,16,128);
+        if ($this->stateHandler) {
+            $performance = call_user_func($this->stateHandler, $state_data);
+            if ($this->performanceHandler) {
+                $block_performance = call_user_func($this->performanceHandler, $block_performance, $performance / (8 * 512), 'extract', 8, 16, 128);
             }
         }
         return $block_performance;
     }
 }
-?>

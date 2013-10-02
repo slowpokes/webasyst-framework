@@ -1,8 +1,9 @@
+{capture assign="installed_format"}[`Theme “%s” is installed, but not used by any apps. To start using this theme, apply it in your Site app's Routing settings.`]{/capture}
+{capture assign="used_format"}[`Theme %s is now in use on`]{/capture}
 <ul class="thumbs li250px">
     {$dialogs = array()}
     {foreach $themes as $theme}
         <li>
-
             <a href="#/themes/{$theme.id}" class="js-theme-info">
                 <div class="wa-theme-cover">
                     {if !empty($theme.cover)}
@@ -15,9 +16,7 @@
             </a>
             {if $theme.path}
                 {if !empty($theme.used)}
-                    <strong class="wa-theme-in-use">
-                        [s`In use`]
-                    </strong>
+                    <strong class="wa-theme-in-use">[s`In use`]</strong>
                     {capture append="dialogs"}
                         <div class="dialog width400px" id="wa-theme-use-dialog-{$theme.id}">
                             <div class="dialog-background"> </div>
@@ -26,7 +25,8 @@
                                     <div class="dialog-content">
                                         <div class="dialog-content-indent">
                                             <h1 id="wa-dialog-title">{$theme.name|escape}</h1>
-                                            {sprintf("[`Theme %s is now in use on`]",$theme.name)|escape}
+                                            {capture name="format"}[`Theme %s is now in use on`]{/capture}
+                                            {sprintf($used_format,$theme.name)|escape}
                                             {foreach $theme.used as $url}
                                                 {if !$url.met}
                                                     <a href="{$url.preview}" target="_blank">{$url.preview}</a><i class="icon10 new-window"></i>
@@ -45,7 +45,7 @@
                         </div>
                     {/capture}
                 {else}
-                    <strong class="wa-theme-installed">[`Installed`]</strong>
+                    <em class="gray">[`Installed`]</em>
                     <i class="icon10 settings"></i>
                     {capture append="dialogs"}
                         <div class="dialog width400px js-setup" id="wa-theme-use-dialog-{$theme.id}">
@@ -55,7 +55,7 @@
                                     <div class="dialog-content">
                                         <div class="dialog-content-indent">
                                             <h1 id="wa-dialog-title">{$theme.name|escape}</h1>
-                                            {sprintf("[`Theme “%s” is installed, but not used by any apps. To start using this theme, apply it in your Site app's Routing settings.`]",$theme.name)}
+                                            {sprintf($installed_format,$theme.name)}
                                         </div>
                                         <div class="clear"></div>
                                     </div>
@@ -71,24 +71,27 @@
                         </div>
                     {/capture}
                 {/if}
-            {elseif !empty($theme.payware)}
-                {if !empty($app.purchase_link)}
-                    <form action="{$app.purchase_link|default:''}" method="post" id="js-theme-buy-{$theme.id}">
-                        <strong>{$app.payware.price.current|escape}</strong>
-                        <input type="hidden" name="app_id[]" value="{$theme.slug}">
+            {elseif !empty($theme.commercial)}
+                {if true}
+                    <em>{$theme.price|escape}</em>
+                    <form id="js-theme-info-{$theme.id}" action="{$wa_backend_url}installer/#/themes/{$theme.id|escape}/" method="GET">
+                    </form>
+                {elseif !empty($theme.purchase_link)}
+                    <form action="{$theme.purchase_link|default:''}" method="post" id="js-theme-buy-{$theme.id}">
+                        <strong>{$theme.payware.price.config|escape}</strong>
+                        {foreach $theme.inherited as $inherited}
+                            <input type="hidden" name="app_id[]" value="{$inherited.slug}{if !empty($theme.edition)}:{$theme.edition}{/if}">
+                        {/foreach}
                         <input type="hidden" name="hash" value="{$identity_hash}">
-                        <input type="submit" class="button green" value="[`Buy`] {$app.payware.price.current}">
                     </form>
                 {/if}
             {else}
-                <form id="js-theme-install-{$theme.id}" action="{$wa_backend_url}installer/" method="get" title="{sprintf('[`Install theme "%s" for the %s app?`]',$theme.name,$app['name'])|escape}">
-                    <input type="hidden" name="module" value="update">
-                    <input type="hidden" name="action" value="manager">
-                    <input type="hidden" name="module" value="update">
-                    <input type="hidden" name="module" value="update">
-
-                    <input type="hidden" name="app_id[{$theme.slug}]" value="{$app.vendor}{if !empty($app.edition)}:{$app.edition}{/if}">
-                    <input type="submit" name="install" value="[`Install`]">
+                <form id="js-theme-install-{$theme.id}" action="{$wa_backend_url}installer/?module=update&action=manager" method="POST" title="{sprintf('[`Install theme "%s" for the %s app?`]',$theme.name,$app['name'])|escape}">
+                    <input type="hidden" name="return_url" value="{$return_url|replace:'%theme_id%':$theme.id|escape}">
+                    {foreach $theme.inherited as $inherited}
+                        <input type="hidden" name="app_id[{$inherited.slug}]" value="{$theme.vendor}{if !empty($theme.edition)}:{$theme.edition}{/if}">
+                    {/foreach}
+                    <input type="hidden" name="install" value="1">
                 </form>
             {/if}
         </li>
@@ -106,6 +109,7 @@ $("div.wa-themes ul li").on('click', 'a.js-theme-info', function () {
         var dialog = $('#wa-theme-use-dialog-' + theme_id);
         var install = $('#js-theme-install-' + theme_id);
         var buy = $('#js-theme-buy-' + theme_id);
+        var info = $('#js-theme-info-' + theme_id);
         if(dialog.length) {
             dialog.waDialog({
                 height:'100px',
@@ -135,6 +139,8 @@ $("div.wa-themes ul li").on('click', 'a.js-theme-info', function () {
             }
         } else if (buy.length) {
             buy.submit();
+        }else if (info.length) {
+            info.submit();
         }
         return false;
     }catch(e){

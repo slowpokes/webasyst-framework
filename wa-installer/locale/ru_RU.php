@@ -106,7 +106,7 @@ return array(
 		=>'Расширение PHP: %s',
 	'extension %s has %s version but should be %s %s'
 		=>'Требуется версия расширения %1$s %3$s%4$s, текущая версия %2$s',
-	'extension %s has %s version but recomended is %s %s'
+	'extension %s has %s version but recommended is %s %s'
 		=>'Рекомендуется версия расширения %1$s %3$s%4$s, текущая версия %2$s',
 	'extension %s not loaded'
 		=>'расширение %s не загружено',
@@ -124,7 +124,7 @@ return array(
 		=>'%s, версия',
 	'%s has %s version but should be %s %s'
 		=>'Требуется версия %1$s %3$s%4$s, текущая версия %2$s',
-	'%s has %s version but recomended is %s %s'
+	'%s has %s version but recommended is %s %s'
 		=>'Рекомендуется версия %1$s %3$s%4$s, текущая версия %2$s',
 	'%s not installed'
 		=>'Приложение %s не установлено',
@@ -133,9 +133,9 @@ return array(
 
 	'Files access rights'
 		=>'Права доступа к файлам и директориям на сервере',
-	'%s should be writeable'
+	'%s should be writable'
 		=>'Следующие файлы и папки должны быть доступны для записи: %s',
-	'%s is writeable'
+	'%s is writable'
 		=>'Необходимые файлы и папки %s доступны для записи',
 
 	'Files checksum'

@@ -1,8 +1,6 @@
-{extends file='../backend/Backend.html'}
-{block name="head-js"}
+
 {wa_js file="js/installer.min.js"}
 {$wa_url}wa-content/js/jquery-plugins/jquery.tmpl.min.js
-{$wa_app_static_url}js/translate.js
 {$wa_app_static_url}js/installer.js
 {/wa_js}
     <script type="text/javascript">
@@ -10,21 +8,23 @@ $(document).ready( function() {
     $( function() {
         console.production = {if waSystemConfig::isDebug()}false{else}true{/if};
         $.installer.init({
+            redirect_url: '{$return_url|escape:'js'}',
+            redirect_timeout: 1000,
             updateStateInterval: 1000,
             updateStateErrorInterval: 2000,
             timestamp:{time()},
             queue:[
-            {foreach from=$queue_apps item=app name=queue}{
-                'subject':'{$app.subject|default:"app"}',
-                'slug':'{$app.slug}',
-                'vendor':'{$app.vendor}',
-                'edition':'{$app.edition|default:''}'
-            }{if !$app@last}, {/if}
+            {foreach $queue_apps as $target => $item}{
+                'subject':'{$item.subject|default:"app"}',
+                'slug':'{$target}',
+                'vendor':'{$item.vendor}',
+                'edition':'{$item.edition|default:''}'
+            }{if !$item@last}, {/if}
             {/foreach}
             ],
             install:{if $install}true{else}false{/if},
             logMode:'raw'
-        });
+        },'{$thread_id|escape:'js'}');
     });
 
 
@@ -41,27 +41,16 @@ $(document).ready( function() {
     translate['heartbeat'] = '&nbsp;';
     translate['resume'] = '[`Resuming`]';
     translate['wait'] = '[`Standing by`]';
-    translate['error'] = '[`Error occured`]';
+    translate['error'] = '[`Error occurred`]';
 
-    {foreach $queue_apps as $item}{if !empty($item.name)}
-    translate['{$item.slug}']='{$item.name|escape}';
+    {foreach $queue_apps as $slug => $item}{if !empty($item.name)}
+    translate['{$slug}']='{$item.name|escape}';
     {/if}{/foreach}
 
-    {foreach $apps as $app}
-    translate['{$app.slug}'] = '{$app.name|escape}';
-    {if isset($app.extras) && $app.extras}
-    {foreach $app.extras as $extras}
-    {foreach $extras as $extras_item}
-    translate['{$extras_item.slug}'] = '{$extras_item.name|escape}';
-    {/foreach}
-    {/foreach}
-    {/if}
-    {/foreach}
 });
 
     </script>
-{/block}
-{block name="content"}
+
     <div class="i-app-update-screen">
     <div id="update-content" class="block double-padded">
         <div id="template-placeholder">
@@ -90,7 +79,7 @@ $(document).ready( function() {
             {{if ($value) && (!$value.skipped) && (!$value.update) && ($value.subject == 'app')}}
             <li id="wa-app-${$value.slug}">
                 <a href="{/literal}{wa_backend_url()}{literal}${$value.slug}/">
-                    {{if $value.img}}<img alt="" src="${$value.img}">{{/if}}
+                    {{if $value.icon}}<img alt="" src="${$value.icon}">{{/if}}
                     ${$value.name}
                 </a>
             </li>
@@ -107,7 +96,7 @@ $(document).ready( function() {
         </strong></em></p>{{/if}}
         {{else}}
         {{if current_state.stage_status == 'error'}}
-        <p>[`An error occured during installation`]</p>
+        <p>[`An error occurred during installation`]</p>
         <p><i class="icon10 no"></i> <em class="error"><strong>{{html current_state.error}}</strong></em>
         {{else}}
         <p><i class="icon10 yes"></i> <em class="success"><strong>[`Applications were successfully installed`]</strong></em></p>
@@ -178,4 +167,3 @@ $(document).ready( function() {
 </script>
 <!-- {/foreach} -->
 
-{/block}

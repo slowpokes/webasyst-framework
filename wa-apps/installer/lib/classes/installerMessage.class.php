@@ -47,17 +47,17 @@ class installerMessage
 
     private function store()
     {
-        $overdued = array();
+        $overdue = array();
         foreach ($this->messages as $id=>$message) {
             if (!is_array($message)) {
-                $overdued[] = $id;
+                $overdue[] = $id;
             } elseif (isset($message['t'])) {
                 if ((time()-$message['t'])>300) {
-                    $overdued[] = $id;
+                    $overdue[] = $id;
                 }
             }
         }
-        foreach ($overdued as $id) {
+        foreach ($overdue as $id) {
             unset($this->messages[$id]);
         }
         $this->storage->write(__CLASS__, $this->messages);

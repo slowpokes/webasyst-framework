@@ -7,33 +7,115 @@ abstract class installerItemsAction extends waViewAction
 
     public function execute()
     {
-        $extended = false;
+        if (!waRequest::get('_') && false) {
+            $this->setLayout(new installerBackendLayout());
+        }
         $this->view->assign('action', 'update');
 
         $this->view->assign('error', false);
         $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
         $filter = array();
-        $filter['enabled'] = true;
         if ($this->module) {
             $filter['extras'] = $this->module;
         }
 
-        $applications = installerHelper::getApps($messages, $this->update_counter, $filter);
-        $app = false;
+        $app_options = array(
+            'installed' => true,
+        );
+
         try {
+            if ($this->module == 'plugins') {
+                $app_options['system'] = true;
+            }
+            $s = array();
+            $applications = installerHelper::getInstaller()->getApps($app_options, $filter);
             $subject = waRequest::get('subject');
+            if ($this->module == 'plugins') {
+                foreach (array_keys($applications) as $id) {
+                    if (strpos($id, 'wa-plugins/') === 0) {
+                        $s[] = $id;
+                    }
+                }
+            }
+
             if (empty($subject)) {
+                $extras = array();
                 $storage = wa()->getStorage();
                 $search = array();
-                $extras = preg_replace('/s$/', '', $this->module);
-                $slug_id = "installer_select_{$extras}";
-                $vendor_id = "installer_select_{$extras}_vendor";
-                $search['slug'] = waRequest::get('slug', $storage->read($slug_id));
-                $search['vendor'] = waRequest::get('vendor', $storage->read($vendor_id));
+                $key = preg_replace('/s$/', '', $this->module);
+                $slug_id = "installer_select_{$key}";
+                $vendor_id = "installer_select_{$key}_vendor";
 
-                if ((!$this->redirect || array_filter($search, 'strlen')) && $app = installerHelper::search($applications, $search)) {
-                    $storage->write($slug_id, $search['slug'] = $app['slug']);
-                    $storage->write($vendor_id, $search['vendor'] = $app['vendor']);
+                $options = array(
+                    'local'  => false,
+                    'apps'   => false,
+                    'filter' => (array)waRequest::get('filter'),
+                );
+
+                $slug = waRequest::get('slug', $storage->read($slug_id));
+                if (!empty($options['filter']['slug'])) {
+                    $slug = $options['filter']['slug'];
+                    unset($options['filter']['slug']);
+                }
+
+                $search['slug'] = array_filter(array_map('trim', explode(',', $slug)), 'strlen');
+
+                if ($this->module == 'themes') {
+                    if (empty($search['slug'])) {
+                        $search['slug'] = array_keys($applications);
+                    }
+                } else {
+                    if (in_array('shop', $search['slug'])) {
+                        $search['slug'] = array_unique(array_merge($search['slug'], $s));
+                    }
+                }
+
+                if ((!$this->redirect || !empty($search['slug'])) && (($keys = installerHelper::search($applications, $search, true)) !== null)) {
+                    $slug = array();
+                    foreach ($keys as $id => $key) {
+                        $slug[$id] = $applications[$key]['slug'];
+                    }
+                    //   $storage->write($vendor_id, $search['vendor'] = $app['vendor']);
+                    $extras = installerHelper::getInstaller()->getExtras($slug, $this->module, $options);
+                    $vendor_name = null;
+                    foreach ($extras as $app_id => $app_item) {
+                        if (!empty($app_item[$this->module])) {
+                            foreach ($app_item[$this->module] as $extras_id => $extras_item) {
+                                if (!empty($extras_item['vendor_name']) && !empty($options['filter']['vendor']) && empty($vendor_name)) {
+                                    $vendor_name = $extras_item['vendor_name'];
+                                }
+
+                                if (in_array($app_id, $keys) !== false) {
+                                    $app = & $applications[$app_id];
+                                    if (!isset($app[$this->module])) {
+                                        $app[$this->module] = array();
+                                    }
+                                    $app[$this->module][$extras_id] = $extras_item;
+                                    unset($app);
+
+                                } elseif (!empty($extras_item['inherited'])) {
+                                    foreach (array_keys($extras_item['inherited']) as $app_id) {
+                                        if (in_array($app_id, $keys) !== false) {
+                                            $app = & $applications[$app_id];
+                                            if (!isset($app[$this->module])) {
+                                                $app[$this->module] = array();
+                                            }
+                                            $app[$this->module][$extras_id] = $extras_item;
+                                            unset($app);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    foreach ($keys as $id => $key) {
+                        if (empty($applications[$key][$this->module])) {
+                            unset($slug[$id]);
+                        }
+                    }
+
+                    $this->view->assign('vendor_name', $vendor_name);
+                    $storage->write($slug_id, $search['slug'] = $slug);
                 } else {
                     reset($applications);
                     if ($app = current($applications)) {
@@ -41,10 +123,13 @@ abstract class installerItemsAction extends waViewAction
                     }
 
                 }
+
                 $this->view->assign('slug', $search['slug']);
-                $this->view->assign('vendor', $search['vendor']);
-                $this->view->assign('selected_app', $app);
+                //$this->view->assign('vendor', $search['vendor']);
+                $this->view->assign('extras', $extras);
             }
+
+            $this->view->assign('apps', $applications);
         } catch (Exception $ex) {
             $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
         }
@@ -53,8 +138,6 @@ abstract class installerItemsAction extends waViewAction
         $model = new waAppSettingsModel();
         $this->view->assign('update_counter', $model->get($this->getApp(), 'update_counter'));
         $this->view->assign('messages', $messages);
-        $this->view->assign('apps', $applications);
-        $this->view->assign('extended', $extended);
         $this->view->assign('title', _w('Installer'));
     }
 }
