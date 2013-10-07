@@ -51,7 +51,7 @@ class Geoip {
         $cookie_region = waRequest::cookie('region');
         if($cookie_region) return $cookie_region;
         $data = $this->getGeoData();
-        if(isset($data['region'])) return $data['region'];
+        if(isset($data['region_id'])) return $data['region_id'];
         return '';
     }
 
