@@ -46,6 +46,19 @@ class Geoip {
         return '';
     }
 
+    public function getRegion(){
+        //return "48";
+        $cookie_region = waRequest::cookie('region');
+        if($cookie_region) return $cookie_region;
+        $data = $this->getGeoData();
+        if(isset($data['region'])) return $data['region'];
+        return '';
+    }
+
+    public function getRegionName($id){
+        return $this->model->query("SELECT name FROM wa_region WHERE country_iso3 = 'rus' AND code = '$id'")->fetchField();
+    }
+
     public function getData(){
         $city = '';
         $region = 0;
@@ -66,17 +79,21 @@ class Geoip {
                 $region = $data['region_id'];
             }
         }
-        if(($city!='')&&($region>0))
+        if($region>0)
             return array('city'=>$city, 'region'=>$region);
         return null;
     }
 
     public function saveData($data){
         if(isset($data['address.shipping']['region'])&&($data['address.shipping']['region']>0)){
-            wa()->getResponse()->setCookie('region', $data['address.shipping']['region'], time() + 365 * 86400, null, '', false, true);
+            wa()->getResponse()->setCookie('region', $data['address.shipping']['region'], time() + 365 * 86400, null, '', false, false);
         }
         if(isset($data['address.shipping']['city'])&&($data['address.shipping']['city']!='')){
-            wa()->getResponse()->setCookie('city', $data['address.shipping']['city'], time() + 365 * 86400, null, '', false, true);
+            wa()->getResponse()->setCookie('city', $data['address.shipping']['city'], time() + 365 * 86400, null, '', false, false);
         }
+    }
+
+    public function allRegions(){
+        return $this->model->query("SELECT code, name FROM wa_region WHERE country_iso3 = 'rus' ORDER BY name")->fetchAll();
     }
 }

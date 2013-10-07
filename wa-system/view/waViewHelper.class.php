@@ -894,6 +894,16 @@ HTML;
         return "";
     }
 
+    public function regionBlock(){
+        $geoip = new Geoip();
+        $region_id = $geoip->getRegion();
+        if($region_id>0){
+            $region = $geoip->getRegionName($region_id);
+            return "Ваш регион: <span class='region_name region_handler' data-id='$region_id'>$region</span>";
+        }
+        return "";
+    }
+
     public function geoData(){
         $geoip = new Geoip();
         $data = $geoip->getData();
@@ -901,6 +911,16 @@ HTML;
             return "putGeoData('{$data['city']}', {$data['region']})";
         }
         return '';
+    }
+
+    public function regions(){
+        $geoip = new Geoip();
+        $data = $geoip->allRegions();
+        $str = "";
+        foreach($data as $region){
+            $str .= "<option value='{$region['code']}'>{$region['name']}</option>";
+        }
+        return $str;
     }
 
     //VADIM CODE END
