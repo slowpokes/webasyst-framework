@@ -19,4 +19,3 @@ if (file_exists($path)) {
 $_gl_time_end = microtime(1);
 
 $time = (intval(($_gl_time_end - $_gl_time_start)*1000))/1000;
-echo "<!-- $time -->";
