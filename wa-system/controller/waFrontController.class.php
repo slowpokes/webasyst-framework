@@ -156,6 +156,7 @@ class waFrontController
             }
             return $r;
         }
+        $class_names[] = $class_name;
 
         // Plugin is no longer active
         if ($plugin) {
@@ -166,7 +167,6 @@ class waFrontController
         if ($action && $default) {
             return $this->execute($plugin, $module);
         }
-        $class_names[] = $class_name;
 
         // Too bad. 404.
         throw new waException(sprintf('Empty module and/or action after parsing the URL "%s" (%s/%s).<br />Not found classes: %s', $this->system->getConfig()->getCurrentUrl(), $module, $action,implode(', ',$class_names)), 404);
