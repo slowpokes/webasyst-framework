@@ -31,6 +31,7 @@ function smarty_function_wa_pagination($params, &$smarty)
     }
     $p = 1;
     $n = 1;
+    $n = isset($params['n']) ? $params['n'] : 1; // VADIM CODE
     while ($p <= $total) {
         if ($p > $nb && ($total - $p) > $nb && abs($page - $p) > $n && ($p < $page ? ($page - $n - $p > 1) : ($total - $nb > $p))) {
             $p = $p < $page ? $page - $n : $total - $nb + 1;
