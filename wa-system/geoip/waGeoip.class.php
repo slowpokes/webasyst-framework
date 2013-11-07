@@ -86,10 +86,10 @@ class Geoip {
 
     public function saveData($data){
         if(isset($data['address.shipping']['region'])&&($data['address.shipping']['region']>0)){
-            wa()->getResponse()->setCookie('region', $data['address.shipping']['region'], time() + 365 * 86400, null, '', false, false);
+            wa()->getResponse()->setCookie('region', $data['address.shipping']['region'], time() + 365 * 86400, null, '/', false, false);
         }
         if(isset($data['address.shipping']['city'])&&($data['address.shipping']['city']!='')){
-            wa()->getResponse()->setCookie('city', $data['address.shipping']['city'], time() + 365 * 86400, null, '', false, false);
+            wa()->getResponse()->setCookie('city', $data['address.shipping']['city'], time() + 365 * 86400, null, '/', false, false);
         }
     }
 
