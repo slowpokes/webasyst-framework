@@ -241,6 +241,7 @@ class waRouting
     {
         static $_page_routes;
 
+        $app_id = waSystem::getAppName($app_id); //VADIM CODE
         if ($_page_routes === null || !isset($_page_routes[$app_id])) {
             $class = $app_id.'PageModel';
             /**

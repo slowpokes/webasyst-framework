@@ -63,6 +63,9 @@ abstract class waViewAction extends waController
     protected function setThemeTemplate($template)
     {
         $this->template = 'file:'.$template;
+        if($template=='error.html'){
+            throw new waException("Error page generated", 404);
+        }
         return $this->view->setThemeTemplate($this->getTheme(), $template);
     }
 

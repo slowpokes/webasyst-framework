@@ -25,6 +25,7 @@ class waSystem
 
     protected $url;
 
+    protected static $db; // VADIM CODE
     /**
      * @var SystemConfig|waAppConfig
      */
@@ -65,6 +66,7 @@ class waSystem
      */
     public static function getInstance($name = null, waSystemConfig $config = null, $set_current = false)
     {
+        $name = self::getAppName($name); // VADIM CODE
         if ($name === null) {
             if ($config && $config instanceof waAppConfig) {
                 $name = $config->getName();
@@ -670,6 +672,12 @@ class waSystem
                 self::$apps = array();
                 foreach ($all_apps as $app => $enabled) {
                     if ($enabled) {
+                        // VADIM CODE START
+                        $fake_name = $app;
+                        if(is_array($enabled)){
+                            $app = $enabled['app'];
+                        }
+                        // VADIM CODE END
                         waLocale::loadByDomain($app, $locale);
                         $app_config = $this->getAppPath('lib/config/app.php', $app);
                         if (!file_exists($app_config)) {
@@ -718,7 +726,7 @@ class waSystem
                         if (!isset($app_info['icon'][16])) {
                             $app_info['icon'][16] = $app_info['icon'][24];
                         }
-                        self::$apps[$app] = $app_info;
+                        self::$apps[$fake_name] = $app_info; // VADIM CODE
                     }
                 }
                 if (!file_exists($file) || filemtime($file) < filemtime($this->getConfig()->getPath('config', 'apps'))) {
@@ -1098,6 +1106,28 @@ class waSystem
         }
         return $themes;
     }
+
+    // VADIM CODE START
+    public static function getAppName($name){
+        if(is_null($name)){
+            return null;
+        }
+        $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
+        if(isset($all_apps[$name])){
+            if(is_array($all_apps[$name])){
+                self::$db = $all_apps[$name]['db'];
+                return $all_apps[$name]['app'];
+            }
+            return $name;
+        }
+        return $name;
+    }
+
+    public static function getDb()
+    {
+        return self::$db;
+    }
+    // VADIM CODE END
 }
 
 /**

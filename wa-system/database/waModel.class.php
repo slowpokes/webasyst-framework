@@ -61,6 +61,7 @@ class waModel
 
     //private $readonly   = false;
 
+    protected $use_config_db_name = false; //VADIM CODE
     /**
      * @param string $type
      * @param bool $writable
@@ -69,6 +70,7 @@ class waModel
     {
         $this->writable = $writable;
         $this->type = $type ? $type : 'default';
+        $this->type = $this->getDBSheme(); // VADIM CODE
         $this->adapter = waDbConnector::getConnection($this->type, $this->writable);
         if ($this->table && !$this->fields) {
             $this->getMetadata();
@@ -904,4 +906,14 @@ class waModel
         }
         return $schema;
     }
+
+    // VADIM CODE START
+    private function getDBSheme(){
+        if($this->use_config_db_name){
+            $db = wa()->getDb();
+            return $db;
+        }
+        return 'default';
+    }
+    // VADIM CODE END
 }
