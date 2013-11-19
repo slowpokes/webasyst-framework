@@ -348,8 +348,9 @@ class waRouting
         }
         $parts = explode('/', $path);
         $app = $parts[0];
+        $app = wa()->replaceName($app); // VADIM CODE
         if (!$app) {
-            $app = $this->system->getApp();
+            $app = $this->system->getAppFake(); // VADIM CODE
         }
         if (!wa()->appExists($app)) {
             return null;

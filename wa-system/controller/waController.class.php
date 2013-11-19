@@ -45,7 +45,6 @@ abstract class waController
         return $this->getConfig()->getApplication();
     }
 
-
     public function getRights($name = null, $assoc = true)
     {
         return $this->getUser()->getRights($this->getApp(), $name, $assoc);
@@ -258,4 +257,11 @@ abstract class waController
     {
         throw new waException("Call to undefined method ".$name);
     }
+
+    // VADIM CODE START
+    public function getAppFakeId()
+    {
+        return wa()->getAppFake();
+    }
+    // VADIM CODE END
 }
