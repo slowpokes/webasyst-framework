@@ -94,4 +94,8 @@ class Debug {
     private static function getView($html){
         return "<div class='debug_obj'>$html</div>";
     }
+
+    static function breakpoint(){
+        throw new waException("Breakpoint", 404);
+    }
 }

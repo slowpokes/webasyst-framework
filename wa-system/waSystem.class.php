@@ -17,6 +17,7 @@ class waSystem
     protected static $current = 'wa-system';
 
     protected static $apps;
+    protected static $apps_real; // VADIM CODE
     protected static $handlers = array();
     protected static $factories_common = array();
     protected static $factories_config = array();
@@ -727,6 +728,7 @@ class waSystem
                             $app_info['icon'][16] = $app_info['icon'][24];
                         }
                         self::$apps[$fake_name] = $app_info; // VADIM CODE
+                        self::$apps_real[$app] = $app_info; // VADIM CODE
                     }
                 }
                 if (!file_exists($file) || filemtime($file) < filemtime($this->getConfig()->getPath('config', 'apps'))) {
@@ -1126,6 +1128,12 @@ class waSystem
     public static function getDb()
     {
         return self::$db;
+    }
+
+    public function appRealExists($app_id)
+    {
+        $this->getApps();
+        return $app_id === 'webasyst' || isset(self::$apps_real[$app_id]);
     }
     // VADIM CODE END
 }
