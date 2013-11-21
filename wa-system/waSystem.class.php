@@ -15,7 +15,6 @@ class waSystem
 {
     protected static $instances = array();
     protected static $current = 'wa-system';
-    protected static $current_fake = 'wa-system'; // VADIM CODE
 
     protected static $apps;
     protected static $apps_real; // VADIM CODE
@@ -68,7 +67,6 @@ class waSystem
      */
     public static function getInstance($name = null, waSystemConfig $config = null, $set_current = false)
     {
-        $name_fake = $name; // VADIM CODE
         $name = self::getAppName($name); // VADIM CODE
         if ($name === null) {
             if ($config && $config instanceof waAppConfig) {
@@ -98,10 +96,8 @@ class waSystem
         }
         if ($set_current) {
             self::setActive($name);
-            self::$current_fake = $name_fake; // VADIM CODE
         } elseif (!self::$current || self::$current == 'wa-system') {
             self::$current = $name;
-            self::$current_fake = $name_fake; // VADIM CODE
         }
         return self::$instances[$name];
     }
@@ -454,7 +450,7 @@ class waSystem
                 }
 
                 $app_system = self::getInstance($app, null, true);
-                if ($app != 'webasyst' && $this->getEnv() == 'backend' && !$this->getUser()->getRights($app_system->getConfig()->getApplicationFake(), 'backend')) {//VADIM CODE
+                if ($app != 'webasyst' && $this->getEnv() == 'backend' && !$this->getUser()->getRights(wa()->getAppFake(), 'backend')) {//VADIM CODE
                     //$this->getResponse()->redirect($this->getConfig()->getBackendUrl(true), 302);
                     throw new waRightsException('Access to this app denied', 403);
                 }
@@ -1144,18 +1140,18 @@ class waSystem
         return $app_id === 'webasyst' || isset(self::$apps_real[$app_id]);
     }
 
-    public static function getAppFake()
+    public function getAppFake()
     {
-        if (self::$current_fake != 'wa-system') {
-            return self::$current_fake;
-            //return $this->getConfig()->getApplication();
-        } else {
-            return null;
-        }
+        return waRequest::param('app_fake');
+    }
+
+    public function getAppRal()
+    {
+        return waRequest::param('app_real');
     }
 
     public function replaceName($name){
-        if($name=='shop') return self::$current_fake;
+        if($name=='shop') return waRequest::param('app_fake');
         return $name;
     }
     // VADIM CODE END
