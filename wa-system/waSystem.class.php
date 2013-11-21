@@ -15,6 +15,7 @@ class waSystem
 {
     protected static $instances = array();
     protected static $current = 'wa-system';
+    private static $app_names = null; //VADIM CODE
 
     protected static $apps;
     protected static $apps_real; // VADIM CODE
@@ -67,6 +68,7 @@ class waSystem
      */
     public static function getInstance($name = null, waSystemConfig $config = null, $set_current = false)
     {
+        $name_fake = $name; // VADIM CODE
         $name = self::getAppName($name); // VADIM CODE
         if ($name === null) {
             if ($config && $config instanceof waAppConfig) {
@@ -96,6 +98,7 @@ class waSystem
         }
         if ($set_current) {
             self::setActive($name);
+            self::setApp($name, $name_fake); //VADIM CODE
         } elseif (!self::$current || self::$current == 'wa-system') {
             self::$current = $name;
         }
@@ -1140,20 +1143,27 @@ class waSystem
         return $app_id === 'webasyst' || isset(self::$apps_real[$app_id]);
     }
 
-    public function getAppFake()
+    public static function getAppFake()
     {
-        return waRequest::param('app_fake');
+        return self::$app_names['fake'];
     }
 
-    public function getAppRal()
+    public static function getAppReal()
     {
-        return waRequest::param('app_real');
+        return self::$app_names['real'];
     }
 
     public function replaceName($name){
-        if($name=='shop') return waRequest::param('app_fake');
+        if($name=='shop') {
+            return self::getAppFake();
+        }
         return $name;
     }
+
+    public static function setApp($real, $fake){
+        self::$app_names = array('real'=>$real, 'fake'=>$fake);
+    }
+
     // VADIM CODE END
 }
 

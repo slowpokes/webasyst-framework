@@ -273,8 +273,7 @@ class waRouting
 
     protected function getAppRoutes($app, $route = array(), $dispatch = false)
     {
-        waRequest::setParam('app_fake', $app);
-        waRequest::setParam('app_real', wa()->getAppName($app));
+        wa()->setApp(wa()->getAppName($app), $app); // VADIM CODE
         $routes = waSystem::getInstance($app, null, $dispatch)->getConfig()->getRouting($route, $dispatch);
         $routes = $this->formatRoutes($routes, true);
         if ($dispatch && wa($app)->getConfig()->getInfo('pages') && $app != 'site') {
