@@ -454,7 +454,7 @@ class waSystem
                 }
 
                 $app_system = self::getInstance($app, null, true);
-                if ($app != 'webasyst' && $this->getEnv() == 'backend' && !$this->getUser()->getRights($app_system->getConfig()->getApplication(), 'backend')) {
+                if ($app != 'webasyst' && $this->getEnv() == 'backend' && !$this->getUser()->getRights($app_system->getConfig()->getApplicationFake(), 'backend')) {//VADIM CODE
                     //$this->getResponse()->redirect($this->getConfig()->getBackendUrl(true), 302);
                     throw new waRightsException('Access to this app denied', 403);
                 }
@@ -679,8 +679,10 @@ class waSystem
                     if ($enabled) {
                         // VADIM CODE START
                         $fake_name = $app;
+                        $title = '';
                         if(is_array($enabled)){
                             $app = $enabled['app'];
+                            $title = $enabled['title'];
                         }
                         // VADIM CODE END
                         waLocale::loadByDomain($app, $locale);
@@ -704,6 +706,7 @@ class waSystem
                         }
                         $app_info['id'] = $app;
                         $app_info['name'] = _wd($app, $app_info['name']);
+                        if($title) $app_info['name'] = $title; //VADIM CODE
                         if (isset($app_info['icon'])) {
                             if (is_array($app_info['icon'])) {
                                 foreach ($app_info['icon'] as $size => $url) {
@@ -833,6 +836,7 @@ class waSystem
     {
         if ($app === null) {
             $app = $this->getApp();
+            $app = $this->getAppFake();//VADIM CODE
         }
         if ($this->getEnv() == 'backend') {
             $url = $this->config->getRootUrl();

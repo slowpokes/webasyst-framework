@@ -693,6 +693,7 @@ class waContact implements ArrayAccess
      */
     public function getRights($app_id, $name = null, $assoc = true)
     {
+        $app_id = wa()->replaceName($app_id);//VADIM CODE
         if ($name !== null && substr($name, -1) === '%') {
             if (!$this->id) {
                 return array();

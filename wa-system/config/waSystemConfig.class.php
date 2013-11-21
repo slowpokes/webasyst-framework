@@ -389,6 +389,7 @@ class waSystemConfig
             return new webasystConfig($environment, $root_path);
         }
 
+        $application = wa()->getAppName($application);//VADIM CODE
         if (file_exists($file = $root_path.'/wa-apps/'.$application.'/lib/config/'.$class_name.'.class.php')) {
             require_once($file);
             return new $class_name($environment, $root_path, $application, $locale);

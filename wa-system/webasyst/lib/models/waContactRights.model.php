@@ -34,7 +34,7 @@ class waContactRightsModel extends waModel {
      * @return int|array depends on $name */
     public function get($id=null, $app_id=null, $name=null, $check_groups = TRUE)
     {
-        if ($app_id !== null && $app_id !== 'webasyst' && !waSystem::getInstance()->appRealExists($app_id)) {
+        if ($app_id !== null && $app_id !== 'webasyst' && !waSystem::getInstance()->appExists($app_id)) {
             return $name === null ? array() : 0;
         }
 

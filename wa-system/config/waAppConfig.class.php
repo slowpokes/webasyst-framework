@@ -584,4 +584,11 @@ class waAppConfig extends SystemConfig
             wa()->getStorage()->set('apps-count', $count);
         }
     }
+
+    //VADIM CODE START
+    public function getApplicationFake()
+    {
+        return wa()->getAppFake();
+    }
+    //VADIM CODE END
 }

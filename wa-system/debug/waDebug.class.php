@@ -23,6 +23,8 @@ class Debug {
             $tv['query'] = $sql;
             $tv['backtrace'] = debug_backtrace();
             $tv['time'] = $time;
+            $tv['err_code'] = $error_code;
+            $tv['err_str'] = $error;
             self::$objects[] = $tv;
             self::$timer = 0;
         }
@@ -58,6 +60,9 @@ class Debug {
         $html = "<div class='query'>{$obj['query']}</div>";
         $html .= "<div class='time'>".sprintf("%01.5f", $obj['time'])."</div>";
         $html .= "<div class='backtrace'>".self::getViewBacktrace($obj['backtrace'])."</div>";
+        if($obj['err_str']!=''){
+            $html = "<div class='query_error'>$html</div>";
+        }
         return $html;
     }
 
