@@ -27,8 +27,9 @@ class siteRoutingEditAction extends waViewAction
             $app_id = waRequest::get('app', key($apps));
         }
 
+        $app_real_id = wa()->getAppName($app_id);// VADIM CODE
         if ($app_id) {
-            $path = $this->getConfig()->getAppsPath($app_id, 'lib/config/site.php');
+            $path = $this->getConfig()->getAppsPath($app_real_id, 'lib/config/site.php'); // VADIM CODE
             $app = wa()->getAppInfo($app_id);
             if (file_exists($path)) {
                 // load locale of the app
@@ -76,6 +77,7 @@ class siteRoutingEditAction extends waViewAction
         $this->view->assign('route_id', $route_id);
         $this->view->assign('route', $route);
         $this->view->assign('app_id', $app_id);
+        $this->view->assign('app_real_id', $app_real_id);// VADIM CODE
         $this->view->assign('app', $app);
         $this->view->assign('domain_id', siteHelper::getDomainId());
         $this->view->assign('domain', siteHelper::getDomain());

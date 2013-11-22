@@ -19,7 +19,8 @@ class waDesignActions extends waActions
     public function defaultAction()
     {
         $app_id = $this->getAppId();
-        $app = wa()->getAppInfo($app_id);
+        $app_fake_id = $this->getAppFakeId();// VADIM CODE
+        $app = wa()->getAppInfo($app_fake_id);// VADIM CODE
 
         if (empty($app['themes'])) {
             throw new waException('App does not support themes.');
