@@ -382,19 +382,19 @@ class waInstallerRequirements
                                 $requirement['passed'] = empty($requirement['strict']) && $requirement['passed'];
                             }
                         } else {
-                            $requirement['warning'] .= "\n{$file} missed";
+                            $requirement['warning'] .= "\n{$file} missing";
                             $requirement['passed'] = empty($requirement['strict']) && $requirement['passed'];
                         }
                     }
                 } else {
-                    $requirement['warning'] = 'local archives not founded';
+                    $requirement['warning'] = 'local archives not found';
                     $requirement['passed'] = true;
                 }
             } else {
                 if (isset($requirement['silent']) && $requirement['silent']) {
-                    $requirement['note'] = '.files.md5 missed';
+                    $requirement['note'] = '.files.md5 missing';
                 } else {
-                    $requirement['warning'] = '.files.md5 missed';
+                    $requirement['warning'] = '.files.md5 missing';
                 }
                 $requirement['passed'] = true;
             }

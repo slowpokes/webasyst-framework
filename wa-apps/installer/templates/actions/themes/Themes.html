@@ -83,7 +83,22 @@
                     <!-- theme price and status -->
                     {if !$theme.installed}
                         {if $theme.commercial}
-                            <strong class="gray">{$theme.price}</strong>
+                            {if $theme.lease_price == 'free'}
+                                {* free to install on this particular installation (cloud) *}
+                                <span class="black">[`Free`]</span>
+                            {else}
+                                {if !empty($theme.compare_price)}
+                                    <strike class="gray">{$theme.compare_price}</strike>&nbsp;
+                                    <strong class="highlighted">{$theme.price}</strong>
+                                {else}
+                                    <span class="black">
+                                        {$theme.price}
+                                        {if $theme.lease_price}
+                                            [`or`] {sprintf('[`%s/mo`]',$theme.lease_price)}
+                                        {/if}
+                                    </span>
+                                {/if}
+                            {/if}
                         {else}
                             <span class="gray">[`Free`]</span>
                         {/if}

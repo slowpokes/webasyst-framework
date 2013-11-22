@@ -28,6 +28,7 @@
                         <input type="hidden" name="app_id[]" value="{$plugin.slug}">
                         <input type="hidden" name="hash" value="{$identity_hash}">
                         <input type="hidden" name="domain" value="{$domain}">
+                        <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                         {if $plugin.license_expire}
                         {* EXPIRED LICENSE *}
                             <input type="submit" class="button red" value="[`Renew license`]">
@@ -82,16 +83,29 @@
                                 <input type="hidden" name="app_id[]" value="{$plugin.slug}">
                                 <input type="hidden" name="hash" value="{$identity_hash}">
                                 <input type="hidden" name="domain" value="{$domain}">
+                                <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                                 <input type="submit" class="button green" value="[`Extend license`]">
                                 <p><i class="icon16 yes"></i>{sprintf("[`This is a licensed installation of %s on %s. License is valid through <strong>%s</strong>.`]",$plugin.name|escape, installerHelper::getDomain()|escape, $plugin.license_expire)}</p>
 
                             </form>
                         {else}
                         {* VALID UNLIMITED LICENSE *}
+                            {if !empty($plugin.reviews.url)}
+                                <p>
+                                    <a href="{$plugin.reviews.url}" class="large bold">[`Write a review`]</a>
+                                    <i class="icon16 new-window"></i>
+                                </p>
+                            {/if}
                             <p>{sprintf("[`You have the latest version of %s installed: <strong>%s</strong>`]",$plugin.name,$plugin.installed.version)}</p>
                         {/if}
                     {else}
                     {* FREE APP *}
+                        {if !empty($plugin.reviews.url)}
+                            <p>
+                                <a href="{$plugin.reviews.url}" class="large bold">[`Write a review`]</a>
+                                <i class="icon16 new-window"></i>
+                            </p>
+                        {/if}
                         <p>{sprintf("[`You have the latest version of %s installed: <strong>%s</strong>`]",$plugin.name,$plugin.installed.version)}</p>
                     {/if}
                 {/if}
@@ -108,6 +122,7 @@
                         <input type="hidden" name="app_id[]" value="{$plugin.slug}{if !empty($plugin.edition)}:{$plugin.edition}{/if}">
                         <input type="hidden" name="hash" value="{$identity_hash}">
                         <input type="hidden" name="domain" value="{$domain}">
+                        <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                         <input type="submit" class="button green" value="[`Install`]"{if !$plugin.applicable} disabled="disabled"{/if}>
                     </form>
                 {else}
@@ -137,17 +152,25 @@
                             <div class="name">
                                 [`Price`]
                             </div>
-                            <div class="value">
-                                <strong>{$plugin.price}</strong>
-                            </div>
-                            {* if $plugin.lease_price}
+                            {if $plugin.lease_price == 'free'}
+                                {* free to install on this particular installation (cloud) *}
                                 <div class="value">
-                                    [`or`]
+                                    <strong>[`Free`]</strong>
                                 </div>
+                            {else}
                                 <div class="value">
-                                    <strong>{sprintf('[`%s/mo`]',$plugin.lease_price)}</strong> <span class="gray">[`for rent, first 30 days free`]</span>
+                                    {if !empty($plugin.compare_price)}<strike class="gray">{$plugin.compare_price}</strike>&nbsp; {/if}
+                                    <strong{if !empty($plugin.compare_price)} class="highlighted"{/if}>{$plugin.price}</strong>
                                 </div>
-                            {/if *}
+                                {if $plugin.lease_price}
+                                    <div class="value">
+                                        [`or`]
+                                    </div>
+                                    <div class="value">
+                                        <strong>{sprintf('[`%s/mo`]',$plugin.lease_price)}</strong>
+                                    </div>
+                                {/if}
+                            {/if}
                         </div>
                     </div>
                 {else}
@@ -217,7 +240,7 @@
                 </div>
                 <div class="value">
                     {$plugin.version}{if !empty($plugin.changelog)}
-                    <a href="{$current_url}changelog/" class="no-underline">[`View release notes`]</a>
+                    <a href="{$current_url}changelog/">[`View release notes`]</a>
                     {/if}
                 </div>
             </div>
@@ -246,7 +269,7 @@
                 <div class="block top-padded align-center clear-both">
                     <form action="?module=plugins&amp;action=remove" method="POST"  onsubmit="return confirm(this.title);" title="[`This will delete application source code and data without the ability to recover. Are you sure?`]">
                         {$wa->csrf()}
-                        <input type="hidden" name="extras_id[{$plugin.slug}]" value="{$plugin.vendor}{if !empty($plugin.edition)}:{$plugin.edition}{/if}">
+                        <input type="hidden" name="extras_id[{$plugin.slug}]" value="{$plugin.installed.vendor}{if !empty($plugin.installed.edition)}:{$plugin.installed.edition}{/if}">
                         <input type="submit" value="[`Delete this plugin`]" class="button red">
                     </form>
                 </div>
@@ -274,7 +297,10 @@
 
                     <nav>
                         <ul class="menu-h">
-                            <li class="selected" style="display: none;"><a href="{$current_url}">[`Overview`]</a></li>
+                            <li class="selected"{if empty($plugin.reviews.url)} style="display: none;"{/if}><a href="{$current_url}">[`Overview`]</a></li>
+                            {if !empty($plugin.reviews.url)}
+                                <li><a href="{$plugin.reviews.url}" target="_blank">[`Reviews`] <span class="hint">{$plugin.reviews.count|escape}</span> <i class="icon10 new-window"></i></a></li>
+                            {/if}
                         </ul>
                     </nav>
 
@@ -307,10 +333,10 @@
 
 
             {if !empty($plugin.changelog)}
-            <section id="i-page tab-{$plugin.slug|escape}-changelog" style="display:none;">
+            <section class="i-page" id="tab-{$plugin.slug|escape}-changelog" style="display:none;">
                 {foreach $plugin.changelog as $changelog}
 
-                    <div><strong>{$changelog.version}</strong>{if version_compare($changelog.version,$plugin.installed.version,'>')}<i class="icon16 new"></i>{/if}<p>{$changelog.content|nl2br}</p></div>
+                    <div><strong>{$changelog.version}</strong>{if !empty($changelog.datetime)}<span class="hint">{$changelog.datetime|wa_date:'humandate'|escape}</span>{/if}<p>{$changelog.content|nl2br}</p></div>
                 {/foreach}
             </section>
         {/if}

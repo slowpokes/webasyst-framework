@@ -26,6 +26,7 @@
                             <input type="hidden" name="app_id[]" value="{$app.slug}">
                             <input type="hidden" name="domain" value="{$domain}">
                             <input type="hidden" name="hash" value="{$identity_hash}">
+                            <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                             {if $app.license_expire}
                                 {* EXPIRED LICENSE *}
                                 <input type="submit" class="button red" value="[`Renew license`]">
@@ -65,16 +66,29 @@
                                     <input type="hidden" name="app_id[]" value="{$app.slug}">
                                     <input type="hidden" name="hash" value="{$identity_hash}">
                                     <input type="hidden" name="domain" value="{$domain}">
+                                    <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                                     <input type="submit" class="button green" value="[`Extend license`]">
                                     <p><i class="icon16 yes"></i>{sprintf("[`This is a licensed installation of %s on %s. License is valid through <strong>%s</strong>.`]",$app.name|escape, installerHelper::getDomain()|escape, $app.license_expire)}</p>
 
                                 </form>
                             {else}
                                 {* VALID UNLIMITED LICENSE *}
+                                {if !empty($app.reviews.url)}
+                                <p>
+                                    <a href="{$app.reviews.url}" class="large bold">[`Write a review`]</a>
+                                    <i class="icon16 new-window"></i>
+                                </p>
+                                {/if}
                                 <p>{sprintf("[`You have the latest version of %s installed: <strong>%s</strong>`]",$app.name,$app.installed.version)}</p>
                             {/if}
                         {else}
                             {* FREE APP *}
+                            {if !empty($app.reviews.url)}
+                            <p>
+                                <a href="{$app.reviews.url}" class="large bold">[`Write a review`]</a>
+                                <i class="icon16 new-window"></i>
+                            </p>
+                            {/if}
                             <p>{sprintf("[`You have the latest version of %s installed: <strong>%s</strong>`]",$app.name,$app.installed.version)}</p>
                         {/if}
                     {/if}
@@ -91,6 +105,7 @@
                                 <input type="hidden" name="app_id[]" value="{$app.slug}">
                                 <input type="hidden" name="hash" value="{$identity_hash}">
                                 <input type="hidden" name="domain" value="{$domain}">
+                                <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                                 <input type="submit" class="button green" value="[`Install`]"{if !$app.applicable} disabled="disabled"{/if}>
                             </form>
                         {else}
@@ -120,17 +135,25 @@
                                 <div class="name">
                                     [`Price`]
                                 </div>
-                                <div class="value">
-                                    <strong>{$app.price}</strong>
-                                </div>
-                                {* if $app.lease_price}
+                                {if $app.lease_price == 'free'}
+                                    {* free to install on this particular installation (cloud) *}
                                     <div class="value">
-                                        [`or`]
+                                        <strong>[`Free`]</strong>
                                     </div>
+                                {else}
                                     <div class="value">
-                                        <strong>{sprintf('[`%s/mo`]',$app.lease_price)}</strong> <span class="gray">[`for rent, first 30 days free`]</span>
+                                        {if !empty($app.compare_price)}<strike class="gray">{$app.compare_price}</strike>&nbsp; {/if}
+                                        <strong{if !empty($app.compare_price)} class="highlighted"{/if}>{$app.price}</strong>
                                     </div>
-                                {/if *}
+                                    {if $app.lease_price}
+                                        <div class="value">
+                                            [`or`]
+                                        </div>
+                                        <div class="value">
+                                            <strong>{sprintf('[`%s/mo`]',$app.lease_price)}</strong>
+                                        </div>
+                                    {/if}
+                                {/if}
                             </div>
                         </div>
                     {else}
@@ -210,7 +233,7 @@
                             [`Demo`]
                         </div>
                         <div class="value">
-                            <a href="{$app.demo_url}" target="_blank">{$app.demo_url}</a> <i class="icon10 new-window"></i>
+                            <a href="{$app.demo_url}" target="_blank">{str_replace('http://','',str_replace('https://','',$app.demo_url))|truncate:25}</a> <i class="icon10 new-window"></i>
                         </div>
                     </div>
                 {/if}
@@ -222,6 +245,16 @@
                         {$app.update_datetime|wa_datetime:'humandate'}
                     </div>
                 </div>
+                {if $app.url}
+                    <div class="field">
+                        <div class="name">
+                            [`Website`]
+                        </div>
+                        <div class="value">
+                            <a href="{$app.url}">{str_replace('http://','',str_replace('https://','',$app.url))|truncate:25}</a> <i class="icon10 new-window"></i>
+                        </div>
+                    </div>
+                {/if}
                 {*
                 <div class="field">
                     <div class="name">
@@ -237,7 +270,7 @@
             {if $app.installed}
                 {if !$app.system}
                 <div class="block top-padded align-center clear-both">
-                    <a class="no-underline" href="?module=apps&amp;action=remove&amp;app_id[{$app.slug}]={$app.vendor}{if !empty($app.edition)}:{$app.edition}{/if}" onClick="return confirm(this.title);" title="[`This will delete application source code and data without the ability to recover. Are you sure?`]">
+                    <a class="no-underline" href="?module=apps&amp;action=remove&amp;app_id[{$app.slug}]={$app.installed.vendor}{if !empty($app.installed.edition)}:{$app.installed.edition}{/if}" onClick="return confirm(this.title);" title="[`This will delete application source code and data without the ability to recover. Are you sure?`]">
                         <i class="icon16 delete"></i>[`Delete this app`]
                     </a>
                 </div>
@@ -262,17 +295,17 @@
                 <div class="details">
                     <h1>{$app.name}{if isset($app.status_label) && $app.status_label} <span class="highlighted i-app-label">{$app.status_label}</span>{/if}</h1>
                     <p>{$app.summary}</p>
-                    {if $app.url}
-                        <a href="{$app.url}" target="_blank">{$app.url}</a>
-                        <i class="icon10 new-window"></i>
-                    {/if}
+
 
                     <nav>
                         <ul class="menu-h">
-                            <li class="selected" {if !count($app.pages)} style="display: none;"{/if}><a href="{$current_url}">[`Overview`]</a></li>
+                            <li class="selected"><a href="{$current_url}">[`Overview`]</a></li>
                             {foreach $app.pages as $page}
-                            <li title="{$page.title|escape}"><a href="{$current_url}{$page.url}/">{$page.name|escape}</a></li>
+                            <li title="{$page.title|escape}"><a href="{$current_url}{$page.url|escape}/">{$page.name|escape}</a></li>
                             {/foreach}
+                            {if !empty($app.reviews.url)}
+                            <li><a href="{$app.reviews.url}" target="_blank">[`Reviews`] <span class="hint">{$app.reviews.count|escape}</span> <i class="icon10 new-window"></i></a></li>
+                            {/if}
                         </ul>
                     </nav>
 
@@ -311,7 +344,7 @@
         {if !empty($app.changelog)}
             <section class="i-page" id="tab-{$app.slug|escape}-changelog" style="display:none;">
                 {foreach $app.changelog as $changelog}
-                    <h5>{$changelog.version}</h5>
+                    <h5>{$changelog.version}</h5>{if !empty($changelog.datetime)}<span class="hint">{$changelog.datetime|wa_date:'humandate'|escape}</span>{/if}
                     {if version_compare($changelog.version,$app.installed.version,'>')}{/if}
                     <div class="i-changelog">{$changelog.content|nl2br}</div>
                 {/foreach}

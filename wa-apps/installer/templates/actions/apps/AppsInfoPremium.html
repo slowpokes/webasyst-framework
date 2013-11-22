@@ -26,6 +26,7 @@
                             <input type="hidden" name="app_id[]" value="{$app.slug}">
                             <input type="hidden" name="hash" value="{$identity_hash}">
                             <input type="hidden" name="domain" value="{$domain}">
+                            <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                             {if $app.license_expire}
                                 {* EXPIRED LICENSE *}
                                 <input type="submit" class="button red" value="[`Renew license`]">
@@ -66,6 +67,7 @@
                                 <form action="{$app.purchase_url|escape}" method="post">
                                     <input type="hidden" name="app_id[]" value="{$app.slug}">
                                     <input type="hidden" name="hash" value="{$identity_hash}">
+                                    <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                                     <input type="submit" class="button green" value="[`Extend license`]">
                                     <p><i class="icon16 yes"></i>{sprintf("[`This is a licensed installation of %s on %s. License is valid through <strong>%s</strong>.`]",$app.name|escape, installerHelper::getDomain()|escape, $app.license_expire)}</p>
 
@@ -92,6 +94,7 @@
                                 <input type="hidden" name="app_id[]" value="{$app.slug}{if !empty($app.edition)}:{$app.edition}{/if}">
                                 <input type="hidden" name="hash" value="{$identity_hash}">
                                 <input type="hidden" name="domain" value="{$domain}">
+                                <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                                 <input type="submit" class="button green" value="[`Buy & Install`]"{if !$app.applicable} disabled="disabled"{/if}>
                             </form>
                         {else}
@@ -213,7 +216,7 @@
             {if $app.installed}
                 {if !$app.system}
                 <div class="block top-padded align-center clear-both">
-                    <a class="no-underline" href="?module=apps&amp;action=remove&amp;app_id[{$app.slug}]={$app.vendor}{if !empty($app.edition)}:{$app.edition}{/if}" onClick="return confirm(this.title);" title="[`This will delete application source code and data without the ability to recover. Are you sure?`]">
+                    <a class="no-underline" href="?module=apps&amp;action=remove&amp;app_id[{$app.slug}]={$app.installed.vendor}{if !empty($app.installed.edition)}:{$app.installed.edition}{/if}" onClick="return confirm(this.title);" title="[`This will delete application source code and data without the ability to recover. Are you sure?`]">
                         <i class="icon16 delete"></i>[`Delete this app`]
                     </a>
                 </div>
@@ -244,8 +247,11 @@
                         <ul class="menu-h">
                             <li class="selected" {if !count($app.pages)} style="display:none;"{/if}><a href="{$current_url}">[`Overview`]</a></li>
                             {foreach $app.pages as $page}
-                            <li title="{$page.title|escape}"><a href="{$current_url}{$page.url}/">{$page.name|escape}</a></li>
+                            <li title="{$page.title|escape}"><a href="{$current_url}{$page.url|escape}/">{$page.name|escape}</a></li>
                             {/foreach}
+                            {if !empty($app.reviews.url)}
+                                <li><a href="{$app.reviews.url}" target="_blank">[`Reviews`] <span class="hint">{$app.reviews.count|escape}</span> <i class="icon10 new-window"></i></a></li>
+                            {/if}
                         </ul>
                     </nav>
 

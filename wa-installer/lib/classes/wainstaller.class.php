@@ -131,10 +131,10 @@ class waInstaller
      *
      * @throws Exception
      * @param $update_list array[][string]string
-     * @param $update_list[]['source'] array[][string]string Source path or URI
-     * @param $update_list[]['target'] array[][string]string Target path
-     * @param $update_list[]['slug'] array[][string]string Update item slug ()
-     * @param $update_list[]['md5'] array[][string]string MD5 of source archive (optional)
+     * @param $update_list []['source'] array[][string]string Source path or URI
+     * @param $update_list []['target'] array[][string]string Target path
+     * @param $update_list []['slug'] array[][string]string Update item slug (optional item identity)
+     * @param $update_list []['md5'] array[][string]string MD5 of source archive (optional)
      *
      * @return array[][string]mixed
      * @return array[]['skipped']boolean
@@ -152,7 +152,6 @@ class waInstaller
         try {
             $this->formatUpdateList($update_list, $update_path);
             $this->envSet();
-
             $resume = false;
 
             self::$ob_skip = false;
@@ -177,6 +176,7 @@ class waInstaller
                     }
                     unset($update);
                 case self::STAGE_COPY:
+
                     foreach ($update_list as $chunk_id => & $update) {
                         if ($update['skipped'])
                             continue;
@@ -407,9 +407,9 @@ class waInstaller
         }
 
         $this->writeLog(__METHOD__.' tree', self::LOG_DEBUG, array(
-            'targets'     => $targets,
-            'update_list' => $update_list,
-        ));
+                'targets'     => $targets,
+                'update_list' => $update_list,
+            ));
 
         #sort
         uasort($update_list, array(__CLASS__, 'sortUpdateList'));
@@ -548,7 +548,7 @@ class waInstaller
             if ($md5 && ($real_md5 = md5_file($target_file)) && (strcasecmp($md5, $real_md5) != 0)) {
                 throw new Exception(sprintf(_w("Invalid file md5 hash. Expected %s but get %s"), $md5, $real_md5));
             } elseif (empty($md5)) {
-                $this->writeLog(sprintf(_w('MD5 hash missed for file %s'), $source_file), self::LOG_WARNING);
+                $this->writeLog(sprintf(_w('MD5 hash missing for file %s'), $source_file), self::LOG_WARNING);
             }
             return $target_file;
         } catch (Exception $ex) {
@@ -580,7 +580,6 @@ class waInstaller
             //TODO use file_exists for local sources
             $source_stream = @fopen($source, 'r');
             @ini_set('default_socket_timeout', $default_socket_timeout);
-
             if (!$source_stream) {
                 $hint = 'for details see update log;';
                 if (preg_match('@^([a-z\.]+)://@', $source, $matches)) {
@@ -602,7 +601,6 @@ class waInstaller
                         }
                     }
                 }
-
                 throw new Exception("Error while opening source stream [{$source}]. Hint: {$hint}");
             } elseif (!empty($http_response_header)) {
                 //XXX ????
@@ -1383,8 +1381,11 @@ class waInstaller
             }
             $state['stage_current_value'] = 0;
         } else {
-            if (isset($state['stage_current_value']) && isset($state_params['stage_current_value']) && isset($state['timestamp_float']) && isset($state_params['timestamp_float'])) {
-                $state_params['stage_performance'] = ($state_params['stage_current_value'] - $state['stage_current_value']) / ($state_params['timestamp_float'] - $state['timestamp_float']);
+            if (isset($state['stage_current_value']) && isset($state_params['stage_current_value']) && !empty($state['timestamp_float']) && !empty($state_params['timestamp_float'])) {
+                $state_params['stage_performance'] = ($state_params['timestamp_float'] - $state['timestamp_float']);
+                if ($state_params['stage_performance']) {
+                    $state_params['stage_performance'] = ($state_params['stage_current_value'] - $state['stage_current_value']) / $state_params['stage_performance'];
+                }
             } else {
                 $state_params['stage_performance'] = 0;
             }
@@ -1652,6 +1653,12 @@ class waInstaller
             }
         }
         $curl_options[CURLOPT_URL] = $url;
+
+        if (preg_match('@^https://@', $url)) {
+            $curl_options[CURLOPT_SSL_VERIFYHOST] = false;
+            $curl_options[CURLOPT_SSL_VERIFYPEER] = false;
+        }
+
         $options = array();
 
         if (!empty($options['host'])) {
@@ -1738,6 +1745,7 @@ class waInstaller
     private function fclose($fp)
     {
         if ($fp && is_resource($fp)) {
+            fflush($fp);
             flock($fp, LOCK_UN);
             fclose($fp);
         }

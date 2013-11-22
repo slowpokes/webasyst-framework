@@ -11,7 +11,9 @@ String.prototype.translate = function () {
 /**
  * @link http://habrahabr.ru/blogs/javascript/116852/
  * @link https://github.com/theshock/console-cap
+ *
  */
+
 (function () {
     var global = this;
     var original = global.console;
@@ -91,6 +93,11 @@ String.prototype.translate = function () {
         complete: null,
         thread_id: null,
 
+        /**
+         *
+         * @param {object} options
+         * @param {string=} thread_id
+         */
         init: function (options, thread_id) {
             this.trace('init');
             this.thread_id = thread_id || null;
@@ -139,6 +146,11 @@ String.prototype.translate = function () {
                     }
                 });
             },
+            /**
+             *
+             * @param {string} target
+             * @returns {string}
+             */
             subject: function (target) {
                 var matches;
                 var subject = 'generic';
@@ -161,6 +173,17 @@ String.prototype.translate = function () {
                     }
                 }
                 return subject;
+            },
+            /**
+             *
+             * @param {number=500} interval
+             */
+            hideCounter: function (interval) {
+                interval = interval || 500;
+                setTimeout(function () {
+                    $("#wa-app-installer span.indicator").remove();
+                    $("#wa-app li span.indicator").remove();
+                }, interval);
             }
         },
 
@@ -234,10 +257,6 @@ String.prototype.translate = function () {
                     self.execute('state', null);
                 }, Math.max(2000, self.options.updateStateInterval * 4));
             });
-            setTimeout(function () {
-                $("#wa-app-installer span.indicator").remove();
-                $("#wa-app li span.indicator").remove();
-            }, 500);
         },
 
         updateExecuteHandler: function (data) {
@@ -288,7 +307,7 @@ String.prototype.translate = function () {
             result.success_plural = this.helper.plural(result.success);
             result.fail_plural = this.helper.plural(result.fail);
             state = state || 'no';
-
+            this.helper.hideCounter(100);
             var self = this;
             this.drawStateInfo(data.state, state);
             setTimeout(function () {
@@ -298,7 +317,6 @@ String.prototype.translate = function () {
                     sources: data.sources
                 }).appendTo('#update-raw');
 
-                /* $('#menu-item-selected-state-icon').attr('class',$('#update-raw-state-icon').attr('class')); */
                 setTimeout(function () {
                     var targetOffset = $('div.i-app-update-screen :last').offset().top;
                     $('div.i-app-update-screen').scrollTop(targetOffset);
@@ -315,6 +333,16 @@ String.prototype.translate = function () {
              */
         },
 
+        /**
+         *
+         * @param {
+         *      {
+         *          {string}stage_status,
+         *          {number}timestamp
+         *      }current_state,
+         *      {Array}state
+         *  } data
+         */
         updateStateHandler: function (data) {
             this.trace('stateHandler', data);
             if (this.timeout.state || this.complete) {
@@ -330,7 +358,8 @@ String.prototype.translate = function () {
                     var draw = false;
                     var date = new Date();
                     var interval = data.current_state ? Math.abs(this.offset - (date.getTime() / 1000 - parseInt(data.current_state.timestamp))) : null;
-                    if (data.current_state && (interval < 15)) {
+                    var state_is_actual = data.current_state && (interval < 15);
+                    if (state_is_actual) {
                         if (data.current_state.stage_status == 'error') {
                             draw = true;
                         } else if ((data.current_state.stage_status == 'complete') && (data.current_state.stage_name == 'update')) {
@@ -343,7 +372,7 @@ String.prototype.translate = function () {
                             current_state: data.current_state,
                             result: null
                         }).appendTo('#update-raw');
-                    } else if (data.current_state && data.state && (interval < 15) && (data.current_state.stage_status != 'none')) {
+                    } else if (state_is_actual && data.state && (data.current_state.stage_status != 'none')) {
                         this.drawStateInfo(data.state);
 
                         this.timeout.state = setTimeout(function () {
@@ -400,7 +429,6 @@ String.prototype.translate = function () {
                         html = $(target).html();
                         try {
                             $(target).empty();
-                            /* /$('#update-raw').remove(); */
                             $.tmpl('application-update-raw', {
                                 stages: state,
                                 apps: this.options.queue,
@@ -443,9 +471,6 @@ String.prototype.translate = function () {
             setTimeout(function () {
                 var targetOffset = $('div.i-app-update-screen :last').offset().top;
                 $('div.i-app-update-screen').scrollTop(targetOffset);
-                $("#wa-app-installer span.indicator").remove();
-                $("#wa-app li span.indicator").remove();
-
             }, 100);
         },
 
@@ -460,7 +485,7 @@ String.prototype.translate = function () {
         },
 
         animateOnInstall: function () {
-
+            var $app_menu = $('#wa-applist ul');
             $('#update-result-apps li').each(function () {
                 var $this = $(this);
                 $this.parent().show();
@@ -468,18 +493,18 @@ String.prototype.translate = function () {
 
                 var target = null;
                 var insert_last = true;
-                var $item_edition = $('#wa-applist ul li[id^=' + $this.attr('id') + ']');
+                var $item_edition = $app_menu.find('> li[id^=' + $this.attr('id') + ']');
                 if ($item_edition.length) {
                     target = $item_edition.offset();
                 } else {
                     if (insert_last) {
-                        target = $('#wa-applist ul li #wa-moreapps').offset();
+                        target = $app_menu.find('#wa-moreapps').offset();
                         if (!target.left) {
-                            target = $('#wa-applist ul li[id^=wa-app-]:last').offset();
+                            target = $app_menu.find('> li[id^=wa-app-]:last').offset();
                             target.left = target.left + 75;
                         }
                     } else {
-                        target = $('#wa-applist ul li[id^=wa-app-]:first').offset();
+                        target = $app_menu.find('> li[id^=wa-app-]:first').offset();
                     }
                 }
                 var animate_params = {
@@ -518,9 +543,9 @@ String.prototype.translate = function () {
                         $item_edition.replaceWith($element);
                     } else {
                         if (insert_last) {
-                            $element.appendTo('#wa-applist ul');
+                            $element.appendTo($app_menu);
                         } else {
-                            $element.prependTo('#wa-applist ul');
+                            $element.prependTo($app_menu);
                             /* .effect('highlight',{},10000); */
                         }
                     }
@@ -529,6 +554,11 @@ String.prototype.translate = function () {
             });
         },
 
+        /**
+         *
+         * @param {string} stage
+         * @param {*=} data
+         */
         trace: function (stage, data) {
             /*
              * TODO

@@ -1459,6 +1459,10 @@ class Archive_Tar extends PEAR
               return NULL;
           }
 
+          if ($pos0 = strpos($v_header['filename'], "\0")) {
+              $v_header['filename'] = substr($v_header['filename'], 0, $pos0);
+          }
+
           if ($v_header['filename'] == $p_filename) {
               if ($v_header['typeflag'] == "5") {
                   $this->_error('Unable to extract in string a directory '
@@ -1580,12 +1584,12 @@ class Archive_Tar extends PEAR
         $v_extract_file = TRUE;
       }
 
+      if ($pos0 = strpos($v_header['filename'], "\0")) {
+          $v_header['filename'] = substr($v_header['filename'], 0, $pos0);
+      }
       // ----- Look if this file need to be extracted
       if (($v_extract_file) && (!$v_listing))
       {
-          if ($pos0 = strpos($v_header['filename'], "\0")) {
-              $v_header['filename'] = substr($v_header['filename'], 0, $pos0);
-          }
         if (($p_remove_path != '') && (substr($v_header['filename'], 0, $p_remove_path_size) == $p_remove_path)) {
           $v_header['filename'] = substr($v_header['filename'],$p_remove_path_size);
         } elseif(($p_remove_path_ != '') && (substr($v_header['filename'], 0, $p_remove_path_size_) == $p_remove_path_)) {

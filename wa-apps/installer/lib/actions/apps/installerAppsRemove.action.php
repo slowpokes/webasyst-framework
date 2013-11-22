@@ -25,7 +25,8 @@ class installerAppsRemoveAction extends waViewAction
 
     function execute()
     {
-        $app_ids = waRequest::get('app_id');
+        //TODO use POST
+        $app_ids = waRequest::request('app_id');
         try {
             if (installerHelper::isDeveloper()) {
                 throw new waException(_w('Unable to delete application (developer version is on)'));
@@ -80,7 +81,7 @@ class installerAppsRemoveAction extends waViewAction
         $system = wa($app_id);
 
         /**
-         * @var waAppConfig $config;
+         * @var waAppConfig $config ;
          */
         $config = $system->getConfig();
 
@@ -112,10 +113,12 @@ class installerAppsRemoveAction extends waViewAction
             $paths[] = wa()->getAppPath(null, false, $app_id); //wa-log/$app_id/
         }
         if ($this->options['config']) {
-            $paths[] = wa()->getAppPath(null, $app_id); //wa-config/$app_id/
+            $paths[] = wa()->getConfigPath($app_id); //wa-config/$app_id/
         }
 
         $paths[] = wa()->getAppPath(null, $app_id); //wa-apps/$app_id/
+
+        $paths[] = wa()->getAppCachePath(null, 'webasyst'); //wa-cache/apps/webasyst/
 
         foreach ($paths as $path) {
             try {

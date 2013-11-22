@@ -29,23 +29,25 @@ class installerConfig extends waAppConfig
 
         $model = new waAppSettingsModel();
         $app_id = $this->getApplication();
-        $update_counter = null;
+        $count = null;
 
         //check cache expiration time
-        if ($force || true || ((time() - $model->get($app_id, 'update_counter_timestamp', 0)) > 10) || is_null($update_counter = $model->get($app_id, 'update_counter', null))) {
-            $update_counter = installerHelper::getUpdatesCounter('total');
+        if ($force || ((time() - $model->get($app_id, 'update_counter_timestamp', 0)) > 600) || is_null($count = $model->get($app_id, 'update_counter', null))) {
+            $count = installerHelper::getUpdatesCounter('total');
             //check available versions for installed items
-
             //download if required changelog & requirements for updated items
-
             //count applicable updates (optional)
-
-
             $model->ping();
-        } elseif (is_null($update_counter)) {
-            $update_counter = $model->get($app_id, 'update_counter');
+        } elseif (is_null($count)) {
+            $count = $model->get($app_id, 'update_counter');
         }
-        return $update_counter ? $update_counter : null;
+        if ($count) {
+            $count = array(
+                'count' => $count,
+                'url'   => $url = $this->getBackendUrl(true).$this->application.'/?module=update',
+            );
+        }
+        return $count;
     }
 
     public function setCount($n = null)

@@ -957,3 +957,31 @@ msgstr ""
 #: /wa-apps/installer/templates/actions/themes/ThemesView.html:78
 msgid "Info"
 msgstr ""
+
+#: /wa-apps/installer/templates/actions/apps/AppsInfo.html:75
+#: /wa-apps/installer/templates/actions/apps/AppsInfo.html:83
+msgid "Write a review"
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/apps/AppsInfo.html:243
+msgid "Website"
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/apps/AppsInfo.html:299
+#: /wa-apps/installer/templates/actions/apps/AppsInfoPremium.html:250
+#: /wa-apps/installer/templates/actions/plugins/PluginsInfo.html:286
+#: /wa-apps/installer/templates/actions/themes/ThemesInfo.html:293
+msgid "Reviews"
+msgstr ""
+
+#: /wa-apps/installer/lib/actions/settings/installerSettingsClearCache.controller.php:25
+msgid "But with errors:"
+msgstr ""
+
+#: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:148
+msgid "Application plugin %s has been deleted', 'Applications plugins %s have been deleted"
+msgstr ""
+
+#: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:149
+msgid "Application theme %s has been deleted', 'Applications themes %s have been deleted"
+msgstr ""

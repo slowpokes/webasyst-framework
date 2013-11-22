@@ -7,10 +7,19 @@ class webasystCreateAppCli extends waCliController
         $app_id = waRequest::param(0);
         $params = waRequest::param();
         if (empty($app_id) || isset($params['help'])) {
-            print("Usage: php wa.php APP_ID[ -name APP_NAME][ -version APP_VERSION][ -frontend[ -themes]][ -plugins][ -cli][ -api[ API_VERSION]]\n");
+            print("Usage: php wa.php APP_ID[ -name APP_NAME][ -version APP_VERSION][ -vendor VENDOR_ID][ -frontend[ -themes]][ -plugins][ -cli][ -api[ API_VERSION]]\n");
         } else {
-            $app_path = wa()->getAppPath(null, $app_id);
-            $this->create($app_id, $app_path, $params);
+            $errors = array();
+            if (!empty($params['version']) && !preg_match('@^[\d]+(\.\d+)*$@', $params['version'])) {
+                $errors[] = 'Invalid version format';
+            }
+            if ($errors) {
+                print "ERROR:\n";
+                print implode("\n", $errors);
+            } else {
+                $app_path = wa()->getAppPath(null, $app_id);
+                $this->create($app_id, $app_path, $params);
+            }
         }
     }
 
@@ -53,6 +62,7 @@ class webasystCreateAppCli extends waCliController
                 'name'    => empty($params['name']) ? ucfirst($app_id) : $params['name'],
                 'icon'    => 'img/'.$app_id.'.gif',
                 'version' => $version = empty($params['version']) ? '0.1' : $params['version'],
+                'vendor'  => $vendor = empty($params['vendor']) ? '--' : $params['vendor'],
             );
 
             if (isset($params['frontend'])) {
@@ -85,7 +95,7 @@ class webasystCreateAppCli extends waCliController
             }
             // locale
             mkdir($path.'locale');
-
+            waFiles::protect($path.'locale');
             if (isset($params['frontend']) && isset($params['themes'])) {
                 // themes
                 mkdir($path.'themes');
@@ -93,6 +103,7 @@ class webasystCreateAppCli extends waCliController
                 $theme = new waTheme('default', $app_id, true);
                 $theme->name = 'Default theme';
                 $theme->description = 'Auto generated default theme';
+                $theme->vendor = $vendor;
                 $theme->system = 1;
                 $theme->addFile('index.html', 'Frontend index file');
                 touch($path.'themes/default/index.html');

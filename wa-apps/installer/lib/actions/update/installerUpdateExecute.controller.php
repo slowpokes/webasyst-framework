@@ -26,6 +26,7 @@ class installerUpdateExecuteController extends waJsonController
         if ($this->thread_id = waRequest::get('thread_id', false)) {
             $cache = new waSerializeCache($this->getApp().'.'.$this->thread_id);
             $this->urls = $cache->get();
+            $cache->delete();
         }
         if ($this->urls) {
             wa()->getStorage()->close();
@@ -107,18 +108,18 @@ class installerUpdateExecuteController extends waJsonController
 
     private function cleanup()
     {
-        $path_cache = waConfig::get('wa_path_cache');
-        waFiles::delete($path_cache, true);
-        waFiles::protect($path_cache);
-        $root_path = waConfig::get('wa_path_root');
+        $apps = array();
         foreach ($this->urls as $url) {
             if (!isset($url['skipped']) || !$url['skipped']) {
-                $path_cache = $root_path.'/'.$url['target'].'/js/compiled';
-                waFiles::delete($path_cache, true);
+                if (preg_match('@^wa-apps/[^/]+$@', $url['target'])) {
+                    $apps[] = array(
+                        'installed' => true,
+                        'slug'      => $url['target'],
+                    );
+                }
             }
         }
-        $cache = new waSerializeCache($this->getApp().'.'.$this->thread_id);
-        $this->urls = $cache->delete();
+        installerHelper::flushCache($apps);
         $this->model->ping();
     }
 

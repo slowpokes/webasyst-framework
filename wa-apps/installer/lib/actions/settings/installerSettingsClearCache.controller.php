@@ -17,21 +17,13 @@ class installerSettingsClearCacheController extends waJsonController
     public function execute()
     {
         try {
-            $path_cache = waConfig::get('wa_path_cache');
-            waFiles::delete($path_cache, true);
-            waFiles::protect($path_cache);
-            $app_path = waConfig::get('wa_path_apps');
 
+            $errors = installerHelper::flushCache();
 
-            $app_list = array();
-            //XXX check it
-            foreach ($app_list as $app) {
-                if (!empty($app['installed'])) {
-                    $path_cache = $app_path.'/'.$app['slug'].'/js/compiled';
-                    waFiles::delete($path_cache, true);
-                }
-            }
             $this->response['message'] = _w('Cache cleared');
+            if ($errors) {
+                $this->response['message'] .= "<br>"._w('But with errors:')."<br>".implode("<br>", $errors);
+            }
         } catch (Exception $ex) {
             $this->setError($ex->getMessage());
         }

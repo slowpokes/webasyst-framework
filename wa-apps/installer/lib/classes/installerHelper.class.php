@@ -51,6 +51,46 @@ class installerHelper
         return self::getInstaller()->getDomain();
     }
 
+    public static function flushCache($apps = array())
+    {
+        $path_cache = waConfig::get('wa_path_cache');
+        waFiles::protect($path_cache);
+
+        $caches = array();
+        $paths = waFiles::listdir($path_cache);
+        foreach ($paths as $path) {
+            #skip long action & data path
+            if ($path != 'temp') {
+                $path = $path_cache.'/'.$path;
+                if (is_dir($path)) {
+                    $caches[] = $path;
+                }
+            }
+        }
+
+        if ($apps) {
+            $app_path = waConfig::get('wa_path_apps');
+            foreach ($apps as $app) {
+                if (!empty($app['installed'])) {
+                    $caches[] = $app_path.'/'.$app['slug'].'/js/compiled';
+                }
+            }
+        }
+
+        $caches[] = $path_cache.'/temp';
+        $root_path = wa()->getConfig()->getRootPath();
+        $errors = array();
+        foreach ($caches as $path) {
+            try {
+                waFiles::delete($path);
+            } catch (Exception $ex) {
+                $errors[] = str_replace($root_path.DIRECTORY_SEPARATOR, '', $ex->getMessage());
+                waFiles::delete($path, true);
+            }
+        }
+        return $errors;
+    }
+
     public static function checkUpdates(&$messages)
     {
         try {
@@ -73,7 +113,7 @@ class installerHelper
     /**
      *
      * @param array $filter
-     * @param array[string]string $filter['extras'] select apps with specified extras type
+     * @param array [string]string $filter['extras'] select apps with specified extras type
      * @return array
      * @throws Exception
      */

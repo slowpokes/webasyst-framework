@@ -38,6 +38,9 @@ abstract class installerExtrasRemoveAction extends waViewAction
                 case 'plugins':
                     $msg = _w("Unable to delete application's plugins (developer version is on)");
                     break;
+                default:
+                    $msg = '???';
+                    break;
             }
             $this->redirect(array(
                 'module' => $this->extras_type,
@@ -81,37 +84,39 @@ abstract class installerExtrasRemoveAction extends waViewAction
             if ($module == 'plugins') {
                 $options['system'] = true;
             }
-            $filter = array(
-                'extras' => $this->extras_type,
-            );
+
             $this->installer = installerHelper::getInstaller();
             $app_list = $this->installer->getItems();
 
             $queue = array();
 
-            $filter = false;
-            foreach ($app_list as $app) {
-                if (!empty($app[$this->extras_type])) {
-                    foreach ($app[$this->extras_type] as $extras_id => $info) {
-                        $slug = $info['slug'];
-                        if (isset($extras_ids[$slug]) /*&& ($extras_ids[$slug]['vendor'] == $info['installed']['vendor'])*/) {
-                            if (!empty($info['system'])) {
-                                /*
-                                 _w("Can not delete system application's themes \"%s\"");
-                                 _w("Can not delete system application's plugins \"%s\"");
-                                 */
 
-                                $message = "Can not delete system application's {$this->extras_type} \"%s\"";
-                                throw new waException(sprintf(_w($message), $info['name']));
-                            }
+            foreach ($extras_ids as $slug => $info) {
+                $slug_chunks = explode('/', $slug);
+                if ($slug_chunks == 'wa-plugins') {
+                    $app_id = $slug_chunks[0].'/'.$slug_chunks[1];
+                } else {
+                    $app_id = reset($slug_chunks);
+                }
+                if (isset($app_list[$app_id])) {
+                    $app = $app_list[$app_id];
+                    $installed = $this->installer->getItemInfo($slug, $options);
+                    if ($info['vendor'] == $installed['installed']['vendor']) {
+                        if (!empty($installed['installed']['system'])) {
+                            /*
+                             _w("Can not delete system application's themes \"%s\"");
+                             _w("Can not delete system application's plugins \"%s\"");
+                             */
 
-                            $queue[] = array(
-                                'app_slug' => $app['slug'],
-                                'ext_id'   => $info['id'],
-                                'name'     => "{$info['installed']['name']} ({$app['name']})",
-                            );
-                            unset($extras_ids[$slug]);
+                            $message = "Can not delete system application's {$this->extras_type} \"%s\"";
+                            throw new waException(sprintf(_w($message), $info['name']));
                         }
+                        $queue[] = array(
+                            'app_slug' => $app_id,
+                            'ext_id'   => $installed['id'],
+                            'name'     => "{$installed['installed']['name']} ({$app['name']})",
+                        );
+                        unset($extras_ids[$slug]);
                     }
                 }
             }
@@ -120,7 +125,6 @@ abstract class installerExtrasRemoveAction extends waViewAction
             foreach ($queue as $q) {
                 if ($this->removeExtras($q['app_slug'], $q['ext_id'])) {
                     $deleted_extras[] = $q['name'];
-                    $filter = $app['id'].'/';
                 }
             }
 
@@ -133,7 +137,6 @@ abstract class installerExtrasRemoveAction extends waViewAction
                     if (file_exists($info_path) && ($info = include($info_path))) {
                         waFiles::delete($path, true);
                         $deleted_extras[] = empty($info['name']) ? $matches[1] : $info['name'];
-                        $filter = 'wa-plugins/'.$matches[2];
                     }
                 }
             }

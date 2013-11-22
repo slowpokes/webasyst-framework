@@ -1,4 +1,5 @@
 <!DOCTYPE html><html>
+{block name='init'}{/block}
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -31,7 +32,7 @@
     <script type="text/javascript">
         $.layout.init({
             default_query:{
-                plugins:'{$default_query.plugins}'
+                plugins:'{$default_query.plugins|default:''}'
             }
         });
     </script>
@@ -74,6 +75,11 @@
                         </li>
                       </ul>
                     </div>
+
+
+                    {block name='sidebar'}
+
+                    {/block}
 
                     <div class="hr"></div>
 

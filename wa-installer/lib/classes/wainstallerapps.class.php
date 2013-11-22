@@ -94,10 +94,14 @@ class waInstallerApps
         $signature = array(
             'php' => preg_replace('@([^0-9\\.].*)$@', '', phpversion()),
             'c'   => PHP_INT_SIZE,
-            'os'  => php_uname('s'),
-            'r'   => php_uname('r'),
             'api' => PHP_SAPI,
         );
+        if (function_exists('php_uname')) {
+            $signature['os'] = @php_uname('s');
+            $signature['r'] = @php_uname('r');
+        } elseif (defined('PHP_OS')) {
+            $signature['os'] = constant('PHP_OS');
+        }
         return $raw ? $signature : base64_encode(json_encode($signature));
     }
 
@@ -300,7 +304,7 @@ class waInstallerApps
                 }
 
             } else {
-                //XXX allow update, while vendor missed
+                //XXX allow update, while vendor missing
                 $applicable = false;
             }
         }
@@ -536,6 +540,7 @@ class waInstallerApps
                     $extra_types['themes'][] = $app['id'];
                 }
             }
+            $options['status'] = true;
             foreach ($extra_types as $type => $extras_apps) {
                 $extras = $this->getExtras($extras_apps, $type, $options);
                 foreach ($extras as $app_id => $app) {
@@ -860,7 +865,6 @@ class waInstallerApps
         );
 
         $enum_options = array();
-
         if (!empty($options['status'])) {
             if ($type == 'plugins') {
                 foreach ((array)$app as $app_id) {
@@ -1013,7 +1017,9 @@ class waInstallerApps
                 if (!empty($options['vendor'])) {
                     $filter['vendor'] = $options['vendor'];
                 }
-                $info = array_merge($info, $this->info(($id == 'wa-plugins') ? '' : 'wa-apps', $info['slug'], $filter));
+                $key = ($id == 'wa-plugins') ? '' : 'wa-apps';
+                $info = array_merge($info, $this->info($key, $info['slug'], $filter));
+
 
                 if (!empty($info['inherited'])) {
                     foreach ($info['inherited'] as $inherited_app_id => $inherited) {
@@ -1371,6 +1377,7 @@ class waInstallerApps
         fwrite($fp, var_export($config, true));
         fwrite($fp, ";\n//EOF");
 
+        @fflush($fp);
         @flock($fp, LOCK_UN);
         @fclose($fp);
         self::$configs[$path] = $config;

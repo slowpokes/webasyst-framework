@@ -32,6 +32,7 @@
                         {/foreach}
                         <input type="hidden" name="hash" value="{$identity_hash}">
                         <input type="hidden" name="domain" value="{$domain}">
+                        <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                         {if $theme.license_expire}
                         {* EXPIRED LICENSE *}
                             <input type="submit" class="button red" value="[`Renew license`]">
@@ -69,6 +70,12 @@
 
                         </form>
                     {elseif $theme.commercial}
+                        {if !empty($theme.reviews.url)}
+                            <p>
+                                <a href="{$theme.reviews.url}" class="large bold">[`Write a review`]</a>
+                                <i class="icon16 new-window"></i>
+                            </p>
+                        {/if}
 
                         {if $theme.license_expire}
                         {* COMMERCIAL LICENSE WITH AN EXPIRE DATE *}
@@ -79,6 +86,7 @@
                                 {/foreach}
                                 <input type="hidden" name="hash" value="{$identity_hash}">
                                 <input type="hidden" name="domain" value="{$domain}">
+                                <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                                 <input type="submit" class="button green" value="[`Extend license`]">
                                 <p><i class="icon16 yes"></i>{sprintf("[`This is a licensed installation of %s on %s. License is valid through <strong>%s</strong>.`]",$theme.name|escape, installerHelper::getDomain()|escape, $theme.license_expire)}</p>
 
@@ -88,7 +96,12 @@
                             <p>{sprintf("[`You have the latest version of %s installed: <strong>%s</strong>`]",$theme.name,$theme.installed.version)}</p>
                         {/if}
                     {else}
-                    {* FREE APP *}
+                    {* FREE APP *}{if !empty($theme.reviews.url)}
+                        <p>
+                            <a href="{$theme.reviews.url}" class="large bold">[`Write a review`]</a>
+                            <i class="icon16 new-window"></i>
+                        </p>
+                    {/if}
                         <p>{sprintf("[`You have the latest version of %s installed: <strong>%s</strong>`]",$theme.name,$theme.installed.version)}</p>
                     {/if}
                 {/if}
@@ -108,6 +121,7 @@
                         {/foreach}
                         <input type="hidden" name="hash" value="{$identity_hash}">
                         <input type="hidden" name="domain" value="{$domain}">
+                        <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                         <input type="submit" class="button green" value="[`Install`]"{if !$theme.applicable} disabled="disabled"{/if}>
                     </form>
                 {else}
@@ -139,17 +153,25 @@
                             <div class="name">
                                 [`Price`]
                             </div>
-                            <div class="value">
-                                <strong>{$theme.price}</strong>
-                            </div>
-                            {* if $theme.lease_price}
+                            {if $theme.lease_price == 'free'}
+                                {* free to install on this particular installation (cloud) *}
                                 <div class="value">
-                                    [`or`]
+                                    <strong>[`Free`]</strong>
                                 </div>
+                            {else}
                                 <div class="value">
-                                    <strong>{sprintf('[`%s/mo`]',$theme.lease_price)}</strong> <span class="gray">[`for rent, first 30 days free`]</span>
+                                    {if !empty($theme.compare_price)}<strike class="gray">{$theme.compare_price}</strike>&nbsp; {/if}
+                                    <strong{if !empty($theme.compare_price)} class="highlighted"{/if}>{$theme.price}</strong>
                                 </div>
-                            {/if *}
+                                {if $theme.lease_price}
+                                    <div class="value">
+                                        [`or`]
+                                    </div>
+                                    <div class="value">
+                                        <strong>{sprintf('[`%s/mo`]',$theme.lease_price)}</strong>
+                                    </div>
+                                {/if}
+                            {/if}
                         </div>
                     </div>
                 {else}
@@ -220,7 +242,7 @@
                 </div>
                 <div class="value">
                     {$theme.version}{if $theme.changelog}
-                        <a href="{$current_url}changelog/" data-href="{$current_data_url}changelog/" class="no-underline js-item-link">[`View release notes`]</a>
+                        <a href="{$current_url}changelog/" data-href="{$current_data_url}changelog/" class="js-item-link">[`View release notes`]</a>
                     {/if}
                 </div>
             </div>
@@ -249,9 +271,9 @@
                 <div class="block top-padded align-center clear-both">
                     <form action="?module=themes&amp;action=remove" method="POST" onsubmit="return confirm(this.title);" title="[`This will delete application source code and data without the ability to recover. Are you sure?`]">
                         {$wa->csrf()}
-                        <input type="hidden" name="extras_id[{$theme.slug}]" value="{$theme.vendor}{if !empty($theme.edition)}:{$theme.edition}{/if}">
+                        <input type="hidden" name="extras_id[{$theme.slug}]" value="{$theme.installed.vendor}{if !empty($theme.installed.edition)}:{$theme.installed.edition}{/if}">
                         {if !empty($theme.inherited)}{foreach $theme.inherited as $inherited}
-                            <input type="hidden" name="extras_id[{$inherited.slug}]" value="{$theme.vendor}{if !empty($theme.edition)}:{$theme.edition}{/if}">
+                            <input type="hidden" name="extras_id[{$inherited.slug}]" value="{$theme.installed.vendor}{if !empty($theme.installed.edition)}:{$theme.installed.edition}{/if}">
                         {/foreach}{/if}
                         <input type="submit" value="[`Delete this theme`]" class="button red">
                     </a>
@@ -281,7 +303,10 @@
 
                     <nav>
                         <ul class="menu-h">
-                            <li class="selected" style="display: none;"><a href="{$current_url}" data-href="{$current_data_url}" class=" js-item-link">[`Overview`]</a></li>
+                            <li class="selected"{if empty($theme.reviews.url)} style="display: none;"{/if}><a href="{$current_url}" data-href="{$current_data_url}" class=" js-item-link">[`Overview`]</a></li>
+                            {if !empty($theme.reviews.url)}
+                                <li><a href="{$theme.reviews.url}" target="_blank">[`Reviews`] <span class="hint">{$theme.reviews.count|escape}</span> <i class="icon10 new-window"></i></a></li>
+                            {/if}
                         </ul>
                     </nav>
 
@@ -308,15 +333,15 @@
 
         </article>
 
-        <section class="i-description">
+        <section class="i-description" id="tab-{$theme.id|escape}-info">
             <p>{$theme.description}</p>
         </section>
 
         {if !empty($theme.changelog)}
-            <section id="tab-{$theme.slug|escape}-changelog" style="display:none;">
+            <section id="tab-{$theme.id|escape}-changelog" style="display:none;">
                 {foreach $theme.changelog as $changelog}
 
-                    <div><strong>{$changelog.version}</strong>{if version_compare($changelog.version,$theme.installed.version,'>')}<i class="icon16 new"></i>{/if}<p>{$changelog.content|nl2br}</p></div>
+                    <div><strong>{$changelog.version}</strong><p>{$changelog.content|nl2br}</p></div>
                 {/foreach}
             </section>
         {/if}

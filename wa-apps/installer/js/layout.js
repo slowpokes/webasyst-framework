@@ -146,7 +146,7 @@ $.layout = {
                     matches = matches.slice(query_size);
                     if (item = matches.shift() || '') {
                         item = query + '/' + item;
-                        query = this.path.query;
+                       // query = this.path.query;
                     }
                 } else {
                     query = this.options.default_query.plugins;
@@ -475,8 +475,11 @@ $.layout = {
                 $nav.find('> li').hide();
             }
         }
-
-        id = '#tab-' + path.item + '-' + (path.tab || 'info');
+        var item = path.item;
+        if (path.list == 'plugins') {
+            item = item.replace(/\//, '/' + path.list + '/');
+        }
+        id = '#tab-' + (item + '-' + (path.tab || 'info')).replace(/([ #;&,.+*~\':"!^$[\]()=>|\/])/g, '\\$1');
         //tab-pocketlists-info
         var href = path.item + '/';
         if (path.tab) {
@@ -650,9 +653,9 @@ $.layout = {
             $('html, body').animate({
                 scrollTop: 0
             }, 200);
-            if (callback) {
+            if (typeof(callback) == 'function') {
                 try {
-                    callback.call(self);
+                    callback();
                 } catch (e) {
                     $.layout.error('$.layout.loadContent callback error: ' + e.message, e);
                 }

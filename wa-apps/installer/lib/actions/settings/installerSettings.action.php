@@ -175,15 +175,7 @@ class installerSettingsAction extends waViewAction
             $this->view->assign('messages', $messages);
         }
 
-        $installer_info = array(
-            'build'   => time(),
-            'version' => '1.0.1',
-        );
-        $version = $installer_info['version'];
-        if (abs(time() - $installer_info['build']) > 2) {
-            $version .= '.'.$installer_info['build'];
-        }
-        $this->view->assign('version', $version);
+        $this->view->assign('version', wa()->getVersion('webasyst'));
 
         $this->view->assign('settings', $settings);
         $this->view->assign('config', $config);
