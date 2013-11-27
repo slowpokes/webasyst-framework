@@ -103,4 +103,11 @@ class Debug {
     static function breakpoint(){
         throw new waException("Breakpoint", 404);
     }
+
+    static function trace(){
+        echo "<pre>";
+        debug_print_backtrace();
+        echo "</pre>";
+        die();
+    }
 }
