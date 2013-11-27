@@ -35,7 +35,7 @@ class waAppViewHelper
                 $route = wa()->getRouting()->getRoute('url');
                 $url = $this->wa->getAppUrl(null, true);
             } else {
-                $routes = wa()->getRouting()->getByApp($this->wa->getConfig()->getApplication(), $domain);
+                $routes = wa()->getRouting()->getByApp($this->wa->getAppFake(), $domain);//VADIM CODE
                 if ($routes) {
                     $route = end($routes);
                     $route = $route['url'];
