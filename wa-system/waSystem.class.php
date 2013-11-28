@@ -877,6 +877,7 @@ class waSystem
         if ($app_id === null) {
             $app_id = self::getApp();
         }
+        $app_id = wa()->replaceName($app_id);// VADIM CODE
         if (!isset(self::$models['app_settings'])) {
             self::$models['app_settings'] = new waAppSettingsModel();
         }
