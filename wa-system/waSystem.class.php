@@ -1133,6 +1133,7 @@ class waSystem
         $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
         if(isset($all_apps[$name])){
             if(is_array($all_apps[$name])){
+                self::$app_names['fake'] = $name;
                 self::$db = $all_apps[$name]['db'];
                 return $all_apps[$name]['app'];
             }
