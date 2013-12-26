@@ -685,9 +685,11 @@ class waSystem
                         // VADIM CODE START
                         $fake_name = $app;
                         $title = '';
+                        $db = '';
                         if(is_array($enabled)){
                             $app = $enabled['app'];
                             $title = $enabled['title'];
+                            $db = $enabled['db'];
                         }
                         // VADIM CODE END
                         waLocale::loadByDomain($app, $locale);
@@ -711,7 +713,11 @@ class waSystem
                         }
                         $app_info['id'] = $app;
                         $app_info['name'] = _wd($app, $app_info['name']);
-                        if($title) $app_info['name'] = $title; //VADIM CODE
+                        //VADIM CODE START
+                        if($title) $app_info['name'] = $title;
+                        $app_info['db'] = '';
+                        if($db) $app_info['db'] = $db;
+                        //VADIM CODE END
                         if (isset($app_info['icon'])) {
                             if (is_array($app_info['icon'])) {
                                 foreach ($app_info['icon'] as $size => $url) {

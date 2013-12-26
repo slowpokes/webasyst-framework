@@ -44,7 +44,7 @@ class webasystBackendCountController extends waJsonController
             }
         }
         //VADIM CODE END
-        
+
         // cache counts in session
         wa()->getStorage()->write('apps-count', array_filter($this->response));
 

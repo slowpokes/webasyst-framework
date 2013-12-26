@@ -915,5 +915,9 @@ class waModel
         }
         return 'default';
     }
+
+    public function setDb($db){
+        $this->type = $db;
+    }
     // VADIM CODE END
 }
