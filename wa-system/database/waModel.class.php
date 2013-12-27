@@ -919,5 +919,9 @@ class waModel
     public function setDb($db){
         $this->type = $db;
     }
+
+    public function showScheme(){
+        echo "\nDB sheme is ".$this->getDBSheme()."\n";
+    }
     // VADIM CODE END
 }

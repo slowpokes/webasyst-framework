@@ -1148,6 +1148,20 @@ class waSystem
         return $name;
     }
 
+    public static function setAppTemp($name){
+        $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
+        if(isset($all_apps[$name])){
+            if(is_array($all_apps[$name])){
+                self::$app_names['fake'] = $name;
+                self::$db = $all_apps[$name]['db'];
+            }
+            else{
+                self::$app_names['fake'] = '';
+                self::$db = 'default';
+            }
+        }
+    }
+
     public static function getDb()
     {
         return self::$db;
