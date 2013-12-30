@@ -1008,5 +1008,17 @@ HTML;
         return $str;
     }
 
+    public function getAppTitle(){
+        $fake = wa()->getAppFake();
+        $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
+        if(isset($all_apps[$fake]['title_html'])){
+            return $all_apps[$fake]['title_html'];
+        }
+        elseif(isset($all_apps[$fake]['title'])){
+            return $all_apps[$fake]['title'];
+        }
+        return '';
+    }
+
     //VADIM CODE END
 }
