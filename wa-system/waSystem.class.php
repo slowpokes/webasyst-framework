@@ -1184,6 +1184,14 @@ class waSystem
     }
 
     public function replaceName($name){
+        if(is_array($name)){
+            foreach($name as &$value){
+                if($value=='shop'){
+                    $value = self::getAppFake();
+                }
+            }
+            return $name;
+        }
         if($name=='shop') {
             return self::getAppFake();
         }
