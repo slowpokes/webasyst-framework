@@ -198,7 +198,7 @@ class waRouting
                 }
             }
             $this->root_url = self::clearUrl($u);
-            $url = substr($url, strlen($this->root_url));
+            $url = isset($params['url']) ? $params['url'] : substr($url, strlen($this->root_url));
             $this->dispatchRoutes($this->getAppRoutes($r['app'], $r, true), $url);
         }
 
@@ -360,8 +360,7 @@ class waRouting
             $params['action'] = $parts[2];
         }
         $routes = array();
-        if (!$this->route || $this->route['app'] != $app || $domain_url ||
-        (!isset($this->route['module']) && isset($params['module']) && $params['module'] != 'frontend') ||
+        if (!$this->route || $this->route['app'] != $app || ($domain_url && $domain_url != $this->getDomain()) ||
         (isset($this->route['module']) && isset($params['module']) && $this->route['module'] != $params['module'])
         ){
             // find base route
