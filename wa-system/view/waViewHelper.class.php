@@ -963,7 +963,7 @@ HTML;
     //VADIM CODE START
     public function backend()
     {
-        return $this->wa->getConfig()->getBackendUrl(true);
+        return wa()->getConfig()->getBackendUrl(true);
     }
 
     public function debug(){
