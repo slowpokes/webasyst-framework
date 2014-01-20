@@ -1021,14 +1021,22 @@ msgstr "Отзывы"
 msgid "But with errors:"
 msgstr "С ошибками:"
 
-#: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:148
+#: /wa-apps/installer/templates/actions/plugins/PluginsView.html:13
+msgid "Popular plugins"
+msgstr "Популярные плагины"
+
+#: /wa-apps/installer/templates/actions/plugins/PluginsView.html:14
 msgid ""
-"Application plugin %s has been deleted', 'Applications plugins %s have been "
-"deleted"
+"The following list of plugins is automatically updated from the Webasyst "
+"Store. Click on a plugin to install."
+msgstr ""
+"Щелкните по плагину, чтобы автоматически скачать и установить его из "
+"магазина Webasyst"
+
+#: /wa-apps/installer/templates/actions/qa/QaDefault.html:45
+msgid "Plugin"
 msgstr ""
 
-#: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:149
-msgid ""
-"Application theme %s has been deleted', 'Applications themes %s have been "
-"deleted"
+#: /wa-apps/installer/templates/actions/qa/QaDefault.html:55
+msgid "Theme"
 msgstr ""

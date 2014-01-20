@@ -16,5 +16,10 @@ class installerPluginsAction extends installerItemsAction
 {
     protected $module = 'plugins';
 
+    protected function getAppOptions()
+    {
+        return parent::getAppOptions() + array('system' => true);
+    }
+
 }
 //EOF

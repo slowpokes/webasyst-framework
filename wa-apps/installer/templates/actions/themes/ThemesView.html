@@ -61,7 +61,7 @@
                                     </div>
                                     <div class="dialog-buttons">
                                         <div class="dialog-buttons-gradient">
-                                            <input type="submit" value="[`Setup routing`]" class="button green">
+                                            <input type="submit" value="[`Setup routing`]" class="button">
                                             <span>[`or`]</span>
                                             <a href="#" class="cancel">[s`cancel`]</a>
                                         </div>
@@ -73,7 +73,14 @@
                 {/if}
             {elseif !empty($theme.commercial)}
                 {if true}
-                    <em>{$theme.price|escape}</em>
+                    {if 1||!empty($theme.compare_price)}
+                        <strike class="wa-price">{$theme.compare_price}</strike>&nbsp;
+                        <strong class="highlighted">{$theme.price}</strong>
+                    {else}
+                        <span class="wa-price">
+                            {$theme.price}
+                        </span>
+                    {/if}
                     <form id="js-theme-info-{$theme.id}" action="{$wa_backend_url}installer/#/themes/{$theme.id|escape}/" method="GET">
                     </form>
                 {elseif !empty($theme.purchase_link)}
@@ -86,6 +93,9 @@
                     </form>
                 {/if}
             {else}
+                <span class="wa-price">
+                    [`Free`]
+                </span>
                 <form id="js-theme-install-{$theme.id}" action="{$wa_backend_url}installer/?module=update&action=manager" method="POST" title="{sprintf('[`Install theme "%s" for the %s app?`]',$theme.name,$app['name'])|escape}">
                     <input type="hidden" name="return_url" value="{$return_url|replace:'%theme_id%':$theme.id|escape}">
                     {foreach $theme.inherited as $inherited}
@@ -120,7 +130,7 @@ $("div.wa-themes ul li").on('click', 'a.js-theme-info', function () {
                             var href = url.attr('href');
                             $(this).find('form').attr('action',href);
                         } else {
-                            $(this).find(':submit').hide().next().hide();
+//                            $(this).find(':submit').hide().next().hide();
                         }
                     }
                     $(this).find('div.dialog-window').css('height', $(this).find('.dialog-content-indent').height()+50+'px');

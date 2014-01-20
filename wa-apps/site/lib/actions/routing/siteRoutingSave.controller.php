@@ -70,7 +70,7 @@ class siteRoutingSaveController extends waJsonController
                         <td class="s-url">
                             <span><a style="display:inline" href="#"><i class="icon16 sort"></i></a></span> <span class="s-domain-url">'.$domain.'/</span><span class="s-editable-url" style="color:#000">'.htmlspecialchars($route['url']).'</span>
                         </td>
-                        <td class="s-app">';
+                        <td class="s-app'.(!empty($route['private']) ? ' gray' : '').'">';
                             $root_url = wa()->getRootUrl();
                             if (!empty($route['app'])) {
                                 $app = wa()->getAppInfo($route['app']);
@@ -88,10 +88,16 @@ class siteRoutingSaveController extends waJsonController
         } else {
             $old = $routes[$domain][$route_id];
             $routes[$domain][$route_id] = $this->getRoute($old);
+
             // save
             waUtils::varExportToFile($routes, $path);
 
             $this->response['url'] = $routes[$domain][$route_id]['url'];
+            $this->response['private'] = !empty($routes[$domain][$route_id]['private']);
+
+            if (isset($routes[$domain][$route_id]['redirect'])) {
+                $this->response['redirect'] = $routes[$domain][$route_id]['redirect'];
+            }
 
             if (!isset($routes[$domain][$route_id]['redirect']) && $routes[$domain][$route_id]['url'] != $old['url']) {
                 // update pages
@@ -188,7 +194,7 @@ class siteRoutingSaveController extends waJsonController
         }
 
         foreach ($params as $key => $value) {
-            if ($key != '_name' || $value != $name || (isset($r['_name']) && $value != $r['_name'])) {
+            if ($key != '_name' || (isset($name) && $value != $name) || (isset($r['_name']) && $value != $r['_name'])) {
                 $r[$key] = $value;
             }
         }

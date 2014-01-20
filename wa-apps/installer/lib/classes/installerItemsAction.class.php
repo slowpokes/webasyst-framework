@@ -5,6 +5,24 @@ abstract class installerItemsAction extends waViewAction
     protected $redirect = false;
     protected $update_counter = 0;
 
+    protected function getAppOptions()
+    {
+        return array(
+            'installed' => true,
+        );
+    }
+
+    protected function getExtrasOptions()
+    {
+        return array(
+            'local'  => false,
+            'apps'   => false,
+            'filter' => (array)waRequest::get('filter'),
+        );
+
+        //'requirements' => true,
+    }
+
     public function execute()
     {
         if (!waRequest::get('_') && false) {
@@ -19,14 +37,10 @@ abstract class installerItemsAction extends waViewAction
             $filter['extras'] = $this->module;
         }
 
-        $app_options = array(
-            'installed' => true,
-        );
+
+        $app_options = $this->getAppOptions();
 
         try {
-            if ($this->module == 'plugins') {
-                $app_options['system'] = true;
-            }
             $s = array();
             $applications = installerHelper::getInstaller()->getApps($app_options, $filter);
             $subject = waRequest::get('subject');
@@ -46,11 +60,7 @@ abstract class installerItemsAction extends waViewAction
                 $slug_id = "installer_select_{$key}";
                 $vendor_id = "installer_select_{$key}_vendor";
 
-                $options = array(
-                    'local'  => false,
-                    'apps'   => false,
-                    'filter' => (array)waRequest::get('filter'),
-                );
+                $options = $this->getExtrasOptions();
 
                 $slug = waRequest::get('slug', $storage->read($slug_id));
                 if (!empty($options['filter']['slug'])) {
@@ -69,7 +79,6 @@ abstract class installerItemsAction extends waViewAction
                         $search['slug'] = array_unique(array_merge($search['slug'], $s));
                     }
                 }
-
                 if ((!$this->redirect || !empty($search['slug'])) && (($keys = installerHelper::search($applications, $search, true)) !== null)) {
                     $slug = array();
                     foreach ($keys as $id => $key) {

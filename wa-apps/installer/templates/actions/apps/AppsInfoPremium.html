@@ -301,7 +301,7 @@
 {if !empty($app)}
 <script type="text/javascript">
 <!--
-$.layout.window.setTitle('{$app.name} — {$wa->accountName()}');
+$.layout.window.setTitle('{$app.name|cat:" — ":{$wa->accountName(false)}|escape:'javascript'}');
 $.layout.premium.setClass('apps:{$app.slug}','premium-layout-{$app.slug}');
 //-->
 </script>

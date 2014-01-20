@@ -344,7 +344,7 @@
         {if !empty($app.changelog)}
             <section class="i-page" id="tab-{$app.slug|escape}-changelog" style="display:none;">
                 {foreach $app.changelog as $changelog}
-                    <h5>{$changelog.version}</h5>{if !empty($changelog.datetime)}<span class="hint">{$changelog.datetime|wa_date:'humandate'|escape}</span>{/if}
+                    <h5>{$changelog.version}</h5>{if !empty($changelog.datetime)} <span class="hint">{$changelog.datetime|wa_date:'humandate'|escape}</span>{/if}
                     {if version_compare($changelog.version,$app.installed.version,'>')}{/if}
                     <div class="i-changelog">{$changelog.content|nl2br}</div>
                 {/foreach}
@@ -361,7 +361,7 @@
 </div>
 <script type="text/javascript">
 <!--
-$.layout.window.setTitle('{$app.name} — {$wa->accountName()}');
+$.layout.window.setTitle('{$app.name|cat:" — ":{$wa->accountName(false)}|escape:'javascript'}');
 {if !empty($app['is_premium'])}
 $.layout.premium.setClass('apps:{$app.slug}','premium-layout-{$app.slug}');
 {/if}

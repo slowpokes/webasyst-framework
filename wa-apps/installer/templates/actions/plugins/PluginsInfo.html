@@ -351,7 +351,7 @@
 </div>
 <script type="text/javascript">
     <!--
-    $.layout.window.setTitle('{$plugin.name} — {$wa->accountName()}');
+    $.layout.window.setTitle('{$plugin.name|cat:" — ":{$wa->accountName(false)}|escape:'javascript'}');
     //-->
 </script>
 {block name=footer}
