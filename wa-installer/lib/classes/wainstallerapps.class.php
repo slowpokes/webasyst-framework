@@ -364,16 +364,16 @@ class waInstallerApps
      *
      * @param array $options
      *
-     * @param array[string]array $options['items']
-     * @param array[string]boolean $options['plugins']
-     * @param array[string]boolean $options['themes']
-     * @param array[string]boolean $options['list']
+     * @param array [string]array $options['items']
+     * @param array [string]boolean $options['plugins']
+     * @param array [string]boolean $options['themes']
+     * @param array [string]boolean $options['list']
      *
      * @param array $filter
-     * @param array[string]mixed $filter['locale']
-     * @param array[string]mixed $filter['vendor']
-     * @param array[string]boolean $options['plugins']
-     * @param array[string]boolean $options['themes']
+     * @param array [string]mixed $filter['locale']
+     * @param array [string]mixed $filter['vendor']
+     * @param array [string]boolean $options['plugins']
+     * @param array [string]boolean $options['themes']
      * @return array
      */
     protected function enumerate($path, $options = array(), $filter = array())
@@ -741,12 +741,12 @@ class waInstallerApps
      *
      * @param array $options
      *
-     * @param array[string]string $options['status'] item status at config (enabled|disabled or deleted); default are enabled
-     * @param array[string]boolean $options['requirements'] check apps requirements; default are false
-     * @param array[string]boolean $options['installed'] get local apps only if true; get remote apps if false; merge if not set
+     * @param array [string]string $options['status'] item status at config (enabled|disabled or deleted); default are enabled
+     * @param array [string]boolean $options['requirements'] check apps requirements; default are false
+     * @param array [string]boolean $options['installed'] get local apps only if true; get remote apps if false; merge if not set
      *
      * @param array $filter
-     * @param array[string]string $filter['extras']
+     * @param array [string]string $filter['extras']
      * @return array
      * @since 2.0
      */
@@ -926,6 +926,9 @@ class waInstallerApps
 
                 $list = $this->query($url, $vendor);
 
+                $sort = array();
+
+                $count = 0;
                 foreach ($list as $app_id => $available_extras) {
                     if (!isset($extras[$app_id])) {
                         if (!isset($options['apps']) || !empty($options['apps'])) {
@@ -937,6 +940,9 @@ class waInstallerApps
                     }
                     foreach ($available_extras[$type] as $extras_id => $extras_item) {
 
+                        if (!isset($sort[$extras_id])) {
+                            $sort[$extras_id] = $count++;
+                        }
 
                         if (!empty($installed[$app_id][$type][$extras_id])) {
                             $_installed = $installed[$app_id][$type][$extras_id];
@@ -967,8 +973,15 @@ class waInstallerApps
                             );
                             $extras[$app_id][$type][$extras_id] = $extras_item;
                         }
-
                     }
+                }
+                $f = create_function('$a,$b', '
+                    $sort = '.var_export($sort, true).';
+                    return max(-1,min(1,(isset($sort[$a])?$sort[$a]:100)-(isset($sort[$b])?$sort[$b]:100)));
+                    ');
+                foreach ($extras as &$available_extras) {
+                    uksort($available_extras[$type], $f);
+                    unset($available_extras);
                 }
             }
         }

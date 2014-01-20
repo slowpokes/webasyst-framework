@@ -44,6 +44,7 @@ class installerThemesViewAction extends waViewAction
             'inherited' => array_keys($applications),
         );
         $list = $installer->getExtras($search['slug'], 'themes', $options);
+
         /**
          * @var $themes waTheme[]
          */
@@ -53,12 +54,16 @@ class installerThemesViewAction extends waViewAction
             if (!empty($item_list['themes'])) {
                 foreach ($item_list['themes'] as $theme_id => $theme) {
                     if (($id == $app_id) || !empty($theme['inherited'][$app_id])) {
-                        $themes[$theme_id] = new waTheme($theme_id, $app_id, true);
+                        $themes[$theme_id] = new waTheme($theme_id, $app_id, true, true);
+
                         $themes[$theme_id]['name'] = empty($theme['name']) ? $theme_id : $theme['name'];
                         $themes[$theme_id]['description'] = empty($theme['description']) ? '' : $theme['description'];
 
                         if (!empty($theme['price'])) {
                             $themes[$theme_id]['price'] = $theme['price'];
+                        }
+                        if (!empty($theme['compare_price'])) {
+                            $themes[$theme_id]['compare_price'] = $theme['compare_price'];
                         }
                         if (isset($theme['commercial'])) {
                             $themes[$theme_id]['commercial'] = $theme['commercial'];
@@ -93,6 +98,7 @@ class installerThemesViewAction extends waViewAction
         }
         foreach ($themes as $theme_id => &$theme) {
             $theme['inherited'] = $inherited[$theme_id];
+            unset($theme);
         }
 
         $app = $installer->getItemInfo($app_id);

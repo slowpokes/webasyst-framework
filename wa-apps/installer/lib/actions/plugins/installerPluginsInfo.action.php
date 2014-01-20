@@ -29,11 +29,12 @@ class installerPluginsInfoAction extends waViewAction
             $options = array(
                 'action'       => true,
                 'requirements' => true,
-             //XXX   'vendor'       => waRequest::get('plugin_vendor', 'webasyst'),
+                //XXX   'vendor'       => waRequest::get('plugin_vendor', 'webasyst'),
             );
             $plugin = installerHelper::getInstaller()->getItemInfo($plugin_search['slug'], $options);
             if ($plugin) {
                 $plugin['app'] = preg_replace('@^(wa-plugins/)?([^/]+)/.+$@', '$1$2', $plugin['slug']);
+                $plugin['slug'] = preg_replace('@^wa-plugins/([^/]+)/plugins/(.+)$@', 'wa-plugins/$1/$2', $plugin['slug']);
             }
             $this->view->assign('identity_hash', installerHelper::getHash());
             $this->view->assign('domain', installerHelper::getDomain());

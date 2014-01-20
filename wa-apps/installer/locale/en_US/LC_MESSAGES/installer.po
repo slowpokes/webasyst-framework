@@ -985,3 +985,19 @@ msgstr ""
 #: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:149
 msgid "Application theme %s has been deleted', 'Applications themes %s have been deleted"
 msgstr ""
+
+#: /wa-apps/installer/templates/actions/plugins/PluginsView.html:13
+msgid "Popular plugins"
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/plugins/PluginsView.html:14
+msgid "The following list of plugins is automatically updated from the Webasyst Store. Click on a plugin to install."
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/qa/QaDefault.html:45
+msgid "Plugin"
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/qa/QaDefault.html:55
+msgid "Theme"
+msgstr ""

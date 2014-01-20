@@ -57,6 +57,6 @@
 </div>
 <script type="text/javascript">
 <!--
-$.layout.window.setTitle('[`Apps`] — {$wa->accountName()}');
+$.layout.window.setTitle('{"[`Apps`]"|cat:" — ":{$wa->accountName(false)}|escape:'javascript'}');
 //-->
 </script>

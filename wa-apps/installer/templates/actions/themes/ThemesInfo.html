@@ -357,7 +357,7 @@
 <script type="text/javascript">
     <!--
     if($){
-        $.layout.window.setTitle('{$theme.name|default:'[`Application not found`]'} — {$wa->accountName()}');
+        $.layout.window.setTitle('{$theme.name|default:'[`Application not found`]'|cat:" — ":{$wa->accountName(false)}|escape:'javascript'}');
     }
     //-->
 </script>
