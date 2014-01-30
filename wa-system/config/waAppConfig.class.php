@@ -125,7 +125,6 @@ class waAppConfig extends SystemConfig
         try {
             $app_settings_model = new waAppSettingsModel();
             $time = $app_settings_model->get($this->application, 'update_time');
-            print_r($time);
         } catch (waDbException $e) {
             if ($e->getCode() == 2002 && !waSystemConfig::isDebug()) {
                 return;
