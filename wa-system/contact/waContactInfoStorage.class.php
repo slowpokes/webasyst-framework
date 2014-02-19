@@ -26,7 +26,7 @@ class waContactInfoStorage extends waContactStorage
         }
         $data = $this->model->getById($contact->getId());
         if (!$data) {
-            throw new waException('Contact does not exist: '.$contact->getId(), 404);
+            //throw new waException('Contact does not exist: '.$contact->getId(), 404);
         }
         return $data;
     }
