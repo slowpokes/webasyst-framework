@@ -12,16 +12,17 @@ class waSMS
         }
     }
 
-    public function setFrom($from)
-    {
-        $this->from = $from;
-    }
-
+    /**
+     * @param $to
+     * @param $text
+     * @param string $from - sender
+     * @return bool|mixed
+     */
     public function send($to, $text, $from = null)
     {
         try {
-            $adapter = $this->getAdapter();
-            $result = $adapter->send($to, $text, $from ? $from : $this->from);
+            $adapter = $this->getAdapter($from);
+            $result = $adapter->send($to, $text, $from ? $from : $adapter->getOption('from'));
             return $result;
         } catch (waException $e) {
             waLog::log($e->getMessage(), 'sms.log');
@@ -31,20 +32,26 @@ class waSMS
 
 
     /**
+     * @param string $from
+     * @throws waException
      * @return waSMSAdapter
      */
-    protected function getAdapter()
+    protected function getAdapter($from = null)
     {
-        $from = $this->from;
-        
-        if (!$from || !isset(self::$config[$from])) {
+        if (!$from || (!isset(self::$config[$from]) && isset(self::$config['*']))) {
             $from = '*';
         }
-
         if (isset(self::$config[$from])) {
             $options = self::$config[$from];
-        } else {
+        } elseif ($from == '*') {
             $options = reset(self::$config);
+            $from = key(self::$config);
+        } else {
+            throw new waException('SMS sender '.$from.' not configured.');
+        }
+
+        if ($from != '*' && !isset($options['from'])) {
+            $options['from'] = $from;
         }
 
         if (!isset($options['adapter'])) {
