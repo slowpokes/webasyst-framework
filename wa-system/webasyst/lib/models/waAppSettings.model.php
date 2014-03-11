@@ -35,7 +35,7 @@ class waAppSettingsModel extends waModel
 
     public function get($app_id, $name = null, $default = '')
     {
-        //$app_id = wa()->replaceName($app_id);// VADIM CODE
+        $app_id = wa()->replaceName($app_id);// VADIM CODE
         $key = $this->getCacheKey($app_id);
         if (!isset(self::$settings[$app_id])) {
             $cache = $this->getCache($app_id);
