@@ -26,7 +26,7 @@ class waSessionStorage extends waStorage
             //'session_name'            => 'webasyst',
             'session_id'              => null,
             'auto_start'              => true,
-            'session_cookie_lifetime' => $cookie_defaults['lifetime'],
+            'session_cookie_lifetime' => 365*24*3600, //$cookie_defaults['lifetime'],
             'session_cookie_path'     => $cookie_defaults['path'],
             'session_cookie_domain'   => $cookie_defaults['domain'],
             'session_cookie_secure'   => $cookie_defaults['secure'],

@@ -41,6 +41,7 @@ class waContactRegionField extends waContactField
 
     public function format($data, $format = null, $full_composite=null)
     {
+        $full_composite['country'] = 'RUS';
         if (empty($full_composite['country'])) {
             return $format === 'value' ? htmlspecialchars($data) : $data;
         }
