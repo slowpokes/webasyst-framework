@@ -25,11 +25,20 @@ class sagepayPayment extends waPayment implements waIPayment
     public function getSettingsHTML($params = array())
     {
         $currencies = waCurrency::getAll();
+        ksort($currencies);
         foreach ($currencies as $k => $v) {
             $currencies[$k] = $v . ' (' . $k . ')';
         }
         $params['options']['currency'] = $currencies;
         return parent::getSettingsHTML($params);
+    }
+    
+    public function __get($name)
+    {
+        if ($name === 'crypt_password') {
+            return str_pad($this->getSettings($name), 16, " ");
+        }
+        return parent::__get($name);
     }
 
     /**
