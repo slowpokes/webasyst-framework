@@ -1216,7 +1216,9 @@ class waSystem
     }
 
     public static function setApp($real, $fake){
-        self::$app_names = array('real'=>$real, 'fake'=>$fake);
+        if($real=='shop'){
+            self::$app_names = array('real'=>$real, 'fake'=>$fake);
+        }
     }
 
     // VADIM CODE END
