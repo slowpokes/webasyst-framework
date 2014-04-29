@@ -1117,7 +1117,6 @@ class waSystem
         if ($app_id === null) {
             $app_id = $this->getConfig()->getApplication();
         }
-        $app_id = $this->replaceNameToReal($app_id);//VADIM CODE
 
         $theme_paths = array(
             'original' => $this->getAppPath('themes', $app_id),
@@ -1221,7 +1220,7 @@ class waSystem
         if(isset($all_apps[$name])){
             return $all_apps[$name]['app'];
         }
-        return null;
+        return $name;
     }
 
     public static function setApp($real, $fake){

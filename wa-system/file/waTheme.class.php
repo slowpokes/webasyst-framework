@@ -65,6 +65,7 @@ class waTheme implements ArrayAccess
     const PATH = 'theme.xml';
 
     protected $app;
+    protected $app_fake;
     protected $id;
     protected $info;
     protected $extra_info;
@@ -98,6 +99,8 @@ class waTheme implements ArrayAccess
      */
     public function __construct($id, $app_id = true, $force = false, $readonly = false)
     {
+        $this->app_fake = ($app_id === true || !$app_id) ? wa()->getAppFake() : $app_id; //VADIM CODE
+        $app_id = wa()->replaceNameToReal($app_id); //VADIM CODE
         $this->readonly = $readonly;
         if (strpos($id, ':') !== false) {
             list($app_id, $id) = explode(':', $id, 2);
@@ -142,7 +145,7 @@ class waTheme implements ArrayAccess
          * $this->url = null;
          */
 
-        $this->path_custom = wa()->getDataPath('themes/', true, $this->app).$this->id;
+        $this->path_custom = wa()->getDataPath('themes/', true, $this->app_fake).$this->id;//VADIM CODE
         $this->path_original = wa()->getAppPath('themes/', $this->app).$this->id;
 
         if (!file_exists($this->path_custom) || (!$force && !file_exists($this->path_custom.'/'.self::PATH))) {
@@ -572,7 +575,7 @@ XML;
         } else {
             $id = $this->id;
         }
-        $target = wa()->getDataPath("themes/{$id}", true, $this->app, false);
+        $target = wa()->getDataPath("themes/{$id}", true, $this->app_fake, false);
         if (file_exists($target.'/'.self::PATH)) {
             throw new waException(sprintf(_ws("Theme %s already exists"), $id));
         }
@@ -801,7 +804,7 @@ HTACCESS;
     protected function getUsed()
     {
         if ($this->used === null) {
-            $this->used = self::getRoutingRules($domains = null, $this->app, $this->id);
+            $this->used = self::getRoutingRules($domains = null, $this->app_fake, $this->id);
             if ($this->used) {
                 $urls = array();
                 foreach ($this->used as &$url) {
@@ -1177,16 +1180,17 @@ HTACCESS;
                         foreach ($theme_types as $type => $source) {
                             $id = isset($rule[$source]) ? $rule[$source] : 'default';
                             $app = $rule['app'];
+                            $app_real = wa()->getAppName($app);
 
-                            if (!isset($themes[$app])) {
-                                $themes[$app] = array();
+                            if (!isset($themes[$app_real])) {
+                                $themes[$app_real] = array();
                             }
 
-                            if (!isset($themes[$app][$id])) {
-                                $themes[$app][$id] = array();
+                            if (!isset($themes[$app_real][$id])) {
+                                $themes[$app_real][$id] = array();
                             }
 
-                            $themes[$app][$id][] = array(
+                            $themes[$app_real][$id][] = array(
                                 'domain'  => $domain,
                                 'url'     => $rule['url'],
                                 'type'    => $type,
