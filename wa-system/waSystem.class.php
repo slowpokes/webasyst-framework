@@ -1117,6 +1117,7 @@ class waSystem
         if ($app_id === null) {
             $app_id = $this->getConfig()->getApplication();
         }
+        $app_id = $this->replaceNameToReal($app_id);//VADIM CODE
 
         $theme_paths = array(
             'original' => $this->getAppPath('themes', $app_id),
@@ -1213,6 +1214,14 @@ class waSystem
             return self::getAppFake();
         }
         return $name;
+    }
+
+    public function replaceNameToReal($name){
+        $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
+        if(isset($all_apps[$name])){
+            return $all_apps[$name]['app'];
+        }
+        return null;
     }
 
     public static function setApp($real, $fake){

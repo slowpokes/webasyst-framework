@@ -378,6 +378,7 @@ class waDesignActions extends waActions
     public function themeAction()
     {
         $app_id = $this->getAppId();
+        $app_id = $this->getAppFakeId();//VADIM CODE
         $theme_id = waRequest::get('theme');
         $parent_themes = array();
         $apps = wa()->getApps();
