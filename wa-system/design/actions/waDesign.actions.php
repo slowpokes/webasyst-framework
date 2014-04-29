@@ -391,7 +391,6 @@ class waDesignActions extends waActions
             if (!empty($app['themes']) && ($themes = wa()->getThemes($theme_app_id))) {
                 $themes_data = array();
                 foreach($themes as $id => $theme) {
-                    //echo "$app_id == $theme_app_id && $theme_id == $id\n";
                     if (($app_id == $theme_app_id) && ($theme_id == $id) ) {
                         $current_theme = $theme;
                     }

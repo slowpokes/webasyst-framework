@@ -1114,26 +1114,22 @@ class waSystem
      */
     public function getThemes($app_id = null, $domain = null)
     {
-        echo "themes for $app_id\n";
         if ($app_id === null) {
             $app_id = $this->getConfig()->getApplication();
         }
 
+        $app_id_real = wa()->getAppName($app_id);//VADIM CODE
         $theme_paths = array(
-            'original' => $this->getAppPath('themes', $app_id),
+            'original' => $this->getAppPath('themes', $app_id_real),
             'custom'   => $this->getDataPath('themes', true, $app_id, false),
         );
-
-        print_r($theme_paths);
 
         $theme_ids = array();
         foreach ($theme_paths as $path) {
             if (file_exists($path) && is_dir($path) && ($dir = opendir($path))) {
-                echo "exist $path\n";
                 while ($current = readdir($dir)) {
                     if ($current !== '.' && $current !== '..' &&
                         is_dir($path.'/'.$current) && file_exists($path.'/'.$current.'/theme.xml')) {
-                        echo "found $current\n";
                         $theme_ids[] = $current;
                     }
                 }
