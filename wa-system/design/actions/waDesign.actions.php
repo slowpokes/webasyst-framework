@@ -217,7 +217,7 @@ class waDesignActions extends waActions
 
     public function saveAction()
     {
-        $app_id = $this->getAppId();
+        $app_id = $this->getAppFakeId();
         $theme_id = waRequest::get('theme_id');
         $file = waRequest::get('file');
 
@@ -231,7 +231,6 @@ class waDesignActions extends waActions
         if ($theme['type'] == waTheme::ORIGINAL) {
             $theme->copy();
         }
-
         // create file
         if (!$file) {
             // parent
