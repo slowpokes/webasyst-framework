@@ -1114,7 +1114,7 @@ class waSystem
      */
     public function getThemes($app_id = null, $domain = null)
     {
-        echo "themes for $app_id\n";
+        //echo "themes for $app_id\n";
         if ($app_id === null) {
             $app_id = $this->getConfig()->getApplication();
         }
@@ -1124,7 +1124,7 @@ class waSystem
             'custom'   => $this->getDataPath('themes', true, $app_id, false),
         );
 
-        print_r($theme_paths);
+        //print_r($theme_paths);
 
         $theme_ids = array();
         foreach ($theme_paths as $path) {
