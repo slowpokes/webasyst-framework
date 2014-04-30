@@ -788,7 +788,7 @@ HTACCESS;
             switch ($this->type) {
                 case self::CUSTOM:
                 case self::OVERRIDDEN:
-                    $this->url = wa()->getDataUrl('themes', true, $this->app).'/'.$this->id.'/';
+                    $this->url = wa()->getDataUrl('themes', true, $this->app_fake).'/'.$this->id.'/';
                     break;
                 case self::ORIGINAL:
                     $this->url = wa()->getAppStaticUrl($this->app).'themes/'.$this->id.'/';
