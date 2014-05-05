@@ -853,7 +853,9 @@ class waSystem
     {
         if ($app === null) {
             $app = $this->getApp();
-            $app = $this->getAppFake();//VADIM CODE
+            if($app=='shop'){
+                $app = $this->getAppFake();//VADIM CODE
+            }
         }
         if ($this->getEnv() == 'backend') {
             $url = $this->config->getRootUrl();
