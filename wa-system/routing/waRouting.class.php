@@ -398,6 +398,17 @@ class waRouting
         $max = -1;
         $result = null;
 
+        // VADIM CODE START
+        if(isset($params['fast'])&&$params['fast']&&$path=='shop/frontend/product'){
+            foreach ($routes as $domain => $domain_routes) {
+                foreach($domain_routes as $r){
+                    if($r['app']==$app){
+                        return "http://$domain/product/".$params['product_url'].'/';
+                    }
+                }
+            }
+        }
+        // VADIM CODE END
         foreach ($routes as $domain => $domain_routes) {
             foreach ($domain_routes as $r) {
                 $i = $this->countParams($r, $params);

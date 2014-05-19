@@ -110,4 +110,28 @@ class Debug {
         echo "</pre>";
         die();
     }
+
+    static function showQueries(){
+        if(self::enabled()){
+            foreach(self::$objects as $obj){
+                if($obj['type']=='query'){
+                    echo $obj['query']."\n";
+                    echo sprintf("%01.5f", $obj['time'])."\n\n";
+                }
+            }
+        }
+    }
+
+    static function showTime(){
+        $backtrace = debug_backtrace();
+        $line_str = '';
+        //print_r($backtrace);
+        if(isset($backtrace[0])){
+            $line_str = basename($backtrace[0]['file'])."::".$backtrace[0]['line'];
+        }
+        global $_gl_time_start;
+        $_gl_time_end = microtime(1);
+        $time = (intval(($_gl_time_end - $_gl_time_start)*1000))/1000;
+        echo "Timer: ".$time." sec, file: $line_str\n";
+    }
 }
