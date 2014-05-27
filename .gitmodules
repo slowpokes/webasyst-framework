@@ -6,3 +6,6 @@
 	path = wa-apps/warehouse
 	url = git@github.com:slowpokes/warehouse.git
 	ignore = untracked
+[submodule "wa-apps/courier"]
+	path = wa-apps/courier
+	url = git@github.com:slowpokes/courier.git
