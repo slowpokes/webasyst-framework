@@ -6,7 +6,7 @@
  * @subpackage  response
  * @author      Webasyst LLC
  * @copyright   2014 Webasyst LLC
- * @license     http://webasyst.com/framework/license/ LGPL
+ * @license     http://www.webasyst.com/developers/ LGPL
  */
 class waResponse
 {
@@ -124,8 +124,7 @@ class waResponse
             (bool)$http_only
         );
 
-        // New value available only after the page reloads
-        // $_COOKIE[$name] = $value;
+        $_COOKIE[$name] = $value;
         
         return $this;
     }
@@ -165,23 +164,17 @@ class waResponse
      */
     public function addHeader($name, $value, $replace = true)
     {
-        $name = strtolower($name);
-
-        if (in_array($name, array('expires', 'last-modified'))) {
+        if (in_array(strtolower($name), array('expires', 'last-modified'))) {
             $value = gmdate('D, d M Y H:i:s', is_int($value) ? $value : strtotime($value)).' GMT';
         }
 
-        if (!isset($this->headers[$name])) {
+        if (!isset($this->headers[$name]) || $replace) {
             $this->headers[$name] = $value;
-        } else {
-            if ($replace) {
-                $this->headers[$name] = $value;
-            } else {
-                if (!is_array($this->headers[$name])) {
-                    settype($this->headers[$name], 'array');
-                }
-                $this->headers[$name][] = $value;
+        } elseif (!$replace) {
+            if (!is_array($this->headers[$name])) {
+                settype($this->headers[$name], 'array');
             }
+            $this->headers[$name][] = $value;
         }
 
         return $this;
@@ -221,7 +214,7 @@ class waResponse
 
         // Added after all that was not erased
         if ($this->status !== null) {
-            header($_SERVER['SERVER_PROTOCOL'].' '.$this->status.' '.self::$statuses[$this->status]);
+            header(waRequest::server('SERVER_PROTOCOL', 'HTTP/1.0').' '.$this->status.' '.self::$statuses[$this->status]);
         }
 
         return $this;
