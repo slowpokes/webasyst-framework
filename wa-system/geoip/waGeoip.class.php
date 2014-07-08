@@ -100,4 +100,14 @@ class Geoip {
     public function allAreas(){
         return $this->model->query("SELECT * FROM geo_area ORDER BY name")->fetchAll();
     }
+
+    public function getCities($string, $region = 0){
+        $cities = array();
+        $sql = "SELECT name FROM geo_citi WHERE name LIKE '".$this->model->escape($string)."%' AND area_code = '$region' GROUP BY name";
+        $data = $this->model->query($sql)->fetchAll();
+        foreach($data as $line){
+            $cities[] = $line['name'];
+        }
+        return $cities;
+    }
 }
