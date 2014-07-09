@@ -189,7 +189,7 @@ class waPageActions extends waActions
 
     protected function getRoutes()
     {
-        $routes = wa()->getRouting()->getByApp($this->getAppId());
+        $routes = wa()->getRouting()->getByApp($this->getAppFakeId());
         $result = array();
         foreach ($routes as $d => $domain_routes) {
             foreach ($domain_routes as $route) {
