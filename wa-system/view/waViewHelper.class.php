@@ -1010,7 +1010,7 @@ HTML;
         $region_id = $geoip->getRegion();
         if($region_id>0){
             $region = $geoip->getRegionName($region_id);
-            return "Ваш регион: <span id='region_name' class='region_name region_handler' data-id='$region_id'>$region</span>";
+            return "<span id='region_name' class='region_name region_handler' data-id='$region_id'>$region</span>";
         }
         return "";
     }

@@ -33,7 +33,9 @@ class Geoip {
 
     public function getGeoData(){
         $ip = $this->getIP();
-        //$ip = '188.244.45.3'; // test
+        if($ip=='127.0.0.1'){
+            $ip = '188.244.45.3'; // test
+        }
         $data = $this->model->getData($ip);
         return $data;
     }
