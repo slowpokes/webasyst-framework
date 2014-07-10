@@ -96,7 +96,7 @@ class Geoip {
     }
 
     public function allRegions(){
-        return $this->model->query("SELECT code, name FROM wa_region WHERE country_iso3 = 'rus' ORDER BY fav_sort, name")->fetchAll();
+        return $this->model->query("SELECT code, name FROM wa_region WHERE country_iso3 = 'rus' ORDER BY fav_sort IS NULL, fav_sort, name")->fetchAll();
     }
 
     public function allAreas(){
