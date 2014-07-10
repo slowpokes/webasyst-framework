@@ -1011,7 +1011,7 @@ HTML;
         if($region_id>0){
         }
         else{
-            $region_id = 77;
+            $region_id = 77; 
         }
         $region = $geoip->getRegionName($region_id);
         return "<span id='region_name' class='region_name region_handler' data-id='$region_id'>$region</span>";
