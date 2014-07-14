@@ -1,0 +1,84 @@
+<script type="text/javascript">
+    document.title = 'Редиректы - {$domain}' ;
+</script>
+<div class="content">
+    <div class="s-editor s-white">
+        <div class="block s-grey-toolbar">
+            <h4 style="margin-left: 4px; margin-top:2px;">Редиректы</h4>
+        </div>
+        <div class="block s-routing-header">
+            <a href="#" class="inline-link" id="s-redirect-add"><i class="icon16 add"></i><b><i>Добавить редирект</i></b></a>
+        </div>
+        <div class="block double-padded">
+            <div id="add_form_block" class="hidden">
+                <form method="post" id="add_form">
+                    <div class="field-group">
+                        <div class="field">
+                            <div class="name">Старый URL</div>
+                            <div class="value">
+                                <input type="text" value="" name="url" class="long"/>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">Новый URL</div>
+                            <div class="value">
+                                <input type="text" value="" name="redirect" class="long"/>
+                            </div>
+                        </div>
+                        <input type="hidden" value="{$domain_id}" name="domain_id" class="long"/>
+                        <div class="field">
+                            <div class="value">
+                                <input id="btn_add" type="submit" value="Сохранить" class="button green"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <table class="zebra" id="redirect_table">
+                    <thead>
+                    <tr>
+                        <th>Старый URL</th>
+                        <th>Новый URL</th>
+                        <th> </th>
+                    </tr>
+                    </thead>
+                {foreach $urls as $url}
+                    <tr>
+                        <td>{$url.url}</td>
+                        <td>{$url.redirect}</td>
+                        <td><a href="#" class="del_row" data-id="{$url.id}"><i class="icon16 delete"></a></td>
+                    </tr>
+                {/foreach}
+                </table>
+            </div>
+        </div>
+        <div class="clear-left"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $("#s-redirect-add").click(function(){
+        $("#add_form_block").toggle();
+        return false;
+    });
+    $("#btn_add").click(function(){
+        $.post("?module=redirect&action=add&domain_id={$domain_id}" , $('#add_form').serialize(), function (json) {
+            $("#redirect_table > tbody").prepend('<tr><td>'+json.data.info.url+'</td><td>'+json.data.info.redirect+'</td><td><a href="#" class="del_row" data-id="'+json.data.info.id+'"><i class="icon16 delete"></a></td></tr>');
+        }, "json");
+        return false;
+    });
+    $(".del_row").on('click', function(){
+        var el = $(this);
+        $.post("?module=redirect&action=delete&domain_id={$domain_id}" , { id:el.data('id') }, function (json) {
+            el.parents('tr').remove();
+        }, "json");
+        return false;
+    });
+</script>
+
+<style>
+    table.zebra a.del_row{
+        display: inline;
+    }
+</style>

@@ -291,6 +291,7 @@ class waAutoload
         'waRegionModel'            => 'webasyst/lib/models/waRegion.model.php',
         'waTransactionModel'       => 'webasyst/lib/models/waTransaction.model.php',
         'waTransactionDataModel'   => 'webasyst/lib/models/waTransactionData.model.php',
+        'waRedirectModel'          => 'webasyst/lib/models/waRedirect.model.php',
 
         'waPageModel'              => 'page/models/waPage.model.php',
         'waPageParamsModel'        => 'page/models/waPageParams.model.php',

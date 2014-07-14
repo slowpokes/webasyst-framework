@@ -401,6 +401,13 @@ $.wa.site = {
 	settingsRoutingAction: function () {
 		this.settingsAction('routing');
 	},
+
+    redirectAction: function () {
+        this.savePanel(false);
+        $("#s-content").load('?module=redirect&domain_id=' + this.domain, function () {
+            $.wa.site.active($("#s-link-redirect"));
+        });
+    },
 	
 	blocksAction: function (params) {
         $('#s-save-panel input').replaceWith('<input id="s-editor-save-button" type="button" class="button green" value="' + $_('Save') + '">');

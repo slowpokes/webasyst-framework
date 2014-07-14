@@ -58,6 +58,7 @@ class waFrontController
                 $this->execute($plugin, $module, $action);
             }
         } else {
+            waRedirect::execute();//VADIM CODE
             $this->execute($plugin, $module, $action);
         }
     }
