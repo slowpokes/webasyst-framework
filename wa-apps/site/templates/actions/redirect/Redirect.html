@@ -45,7 +45,7 @@
                     </thead>
                 {foreach $urls as $url}
                     <tr>
-                        <td><a href="http://{$domain}/{$url.url}" target="_blank">http://{$domain}/{$url.url}</a></td>
+                        <td><a href="http://{$domain_replace}/{$url.url}" target="_blank">http://{$domain_replace}/{$url.url}</a></td>
                         <td>{$url.redirect}</td>
                         <td><a href="#" class="edit_row" data-id="{$url.id}"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="{$url.id}"><i class="icon16 delete"></i></a></td>
                     </tr>
@@ -86,7 +86,7 @@
         return false;
     });
     function getLineStr(info){
-        return '<tr><td><a href="http://{$domain}/'+info.url+'" target="_blank">http://{$domain}/'+info.url+'</td><td>'+info.redirect+'</td><td><a href="#" class="edit_row" data-id="'+info.id+'"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="'+info.id+'"><i class="icon16 delete"></i></a></td></tr>'
+        return '<tr><td><a href="http://{$domain_replace}/'+info.url+'" target="_blank">http://{$domain_replace}/'+info.url+'</td><td>'+info.redirect+'</td><td><a href="#" class="edit_row" data-id="'+info.id+'"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="'+info.id+'"><i class="icon16 delete"></i></a></td></tr>'
     }
 </script>
 
