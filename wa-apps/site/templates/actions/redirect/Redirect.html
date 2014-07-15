@@ -45,9 +45,9 @@
                     </thead>
                 {foreach $urls as $url}
                     <tr>
-                        <td>{$url.url}</td>
+                        <td><a href="http://{$domain}/{$url.url}" target="_blank">http://{$domain}/{$url.url}</a></td>
                         <td>{$url.redirect}</td>
-                        <td><a href="#" class="del_row" data-id="{$url.id}"><i class="icon16 delete"></a></td>
+                        <td><a href="#" class="edit_row" data-id="{$url.id}"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="{$url.id}"><i class="icon16 delete"></i></a></td>
                     </tr>
                 {/foreach}
                 </table>
@@ -64,7 +64,7 @@
     });
     $("#btn_add").click(function(){
         $.post("?module=redirect&action=add&domain_id={$domain_id}" , $('#add_form').serialize(), function (json) {
-            $("#redirect_table > tbody").prepend('<tr><td>'+json.data.info.url+'</td><td>'+json.data.info.redirect+'</td><td><a href="#" class="del_row" data-id="'+json.data.info.id+'"><i class="icon16 delete"></a></td></tr>');
+            $("#redirect_table > tbody").prepend(getLineStr(json.data.info));
         }, "json");
         return false;
     });
@@ -75,10 +75,30 @@
         }, "json");
         return false;
     });
+    $(".edit_row").on('click', function(){
+        var redirect = prompt('URL куда:', '');
+        if(redirect){
+            var el = $(this);
+            $.post("?module=redirect&action=update&domain_id={$domain_id}" , { id:el.data('id'),redirect:redirect }, function (json) {
+                el.parents('tr').replaceWith(getLineStr(json.data.info));
+            }, "json");
+        }
+        return false;
+    });
+    function getLineStr(info){
+        return '<tr><td><a href="http://{$domain}/'+info.url+'" target="_blank">http://{$domain}/'+info.url+'</td><td>'+info.redirect+'</td><td><a href="#" class="edit_row" data-id="'+info.id+'"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="'+info.id+'"><i class="icon16 delete"></i></a></td></tr>'
+    }
 </script>
 
 <style>
-    table.zebra a.del_row{
+    table.zebra a{
         display: inline;
+    }
+    table.zebra{
+        width: auto;
+    }
+
+    table tr td:last-child{
+        white-space: nowrap;
     }
 </style>

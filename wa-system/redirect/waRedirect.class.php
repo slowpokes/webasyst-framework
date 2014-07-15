@@ -17,6 +17,14 @@ class waRedirect {
         $routing = new waRouting(wa());
         $domain = $routing->getDomain(null, true);
         $url = wa()->getConfig()->getRequestUrl(true, true);
+        //echo "$url\n";
+        $redirect = self::getRoute($url, $domain);
+        if($redirect){
+            wa()->getResponse()->redirect($redirect, 301);
+            return;
+        }
+        $url = wa()->getConfig()->getRequestUrl(true, false);
+        //echo "$url\n";
         $redirect = self::getRoute($url, $domain);
         if($redirect){
             wa()->getResponse()->redirect($redirect, 301);
@@ -31,6 +39,13 @@ class waRedirect {
         return $model->insert($array);
     }
 
+    static function update($id, $redirect){
+        $array = array();
+        $array['redirect'] = self::clearTo($redirect);
+        $model = new waRedirectModel();
+        return $model->updateById($id, $array);
+    }
+
     static function get($id){
         $model = new waRedirectModel();
         return $model->getById($id);
@@ -43,7 +58,7 @@ class waRedirect {
 
     static function getByDomain($domain){
         $model = new waRedirectModel();
-        return $model->where("domain = '$domain'")->order('url')->fetchAll('id');
+        return $model->where("domain = '$domain'")->where('visible = 1')->order('url')->fetchAll('id');
     }
 
     static function clearFrom($url){
