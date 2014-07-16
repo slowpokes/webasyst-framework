@@ -9,6 +9,8 @@ class waRedirect {
         $data = $model->getByField(array('domain'=>$domain, 'url'=>$url));
         if($data){
             if($data['redirect']){
+                if($data['redirect']=='/'.$data['url'])
+                    return null;
                 return $data['redirect'];
             }
         }
