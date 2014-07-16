@@ -2,6 +2,8 @@
 
 class waRedirect {
 
+    static $count_per_page = 50;
+
     static function getRoute($url, $domain){
         $model = new waRedirectModel();
         $data = $model->getByField(array('domain'=>$domain, 'url'=>$url));
@@ -56,9 +58,22 @@ class waRedirect {
         $model->deleteById($id);
     }
 
-    static function getByDomain($domain){
+    static function getByDomain($domain, $paging){
+        $limit_start = ($paging['page']-1)*self::$count_per_page;
+        $sort= 'url';
+        if($paging['sort']=='redirect')$sort = 'redirect';
+        if($paging['sort']=='status')$sort = "redirect != '/'";
+        if($paging['order']=='desc') $sort .= " desc";
+
         $model = new waRedirectModel();
-        return $model->where("domain = '$domain'")->where('visible = 1')->order('url')->fetchAll('id');
+        $data = $model->where("domain = '$domain'")->where('visible = 1')->order($sort)->limit("$limit_start, ".self::$count_per_page)->fetchAll('id');
+        $total = $model->select('count(id)')->where("domain = '$domain'")->where('visible = 1')->fetchField();
+        $page_count = ceil($total/self::$count_per_page);
+        return array(
+            'data'=>$data,
+            'total'=>$total,
+            'page_count'=>$page_count
+        );
     }
 
     static function clearFrom($url){

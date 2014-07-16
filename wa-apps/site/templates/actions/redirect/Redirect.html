@@ -38,19 +38,26 @@
                 <table class="zebra" id="redirect_table">
                     <thead>
                     <tr>
-                        <th>Старый URL</th>
-                        <th>Новый URL</th>
+                        <th><a href="#" data-sort="status">Статус</a></th>
+                        <th><a href="#" data-sort="url">Старый URL</a></th>
+                        <th><a href="#" data-sort="redirect">Новый URL</a></th>
                         <th> </th>
                     </tr>
                     </thead>
                 {foreach $urls as $url}
                     <tr>
+                        {if ($url.redirect==''||($url.redirect=='/'))}<td><i class="icon16 status-red"></i></td>
+                        {else}<td><i class="icon16 status-green"></i></td>
+                        {/if}
                         <td><a href="http://{$domain_replace}/{$url.url}" target="_blank">http://{$domain_replace}/{$url.url}</a></td>
                         <td><a href="http://{$domain}{$url.redirect}" target="_blank">http://{$domain}{$url.redirect}</td>
                         <td><a href="#" class="edit_row" data-id="{$url.id}"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="{$url.id}"><i class="icon16 delete"></i></a></td>
                     </tr>
                 {/foreach}
                 </table>
+            </div>
+            <div class="paging">
+                {wa_pagination total=$pages_count nb=3 page=$paging.page url='#/redirect/'}
             </div>
         </div>
         <div class="clear-left"></div>
@@ -85,8 +92,27 @@
         }
         return false;
     });
+    $("#redirect_table > thead").find('a').click(function(){
+        var url = '#/redirect/?page={$paging.page}';
+        url += '&sort='+$(this).data('sort');
+        if($(this).data('sort')=='{$paging.sort}'){
+            {if $paging.order==''}
+            url += '&order=desc';
+            {/if}
+        }
+        window.location.hash = url;
+        return false;
+    });
     function getLineStr(info){
-        return '<tr><td><a href="http://{$domain_replace}/'+info.url+'" target="_blank">http://{$domain_replace}/'+info.url+'</td><td><a href="http://{$domain}'+info.redirect+'" target="_blank">http://{$domain}'+info.redirect+'</td><td><a href="#" class="edit_row" data-id="'+info.id+'"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="'+info.id+'"><i class="icon16 delete"></i></a></td></tr>'
+        var str = '<tr>';
+        if ((info.redirect=='')||(info.redirect=='/')){
+            str += '<td><i class="icon16 status-red"></i></td>';
+        }
+        else{
+            str += '<td><i class="icon16 status-green"></i></td>';
+        }
+        str += '<td><a href="http://{$domain_replace}/'+info.url+'" target="_blank">http://{$domain_replace}/'+info.url+'</td><td><a href="http://{$domain}'+info.redirect+'" target="_blank">http://{$domain}'+info.redirect+'</td><td><a href="#" class="edit_row" data-id="'+info.id+'"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="'+info.id+'"><i class="icon16 delete"></i></a></td></tr>'
+        return str;
     }
 </script>
 
