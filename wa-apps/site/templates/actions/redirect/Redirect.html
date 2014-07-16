@@ -34,6 +34,9 @@
                     </div>
                 </form>
             </div>
+            <div class="paging">
+                {wa_pagination total=$pages_count nb=3 page=$paging.page url='#/redirect/'}
+            </div>
             <div>
                 <table class="zebra" id="redirect_table">
                     <thead>
@@ -126,5 +129,29 @@
 
     table tr td:last-child{
         white-space: nowrap;
+    }
+
+    .paging{
+        margin: 20px 0;
+    }
+
+    .paging ul{
+        padding: 0;
+        margin: 0;
+    }
+
+    .paging li{
+        display: inline-block;
+        vertical-align: top;
+        margin: 0 5px;
+        pad
+    }
+
+    .paging li a{
+        padding: 5px 10px;
+    }
+
+    .paging li.selected a{
+        background: #eee;
     }
 </style>
