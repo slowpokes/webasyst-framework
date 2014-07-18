@@ -1,0 +1,82 @@
+<div id='fast_view' class="overlay">
+    <div class="overlay_container">
+        <div id='product_fast_info' class="fast_info"></div>
+    </div>
+</div>
+
+<div id='fast_cart_view' class="overlay">
+    <div class="overlay_container">
+        <div id='cart_fast_info'></div>
+    </div>
+</div>
+
+<div id='cart_add_ok' class="overlay_small">
+    <div class="overlay_small_container cart_ok">
+        <div class="message">
+            <div class="animation"></div>
+            <div class="info">Товар в корзине</div>
+        </div>
+        <div class="buttons"><a href='#' class="continue_shopping">продолжить покупки</a><a href='/cart/' class="button">оформление заказа</a></div>
+    </div>
+</div>
+
+<div id='cart_add_additional' class="overlay_small">
+    <form class="ov_form" method="post" action="{$wa->getUrl('/frontendCart/add')}">
+        <input type="hidden" name="sku_id" value="0">
+        <input type="hidden" name="product_id" value="0">
+        <div class="overlay_small_container cart_ok">
+            <div class="message noanimation">
+                <div class="info">Товар уже в корзине</div>
+            </div>
+            <div class="buttons">
+                <input type="text" class="number" name="quantity" value="1">
+                <input type="submit" class="button ov_add_btn" value="Добавить в корзину">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href='/cart/' class="button">Перейти в корзину</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id='saved_add_ok' class="overlay_small">
+    <div class="overlay_small_container cart_ok">
+        <div class="message">
+            <div class="animation"></div>
+            <div class="info">Товар отложен на 60 дней</div>
+        </div>
+        <div class="buttons"><a href='#' class="continue_shopping">продолжить покупки</a><a href='/saved/' class="button">перейти к отложенным товарам</a></div>
+    </div>
+</div>
+
+<div id='region' class="overlay_normal">
+    <div class="overlay_small_container regions">
+        {$wa->regionsList()}
+    </div>
+</div>
+
+<div id='sku_shooser' class="overlay_small">
+    <div class="overlay_small_container cart_ok">
+        <div class="sku_block">
+            <div class="ov_sku_image"></div>
+            <div class="ov_add">
+                <div class="ov_price_block product_price">
+                    <span class="price_title">Цена:</span>
+                    <span class="ov_price price">830 руб.</span>
+                </div>
+                <div class="ov_skus"></div>
+                <form class="ov_form" method="post" action="{$wa->getUrl('/frontendCart/add')}">
+                    <input type="hidden" name="sku_id" value="0">
+                    <input type="hidden" name="product_id" value="0">
+                    <input type="hidden" name="quantity" value="1">
+                    <input type="submit" class="button ov_add_btn" value="Добавить в корзину">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="hover_tooltip" class="hover_tooltip">olololo</div>
+
+<div id="brand_letters">
+    {include file="brands_letters.html"}
+</div>

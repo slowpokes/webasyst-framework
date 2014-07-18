@@ -1,0 +1,48 @@
+<div class="footer">
+    <div class="subscribe">
+        <div class="subscribe_form">
+            <form id="mailer-frontend-subscribe-form" action="/subscribe/subscribe/" method="post" target="mailer-frontend-subscribe-form-target">
+                Подпишитесь на наши новости и акции  <input type="hidden" name="name" value=""><input type="text" class="subscribe_input subscribe_email" name="email"> <input type="submit" class="button subscribe_input" value="Подписаться">
+            </form>
+            <span class="submit_ok" style="display:none;">Вы успешно подписались на новости и скидки!</span>
+            <iframe name="mailer-frontend-subscribe-form-target" src="javascript:true" style="width:0;height:0;border:0px solid #fff;"></iframe>
+        </div>
+    </div>
+    <div class="footer_content">
+        <div class="footer_line">
+            <div class="footer_block">
+                {$wa->block("footer_1")}
+            </div>
+            <div class="footer_block">
+                {$wa->block("footer_2")}
+            </div>
+            <div class="footer_block">
+                {$wa->block("footer_3")}
+            </div>
+            <div class="footer_block">
+                {$wa->block("footer_4")}
+            </div>
+            <div class="footer_block birthday">
+                <a href="#" class="birthday"></a>
+                <div class="operating_hours">
+                    {$wa->block("operating_hours")}
+                </div>
+                <div class="follow">
+                    <div class="title">Следуйте за нами</div>
+                    <div class="social_links">
+                        <a target="_blank" href="http://vk.com/1mmtt" class="icon_vk"></a>
+                        <a target="_blank" href="http://www.odnoklassniki.ru/ok1mmtt" class="icon_ok"></a>
+                        <a target="_blank" href="/" class="icon_fb"></a>
+                        <a target="_blank" href="/" class="icon_tw"></a>
+                        <a target="_blank" href="http://instagram.com/1mmtt" class="icon_in"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer_line">
+            <div class="footer_text">
+                2009-2013 &copy; Первый московский магазин таможенных товаров - парфюм духи туалетная вода косметика бижутерия часы сумки.
+            </div>
+        </div>
+    </div>
+</div>

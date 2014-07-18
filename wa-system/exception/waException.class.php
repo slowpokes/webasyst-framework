@@ -95,7 +95,7 @@ HTML;
         $result .= var_export($_REQUEST, true);
         $result .= "</pre></div></div>
 <div><h2>Params</h2><pre>";
-        $result .= var_export(waRequest::param(), true);
+        $result .= print_r(waRequest::param(), true);
         if ($additional_info) {
             $result .= "</pre></div></div>
             <div><h2>Error while initializing waSystem during error generation</h2><pre>";
