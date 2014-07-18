@@ -1241,7 +1241,9 @@ class waSystem
     public function replaceNameToReal($name){
         $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
         if(isset($all_apps[$name])){
-            return $all_apps[$name]['app'];
+            if(isset($all_apps[$name]['app'])){
+                return $all_apps[$name]['app'];
+            }
         }
         return $name;
     }
