@@ -32,7 +32,6 @@
 
 </head>
 <body>
-
 <div class="wrapper">
 <div class="wrapper2">
     {include file="header.html"}
@@ -40,7 +39,7 @@
         <script>
             $(".container").css('min-height', $(window).height());
         </script>
-        {include file="top_menu.html"}
+        {include file="$wa_active_theme_path/top_menu.html"}
         <div class="main_content">
             {$content}
             <div class="cb"></div>
@@ -53,7 +52,7 @@
 
 
 <noindex>
-{*  include file="noindex.html" *}
+{include file="$wa_active_theme_path/noindex.html"}
 </noindex>
 
 {* debug *}

@@ -1,1 +1,44 @@
-1234567
+<!--header-->
+<div class="header">
+    <div class="top_line">
+        <div class="site_name"><span id='site_name1'>Первый Московский Магазин</span> Таможенных Товаров</div>
+        <div class="user_links">
+            <a href="/saved/">Отложено</a> |
+            {if $wa->isAuthEnabled()}
+                {if $wa->user()->isAuth()}
+                    <a href="{$wa->getUrl('/frontend/my')}">{$wa->user('name')}</a> |
+                    <a href="?logout">[s`Log out`]</a>
+                {else}
+                    <a href="{$wa->loginUrl()}">Личный кабинет</a> |
+                    <a href="{$wa->signupUrl()}">[s`Sign up`]</a>
+                {/if}
+            {/if}
+        </div>
+    </div>
+    <div class="header_main">
+        <div class="logo_block">
+            <div class="logo"><a href="/"><img alt="Интернет магазин таможенных товаров 1mmtt.ru" src="/wa-apps/shop/themes/mmtt/img/logo.png"></a></div>
+        </div>
+        <div class="header_center">
+            <div class="phone_big">8 (800) 100-03-90 &nbsp;&nbsp;&nbsp; +7 (495) 662-30-60</div>
+            <div class="delivery_link"><a href="/dostavka-po-rossii">Доставка по всей России</a> <div class="delivery_city">{$wa->regionBlock()}</div></div>
+            <div class="header_search">
+                {include file="search_form_small.html"}
+            </div>
+        </div>
+        <div class="header_right">
+            <div class="cart_wrapper">
+                <div class="cart_block cart cart-summary" id="cart-summary">
+                    <div class="cart_maininfo">
+                        <div class="cart_main"><a class="cart_button" href='{$wa->getUrl('/frontend/cart')}'>Корзина:</a></div>
+                        <div class="cart_info cart-total">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cb"></div>
+    </div>
+</div>
+<!--header end-->
