@@ -10,7 +10,7 @@ var current_menu_item;
 var menu_timer = null;
 var submenu_timer = null;
 
-$(document).ready(function () {
+function mainInit(){
     $(".image_view").live('click', function(){
         imageArrowClick($(this));
         return false;
@@ -20,6 +20,78 @@ $(document).ready(function () {
         fastView($(this));
         return false;
     });
+    $("#region").find('.regions').find('a').click(function(){
+        setRegion($(this));
+        $("#region").overlay().close();
+        return false;
+    });
+    initNumber($(document));
+    $(".continue_shopping").live('click', function(){
+        $("#cart_add_ok").overlay().close();
+        $("#saved_add_ok").overlay().close();
+        return false;
+    });
+    $(".big_rarr").live('click', function(){
+        fastViewNext();
+        return false;
+    });
+    $(".big_larr").live('click', function(){
+        fastViewPrev();
+        return false;
+    });
+
+    $(".region_handler").click(function(){
+        showRegion();
+    });
+
+    $("#sku_shooser").find('.ov_add_btn').click(function(){
+        var form = $("#sku_shooser").find('.ov_form').first();
+        var image = $("#sku_shooser").find('.ov_sku_image').find('img').first();
+        processAdd2Cart(form, image);
+        $("#sku_shooser").overlay().close();
+        return false;
+    });
+
+    $("#cart_add_additional").find('.ov_add_btn').click(function(){
+        add2Cart($(this), false);
+        $("#cart_add_additional").overlay().close();
+        return false;
+    });
+
+    $(document).scroll(function() {
+        flowHeader();
+    });
+
+    $('#mailer-frontend-subscribe-form').submit(function() {
+        var form = $(this);
+
+        // Validate email
+        var email_input = form.find('input[name="email"]');
+        email_input.siblings('.errormsg').remove();
+        if (!email_input.val()) {
+            email_input.addClass('error').after('<em class="errormsg">Это поле обязательное.</em>');
+            return false;
+        } else {
+            email_input.removeClass('error');
+        }
+        $('iframe[name="mailer-frontend-subscribe-form-target"]').load(function() {
+            $('#mailer-frontend-subscribe-form').hide();
+            $('.submit_ok').show();
+        });
+        return true;
+    });
+
+    $(".cart_button").live('click', function(){
+        showCart();
+        return false;
+    });
+    infoHoverInit();
+    $.datepicker.setDefaults($.datepicker.regional['ru']);
+    menuInit();
+    initOverlays();
+}
+
+function initOverlays(){
     $("#fast_view").overlay({
         top: 0,
         closeOnClick: true,
@@ -80,106 +152,7 @@ $(document).ready(function () {
         oneInstance: false,
         load: false
     });
-    $("#region").find('.regions').find('a').click(function(){
-        setRegion($(this));
-        $("#region").overlay().close();
-        return false;
-    });
-    initNumber($(document));
-    $(".continue_shopping").live('click', function(){
-        $("#cart_add_ok").overlay().close();
-        $("#saved_add_ok").overlay().close();
-        return false;
-    });
-    /*
-    $(".shipping_option").live('click', function(){
-        chooseShipping($(this).data('id'));
-        return false;
-    });
-    */
-    $(".big_rarr").live('click', function(){
-        fastViewNext();
-        return false;
-    });
-    $(".big_larr").live('click', function(){
-        fastViewPrev();
-        return false;
-    });
-
-    $(".region_handler").click(function(){
-        showRegion();
-    });
-
-    $("#sku_shooser").find('.ov_add_btn').click(function(){
-        var form = $("#sku_shooser").find('.ov_form').first();
-        var image = $("#sku_shooser").find('.ov_sku_image').find('img').first();
-        processAdd2Cart(form, image);
-        $("#sku_shooser").overlay().close();
-        return false;
-    });
-
-    $("#cart_add_additional").find('.ov_add_btn').click(function(){
-        add2Cart($(this), false);
-        $("#cart_add_additional").overlay().close();
-        return false;
-    });
-
-    $(document).scroll(function() {
-        flowHeader();
-    });
-
-    generateCart();
-    $(".cart-summary").hover(function(){
-        cartMouseIn($(this));
-    }, function(){
-        cartMouseOut($(this));
-    });
-    $(".cart_preview").hover(function(){
-        cartMouseIn($(this));
-    }, function(){
-        cartMouseOut($(this));
-    });
-    $(".cart_preview a.delete").live('click', function(){
-        var tr = $(this).closest('.sc_item');
-        tr.animate({height:0}, 500, function(){
-            tr.remove();
-        });
-        $.post('/cart/delete/', {id: tr.data('id')}, function (response) {
-            delCartPreview(tr.data('id'));
-            updateCartSmall(response.data);
-        }, "json");
-        return false;
-    });
-
-    $('#mailer-frontend-subscribe-form').submit(function() {
-        var form = $(this);
-
-        // Validate email
-        var email_input = form.find('input[name="email"]');
-        email_input.siblings('.errormsg').remove();
-        if (!email_input.val()) {
-            email_input.addClass('error').after('<em class="errormsg">Это поле обязательное.</em>');
-            return false;
-        } else {
-            email_input.removeClass('error');
-        }
-        $('iframe[name="mailer-frontend-subscribe-form-target"]').load(function() {
-            $('#mailer-frontend-subscribe-form').hide();
-            $('.submit_ok').show();
-        });
-        return true;
-    });
-
-    dayProductInit();
-
-    $(".cart_button").click(function(){
-        showCart();
-        return false;
-    });
-    infoHoverInit();
-    $.datepicker.setDefaults($.datepicker.regional['ru']);
-    menuInit();
-});
+}
 
 var fast_view_product;
 
@@ -1064,31 +1037,6 @@ function fastViewClose(){
     flowHeader();
 }
 
-function dayProductInit(){
-    /*
-    $(".day_product").each(function(){
-        var e = $(this).prev().addClass('has_product').find('.lvl3_main');
-        e.wrapInner("<div class='with_product'>").append($(this));
-        e.append('<div class="cb"></div>')
-        var sm_pr = $(this);
-        $(this).find('.add2cart_small').click(function(){
-            smallAdd2Cart(sm_pr);
-            return false;
-        });
-    });
-    $(".lvl2_cat").each(function(){
-        var link = $(this).data('url');
-        var html =
-            '<div class="lvl2_special">' +
-            '<a class="lvl3_green" href="'+link+'?special=new"><span class="bullet">•</span>НОВИНКИ</a>' +
-            '<a class="lvl3_orange" href="'+link+'?special=hit"><span class="bullet">•</span>ХИТЫ ПРОДАЖ</a>' +
-            '<a class="lvl3_red" href="'+link+'?special=sale"><span class="bullet">•</span>ТОВАРЫ СО СКИДКОЙ</a>' +
-            '</div>';
-        $(this).find('.lvl3_main').append(html);
-    });
-    */
-}
-
 function formAjax(button, form, container, result_container_id, params, callback){
     var url = form.attr('action');
     var data = form.serialize()+params;
@@ -1168,7 +1116,7 @@ function menuInit(){
 }
 
 function initBrandsMenu(){
-    var bl = $("#brand_letters").detach();
+    var bl = $("#brand_letters").clone();
     $(".mainmenu").find('.brands').addClass('menu_link').data('category-id', 'brands');
     $(".sub_menu > .sub_small").append('<div class="parent_brands">'+bl.html()+'</div>');
 }
@@ -1205,4 +1153,12 @@ function showSubMenu(element, t){
             el.parent().removeClass('with_product');
         }
     }, t);
+}
+
+function lazyLoadHeader(){
+    $.get('/login/', function(data){
+        $("#cart-summary").html($(data).find("#cart-summary"));
+        $("#top_menu").html($(data).find("#top_menu"));
+        menuInit();
+    });
 }
