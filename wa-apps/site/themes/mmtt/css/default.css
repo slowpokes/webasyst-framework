@@ -821,12 +821,12 @@ span.bullet{
 .footer_block li, .footer_block b{
     margin-bottom: 10px;
     display: block;
+    font-size: 13px;
 }
 
 .footer_block li a{
     color: #3E3C32;
     /*text-transform: uppercase;*/
-    font-size: 13px;
     text-decoration: none;
 }
 
