@@ -818,7 +818,7 @@ span.bullet{
     list-style: none;
 }
 
-.footer_block li{
+.footer_block li, .footer_block b{
     margin-bottom: 10px;
 }
 
