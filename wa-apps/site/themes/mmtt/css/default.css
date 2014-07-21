@@ -775,7 +775,6 @@ span.bullet{
     min-height: 10px;
     padding:10px 0 0 0;
     display: inline-block;
-    line-height: 180%;
     vertical-align: top;
     text-align: left;
 }
@@ -817,6 +816,10 @@ span.bullet{
     padding: 0;
     margin: 0;
     list-style: none;
+}
+
+.footer_block li{
+    margin-bottom: 10px;
 }
 
 .footer_block li a{
