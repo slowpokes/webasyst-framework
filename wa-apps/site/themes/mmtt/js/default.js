@@ -89,6 +89,17 @@ function mainInit(){
     $.datepicker.setDefaults($.datepicker.regional['ru']);
     menuInit();
     initOverlays();
+    $(".sidebar_link").click(function(){
+        var li = $(this).parent();
+        if(li.hasClass('closed')){
+            li.removeClass('closed');
+        }
+        else{
+            li.addClass('closed');
+            li.find('li').addClass('closed');
+        }
+        return false;
+    });
 }
 
 function initOverlays(){
@@ -1235,4 +1246,8 @@ function form_refresh(empty){
     if (empty) {
         form.find('textarea').val('');
     }
-};
+}
+
+function openLink(element){
+    element.parentsUntil("div").removeClass('closed');
+}

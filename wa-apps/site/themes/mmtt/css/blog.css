@@ -1,0 +1,118 @@
+/* MENUs
+
+-------------------------------------------- */
+ul.menu-v { list-style-type:none; margin:5px 0 0; padding: 0; }
+ul.menu-v li { text-align:left; display:block; margin:0 -2px 3px 0; padding: 4px 0; line-height:1em; position: relative /* for overhanging icons */; min-width: 60px; }
+ul.menu-v a { outline:none; -moz-outline:none; font-style:normal; text-decoration: none; display: block /* for proper hierarchical menus display */; padding: 5px; margin: -5px; }
+ul.menu-v a strong.small.highlighted { color: #000; }
+ul.menu-v li.selected a { background:#eee; color: #000; }
+ul.menu-v li.selected a:hover { color: #000 !important; }
+ul.menu-v li.selected a.inline-link b { border-bottom: 0; }
+ul.menu-v li.selected ul.menu-v li a { background: inherit; color: #03c; }
+ul.menu-v li.selected ul.menu-v li a:hover { color: red !important; }
+ul.menu-v li ul.menu-v li { /* font-size: 95%; decrease font size on every level in hierarchical menus if you want */ }
+ul.menu-v img.overhanging { margin-left: -24px; margin-top: -8px; position: relative; top: 6px; } /* optimized for 20x20 userpic image overhanging menu element on the left side */
+ul.menu-v i.icon16.overhanging { position: absolute; left: 4px; margin: 0; top: 2px; }
+ul.menu-v i.icon10.overhanging { position: absolute; left: 9px; margin: 0; }
+ul.menu-v.with-icons li { padding: 4px 2px 4px 24px; margin-left: -4px; }
+ul.menu-v.with-icons a { padding-left: 23px; margin-left: -23px; }
+ul.menu-v.with-icons i.icon10 { margin-left: -17px; margin-right: 7px; }
+ul.menu-v.with-icons i.icon16 { margin-left: -20px; margin-right: 4px; }
+ul.menu-v.with-icons i.icon10.no-overhanging, ul.menu-v.with-icons i.icon16.no-overhanging { margin-left: 0px; margin-right: 0px; }
+ul.menu-v.collapsible { padding-left: 12px; }
+ul.menu-v.compact li { padding-top: 1px; padding-bottom: 1px; }
+ul.menu-v.compact li a { margin-bottom: 0; margin-top: 0; padding-bottom: 2px; padding-top: 2px; }
+ul.menu-v.compact img.overhanging { margin-top: -6px; top: 4px;margin-right: 4px; }
+ul.menu-v.compact i.icon10 { margin-top: 1px; }
+ul.menu-v.compact i.icon16 { margin-top: -2px; }
+ul.menu-v li.drag-newparent a { background:#eec !important; }
+ul.menu-v li.drag-newposition { height: 2px; background: inherit; padding: 0; margin: -2px -10px 0 -5px; } /* placeholder for menu-v sort order change */
+ul.menu-v li.drag-newposition.active { background: #bb8; }
+ul.menu-v li.drag-newparent ul.menu-v li a { background: inherit !important; color: #03c; /* color for links within hierarchical nodes */ }
+ul.menu-v.dropdown li { position: relative; }
+ul.menu-v.dropdown li:hover { background: #eee; }
+ul.menu-v.dropdown li ul { display: none; position: absolute; left: 100%; width: 100%; top: -12px; background: #fff; border: 2px solid #aaa; padding: 5px; z-index: 50; margin-left: 2px; -moz-box-shadow: 0px 0px 5px #aaa; -webkit-box-shadow: 0px 0px 5px #aaa; box-shadow: 0px 0px 5px #aaa; }
+ul.menu-v.dropdown li:hover ul { display: block; }
+ul.menu-v.dropdown.disabled li:hover ul { display: none !important; }
+ul.menu-v.dropdown li:hover ul ul { display: none; } /* level 2*/
+ul.menu-v.dropdown li:hover ul li:hover ul { display: block; }
+ul.menu-v.dropdown li:hover ul li:hover ul ul { display: none; } /* level 3; add more levels in a similar way if you want */
+ul.menu-v.dropdown li:hover ul li:hover ul li:hover ul { display: block; }
+ul.menu-v li.top-padded { padding-top: 15px; } /* extra bottom padding for visual menu segmentation */
+ul.menu-v li.bottom-padded { padding-bottom: 15px; }
+ul.menu-v li.hr { margin-top: 10px !important; border-top: 1px solid #ccc; padding: 0; }
+ul.menu-v li.hr:hover { background: inherit !important; }
+ul.menu-v li a.inline { display:inline; margin:0px; padding:0px; min-width:0px; }
+ul.menu-v.with-icons.stack { margin: 0 0 20px; }
+ul.menu-v.with-icons.stack li { margin: 1px 3px 5px -1px; }
+ul.menu-v.with-icons.stack li a { padding-bottom: 7px; padding-left: 26px; padding-top: 7px; }
+ul.menu-v li.gray a, ul.menu-v li.grey a { color: #aaa; }
+ul.menu-v li.gray a:hover, ul.menu-v li.grey a:hover { color: red; }
+
+/* .menu-h is for horizontal menus: view mode, filters, etc. */
+ul.menu-h { margin: 0; padding:0; max-width:100%; }
+ul.menu-h li { display: inline-block; //display: inline;
+    text-align:left; list-style-type:none; font-weight:normal; padding: 5px; line-height:1em; margin: 0 10px 0 0; }
+ul.menu-h a { text-decoration:none; display: block; padding: 5px; margin: -5px; }
+ul.menu-h li.selected a { background:#eee; color:#000; }
+ul.menu-h li.selected a:hover { color: #000 !important; }
+ul.menu-h li.selected a.inline-link b { border-bottom: 0; }
+ul.menu-h.dropdown li { position: relative; }
+ul.menu-h.dropdown li:hover { background: #eee; }
+ul.menu-h.dropdown ul { display: none; position: absolute; top: 80%; width: 100%; left: -3px; background: #fff; border: 2px solid #aaa; padding: 0; z-index: 50; margin-left: 2px; -moz-box-shadow: 0px 0px 5px #aaa; -webkit-box-shadow: 0px 0px 5px #aaa; box-shadow: 0px 0px 5px #aaa; } /* .menu-h's dropdown menus look like .menu-v's menus: plain, with icons, new branches are rendered to the left from parent menu */
+ul.menu-h.dropdown ul li { display: block; padding: 6px 8px 6px 24px; margin: 0; }
+ul.menu-h.dropdown ul li i.icon16 { margin-left:-20px; margin-right:4px; }
+ul.menu-h.dropdown ul li ul { top: -7px; left: 100%; margin-left: 0; }
+ul.menu-h.dropdown li:hover ul { display: block; }
+ul.menu-h.dropdown.disabled li:hover ul { display: none !important; }
+ul.menu-h.dropdown li:hover ul ul { display: none; }  /* level 2*/
+ul.menu-h.dropdown li:hover ul li:hover ul { display: block; }
+ul.menu-h.dropdown li:hover ul li:hover ul ul { display: none; } /* level 3; add more levels in a similar way if needed */
+ul.menu-h.dropdown li:hover ul li:hover ul li:hover ul { display: block; }
+ul.menu-h.dropdown li.disabled:hover { background: #fff; }
+ul.menu-h.dropdown ul li.disabled a { color: #888!important; background: #fff!important }
+ul.menu-h.dropdown ul li.disabled .icon16 {
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50); -moz-opacity: 0.5; -khtml-opacity: 0.5; opacity:.5; }
+
+/* dropdown.clickable */
+ul.menu-h.dropdown.clickable ul { display: none;}
+ul.menu-h.dropdown.clickable li:hover ul { display: none; }
+ul.menu-h.dropdown.clickable li:hover ul li:hover ul { display:none; }
+ul.menu-h.dropdown.clickable li:hover ul li:hover ul ul { display: none; }
+ul.menu-h.dropdown.clickable li:hover ul li:hover ul li:hover ul { display: none; }
+
+.menu-v li .arrow {
+    background-position: -112px 0;
+}
+
+i.icon16 {
+    margin: -0.1em 0.25em 0 0;
+    text-decoration: none !important;
+    vertical-align: top;
+}
+
+i.icon16 {
+    background-image: url("/wa-content/img/icon16.png");
+}
+
+.icon16.folder {
+    background-position: -192px -32px;
+}
+
+.icon16.calendar {
+    background-position: -48px -48px;
+}
+
+.sidebar{;
+    font-size:	13px;
+}
+
+.menu-v li.closed > ul {
+    display: none;
+}
+
+.menu-v li.closed .arrow {
+    background-position: -144px 0;
+}
+
+.icon16.post { background-position:-96px -80px; }

@@ -874,6 +874,35 @@ span.bullet{
     display: block;
 }
 
+.blog_sidebar{
+
+}
+
+.hierarchical {
+    margin-left: 14px;
+}
+.collapsible {
+    padding-left: 12px;
+}
+ul.menu-v {
+    list-style-type: none;
+    margin: 5px 0 0;
+    padding: 0;
+}
+ul.menu-v.with-icons li {
+    margin-left: -4px;
+    padding: 4px 2px 4px 24px;
+}
+ul.menu-v li {
+    display: block;
+    line-height: 1em;
+    margin: 0 -2px 3px 0;
+    min-width: 60px;
+    padding: 4px 0;
+    position: relative;
+    text-align: left;
+}
+
 /* ========== оформление заказа ========== */
 
 .checkout_shipping{
