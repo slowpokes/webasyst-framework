@@ -1156,9 +1156,83 @@ function showSubMenu(element, t){
 }
 
 function lazyLoadHeader(){
-    $.get('/login/', function(data){
+    $.get('/null/', function(data){
         $("#cart-summary").html($(data).find("#cart-summary"));
         $("#top_menu").html($(data).find("#top_menu"));
         menuInit();
     });
 }
+
+
+function initComments(){
+    $('#comment_submit').click(function(){
+        var button = $(this);
+        button.attr('disabled', true).next().show();
+
+        var container = $('.comment-form');
+        var form = $('.comment-form form');
+        $.post(form.attr('action')+'?json=1', form.serialize(), function(response){
+
+            button.attr('disabled', false).next().hide();
+
+            if (response.status && response.status == 'ok' && response.data.redirect) {
+                window.location.replace(response.data.redirect);
+                window.location.href = response.data.redirect;
+                return;
+            }
+            if ( response.status && response.status == 'ok' && response.data) {
+                var template = $(response.data.template);
+                var count_str = response.data.count_str;
+
+                var target;
+                if (container.prev().is('.comments')) {
+                    target = container.prev('.comments').children('ul');
+                } else {
+                    target = container.parent();
+                    if (!target.next('ul').size()) {
+                        target.after('<ul class="menu-v with-icons"></ul>');
+                    }
+                    target = target.next('ul');
+                }
+
+                target.append( $('<li />').append(template) );
+                move_form_add('.comments', 0);
+
+                $('.not-comment').remove();
+                $('.comment-count').show().html(count_str);
+
+                template.trigger('plugin.comment_add');
+                form_refresh(true);
+            } else if( response.status && response.status == 'fail' ) {
+                form_refresh();
+                var errors = response.errors;
+                $(errors).each(function($name){
+                    var error = this;
+                    for (name in error) {
+                        var elem = $('.comment-form form').find('[name='+name+']');
+                        elem.after($('<em class="errormsg"></em>').text(error[name])).addClass('error');
+                    }
+                });
+            }
+            else {
+                form_refresh(false);
+            }
+
+        }, "json")
+            .error(function(){
+                form_refresh(false);
+            });
+        return false;
+    });
+}
+
+function form_refresh(empty){
+    var form = $('.comment-form');
+    form.find('.errormsg').remove();
+    form.find('.error').removeClass('error');
+    form.find('.wa-captcha-refresh').click();
+
+    if (empty) {
+        form.find('textarea').val('');
+    }
+};

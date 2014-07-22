@@ -838,6 +838,42 @@ span.bullet{
     margin-right: 10px;
 }
 
+/* блог */
+
+.comment-form .wa-field{
+    text-align: left;
+}
+
+.comment-form .form{
+    margin: 0;
+}
+
+.comments ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.comments li{
+    border-bottom: 1px solid #999;
+    padding: 10px;
+}
+
+.comment .text{
+    margin-top: 10px;
+}
+
+.comment .credentials span, .comment .credentials a, .comment .credentials img{
+    vertical-align: middle;
+}
+.comment .hint{
+    color: #999;
+}
+
+.comment-form em{
+    display: block;
+}
+
 /* ========== оформление заказа ========== */
 
 .checkout_shipping{
