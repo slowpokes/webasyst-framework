@@ -3445,6 +3445,10 @@ h2{
 
 /* top_menu */
 
+#top_menu{
+    min-height: 40px;
+}
+
 .top_menu{
     background: #369b1e;
     padding: 6px 15px;
