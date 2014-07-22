@@ -1159,12 +1159,8 @@ ul.menu-v li {
     padding-bottom: 5px;
 }
 
-.pages_sidebar .sidebar_links ul{
-    margin: 10px 0;
-}
 
-
-.filter, .sidebar_links ul{
+.filter{
     margin: 0;
     padding: 0;
     margin-bottom: 20px;
@@ -1199,26 +1195,43 @@ ul.menu-v li {
     font-size: 0;
 }
 
-.brand_page .sidebar_links ul{
-    border: none;
-}
-
-.sidebar_links ul li{
+.sidebar_links ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
     font-size: 12px;
 }
 
+.sidebar_links>ul>li>a, .sidebar_links>ul>li>span{
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.sidebar_links li{
+    margin-left: 10px;
+}
+
+.sidebar_links>ul>li{
+    margin-left: 0;
+}
+
+.sidebar_links>ul>li>ul>li>ul>li>a{
+    background: url(../img/uri/small_arrow.png) no-repeat 5px 8px;
+    padding-left: 15px;
+}
+
 .sidebar_links ul li a:hover{
-    background: #e9ecea;
+    background-color: #e9ecea;
     color: #333;
 }
 
-.sidebar_links ul li a{
+.sidebar_links ul li>a, .sidebar_links ul li>span{
     text-decoration: none;
     display: block;
     padding: 3px 0 3px 10px;
 }
 
-.filter_title, .sidebar_links .title{
+.filter_title{
     font-size: 12px;
     font-weight: bold;
     padding: 5px 0 5px 10px;
@@ -1228,35 +1241,17 @@ ul.menu-v li {
     background-position: 160px 7px;
 }
 
-.sidebar_links .title{
-    background-image: none;
-}
-
 .sidebar_links .current{
-    font-weight: bold;
-}
-
-.brand_page .depth_0>a{
-    font-weight: bold;
-    padding: 5px 0 5px 10px;
     background: #e9ecea;
     color: #333;
-    border-radius: 5px;
 }
 
-.brand_page .depth_0{
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-.brand_page .depth_0 ul{
-    margin: 0;
-}
-
+/*
 .brand_page .depth_1 ul li{
     padding-left: 25px;
     background: url(../img/uri/small_arrow.png) no-repeat 15px 8px;
 }
+*/
 
 .filter.collapsed .filter_title{
     background-position: 160px -23px;
@@ -1316,7 +1311,9 @@ ul.menu-v li {
     padding: 2px 5px;
 }
 
-.homepage .sidebar_links ul,.sidebar_links ul li{
+/*
+
+.homepage .sidebar_links ul{
     margin: 0;
     padding: 0;
     list-style: none;
@@ -1357,6 +1354,8 @@ ul.menu-v li {
     background: #aacf4e;
     color: #fff;
 }
+
+*/
 
 .filter label input{
     display: inline-block;
