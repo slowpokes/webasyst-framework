@@ -1,11 +1,12 @@
 [submodule "wa-apps/shop"]
 	path = wa-apps/shop
 	url = git@github.com:slowpokes/shop-script.git
-	ignore = untracked
+	ignore = dirty
 [submodule "wa-apps/warehouse"]
 	path = wa-apps/warehouse
 	url = git@github.com:slowpokes/warehouse.git
-	ignore = untracked
+	ignore = dirty
 [submodule "wa-apps/courier"]
 	path = wa-apps/courier
 	url = git@github.com:slowpokes/courier.git
+	ignore = dirty
