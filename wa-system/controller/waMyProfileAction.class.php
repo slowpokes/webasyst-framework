@@ -21,6 +21,11 @@ abstract class waMyProfileAction extends waViewAction
 
         $saved = waRequest::post() && $this->saveFromPost($this->form, $this->contact);
 
+        if($saved){
+            $this->form = $this->getForm();
+            $this->form->setValue($this->contact);
+        }
+
         $this->view->assign('saved', $saved);
         $this->view->assign('contact', $this->contact);
         $this->view->assign('form', $this->form);
