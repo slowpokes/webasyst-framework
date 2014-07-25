@@ -332,10 +332,20 @@ class waContactForm
             if ($f->isRequired()) {
                 $field_class .= ' '.(wa()->getEnv() == 'frontend' ? 'wa-required' : 'required');
             }
-            $result .= '<div class="'.$class_field.' '.$field_class.'" data-id="'.$fid.'"><div class="'.$class_name.'">'. // VADIM CODE
-                $f->getName().'</div><div class="'.$class_value.'">';
+            //VADIM CODE START
+            $result .= '<div class="'.$class_field.' '.$field_class.'" ';
+            if(is_array($this->values[$fid])){
+                foreach($this->values[$fid] as $el_id=>$el){
+                    if(isset($el['ext'])){
+                        $result .= ' data-ext-'.$el_id.'="'.$el['ext'].'" ';
+                    }
+                }
+            }
+            $result .= ' data-id="'.$fid.'"><div class="'.$class_name.'">';
+            $result .= $f->getName().'</div><div class="'.$class_value.'">';
             $result .= "\n".$this->html($fid, $with_errors);
             $result .= "\n</div></div>";
+            //VADIM CODE END
         }
         return $result;
     }

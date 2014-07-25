@@ -39,20 +39,13 @@ return array(
     new waContactEmailField('email', 'Email', array(
         'multi' => true, 'storage' => 'email',
         'ext' => array(
-            'work' => 'Work',
-            'personal' => 'Personal',
+            'personal' => 'Основной',
         ),
         'top' => true
     )),
     new waContactDateField('birthday', 'Birthday', array('storage' => 'info')),
     new waContactTextField('about', 'Description', array('storage' => 'info')),
     new waContactPhoneField('phone', 'Phone', array(
-        'multi' => true,
-        'ext' => array(
-            'work' => 'Work',
-            'mobile' => 'Mobile',
-            'home' => 'Home',
-        ),
         'top' => true
     )),
     new waContactStringField('im', 'Instant messenger', array(
@@ -76,10 +69,7 @@ return array(
     new waContactAddressField('address', 'Address', array(
         'multi' => true,
         'ext' => array(
-            'work' => 'Work',
-            'home' => 'Home',
-            'shipping' => 'Shipping',
-            'billing' => 'Billing',
+            'shipping' => 'Основной',
         )
     )),
 

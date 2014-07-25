@@ -236,6 +236,17 @@ class waContact implements ArrayAccess
                 }
                 // for non-multi fields return field value
                 else {
+                    //VADIM CODE START
+                    if(is_array($result)){
+                        if(isset($result['value'])){
+                            return $result['value'];
+                        }
+                        return null;
+                    }
+                    else{
+                        return $result;
+                    }
+                    //VADIM CODE END
                     return is_array($result) ? $result['value'] : $result;
                 }
             }
