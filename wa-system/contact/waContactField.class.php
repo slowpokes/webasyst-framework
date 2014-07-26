@@ -754,7 +754,7 @@ abstract class waContactField
                 $str = '';
                 //VADIM CODE START
                 foreach($result as $id=>$el){
-                    $str .= '<p class="field_separator" data-id="'.$id.'">'.$el.'</p>';
+                    $str .= '<p class="field_separator field_separator_'.$id.'" data-id="'.$id.'">'.$el.'</p>';
                 }
                 return $str;
                 //VADIM CODE END

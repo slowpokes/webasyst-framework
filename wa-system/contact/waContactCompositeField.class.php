@@ -316,7 +316,11 @@ class waContactCompositeField extends waContactField
                 $result[] = '<div class="'.($field->isRequired() ? $required_class : '').'wa-field" data-id="'.$params_subfield['parent'].'.'.$field->getId().'"><div class="wa-name">'.$field->getName().'</div><div class="wa-value">'.$field->getHTML($params_subfield, $attrs_one).$errors_html.'</div></div>'; // VADIM CODE
             }
         }
-        return '<div class="multi_block">'.implode($result)."</div>";
+        //VADIM CODE START
+        $cl = '';
+        if(isset($params['multi_index'])){$cl = 'multi_block_'.$params['multi_index'];}
+        return '<div class="multi_block '.$cl.'">'.implode($result)."</div>";
+        //VADIM CODE END
     }
 
     public function getHtmlOneWithErrors($errors, $params = array(), $attrs = '')
