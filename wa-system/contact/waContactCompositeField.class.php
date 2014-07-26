@@ -196,14 +196,26 @@ class waContactCompositeField extends waContactField
             } else {
                 if ($is_ext && $ext) {
                     $data = $contact->get($this->id);
+                    $prev_sort = null;//VADIM CODE
                     foreach ($data as $sort => $row) {
                         if ($row['ext'] == $ext) {
+                            $prev_sort = $sort;//VADIM CODE
                             unset($data[$sort]);
                         }
                     }
+                    //VADIM CODE START
                     foreach ($value as $v) {
-                        $data[] = $v;
+                        if($v['ext'] == $ext){
+                            if($prev_sort!==null){
+                                $data[$prev_sort] = $v;
+                            }
+                        }
+                        else{
+                            $data[] = $v;
+                        }
                     }
+                    ksort($data);
+                    //VADIM CODE END
                     return $data;
                 } else {
                     return $value;

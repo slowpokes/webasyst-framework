@@ -168,6 +168,7 @@ abstract class waMyProfileAction extends waViewAction
                     }
                 }
             }
+            ksort($_POST['customer']['address']);
         }
     }
 }
