@@ -19,6 +19,7 @@ abstract class waMyProfileAction extends waViewAction
 
         $this->form->setValue($this->contact);
 
+        $this->updateAddress();//VADIM CODE
         $saved = waRequest::post() && $this->saveFromPost($this->form, $this->contact);
 
         if($saved){
@@ -100,6 +101,38 @@ abstract class waMyProfileAction extends waViewAction
         return waContactForm::loadConfig($enabled, array(
             'namespace' => 'profile'
         ));
+    }
+
+    //VADIM CODE START
+    private function updateAddress(){
+        $delete = waRequest::post('delete', null, 'array');
+        if($delete){
+            foreach($delete as $name=>$element){
+                foreach($element as $id=>$nth){
+                    if(isset($_POST['customer'][$name][$id])){
+                        array_splice($_POST['customer'][$name], $id, 1);
+                    }
+                }
+            }
+        }
+        if(isset($_POST['customer']['address'])){
+            foreach($_POST['customer']['address'] as $key=>$val){
+                if(!is_int($key)){
+                    $_POST['customer']['address'][0][$key] = $val;
+                    unset($_POST['customer']['address'][$key]);
+                }
+            }
+        }
+        $add = waRequest::post('add', null, 'array');
+        if($add){
+            foreach($add as $id=>$element){
+                $arr = array('ext'=>'Новый');
+                if($id=='address'){
+                    $arr['country']='rus';
+                }
+                $_POST['customer'][$id][] = $arr;
+            }
+        }
     }
 }
 
