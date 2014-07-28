@@ -205,10 +205,8 @@ class waContactCompositeField extends waContactField
                     }
                     //VADIM CODE START
                     foreach ($value as $v) {
-                        if($v['ext'] == $ext){
-                            if($prev_sort!==null){
-                                $data[$prev_sort] = $v;
-                            }
+                        if(($v['ext'] == $ext)&&($prev_sort!==null)){
+                            $data[$prev_sort] = $v;
                         }
                         else{
                             $data[] = $v;
