@@ -334,7 +334,7 @@ class waContactForm
             }
             //VADIM CODE START
             $result .= '<div class="'.$class_field.' '.$field_class.'" ';
-            if(is_array($this->values[$fid])){
+            if(isset($this->values[$fid])&&is_array($this->values[$fid])){
                 foreach($this->values[$fid] as $el_id=>$el){
                     if(isset($el['ext'])){
                         $result .= ' data-ext-'.$el_id.'="'.$el['ext'].'" ';
