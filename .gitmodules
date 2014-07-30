@@ -6,3 +6,6 @@
 	path = wa-apps/courier
 	url = git@github.com:slowpokes/courier.git
 	ignore = dirty
+[submodule "wa-apps/shop"]
+	path = wa-apps/shop
+	url = git@github.com:slowpokes/shop-script.git
