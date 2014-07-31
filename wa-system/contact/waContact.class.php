@@ -253,6 +253,13 @@ class waContact implements ArrayAccess
             // 'html' format: ???
             else if ($format == 'html') {
                 if ($field->isMulti()) {
+                    //VADIM CODE START
+                    $str = '';
+                    foreach($result as $key=>$line){
+                        $str .= "<span class='multi_value line_$key'>$line</span>";
+                    }
+                    return $str;
+                    //VADIM CODE END
                     return implode(', ', $result);
                 } else {
                     return $result;
