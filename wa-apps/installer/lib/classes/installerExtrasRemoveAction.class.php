@@ -29,7 +29,10 @@ abstract class installerExtrasRemoveAction extends waViewAction
         $url = parse_url($r = waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
         if (preg_match('/(^|&)module=(themes|plugins)($|&)/', $url, $matches)) {
             $this->extras_type = $matches[2];
+        } elseif (preg_match('/^installer(\w+)RemoveAction$/', get_class($this), $matches)) {
+            $this->extras_type = strtolower($matches[1]);
         }
+
         if (installerHelper::isDeveloper()) {
             switch ($this->extras_type) {
                 case 'themes':
@@ -42,26 +45,15 @@ abstract class installerExtrasRemoveAction extends waViewAction
                     $msg = '???';
                     break;
             }
-            $this->redirect(array(
-                'module' => $this->extras_type,
-                'msg'    => installerMessage::getInstance()->raiseMessage($msg, 'fail'),
-            ));
+
+            $msg = installerMessage::getInstance()->raiseMessage($msg, installerMessage::R_FAIL);
+            $this->redirect('?msg='.$msg.'#/'.$this->extras_type.'/');
         }
     }
 
     function execute()
     {
         $this->init();
-        if (!$this->extras_type && preg_match('/^installer(\w+)RemoveAction$/', get_class($this), $matches)) {
-            $this->extras_type = strtolower($matches[1]);
-        }
-
-
-        $module = $this->extras_type;
-        $url = parse_url(waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
-        if (preg_match("/(^|&)module=(update|apps| {$this->extras_type})($|&)/", $url, $matches)) {
-            $module = $matches[2];
-        }
 
         $extras_ids = waRequest::post('extras_id');
         try {
@@ -78,30 +70,30 @@ abstract class installerExtrasRemoveAction extends waViewAction
 
             $options = array(
                 'installed' => true,
+                'local'     => true,
             );
 
 
-            if ($module == 'plugins') {
+            if ($this->extras_type == 'plugins') {
                 $options['system'] = true;
             }
 
             $this->installer = installerHelper::getInstaller();
-            $app_list = $this->installer->getItems();
+            $app_list = $this->installer->getItems($options);
 
             $queue = array();
 
 
             foreach ($extras_ids as $slug => $info) {
                 $slug_chunks = explode('/', $slug);
-                if ($slug_chunks == 'wa-plugins') {
+                if ($slug_chunks[0] == 'wa-plugins') {
                     $app_id = $slug_chunks[0].'/'.$slug_chunks[1];
                 } else {
                     $app_id = reset($slug_chunks);
                 }
-                if (isset($app_list[$app_id])) {
+                if (isset($app_list[$app_id]) || ($slug_chunks == 'wa-plugins')) {
                     $app = $app_list[$app_id];
-                    $installed = $this->installer->getItemInfo($slug, $options);
-                    if ($info['vendor'] == $installed['installed']['vendor']) {
+                    if (($installed = $this->installer->getItemInfo($slug, $options)) && ($info['vendor'] == $installed['vendor'])) {
                         if (!empty($installed['installed']['system'])) {
                             /*
                              _w("Can not delete system application's themes \"%s\"");
@@ -109,12 +101,12 @@ abstract class installerExtrasRemoveAction extends waViewAction
                              */
 
                             $message = "Can not delete system application's {$this->extras_type} \"%s\"";
-                            throw new waException(sprintf(_w($message), $info['name']));
+                            throw new waException(sprintf(_w($message), _wd($slug, $info['name'])));
                         }
                         $queue[] = array(
                             'app_slug' => $app_id,
                             'ext_id'   => $installed['id'],
-                            'name'     => "{$installed['installed']['name']} ({$app['name']})",
+                            'name'     => sprintf("%s (%s)", _wd($slug, $installed['installed']['name']), _wd($app_id, $app['name'])),
                         );
                         unset($extras_ids[$slug]);
                     }
@@ -128,18 +120,6 @@ abstract class installerExtrasRemoveAction extends waViewAction
                 }
             }
 
-
-            foreach ($extras_ids as $slug => $data) {
-                $slug = preg_replace('@^wa-plugins/([^/]+)/plugins/(.+)$@', 'wa-plugins/$1/$2', $slug);
-                if (preg_match('@^wa-plugins/(([^/]+/)[^/]+)$@', $slug, $matches)) {
-                    $path = wa()->getConfig()->getPath('plugins').'/'.$matches[1];
-                    $info_path = $path.'/lib/config/plugin.php';
-                    if (file_exists($info_path) && ($info = include($info_path))) {
-                        waFiles::delete($path, true);
-                        $deleted_extras[] = empty($info['name']) ? $matches[1] : $info['name'];
-                    }
-                }
-            }
             if (!$deleted_extras) {
                 $message = sprintf('Application %s not found', $this->extras_type);
                 throw new waException(_w($message));
@@ -152,10 +132,10 @@ abstract class installerExtrasRemoveAction extends waViewAction
             $message_plural = sprintf('Applications %a %%s have been deleted', $this->extras_type);
             $message = sprintf(_w($message_singular, $message_plural, count($deleted_extras), false), implode(', ', $deleted_extras));
             $msg = installerMessage::getInstance()->raiseMessage($message);
-            $this->redirect('?msg='.$msg.'#/'.$module.'/');
+            $this->redirect('?msg='.$msg.'#/'.$this->extras_type.'/');
         } catch (Exception $ex) {
             $msg = installerMessage::getInstance()->raiseMessage($ex->getMessage(), installerMessage::R_FAIL);
-            $this->redirect('?msg='.$msg.'#/'.$module.'/');
+            $this->redirect('?msg='.$msg.'#/'.$this->extras_type.'/');
         }
 
     }

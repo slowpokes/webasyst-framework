@@ -31,6 +31,7 @@ class installerUpdateAction extends waViewAction
             if (isset($items['installer'])) {
                 $items['installer']['name'] = _w('Webasyst Framework');
             };
+
         } catch (Exception $ex) {
             $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
         }
