@@ -17,6 +17,7 @@
     {$wa->js()}
     {$wa->headJs()}
     <script type="text/javascript" src="/wa-apps/shop/themes/aromateca/js/main.js"></script> {* общие скрипты для сайта *}
+    {include file="$wa_active_theme_path/js.html"}
     <script>
         $(document).ready(function () {
             mainInit();
@@ -36,6 +37,7 @@
     <div class="push"></div>
 </div>
 {include file="footer.html"}
+{include file="$wa_active_theme_path/noindex.html"}
 
 </body>
 </html>
