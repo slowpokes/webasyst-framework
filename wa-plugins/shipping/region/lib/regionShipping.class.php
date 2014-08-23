@@ -6,8 +6,9 @@ class regionShipping extends waShipping
     public function calculate(){
         $region_id = $this->getAddress('region');
         if ($region_id) {
-            if (isset($this->regions[$region_id])) {
-                $price = $this->regions[$region_id];
+            if (isset($this->regions['price'][$region_id])) {
+                $price = $this->regions['price'][$region_id];
+                $time = $this->regions['time'][$region_id];
                 if($price>0){
                     //мы доставляем в этот регион
                     $rate = $price;
@@ -17,7 +18,7 @@ class regionShipping extends waShipping
                     }
                     return array(
                         'delivery' => array(
-                            'est_delivery' => 'Завтра',
+                            'est_delivery' => $time,
                             'currency'     => 'RUB',
                             'rate'         => $rate,
                         ),
@@ -50,13 +51,12 @@ class regionShipping extends waShipping
         if ($regions = $rm->getByCountry('rus')) {
 
             $control .= "<table class=\"zebra\"><thead>";
-            $string = '<tr><td>%s</td><td>%s</td></tr>';
+            $string = '<tr><td>%s</td><td>%s</td><td>%s</td></tr>';
             $c_params = array();
-            $c_params['namespace'] = array($name);
-            $control .= "<tr class=\"gridsheader\"><th>";
-            $control .= htmlentities('Впишите стоимость доставки для каждого региона (0 - доставка не осуществляется)', ENT_QUOTES, 'utf-8');
-            $control .= "</th>";
-            $control .= "<th></th>";
+            $control .= "<tr class=\"gridsheader\">";
+            $control .= "<th>Регион</th>";
+            $control .= "<th>Стоимость доставки<br>(0 - доставка не осуществляется)</th>";
+            $control .= "<th>Срок доставки</th>";
             $control .= "</tr></thead><tbody>";
 
             foreach ($regions as $region) {
@@ -64,9 +64,23 @@ class regionShipping extends waShipping
                 if ($region['code']) {
                     $title .= " ({$region['code']})";
                 }
-                $c_params['value'] = $values[$region['code']];
+                $c_params['value'] = '';
+                if(isset($values[$region['code']])){
+                    $c_params['value'] = $values[$region['code']];
+                }
+                if(isset($values['price'][$region['code']])){
+                    $c_params['value'] = $values['price'][$region['code']];
+                }
+                $c_params['namespace'] = $name."[price]";
                 $price = waHtmlControl::getControl(waHtmlControl::INPUT, $region['code'], $c_params);
-                $control .= sprintf($string, $title, $price);
+
+                $c_params['value'] = '';
+                if(isset($values['time'][$region['code']])){
+                    $c_params['value'] = $values['time'][$region['code']];
+                }
+                $c_params['namespace'] = $name."[time]";
+                $time = waHtmlControl::getControl(waHtmlControl::INPUT, $region['code'], $c_params);
+                $control .= sprintf($string, $title, $price, $time);
             }
             $control .= "</tbody>";
             $control .= "</table>";
