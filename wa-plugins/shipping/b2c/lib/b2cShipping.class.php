@@ -1,14 +1,16 @@
 <?php
 
-class regionShipping extends waShipping
+class b2cShipping extends waShipping
 {
 
     public function calculate(){
         $region_id = $this->getAddress('region');
-        if ($region_id) {
-            if (isset($this->regions['price'][$region_id])) {
-                $price = $this->regions['price'][$region_id];
-                $time = $this->regions['time'][$region_id];
+        $region_int = intval($region_id);
+        $city = $this->getAddress('city');
+        if ($region_id>0) {
+            if (isset($this->regions[$region_id]['price'])) {
+                $price = $this->regions[$region_id]['price'];
+                $time = $this->regions[$region_id]['time'];
                 if($price>0){
                     //мы доставляем в этот регион
                     $rate = $price;
@@ -16,13 +18,25 @@ class regionShipping extends waShipping
                     if($order_price>=$this->free_shipping){
                         $rate = 0;
                     }
-                    return array(
-                        'delivery' => array(
+                    $cities = self::getCities();
+                    if(isset($cities[$region_int])){
+                        if(in_array($city, $cities[$region_int])){
+                            $result['delivery'] = array(
+                                'est_delivery' => $time,
+                                'currency'     => 'RUB',
+                                'rate'         => $rate,
+                            );
+                            return $result;
+                        }
+                    }
+                    if($city==''){
+                        $result['delivery'] = array(
                             'est_delivery' => $time,
                             'currency'     => 'RUB',
                             'rate'         => $rate,
-                        ),
-                    );
+                        );
+                        return $result;
+                    }
                 }
             }
         }
@@ -44,6 +58,27 @@ class regionShipping extends waShipping
         return $this->myTracking($tracking_id);
     }
 
+    public function getSettingsHTML($params = array()){
+        $view = wa()->getView();
+        $html = '';
+        $html .= $view->fetch($this->path.'/templates/settings.html');
+        $html .= parent::getSettingsHTML($params);
+        return $html;
+    }
+
+    public static function getCities(){
+        $model = new waModel();
+        $data = $model->query("SELECT distinct city, r.code FROM `shipment_b2c_zones` z left join b2c_regions r ON z.region = r.name ORDER BY city")->fetchAll();
+        $cities = array();
+        foreach($data as $line){
+            if(!isset($cities[$line['code']])){
+                $cities[$line['code']] = array();
+            }
+            $cities[$line['code']][] = $line['city'];
+        }
+        return $cities;
+    }
+
     public static function settingRegionControl($name, $params = array()){
         $control = '';
         $values = $params['value'];
@@ -59,27 +94,37 @@ class regionShipping extends waShipping
             $control .= "<th>Срок доставки</th>";
             $control .= "</tr></thead><tbody>";
 
+            $cities = self::getCities();
+
             foreach ($regions as $region) {
                 $title = $region['name'];
                 if ($region['code']) {
                     $title .= " ({$region['code']})";
                 }
-                $c_params['value'] = '';
-                if(isset($values[$region['code']])){
-                    $c_params['value'] = $values[$region['code']];
+
+                $cities_block = '';
+                if(isset($cities[intval($region['code'])])){
+                    $cities_block .= '<div class="cities">';
+                    foreach($cities[intval($region['code'])] as $city){
+                        $cities_block .= "<div class='city'>$city</div> ";
+                    }
                 }
-                if(isset($values['price'][$region['code']])){
-                    $c_params['value'] = $values['price'][$region['code']];
-                }
-                $c_params['namespace'] = $name."[price]";
-                $price = waHtmlControl::getControl(waHtmlControl::INPUT, $region['code'], $c_params);
+                $cities_block .= '</div>';
+                $title .= $cities_block;
+
+                $c_params['namespace'] = $name."[{$region['code']}]";
 
                 $c_params['value'] = '';
-                if(isset($values['time'][$region['code']])){
-                    $c_params['value'] = $values['time'][$region['code']];
+                if(isset($values[$region['code']]['price'])){
+                    $c_params['value'] = $values[$region['code']]['price'];
                 }
-                $c_params['namespace'] = $name."[time]";
-                $time = waHtmlControl::getControl(waHtmlControl::INPUT, $region['code'], $c_params);
+                $price = waHtmlControl::getControl(waHtmlControl::INPUT, 'price', $c_params);
+
+                $c_params['value'] = '';
+                if(isset($values[$region['code']]['time'])){
+                    $c_params['value'] = $values[$region['code']]['time'];
+                }
+                $time = waHtmlControl::getControl(waHtmlControl::INPUT, 'time', $c_params);
                 $control .= sprintf($string, $title, $price, $time);
             }
             $control .= "</tbody>";
@@ -88,12 +133,6 @@ class regionShipping extends waShipping
             $control .= 'Не определено ни одной области. Для работы модуля необходимо определить хотя бы одну область в России (см. раздел «Страны и области»).';
         }
         return $control;
-    }
-
-    public function saveSettings($settings = array())
-    {
-
-        return parent::saveSettings($settings);
     }
 
     private function myTracking($barcode){
@@ -113,5 +152,9 @@ class regionShipping extends waShipping
             $result .= "</table>";
         }
         return $result;
+    }
+
+    public function requestedAddressFields(){
+        return false;
     }
 }
