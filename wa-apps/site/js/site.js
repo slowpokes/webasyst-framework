@@ -401,25 +401,6 @@ $.wa.site = {
 	settingsRoutingAction: function () {
 		this.settingsAction('routing');
 	},
-
-    redirectAction: function (params) {
-        var page = 1;
-        var sort = 'url';
-        var order = '';
-        if (typeof params != 'undefined'){
-            if(params.substr(0, 1)=='?')params = params.substr(1);
-            params = this.parseParams(params);
-            if (typeof params.page != 'undefined')page = params.page;
-            if (typeof params.sort != 'undefined')sort = params.sort;
-            if (typeof params.order != 'undefined')order = params.order;
-        }
-        this.savePanel(false);
-        var url = '?module=redirect&domain_id=' + this.domain +'&page='+page+'&sort='+sort;
-        if(order) url += '&order='+order;
-        $("#s-content").load(url, function () {
-            $.wa.site.active($("#s-link-redirect"));
-        });
-    },
 	
 	blocksAction: function (params) {
         $('#s-save-panel input').replaceWith('<input id="s-editor-save-button" type="button" class="button green" value="' + $_('Save') + '">');
