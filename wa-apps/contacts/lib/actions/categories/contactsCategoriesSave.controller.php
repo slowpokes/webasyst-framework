@@ -6,7 +6,7 @@ class contactsCategoriesSaveController extends waJsonController
     public function execute() {
         // only allowed to global admin
         if (!wa()->getUser()->getRights('webasyst', 'backend')) {
-            throw new waRightsException('Access denied.');
+            throw new waRightsException(_w('Access denied'));
         }
 
         $cm = new waContactCategoryModel();
@@ -18,7 +18,7 @@ class contactsCategoriesSaveController extends waJsonController
                 throw new waException('No id and no name given.');
             }
             $id = $cm->add($name);
-            $this->log('category_add', 1);
+            $this->logAction('category_add', $id);
         } else if ($name || $name === '0') {
             $cm->updateById($id, array('name' => $name));
         }

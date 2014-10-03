@@ -31,6 +31,15 @@ class waContactCountryField extends waContactSelectField
         $this->model = null;
     }
 
+    public function format($data, $format = null)
+    {
+        $res = parent::format($data, $format);
+        if (!$res) {
+            return $format === 'value' ? htmlspecialchars($data) : $data;
+        }
+        return $res;
+    }
+    
     public function getOptions($id = null)
     {
         if (isset($this->options['options']) && is_array($this->options['options'])) {
@@ -113,7 +122,6 @@ class waContactCountryField extends waContactSelectField
         $selected = false;
         $value = isset($params['value']) ? $params['value'] : '';
         $html = '<select '.$attrs.' name="'.$this->getHTMLName($params).'"><option value=""></option>';
-        $html = '<select '.$attrs.' name="'.$this->getHTMLName($params).'">';
         foreach ($this->model->allWithFav() as $v) {
             if (!$iso_codes || isset($iso_codes[$v['iso3letter']]) || $v['iso3letter'] === '') {
                 if ($v['name'] === '') {

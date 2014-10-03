@@ -79,8 +79,8 @@ msgid "Categories"
 msgstr ""
 
 #: /wa-apps/contacts/templates/actions/backend/BackendSidebar.html:147
-msgid "Categories are for classifying contacts, e.g. customers, providers, partners, etc. Webasyst users can be customized to have access to certain contact categories only."
-msgstr "Categories are for classifying contacts; e.g., customers, providers, partners, etc. Webasyst users can be set up to have access to certain contact categories only."
+msgid "Categories are for classifying contacts, e.g. customers, providers, partners, etc."
+msgstr ""
 
 #: /wa-apps/contacts/templates/actions/backend/BackendSidebar.html:162
 msgid "All users"
@@ -123,7 +123,7 @@ msgid "cancel"
 msgstr ""
 
 #: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:39
-msgid "Edit contact"
+msgid "Edit contact info"
 msgstr ""
 
 #: /wa-apps/contacts/js/wa.controller.js:826
@@ -144,10 +144,6 @@ msgstr ""
 
 #: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:86
 msgid "Field constructor"
-msgstr ""
-
-#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:96
-msgid "Contact id"
 msgstr ""
 
 #: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:97
@@ -335,7 +331,7 @@ msgid "No categories available"
 msgstr ""
 
 #: /wa-apps/contacts/templates/actions/categories/CategoriesAddSelected.html:4
-msgid "Add contacts to categories"
+msgid "Add users to categories"
 msgstr ""
 
 #: /wa-apps/contacts/templates/actions/categories/CategoriesAddSelected.html:30
@@ -598,3 +594,1010 @@ msgstr ""
 msgid "Available categories"
 msgstr ""
 
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:39
+msgid "Actions"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:48
+msgid "Delete contact"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:6
+#: /wa-apps/contacts/js/compiled/contacts.js:31
+#: /wa-apps/contacts/js/wa.controller.js:845
+msgid "Merge contacts"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:11
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:88
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:93
+msgid "Choose a master contact that will be retained after merging."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:12
+msgid "Other contacts will be deleted during this merging operation."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:13
+msgid "Contact info from the contacts to be deleted, except unique fields, will be added to master contact."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:14
+msgid "Links to deleted contacts from other applications will be updated to link to master contact."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:35
+msgid "selected as a master contact"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:26
+msgid "Leave blank to keep existing password."
+msgstr ""
+
+#: /wa-apps/contacts/js/fieldTypes.js:427
+#: /wa-apps/contacts/js/compiled/contacts.js:91
+msgid "select region"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:60
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:94
+msgid "Users can not be merged into other contacts."
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:33
+msgid "%s of %s contacts have been merged"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:36
+msgid "No contacts were merged"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:12
+msgid "of"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:86
+msgid "@"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:134
+msgid "Edit"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:69
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsAdd.action.php:20
+msgid "New compnay"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser2.html:47
+msgid "Deny"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser2.html:49
+msgid "Allow"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:110
+msgid "Account"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:13
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:18
+msgid "Disabled"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:15
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:18
+msgid "Enabled"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:32
+msgid "Email address is not specified"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:86
+msgid "Available resources"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:96
+msgid "Customer portal only"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:97
+msgid "Customer portal + backend"
+msgstr ""
+
+#: /wa-apps/contacts/js/fieldTypes.js:297
+msgid "Choose company"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:69
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsAdd.action.php:30
+msgid "New person"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/classes/contactsHelper.class.php:57
+msgid "Access disabled by"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:69
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:69
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:69
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/config/logs.php:5
+msgid "added a new contact"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:69
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/config/logs.php:8
+msgid "deleted contact"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:12
+msgid "changed photo"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:69
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsLinks.html:30
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:75
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:58
+msgid "%d other contact will be merged with %%s."
+msgid_plural "%d other contacts will be merged with %%s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsMergeSelectMaster.html:61
+msgid "%d contact will not be merged by the reasons designated above."
+msgid_plural "%d contacts will not be merged by the reasons designated above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/js/fieldTypes.js:1537
+msgid "day"
+msgstr ""
+
+#: /wa-apps/contacts/js/fieldTypes.js:1547
+msgid "month"
+msgstr ""
+
+#: /wa-apps/contacts/js/fieldTypes.js:1575
+#: /wa-apps/contacts/js/fieldTypes.js:1577
+msgid "year"
+msgstr ""
+
+#: /wa-apps/contacts/js/compiled/contacts-jquery.js:5
+msgid "Cancel"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:56
+msgid "%d contact has been removed"
+msgid_plural "%d contacts have been removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:58
+msgid "from %d category"
+msgid_plural "from %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:76
+msgid "%d contact has been added"
+msgid_plural "%d contacts have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/categories/contactsCategories.controller.php:78
+msgid "to %d category"
+msgid_plural "to %d categories"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsDelete.controller.php:69
+msgid "%d contact has been deleted"
+msgid_plural "%d contacts have been deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "contact"
+msgid_plural "contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsEditor.html:26
+msgid "Icon"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsEditor.html:39
+msgid "Group members"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsEditor.html:41
+#: /wa-apps/contacts/templates/actions/groups/GroupsEditor.html:55
+#: /wa-apps/contacts/js/wa.controller.js:448
+msgid "To add users to group, go to <a href=\"#/users/all/\">All users</a>, select them, and click <strong>Actions with selected / Add to group</strong>."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsEditor.html:54
+#: /wa-apps/contacts/js/wa.controller.js:447
+msgid "No users in this group."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsAdd.html:1
+msgid "Add contacts to groups"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsAdd.html:4
+msgid "Select groups:"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsAdd.html:16
+msgid "No user groups."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsAdd.html:18
+#: /wa-apps/contacts/js/wa.controller.js:944
+msgid "New group"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/includeGroupsRights.html:5
+msgid "Access level"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:174
+msgid "Contact not found"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:40
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:108
+msgid "Offline"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:63
+msgid "The same password is used to access personal account and backend."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:66
+msgid "Also to set password set email first"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:118
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:135
+msgid "Customer portal"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:121
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:154
+msgid "Customer Portal is a part of your site available for registered clients and containing their personal data. To access their customer portals your clients must log in with email and password as specified above."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:124
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:156
+msgid "Personal portal settings"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:124
+msgid "in Site app"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:149
+msgid "Email address is used as a login"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:170
+msgid "Backend"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:205
+msgid "change login"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:253
+msgid "Access rights"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:255
+msgid "Backend access rights are customized for every app separately and appear to be a combination of personal and group access rights."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/photo/PhotoEditor.html:19
+msgid "Drop photo here"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/photo/PhotoEditor.html:44
+msgid "To change drop another photo or upload file (JPG, GIF или PNG):"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/photo/PhotoEditor.html:47
+msgid "Or upload file (JPG, GIF or PNG):"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/backend/BackendSidebar.html:127
+msgid "Users"
+msgstr ""
+
+#: /wa-apps/contacts/js/jquery.combobox.js:550
+msgid "Apply"
+msgstr ""
+
+#: /wa-apps/contacts/js/fieldTypes.js:1528
+#: /wa-apps/contacts/lib/classes/contactsHelper.class.php:46
+msgid "map"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.grid.js:211
+msgid "<no-name>"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.grid.js:371
+msgid "There is no geographic location info for these contacts."
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:326
+msgid "Edit user group"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:331
+msgid "Close settings panel"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:645
+#: /wa-apps/contacts/js/wa.controller.js:940
+msgid "New user"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:650
+msgid "<a href=\"#/contacts/add/\">Create a new contact</a> and customize access rights on Account tab."
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:810
+msgid "Exclude users from group \"%s\"?"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:1107
+msgid "Add to group"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:1114
+msgid "Exclude from this group"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:1133
+msgid "on the map"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/contactsRightConfig.class.php:15
+msgid "Can edit or delete contacts added by other users"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:11
+msgid "edited contact"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:14
+msgid "added contact photo"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:17
+msgid "added a new contact category"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:20
+msgid "added a new user group"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:23
+msgid "created user account"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:26
+msgid "performed contact search"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:29
+msgid "merged contacts"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:32
+msgid "added note about contact"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:35
+msgid "edited note about contact"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:38
+msgid "delete note about contact"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:41
+msgid "granted backend access rights"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:44
+msgid "revoked backend access rights"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:47
+msgid "added event"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:50
+msgid "edited event"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsContactSave.controller.php:38
+msgid "to %d group"
+msgid_plural "to %d groups"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsDeleteFrom.controller.php:37
+msgid "from %d group"
+msgid_plural "from %d groups"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/js/wa.controller.js:940
+msgid "Create user"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:94
+msgid "Available"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:96
+msgid "Not available"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.grid.js:544
+msgid "No contacts"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:631
+msgid "You can grant access to your account backend to any existing contact."
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:632
+msgid "Find a contact, or <a href=\"#/contacts/add/\">create a new contact</a>, and then customize their access rights on Access tab."
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.grid.js:544
+msgid "No contacts."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:67
+msgid "Customer Portal is a part of your site available for registered clients and containing their personal data. To access their customer portals your clients must log in with email and password."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:121
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:161
+msgid "Login name is required to access your account backend."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:122
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:162
+msgid "Ex.: john, agent07, and etc."
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/groups/GroupsAdd.html:1
+msgid "Add users to groups"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/categories/CategoriesAddSelected.html:4
+msgid "Add contacts to categories"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsContactSave.controller.php:40
+msgid "%d user has been added"
+msgid_plural "%d users have been added"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsDeleteFrom.controller.php:35
+msgid "%d user excluded"
+msgid_plural "%d users excluded"
+msgstr[0] ""
+msgstr[1] ""
+
+#: /wa-apps/contacts/templates/actions/backend/BackendSidebar.html:33
+msgid "Recent searches"
+msgstr ""
+
+#: /wa-apps/contacts/lib/config/logs.php:38
+msgid "deleted note about contact"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsInfo.html:127
+msgid "ID"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:1121
+msgid "List"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:1122
+msgid "Details"
+msgstr ""
+
+#: /wa-apps/contacts/js/wa.controller.js:1123
+msgid "Userpics"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:43
+msgid "never logged in"
+msgstr ""
+
+#: /wa-apps/contacts/templates/actions/contacts/ContactsUser.html:45
+msgid "last login:"
+msgstr ""
+
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsAdd.action.php:9
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsContactSave.controller.php:15
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsSave.controller.php:9
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsDelete.controller.php:10
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsEditor.action.php:9
+#: /wa-apps/contacts/lib/actions/groups/contactsGroupsDeleteFrom.controller.php:9
+#: /wa-apps/contacts/lib/actions/rights/contactsRights.action.php:10
+#: /wa-apps/contacts/lib/actions/rights/contactsRightsSave.controller.php:10
+#: /wa-apps/contacts/lib/actions/categories/contactsCategoriesDelete.controller.php:10
+#: /wa-apps/contacts/lib/actions/categories/contactsCategoriesSave.controller.php:9
+#: /wa-apps/contacts/lib/actions/categories/contactsCategoriesDeleteFrom.controller.php:10
+#: /wa-apps/contacts/lib/actions/categories/contactsCategoriesEditor.action.php:9
+#: /wa-apps/contacts/lib/actions/categories/contactsCategoriesContactSave.controller.php:9
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsList.controller.php:68
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsUser.controller.php:13
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsUser.controller.php:26
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMergeSelectMaster.action.php:15
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsMerge.controller.php:10
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsSave.controller.php:24
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsSave.controller.php:29
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsAdd.action.php:8
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsInfo.action.php:41
+#: /wa-apps/contacts/lib/actions/contacts/contactsContactsLinks.action.php:24
+msgid "Access denied"
+msgstr ""
+
+#: /wa-apps/contacts//lib/actions/contacts/contactsContactsMerge.controller.php:39
+msgid "%d contact was skipped because they have user accounts"
+msgid_plural "%d contacts were skipped because they have user accounts"
+msgstr[0] ""
+msgstr[1] ""
