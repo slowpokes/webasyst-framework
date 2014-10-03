@@ -83,6 +83,15 @@ class waViewHelper
      */
     public function myNav($ul_class = true)
     {
+
+        $domain = wa()->getRouting()->getDomain(null, true);
+        $domain_config_path = wa()->getConfig()->getConfigPath('domains/'.$domain.'.php', true, 'site');
+        if (file_exists($domain_config_path)) {
+            $domain_config = include($domain_config_path);
+        } else {
+            $domain_config = array();
+        }
+
         $routes = wa()->getRouting()->getRoutes();
         $apps = wa()->getApps();
         $result = array();
@@ -90,6 +99,25 @@ class waViewHelper
             if (isset($r['app']) && !empty($apps[$r['app']]['my_account'])) {
                 $result[$r['app']] = $r;
             }
+        }
+
+
+        if (isset($domain_config['personal'])) {
+            $tmp = array();
+            foreach ($domain_config['personal'] as $app_id => $enabled) {
+                if (!isset($result[$app_id])) {
+                    continue;
+                }
+                if ($enabled) {
+                    $tmp[$app_id] = $result[$app_id];
+                } else {
+                    unset($result[$app_id]);
+                }
+            }
+            foreach ($result as $app_id => $r) {
+                $tmp[$app_id]  = $r;
+            }
+            $result = array_reverse($tmp, true);
         }
 
         $old_app = wa()->getApp();
@@ -587,10 +615,10 @@ HTML;
         return $this->url().$this->app().'/captcha.php'.($add_random ? '?v='.uniqid(time()) : '');
     }
 
-    public function signupUrl()
+    public function signupUrl($absolute = false)
     {
         $auth = wa()->getAuthConfig();
-        return wa()->getRouteUrl((isset($auth['app']) ? $auth['app'] : '').'/signup');
+        return wa()->getRouteUrl((isset($auth['app']) ? $auth['app'] : '').'/signup', array(), $absolute);
     }
 
     public function loginUrl($absolute = false)
@@ -671,6 +699,8 @@ HTML;
         <div class="wa-field">
             <div class="wa-value wa-submit">
                 <input type="submit" value="'._ws('Reset password').'" class="button" >
+                &nbsp;
+                <a href="'.$this->getUrl('/login').'">'._ws('I remember it now!').'</a>
             </div>
         </div>
         <div class="wa-field">
@@ -795,8 +825,9 @@ HTML;
             }
             $html .= '</div></div>';
         }
+        $signup_submit_name = !empty($config['params']['button_caption']) ? htmlspecialchars($config['params']['button_caption']) : _ws('Sign Up');
         $html .= '<div class="wa-field"><div class="wa-value wa-submit">
-            <input type="submit" class="button" value="'._ws('Sign Up').'"> <br><br>'.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
+            <input type="submit" class="button" value="'.$signup_submit_name.'"> '.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
         </div></div>';
         $html .= '</form></div>';
         return $html;
@@ -809,31 +840,46 @@ HTML;
         // get value
         if (isset($params['parent'])) {
             $parent_value = $data[$params['parent']];
-            $params['value'] = $parent_value[$params['id']];
+            $params['value'] = isset($parent_value[$params['id']]) ? $parent_value[$params['id']] : '';
         } else {
             $params['value'] = isset($data[$params['id']]) ? $data[$params['id']] : '';
         }
 
-        $name = $f->getName();
-        if (isset($params['ext'])) {
-            $exts = $f->getParameter('ext');
-            if (isset($exts[$params['ext']])) {
-                $name .= ' ('._ws($exts[$params['ext']]).')';
-            } else {
-                $name .= ' ('.$params['ext'].')';
+        $config = wa()->getAuthConfig();
+        if (!empty($config['fields'][$f->getId()]['caption'])) {
+            $name = htmlspecialchars($config['fields'][$f->getId()]['caption']);
+        } else {
+            $name = $f->getName(null, true);
+
+            if (isset($params['ext'])) {
+                $exts = $f->getParameter('ext');
+                if (isset($exts[$params['ext']])) {
+                    $name .= ' ('._ws($exts[$params['ext']]).')';
+                } else {
+                    $name .= ' ('.$params['ext'].')';
+                }
             }
         }
         $params['namespace'] = 'data';
         if ($f->isMulti()) {
             $f->setParameter('multi', false);
         }
-        $html = '<div class="wa-field wa-field-'.$f->getId().'">
-                <div class="wa-name">'.$name.'</div>
-                <div class="wa-value">'.$f->getHTML($params, $error !== false ? 'class="wa-error"' : '');
-        if ($error) {
-            $html .= '<em class="wa-error-msg">'.$error.'</em>';
+        $attrs = $error !== false ? 'class="wa-error"' : '';
+        if (!empty($config['fields'][$f->getId()]['placeholder'])) {
+            $attrs .= ' placeholder="'.htmlspecialchars($config['fields'][$f->getId()]['placeholder']).'"';
         }
-        $html .= '</div></div>';
+		
+		if ($f instanceof waContactHiddenField) {
+			$html = $f->getHTML($params, $attrs);
+		} else {
+			$html = '<div class="wa-field wa-field-'.$f->getId().'">
+					<div class="wa-name">'.$name.'</div>
+					<div class="wa-value">'.$f->getHTML($params, $attrs);
+			if ($error) {
+				$html .= '<em class="wa-error-msg">'.$error.'</em>';
+			}
+			$html .= '</div></div>';
+		}
         return $html;
     }
 
@@ -847,12 +893,12 @@ HTML;
             return '';
         }
         $html = '<div class="wa-auth-adapters"><ul>';
-        $url = wa()->getRootUrl(false, true).'oauth.php?app='.$this->app().'&amp;provider=';
+
         foreach ($adapters as $adapter) {
             /**
              * @var waAuthAdapter $adapter
              */
-            $html .= '<li><a href="'.$url.$adapter->getId().'"><img alt="'.$adapter->getName().'" src="'.$adapter->getIcon().'"/>'.$adapter->getName().'</a></li>';
+            $html .= '<li class="wa-auth-adapter-'.$adapter->getId().'"><a href="'.$adapter->getUrl().'"><img alt="'.$adapter->getName().'" src="'.$adapter->getIcon().'"/>'.$adapter->getName().'</a></li>';
         }
         $html .= '</ul><p>';
         $html .= _ws("Authorize either by entering your contact information, or through one of the websites listed above.");
@@ -869,6 +915,11 @@ $("div.wa-auth-adapters a").click(function () {
 HTML;
 
         return $html;
+    }
+
+    public function debug()
+    {
+        return waSystemConfig::isDebug();
     }
 
     public function oauth($provider, $config, $token, $code = null)
@@ -997,7 +1048,7 @@ HTML;
         return wa()->getConfig()->getBackendUrl(true);
     }
 
-    public function debug(){
+    public function vdebug(){
         return Debug::getHtml();
     }
 

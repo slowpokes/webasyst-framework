@@ -23,7 +23,11 @@ return array(
         'fconstructor' => 'fixed',
     )),
 
-    new waContactRadioSelectField('sex', 'Sex', array(
+    new waContactHiddenField('company_contact_id', '', array(
+        'storage' => 'info', 'type' => 'Hidden'
+    )),
+    
+    new waContactRadioSelectField('sex', 'Gender', array(
         'storage' => 'info',
         'fconstructor' => 'fixed',
         'translate_options' => true,
@@ -33,9 +37,15 @@ return array(
         ),
     )),
 
+    new waContactStringField('jobtitle', 'Job title', array(
+        'max_length' => 50, 'storage' => 'info',
+        'fconstructor' => 'fixed',
+    )),
+    
     new waContactStringField('company', 'Company', array(
         'max_length' => 150, 'storage' => 'info'
     )),
+    
     new waContactEmailField('email', 'Email', array(
         'multi' => true, 'storage' => 'email',
         'ext' => array(
@@ -43,11 +53,12 @@ return array(
         ),
         'top' => true
     )),
-    new waContactDateField('birthday', 'Birthday', array('storage' => 'info')),
+    new waContactBirthdayField('birthday', 'Birthday', array('storage' => 'info', 'prefix' => 'birth')),
     new waContactTextField('about', 'Description', array('storage' => 'info')),
     new waContactPhoneField('phone', 'Phone', array(
         'top' => true
     )),
+    
     new waContactStringField('im', 'Instant messenger', array(
         'multi' => true,
         'type' => 'IM',
@@ -66,6 +77,27 @@ return array(
         'top' => true
     )),
 
+    new waContactStringField('socialnetwork', 'Social network', array(
+        'multi' => true,
+        'type' => 'SocialNetwork',
+        'ext' => array(
+            'facebook' => 'Facebook',
+            'twitter' => 'Twitter',
+            'linkedin' => 'LinkedIn',
+            'vkontakte' => 'VKontakte',
+        ),
+        'formats' => array(
+            'top' => new waContactSocialNetworkTopFormatter(),
+            'js' => new waContactSocialNetworkJSFormatter()
+        ),
+        'domain' => array(
+            'facebook' => 'facebook.com',
+            'vkontakte' => 'vk.com',
+            'twitter' => 'twitter.com',
+            'linkedin' => null
+        )
+    )),
+    
     new waContactAddressField('address', 'Address', array(
         'multi' => true,
         'ext' => array(
@@ -76,8 +108,8 @@ return array(
     new waContactUrlField('url', 'Website', array(
         'multi' => true,
         'ext' => array(
-            'work' => 'Work',
-            'personal' => 'Personal',
+            'work' => 'work',
+            'personal' => 'personal',
         ),
     )),
 

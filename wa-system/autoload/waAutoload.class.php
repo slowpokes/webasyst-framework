@@ -148,7 +148,9 @@ class waAutoload
         'GeoipModel'               => 'geoip/waGeoip.model.php',
 
         'waFileCache'              => 'cache/waFileCache.class.php',
-        'waMemcachedCache'         => 'cache/waMemcachedCache.class.php',
+        'waMemcachedCacheAdapter'  => 'cache/adapters/waMemcachedCacheAdapter.class.php',
+        'waFileCacheAdapter'       => 'cache/adapters/waFileCacheAdapter.class.php',
+        'waXcacheCacheAdapter'     => 'cache/adapters/waXcacheCacheAdapter.class.php',
         'waRuntimeCache'           => 'cache/waRuntimeCache.class.php',
         'waSerializeCache'         => 'cache/waSerializeCache.class.php',
         'waSystemCache'            => 'cache/waSystemCache.class.php',
