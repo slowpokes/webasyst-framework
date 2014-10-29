@@ -46,7 +46,8 @@
         <li id="s-link-redirect"><a href="#/redirect/"><i class="icon16 export"></i>Редиректы</a></li>
         <script>
             $(function(){
-                $.wa.site.redirectAction = function (tab) {
+                $.wa.site.redirectAction = function (params) {
+                    console.log(params);
                     $("#s-content").load('?module=redirect&domain_id=' + this.domain, function () {
                         $.wa.site.active($("#s-link-redirect"));
                     });
