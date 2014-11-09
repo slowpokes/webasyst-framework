@@ -5,6 +5,5 @@ wa-log
 .idea
 wa-log
 *.md5
-wa-content
 wa-config
 wa-apps/warehouse
