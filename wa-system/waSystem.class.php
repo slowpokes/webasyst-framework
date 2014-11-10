@@ -1308,7 +1308,6 @@ class waSystem
                 while ($current = readdir($dir)) {
                     if ($current !== '.' && $current !== '..' &&
                         is_dir($path.'/'.$current) && file_exists($path.'/'.$current.'/theme.xml')) {
-                        echo $path.'/'.$current.'/theme.xml'."\n";
                         $theme_ids[] = $current;
                     }
                 }
