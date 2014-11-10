@@ -147,7 +147,7 @@ class waTheme implements ArrayAccess
          * $this->url = null;
          */
 
-        $this->path_custom = wa()->getDataPath('themes/', true, $this->app_fake).$this->id;//VADIM CODE
+        $this->path_custom = wa()->getDataPath('themes/', true, wa()->replaceName($this->app)).$this->id;//VADIM CODE
         $this->path_original = wa()->getAppPath('themes/', $this->app).$this->id;
 
         if (!file_exists($this->path_custom) || (!$force && !file_exists($this->path_custom.'/'.self::PATH))) {
@@ -628,7 +628,8 @@ XML;
         } else {
             $id = $this->id;
         }
-        $target = wa()->getDataPath("themes/{$id}", true, $this->app_fake, false);
+        $app_id = wa()->replaceName($this->app);// VADIM CODE
+        $target = wa()->getDataPath("themes/{$id}", true, $app_id, false);// VADIM CODE
         if (file_exists($target.'/'.self::PATH)) {
             throw new waException(sprintf(_ws("Theme %s already exists"), $id));
         }
@@ -856,7 +857,7 @@ HTACCESS;
             switch ($this->type) {
                 case self::CUSTOM:
                 case self::OVERRIDDEN:
-                    $this->url = wa()->getDataUrl('themes', true, $this->app_fake).'/'.$this->id.'/';
+                    $this->url = wa()->getDataUrl('themes', true, wa()->replaceName($this->app)).'/'.$this->id.'/';// VADIM CODE
                     break;
                 case self::ORIGINAL:
                     $this->url = wa()->getAppStaticUrl($this->app).'themes/'.$this->id.'/';

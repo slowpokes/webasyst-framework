@@ -257,7 +257,7 @@ class waDesignActions extends waActions
 
     protected function getRoutes($all = false)
     {
-        $routes = wa()->getRouting()->getByApp($this->getAppId());
+        $routes = wa()->getRouting()->getByApp(wa()->getAppFake());// VADIM CODE
 
         $result = array();
         foreach ($routes as $d => $domain_routes) {

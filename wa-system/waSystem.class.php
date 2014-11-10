@@ -823,6 +823,8 @@ class waSystem
                         if($title) $app_info['name'] = $title;
                         $app_info['db'] = '';
                         if($db) $app_info['db'] = $db;
+                        $app_info['fake_id'] = '';
+                        if($fake_name) $app_info['fake_id'] = $fake_name;
                         //VADIM CODE END
                         if (isset($app_info['icon'])) {
                             if (is_array($app_info['icon'])) {
@@ -1367,9 +1369,13 @@ class waSystem
         return $app_id === 'webasyst' || isset(self::$apps_real[$app_id]);
     }
 
-    public static function getAppFake()
+    public static function getAppFake($default = null)
     {
-        return self::$app_names['fake'];
+        //echo self::$app_names['fake'].";";
+        if(self::$app_names['fake']!=''){
+            return self::$app_names['fake'];
+        }
+        return $default;
     }
 
     public static function getAppReal()
@@ -1381,13 +1387,13 @@ class waSystem
         if(is_array($name)){
             foreach($name as &$value){
                 if($value=='shop'){
-                    $value = self::getAppFake();
+                    $value = self::getAppFake($name);
                 }
             }
             return $name;
         }
         if($name=='shop') {
-            return self::getAppFake();
+            return self::getAppFake($name);
         }
         return $name;
     }
