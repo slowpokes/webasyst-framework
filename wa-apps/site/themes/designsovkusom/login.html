@@ -1,7 +1,17 @@
+{if !isset($checkout_steps)}
+<!--div class="sidebar">
+    {include file="sidebar.html"}
+</div-->
 <div class="content">
-    <div id="page" role="main">
-        <h1>[`Login`]</h1>
+    <div class="authform-container">
+        <h1>Авторизация на сайте</h1>
         {$wa->authAdapters()}
-        {$wa->loginForm($error)}
+        <div class="clear-both"></div>
+        <div class="authform" role="main">
+{/if}
+        {$wa->loginForm($error, empty($without_form))}
+{if !isset($checkout_steps)}
+        </div>
     </div>
 </div>
+{/if}

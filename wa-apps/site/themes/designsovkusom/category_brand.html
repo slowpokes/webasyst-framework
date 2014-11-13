@@ -1,0 +1,22 @@
+<div class="sidebar">
+    <div class="category_sidebar filters">{$wa->shop->showCategories2($categories, 0, $url_params)}</div>
+    {include file="filter.html"}
+</div>
+
+<div class="content-container">
+    <div id="product-list">
+        {if !$products}
+            {if !empty($filters)}
+                [`No products were found.`]
+            {else}
+                [`This category does not contain any products.`]
+            {/if}
+        {else}
+
+            {include file='product-item.html' sorting = 1}
+
+        {/if}
+    </div>
+
+</div>
+<div class="clear-both"></div>

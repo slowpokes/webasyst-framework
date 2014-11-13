@@ -1,0 +1,11 @@
+<div class="set">
+    <a class="view_all" href='/set/{$set_id}'>посмотреть все</a>
+    <h2><a href='/set/{$set_id}'>{$set_title}</a></h2>
+    {$products = $wa->shop->productSet($set_id, null, 8)}
+    {if $products}
+        <div id="product-list">
+            {include file='product-item.html'}
+        </div>
+    {/if}
+    <div class="clear-both"></div>
+</div>

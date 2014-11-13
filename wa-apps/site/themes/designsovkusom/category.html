@@ -1,0 +1,93 @@
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}category.js"></script>
+        <div class="categ_page">
+<div class="category_logo"></div>
+
+<div class="content notbl">
+    <div class="sidebar">
+        {if $current_category}
+        <div class="category_sidebar filters">
+            {$wa->shop->showCategoryLinks($current_category)}
+            {$categories = $wa->shop->categories($current_category, -1, true)}
+
+            <table class="homepage_categories">
+                {foreach $categories as $tc_id => $top_category}
+                {if $tc_id is div by $homepage_columns}<tr>{/if}
+                <td>
+                    <div>
+                        <a class="top_category" href="{$top_category.url}">{$top_category.name|escape}</a>
+                    </div>
+                    <div>
+                        {foreach $top_category.childs as $child_category name=child_categories}
+                        <a href="{$child_category.url}">{$child_category.name|escape}</a>{if !$smarty.foreach.child_categories.last}, {/if}
+                        {/foreach}
+                    </div>
+                </td>
+                {if $tc_id+1 is div by $homepage_columns}<tr>{/if}
+                {/foreach}
+            </table>
+        </div>
+            {else}
+        <div class="category_sidebar filters">{$wa->shop->showCategoryLinks(0)}</div>
+        {/if}
+
+        {include file="filter.html"}
+    </div>
+    <div class="content-container">
+        {$cat=$wa->shop->category($current_category)}
+        {if $cat.custom_image}
+        <img src="{$cat.custom_image}" class="category_image" width="724px" height="200px">
+        {/if}
+        <div class="category_products">
+        <div id="product-list">
+            {if !$products}
+            {if !empty($filters)}
+            [`No products were found.`]
+            {else}
+            [`This category does not contain any products.`]
+            {/if}
+            {else}
+            {include file='product-item.html' sorting=!empty($category.params.enable_sorting)}
+            {/if}
+        </div>
+        <!-- description -->
+        <div class="description" style="width: 715px">{if $category.description}
+            <p>{$category.description}</p>
+            {/if}
+        </div>
+        </div>
+    </div>
+    <!-- /content-container -->
+</div><!-- /content -->
+
+<div class="clear-both"></div>
+
+<!--
+<div class="content-container">
+
+<h1 class="category-name">
+{$category.name|escape} [<span>{$wa->shop->productsCount("category/`$category.id`")}</span>]
+</h1>
+
+<!-- plugin hook: 'frontend_category'
+{* @event frontend_category.%plugin_id% *}
+{foreach $frontend_category as $_}{$_}{/foreach}
+
+<!-- subcategories
+{if $category.subcategories}
+<div class="sub-categories">
+  {foreach $category.subcategories as $sc}
+  <a href="{$sc.url}" title="{$sc.name}" class="subcategory"{*if $sc@iteration is div by 4} style="margin-right:0px"{/if*}>
+      <div class="subcat_image">
+          {$cat=$wa->shop->category($sc.id)}
+          <img src="{if (isset($cat.custom_image)&&($cat.custom_image))}{$cat.custom_image}{elseif isset($cat.params.image)}{$cat.params.image}{else}{$wa_theme_url}img/dummy200.png{/if}">
+          <div class="align-helper"></div>
+      </div>
+      <div class="subcat_name">
+          {$sc.name|truncate:30:"..."} [<span>{$wa->shop->productsCount("category/`$sc.id`")}</span>]
+      </div>
+  </a>
+  {/foreach}
+</div>
+{/if}
+--></div>

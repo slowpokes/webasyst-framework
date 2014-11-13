@@ -1,0 +1,64 @@
+<!--div class="sidebar">
+    <!-- NAVIGATION
+    {include file="sidebar.html"}
+</div-->
+<div class="content">
+    {$wa->myNav('menu-h bottom-padded')}
+    
+    <h1 >[`My orders`]</h1>
+    <a href="/my/profile">Редактировать профиль</a>
+
+    
+    <table class="table my-orders">
+        <tr style="border:0">
+            <th>Номер</th>
+            <th>Статус</th>
+            <th>Наименование</th>
+            <th>Доставка</th>
+            <th>Оплата</th>
+            <th>Дата</th>
+        </tr>
+    {foreach $orders as $o}
+        <tr>
+            <td class="nowrap align-center">
+                <a href="{$o.url}">
+                    {$o.id_str}
+                </a>
+            </td>
+            <td class="nowrap align-center">
+                <span class="nowrap align-center order-status" style="{$o.state->getStyle(1)}">
+                    {$o.state->getName()}
+                </span>
+            </td>
+            <td>
+                {if !empty($o.items)}
+                    {foreach $o.items as $i}
+                        {$i.name|escape|truncate:30:"...":true} <span class="gray">x {$i.quantity}</span><br />
+                    {/foreach}
+                {/if}
+            </td>
+            <td>
+                {if $o.shipping_name}
+                    {$o.shipping_name|escape}
+                {else}
+                    &nbsp;
+                {/if}
+            </td>
+            <td>
+                {if $o.payment_name}
+                    {$o.payment_name|escape}
+                {else}
+                    &nbsp;
+                {/if}
+            </td>
+            <td class="align-center">
+                <span>{$o.create_datetime|wa_date:'humandate'}</span>
+            </td>
+        </tr>
+    {foreachelse}
+        <tr class="no-border">
+            <td colspan="6">[`You have no order history yet.`]</td>
+        </tr>
+    {/foreach}
+    </table>
+</div>

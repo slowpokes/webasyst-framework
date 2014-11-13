@@ -1,0 +1,366 @@
+<script type="text/javascript" src="{$wa_theme_url}jquery.bxslider.min.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}jquery.jcarousel.min.js"></script>
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function ($) {
+
+        $("#set_tabs > li > a").click(function () {
+
+            var set_name = $(this).parent().data('set');
+            $("#set_tabs > li.current").removeClass('current');
+            $(this).parent().addClass('current');
+            $('.tab-content').hide();
+            $('#' + set_name).show();
+            return false;
+        });
+
+
+        var numberOfImages = $('.slider li').length;
+
+        if( numberOfImages > 1 ) {
+            $('.slider').bxSlider({
+                mode: 'fade',
+                auto: true,
+                pager: false,
+                autoControls: true,
+                pause: 5000
+            });
+
+        }
+
+
+
+        $('.jcarousel').jcarousel({
+            wrap: 'circular',
+
+        });
+
+
+        $('.jcarousel-control-prev')
+                .jcarouselControl({
+                    target: '-=1'
+                });
+
+        $('.jcarousel-control-next')
+                .jcarouselControl({
+                    target: '+=1'
+                });
+
+        $('.jcarousel_brand').jcarousel({ wrap: 'circular', itemFallbackDimension: 10000});
+
+        $('.jcarousel-control-brand-prev')
+                .jcarouselControl({
+                    target: '-=1'
+                });
+
+        $('.jcarousel-control-brand-next')
+                .jcarouselControl({
+                    target: '+=1'
+                });
+    });
+</script>
+<style>
+    /** Carousel **/
+
+    .jcarousel {
+        position: relative;
+        overflow: hidden;
+        width: 930px;
+        /*height: 370px;*/
+    }
+
+    .jcarousel ul {
+        width: 20000em;
+        position: relative;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .jcarousel li {
+        width: 150px;
+        float: left;
+    }
+
+    .jcarousel_brand {
+        position: relative;
+        overflow: hidden;
+        width: 970px;
+
+    }
+
+    .jcarousel_brand ul {
+        width: 30000em;
+        position: relative;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .jcarousel_brand li {
+
+        float: left;
+        padding: 20px 10px;
+    }
+
+    /** Carousel Controls **/
+
+    .jcarousel-control-prev,
+    .jcarousel-control-next {
+        position: relative;
+        top: -250px;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        /*background: #4E443C;*/
+        color: #000;
+        text-decoration: none;
+        text-shadow: 0 0 1px #000;
+        font: 40px/43px Arial, sans-serif;
+        -webkit-border-radius: 30px;
+        -moz-border-radius: 30px;
+        border-radius: 30px;
+        -webkit-box-shadow: 0 0 4px #F0EFE7;
+        -moz-box-shadow: 0 0 4px #F0EFE7;
+        box-shadow: 0 0 4px #F0EFE7;
+    }
+
+    .jcarousel-control-prev {
+        left: -15px;
+    }
+
+    .jcarousel-control-next {
+        left: 915px;
+    }
+
+    .jcarousel-control-brand-prev,
+    .jcarousel-control-brand-next {
+        position: relative;
+        top: 30px;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        /*background: #4E443C;*/
+        color: #000;
+        text-decoration: none;
+        text-shadow: 0 0 1px #000;
+        font: 40px/43px Arial, sans-serif;
+        -webkit-border-radius: 30px;
+        -moz-border-radius: 30px;
+        border-radius: 30px;
+        -webkit-box-shadow: 0 0 4px #F0EFE7;
+        -moz-box-shadow: 0 0 4px #F0EFE7;
+        box-shadow: 0 0 4px #F0EFE7;
+    }
+
+    .jcarousel-control-brand-prev {
+        left: 0px;
+    }
+
+    .jcarousel-control-brand-next {
+        left: 940px;
+    }
+
+
+</style>
+
+
+{*
+<div class="sidebar">
+    <!-- NAVIGATION -->
+    {include file="sidebar.html"}
+</div>
+*}
+<div class="content notbl">
+<!-- slider -->
+{include file="`$wa_active_theme_path`/slider.html" album="2"}
+
+<!-- Категории -->
+
+{*$cats = $wa->shop->categories(0, null, true)}
+{if !empty($cats)}
+<div class="sidebar-block-container white">
+    <div class="sidebar-block set categ">
+        <h3>категории товаров</h3>
+        <ul class="product_items product-list blocks main">
+
+            {foreach from=$cats item=cat name=leftmenu}
+            {$subcats = $wa->shop->categories($cat.id,null,true)}
+
+            {if count($subcats)>0}
+
+            {foreach from=$subcats item=subcat name=subleftmenu}
+            <a href="{$subcat.url}">
+                <li>
+                    <div class="image">
+                        <img src="{if (isset($subcat.custom_image)&&($subcat.custom_image))}{$subcat.custom_image}{elseif isset($subcat.params.image)}{$subcat.params.image}{else}{$wa_theme_url}img/dummy150.png{/if}">
+                    </div>
+                    <div class="product-info">
+                        <h5 itemprop="name">
+                            {$subcat.name}
+                        </h5>
+
+                    </div>
+                    <a href="{$subcat.url}" class="rv-button orange-button">Посмотреть</a>
+                </li>
+            </a>
+            {/foreach}
+            {/if}
+            {/foreach}
+        </ul>
+    </div>
+</div>
+{/if*}
+
+
+<!-- lists -->
+{assign var=sets value=['new','hits','special', 'sale']}
+<div class="product-list">
+    <ul id="set_tabs" class="tabs">
+        <li data-set="new"><a href="#">Новинки</a></li>
+        <li data-set="hits"><a href="#">Хиты продаж</a></li>
+        <li data-set="special"><a href="#">Специальные предложение</a></li>
+        <li data-set="sale"><a href="#">Распродажа</a></li>
+    </ul>
+    <div class="set_wrapper">
+    {foreach $sets as $set_id name=z}
+
+    <div id="{$set_id}" class="tab-content">
+
+        <div class="set jcarousel">
+
+            <ul class="product_items product-list blocks main">
+                {foreach $wa->shop->productSet($set_id) as $p name=y}
+                {if $smarty.foreach.y.iteration == 10}
+                {break}
+                {/if}
+                <li>
+                    <div class='imagess'>
+                        <a href="{$p.frontend_url}">{$wa->shop->productImgHtml($p, '300x400', ['itemprop' =>
+                            'image', 'alt' => $p.name, 'default' => "`$wa_theme_url`img/dummy200.png"])} </a>
+                    </div>
+                    <div class="product-info">
+                        <a href="{$p.frontend_url}">
+                            <h5>{$p.name}</h5>
+                            <h5 class="product_type">{$p.cf_type}</h5>
+
+                            <div class="prices center">
+                                <span class='price nowrap'> {wa_currency($p.price, $wa->shop->currency())}</span>
+                                {if $p.compare_price>0}
+
+                                <span class="compare-at-price nowrap"> {shop_currency($p.compare_price, $p.currency, $p.currency)} </span>
+                                {/if}
+                            </div>
+                        </a>
+
+                        <form class="addtocart"
+                        {if isset($p.sku_count)&&$p.sku_count > 1}data-url="{$p.frontend_url}?cart=1"{/if}
+                        method="post" action="{$wa->getUrl('/frontendCart/add')}" data-sumbolrub>
+                        <input type="hidden" name="product_id" value="{$p.id}">
+                        {if $wa->shop->settings('ignore_stock_count') || $p.count === null || $p.count > 0}
+                        <input type="submit" class="rv-button orange-button" value="[`Add to cart`]">
+                        <link itemprop="availability" href="http://schema.org/InStock"/>
+                        {else}
+                        <input type="submit" class="rv-button orange-button" value="[`Add to cart`]" disabled
+                               class="disabled">
+                        <link itemprop="availability" href="http://schema.org/OutOfStock"/>
+                        {/if}
+                        </form>
+
+                    </div>
+                </li>
+                {/foreach}
+
+            </ul>
+
+        </div>
+        <a href="#" class="jcarousel-control-prev">&lsaquo;</a>
+        <a href="#" class="jcarousel-control-next">&rsaquo;</a>
+    </div>
+    {/foreach}
+
+    </div>
+    <!-- КАРУСЕЛЬ БРЕНДОВ -->
+    {if isset($brands)}
+    <div class="set jcarousel_brand">
+        <ul>
+            {*$brands = $wa->shop->getAllBrands()*}
+        </ul>
+        <a href="#" class="jcarousel-control-brand-prev">&lsaquo;</a>
+        <a href="#" class="jcarousel-control-brand-next">&rsaquo;</a>
+    </div>
+    {/if}
+
+    {*include file="dsv.home.html"*}
+    <!-- НЕДАВНО СМОТРЕЛИ -->
+    {if isset($smarty.cookies.dsvviewed)}
+    {$lastviews = $smarty.cookies.dsvviewed}
+    {assign var=last_views value=","|explode:$lastviews}
+
+    {if $last_views ne '' && !isset($product)}
+    <div class="sidebar-block-container white">
+        <div class="sidebar-block set_view jcarousel">
+            <h3>недавно смотрели</h3>
+            <ul class="product_items product-list blocks main">
+                {section name=i loop=$last_views step=-1}
+                {if $smarty.section.i.iteration > 10}{break}{/if}
+                {$im=$wa->shop->product($last_views[i])}
+                <li itemscope itemtype="http://schema.org/Product">
+                    <a href="{$wa->shop->productUrl($im)}">
+                        <div class="imagess">
+                            {$badge_html = $wa->shop->badgeHtml($im.badge)}
+                            {if $badge_html}
+                            <div class="corner top left">{$badge_html}</div>
+                            {/if}
+                            {$wa->shop->productImgHtml($im, '300x400', ['itemprop' => 'image', 'alt' => $im.name,
+                            'default' => "`$wa_theme_url`img/dummy200.png"])}
+                        </div>
+                        <div class="product-info">
+                            <h5 itemprop="name">
+                                {$im.name}
+                            </h5>
+                            <h5 class="product_type">{$p.cf_type}</h5>
+
+                            <div class="prices center">
+                                {if $im.compare_price>0}
+                                <span class="compare-at-price nowrap"> {shop_currency($im.compare_price, $im.currency, $im.currency)} </span>
+                                {/if}
+                                <span class='price nowrap'> {wa_currency($im.price, $wa->shop->currency())}</span>
+                            </div>
+
+
+                            <form class="addtocart"
+                            {if isset($p.sku_count)&&$p.sku_count > 1}data-url="{$p.frontend_url}?cart=1"{/if}
+                            method="post" action="{$wa->getUrl('/frontendCart/add')}" data-sumbolrub>
+                            <input type="hidden" name="product_id" value="{$p.id}">
+                            {if $wa->shop->settings('ignore_stock_count') || $p.count === null || $p.count > 0}
+                            <input type="submit" class="rv-button orange-button" value="[`Add to cart`]">
+                            <link itemprop="availability" href="http://schema.org/InStock"/>
+                            {else}
+                            <input type="submit" class="rv-button orange-button" value="[`Add to cart`]" disabled
+                                   class="disabled">
+                            <link itemprop="availability" href="http://schema.org/OutOfStock"/>
+                            {/if}
+                            </form>
+                        </div>
+                        <!--a href="{$wa->shop->productUrl($im)}"><input type="submit" value="Подробнее" class="details"></a-->
+                </li>
+                </a>
+                {/section}
+            </ul>
+        </div>
+    </div>
+    {/if}
+    {/if}
+    <!--<div class="clear-both"></div>-->
+
+
+
+
+</div>
+
+<div class="clear-both"></div>
+
+</div>
+

@@ -1,7 +1,37 @@
-{include file="sidebar.html"}
+<div class="preloader">
+    <div class="status">&nbsp;</div>
+</div>
 <div class="content">
     <div id="page" role="main">
-        <h1>{$page.name}</h1>
-        {$page.content}
+
+        {$shop_pages=$wa->shop->pages()}
+        <ul id="nav_page" class="page_tab">
+            {foreach $shop_pages as $pages}
+            {$pages_id =  $pages.id}
+            <li data-set="{$pages.id}" data-url="{$pages.url}"><a href="#">{$pages.name}</a></li>
+            {/foreach}
+        </ul>
+
+
+        {foreach $shop_pages as $pages}
+        {$i = 0}
+        <div id="{$pages.id}" data-urls="{$pages.url}" class="tabs-content">
+            {$t[$i] = $wa->shop->page($pages.id)}
+            <h1> {$t[$i]['name']}</h1>
+            {$t[$i]['content']}
+        </div>
+        {/foreach}
+
+        <div class="clear-both"></div>
     </div>
+
 </div>
+<script type="text/javascript">
+    var pathname = window.location.pathname;
+    $('.tabs-content').hide();
+    $("*[data-urls='" + pathname +"']").show();
+
+    $("#nav_page > li.current").removeClass('current');
+    $("*[data-url='" + pathname +"']").addClass('current');
+    //tes.show();
+</script>

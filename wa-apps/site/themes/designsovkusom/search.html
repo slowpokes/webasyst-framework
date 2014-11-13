@@ -1,0 +1,35 @@
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}category.js"></script>
+<div class="categ_page">
+    <div class="brand_page">
+    <div class="sidebar">
+        <div class="category_sidebar filters">{$wa->shop->showCategoryLinks(0)}</div>
+
+    </div>
+
+    <div class="content-container">
+        <h1 class="category-name">
+          Результат по запросу:     {$title}
+        </h1>
+
+        <!-- plugin hook: 'frontend_search' -->
+        {* @event frontend_search.%plugin_id% *}
+        {foreach $frontend_search as $_}{$_}{/foreach}
+
+        {if !$products}
+            [`No products were found.`]
+        {else}
+            <div id="product-list">
+                {include file='product-item.html'}
+            </div>
+            {*
+                or use the line below if you want plain table view instead of thumbs
+                {include file='list-thumbs.html'}
+            *}
+        {/if}
+
+
+    </div>
+    </div>
+    <div class="clear-both"></div>
+</div>

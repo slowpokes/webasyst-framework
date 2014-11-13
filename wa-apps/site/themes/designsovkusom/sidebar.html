@@ -1,87 +1,128 @@
-<div class="sidebar" role="navigation">
+<!-- ЛЕВОЕ МЕНЮ -->
 
-    {$cats=$wa->shop->categories(0, null, true)}
-    {if !empty($cats)}
-    <div class="leftmenu">
-        <ul>
-            <li class="first"><i class="icon categories"></i>Категории</li>
-            {foreach $cats as $cat}
-                {$subcats = $wa->shop->categories($cat.id,null,true)}
-                <li {if count($subcats)>0}class="category_tree"{/if}>
-                    <a href="{$cat.url}">{$cat.name}</a>
-                    {if count($subcats)>0}
-                    <ul>
-                        {foreach $subcats as $subcat}
-                            <li {if $subcat@first}class="first"{/if}{if $subcat@last}class="last"{/if}><a href="{$subcat.url}">{$subcat.name}</a></li>
-                        {/foreach}
-                    </ul>
-                {/if}
-                </li>
-            {/foreach}
-        </ul>
-    </div>
-    {/if}
-
-    {$pages=$wa->site->pages()}
-    {if !empty($pages)}
-    <div class="leftmenu">
-        <ul id="page-list">
-            <li class="first"><i class="icon categories"></i>Страницы</li>
-            {foreach $pages as $p}
-            <li{if $page.id == $p.id} class="selected"{/if}>
-                <a href="{$p.url}">{$p.name}</a>
-            </li>
-            {/foreach}
-        </ul>
-    </div>
-    {/if}
-    
-    {if $theme_settings.news}
-        {$latest_posts = $wa->blog->posts(null,6)}
-        {if !empty($latest_posts)}
-        <!-- новости -->
-        <div class="news_container">
-            <div class="news">
-                <a href="/blog/">Новости</a>
-                
-                {foreach $latest_posts as $post}
-                <div class="post">
-                    <span>{$post.datetime|wa_datetime:"humandate"}</span>
-                    <h3>
-                        <a href="{$post.link}">{$post.title}</a>
-                        {* @event prepare_posts_frontend.%plugin_id%.post_title *}
-                        {if !empty($post.plugins.post_title)}
-                            {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
-                        {/if}
-                    </h3>
-                </div>
-                {/foreach}
-            </div>
-        </div>
-        {/if}
-    {/if}
-    
-    {if $theme_settings.photos}
-        <!-- посленднее фото -->
-        {$photos = $wa->photos->photos(null,null,8)}
-        {if !empty($photos)}
-        <div class="photos_container">
-        <a href="/photos/">Последние фото</a>
-        <ul>
-        {foreach $photos as $photo}
-            <li {if $photo@iteration is even}class="even"{/if}>
-                {if empty($photo.frontend_link)}
-                  {$wa->photos->getImgHtml($photo, "95x95")}
-                {else}
-                  <a href="{$photo.frontend_link|default:'#'}">
-                    {$wa->photos->getImgHtml($photo, "95x95")}
-                  </a>
-                {/if}
+{*$cats = $wa->shop->categories(0, null, true)}
+{if !empty($cats)}
+<div class="leftmenu clear-both">
+    <ul>
+        <li class="first"><i class="icon categories"></i>Категории</li>
+        {foreach from=$cats item=cat name=leftmenu}
+            {$subcats = $wa->shop->categories($cat.id,null,true)}
+            <li {if count($subcats)>0}class="category_tree"{/if}>
+                <a href="{$cat.url}">{$cat.name}</a>
+                {if count($subcats)>0}
+                <ul>
+                    {foreach from=$subcats item=subcat name=subleftmenu}
+                        <li {if $smarty.foreach.subleftmenu.first}class="first"{/if}{if $smarty.foreach.subleftmenu.last}class="last"{/if}><a href="{$subcat.url}">{$subcat.name}</a></li>
+                    {/foreach}
+                </ul>
+            {/if}
             </li>
         {/foreach}
-        </ul>
-        <div class="clear-both"></div>
-        </div>
-        {/if}
-    {/if}
+    </ul>
 </div>
+{/if}
+
+<!-- ФИЛЬТРЫ -->
+<!-- filtering by product features -->    
+{if !empty($filters)}
+    <div class="filters ajax">
+        <form method="get" action="{$wa->currentUrl()}">
+        {foreach $filters as $fid => $filter}
+            <p>
+            {if $fid == 'price'}
+            <div class="filter-box filter-price">
+                {$c = $wa->shop->currency(true)}
+                <div class="filter-name"><b>[`Price`]</b></div>
+                <div class="filter-content">
+                    [`from`] <input type="text" name="price_min" class="price_min" {if $wa->get('price_min')}placeholder="{(int)$wa->get('price_min')}"{/if} placeholder="0">
+                    [`to`] <input type="text" name="price_max" class="price_max" {if $wa->get('price_max')}placeholder="{(int)$wa->get('price_max')}"{/if} placeholder="&infin;"> {$c.sign}
+                    <div style="margin: 10px 0">
+                        <input type="text" id="ionrange" value="0;{(int)$cat_price_max}" data-postfix=" {$c.sign}" data-hideminmax="true" data-step="10" {if $wa->get('price_min')}data-from="{(int)$wa->get('price_min')}"{/if} {if $wa->get('price_max')}data-to="{(int)$wa->get('price_max')}"{/if}>
+                    </div>
+                </div>
+            </div>
+            {else}
+            <div class="filter-box">
+                <div class="filter-name"><b>{$filter.name|escape}</b></div>
+                <div class="filter-content">
+                {if $filter.type == 'boolean'}
+                <div>
+                    <label><input type="radio" name="{$filter.code}"{if $wa->get($filter.code)} checked{/if} value="1"> [`Yes`]</label><br>
+                    <label><input type="radio" name="{$filter.code}"{if $wa->get($filter.code) === '0'} checked{/if} value="0"> [`No`]</label><br>
+                    <label><input type="radio" name="{$filter.code}"{if $wa->get($filter.code, '') === ''} checked{/if} value=""> [`Any`]</label><br>
+                </div>
+                {else}
+                <div>
+                {foreach $filter.values as $v_id => $v}
+                    <label>
+                        <input type="checkbox" name="{$filter.code}[]" {if in_array($v_id, (array)$wa->get($filter.code, array()))}checked{/if} value="{$v_id}"> {$v}
+                    </label><br>
+                {/foreach}
+                </div>
+                {/if}
+                </div>
+            </div>
+            {/if}
+            </p>
+        {/foreach}
+            {if $wa->get('sort')}<input type="hidden" name="sort" value="{$wa->get('sort')|escape}">{/if}
+            {if $wa->get('order')}<input type="hidden" name="order" value="{$wa->get('order')|escape}">{/if}
+        </form>
+        <script type="text/javascript" src="{$wa_theme_url}ion.rangeslider.min.js"></script>
+        <script type="text/javascript">
+            $("#ionrange").ionRangeSlider({
+                min: 0,
+                max: 50000,
+                type: "double",
+                step: 100,
+                postfix: " руб",
+                hasGrid: true,
+                hideMinMax: true,
+                hideFromTo: true,
+                prettify: true,
+                onChange: function(obj){
+                    $(".price_min").attr("placeholder",obj.fromNumber);
+                    $(".price_max").attr("placeholder",obj.toNumber);
+                },
+                onFinish: function(obj){
+                    $(".price_min").val(obj.fromNumber);
+                    $(".price_max").val(obj.toNumber);
+                    $(".price_min").change();
+                },
+            });
+            initFilters($(".filters"));
+        </script>
+    </div>
+{/if}
+
+<!-- НЕДАВНО СМОТРЕЛИ -->
+{include file="`$wa_active_theme_path`/recently_viewed.html"}
+
+{if $theme_settings.news&&false}
+    <!-- НОВОСТИ -->
+    {$latest_posts = $wa->blog->posts(null,6)}
+    {if !empty($latest_posts)}
+    <div class="news_container">
+        <div class="news">
+            <a href="/blog/">Новости</a>
+            
+            {foreach $latest_posts as $post}
+            <div class="post">
+                <span>{$post.datetime|wa_datetime:"humandate"}</span>
+                <h3>
+                    <a href="{$post.link}">{$post.title}</a>
+                    {* @event prepare_posts_frontend.%plugin_id%.post_title }
+                    {if !empty($post.plugins.post_title)}
+                        {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
+                    {/if}
+                </h3>
+            </div>
+            {/foreach}
+        </div>
+    </div>
+    {/if}
+{/if}
+
+<!-- plugin hook: 'frontend_nav' -->
+{* @event frontend_nav.%plugin_id% }
+{foreach $frontend_nav as $_}{$_}{/foreach*}

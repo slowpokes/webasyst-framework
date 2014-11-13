@@ -1,0 +1,25 @@
+<div id="pagebrand" role="main">
+    <h1>Наши бренды</h1>
+
+    <div class="brands_list">
+        <div>
+            {$letter = ''}
+            {foreach $brands as $brand name=brand}
+            {if $brand.letter!=$letter}
+            {$smarty.foreach.brand.iteration = 0}
+        </div>
+        {if $letter!=''}<a id="{$brand.letter}">
+                <div class="brands_letter_end"></div></a>{/if}
+        <div class="brands_letter letter_{$brand.letter}"><a href='/brands/?letter={$brand.letter}'>{$brand.letter}</a>
+        </div>
+        <div class="brands_letter_list">
+            {$letter = $brand.letter}
+            {/if}
+            {if $smarty.foreach.brand.iteration % 5 == 0}{/if}
+
+            <span><a href='/brand/{$brand.link}'>{$brand.name}</a></span>
+
+            {/foreach}
+        </div>
+    </div>
+</div>

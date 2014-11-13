@@ -1,0 +1,102 @@
+{if isset($smarty.cookies.dsv_view)}
+    {$dsv_view = $smarty.cookies.dsv_view}
+{else}
+    {$dsv_view = ""}
+{/if}
+
+{if !isset($line_count)}
+{$line_count = 4}
+{/if}
+
+<div class="sort-view">
+    {if !empty($sorting)}
+        <!-- sorting -->
+        <div class="product-sorting">
+            {$sort_fields = ['rating' => '[`Customer rating`]', 'total_sales' => '[`Bestsellers`]', 'price' => '[`Price`]', 'name' => '[`Name`]', 'create_datetime'=>'[`Date added`]', 'stock' => '[`In stock`]']}
+            {$sort_default = ['rating' => 'desc', 'total_sales' => 'desc', 'price' => 'asc', 'name' => 'asc', 'create_datetime'=>'desc', 'stock' => 'desc']}
+            {if !isset($active_sort)}
+                {$active_sort = $wa->get('sort', 'create_datetime')}
+            {/if}
+            
+            Сортировать по: 
+            <select id="product-sort">
+                <option {if !$active_sort} class="selected" selected{/if} value="{$wa->currentUrl(0, 1)}">[`New & Popular`]</option>
+                {foreach $sort_fields as $sort => $name}
+                <option value="?sort={$sort}&order={$sort_default[$sort]}" {if $active_sort == $sort} class="selected" selected{/if}>{$name} </option>
+                {if $wa->get('sort') == $sort}
+                    {$wa->title( $wa->title()|cat:' — '|cat:$name)}
+                    <option value="?sort={$sort}&order={if $wa->get("order")=="asc" && $active_sort == $sort}desc{else}asc{/if}">{$name} {if $wa->get("order")=="asc" && $active_sort == $sort}&darr;{else}&uarr;{/if}</option>
+                {/if}
+                {/foreach}
+            </select>
+        </div>
+    {/if}
+    {if isset($category)}
+    <div class="product-view">
+            <tr>
+                <td><span class="blocks{if $dsv_view=="blocks"} selected{/if}" data-view="1"><i class="icon block"></i></span></td>
+                <td><span class="list{if $dsv_view=="list"} selected{/if}" data-view="0"><i class="icon list"></i></span></td>
+            </tr>
+        </table>
+        <div class="clear:both"></div>
+    </div>
+    {/if}
+</div>
+
+<!-- products thumbnail list view -->
+<ul class="product_items product-list{if $dsv_view && isset($category)} {$dsv_view}{else} blocks{/if}">
+
+{foreach $products as $p}
+    <li itemscope itemtype ="http://schema.org/Product" {if empty($cart)}{*if $p@iteration is div by $line_count}style="margin-right: 0;"{/if*}{/if} {if $p.badge}class="{$p.badge}"{/if}>
+        <a href="{$p.frontend_url}"  title="{$p.name}{if $p.summary} &mdash; {strip_tags($p.summary)}{/if}">
+            <div class="imagess">
+                {$badge_html = $wa->shop->badgeHtml($p.badge)}
+                {if $badge_html}
+                    <div class="corner top left">{$badge_html}</div>
+                {/if}
+                {$wa->shop->productImgHtml($p, '300x400', ['itemprop' => 'image', 'alt' => $p.name, 'default' => "`$wa_theme_url`img/dummy200.png"])}
+            </div>
+            <div class="product-info">
+                <h5 itemprop="name">
+                    {$p.name}
+                </h5>
+                <h5>{$p.cf_type}</h5>
+
+                <div class="description">
+                    {$p.name}{if $p.summary} &mdash; {strip_tags($p.summary)}{/if}
+                </div>
+                
+                <div itemprop="offers" class="offers" itemscope itemtype="http://schema.org/Offer">
+                    <div class="prices">
+                        {if $p.rating > 0}
+                            <span class="rating nowrap">{$wa->shop->ratingHtml($p.rating)}</span>
+                        {/if}
+                        {if $p.compare_price > 0 && $p.rating == 0}<span class="compare-at-price nowrap"> {shop_currency($p.compare_price)} </span>{/if}
+                        <span class="price nowrap" itemprop="price">{shop_currency($p.price)}</span>
+
+                    </div>
+                        <form class="addtocart" {if isset($p.sku_count)&&$p.sku_count > 1}data-url="{$p.frontend_url}?cart=1"{/if} method="post" action="{$wa->getUrl('/frontendCart/add')}" data-sumbolrub>
+                        <input type="hidden" name="product_id" value="{$p.id}">
+                        {if $wa->shop->settings('ignore_stock_count') || $p.count === null || $p.count > 0}
+                            <input type="submit" class="rv-button orange-button" value="[`Add to cart`]">
+                            <link itemprop="availability" href="http://schema.org/InStock" />
+                        {else}
+                            <input type="submit" class="rv-button orange-button" value="[`Add to cart`]" disabled class="disabled">
+                            <link itemprop="availability" href="http://schema.org/OutOfStock" />
+                            
+                        {/if}
+                        </form>
+                        <!--a href="{$p.frontend_url}"><input type="submit" value="Подробнее" class="details"></a-->
+
+                </div>
+            </div>
+        </a>
+    </li>
+{/foreach}
+</ul>
+
+{if isset($pages_count) && $pages_count > 1}
+<div class="block">
+    {wa_pagination total=$pages_count attrs=['class' => "menu-h"] nb=3}
+</div>
+{/if}

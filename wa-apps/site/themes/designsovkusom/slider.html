@@ -1,0 +1,16 @@
+{if $wa->photos}
+    {$photos = $wa->photos->photos("/album/2", "970")}
+
+    <div class="slider_container">
+        <ul class="slider">
+            {foreach $photos as $photo}
+                <li>
+                    {if $photo.description}<a href="{$photo.description}"><img src="{$photo.thumb_970.url}"></a>
+                    {else}
+                        <a href="javascript:void(0);"><img src="{$photo.thumb_970.url}"></a>
+                    {/if}
+                </li>
+            {/foreach}
+        </ul>
+    </div>
+{/if}
