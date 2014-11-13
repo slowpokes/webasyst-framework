@@ -1,0 +1,106 @@
+{$cart.items = $wa->shop->cart()->items()}
+{$cart_total = $wa->shop->cart()->total()}
+
+
+<table>
+    <!-- products -->
+    {foreach $cart.items as $item}
+
+
+    <tr data-id="{$item.id}" data-price="{$item.price}">
+        <td class="min-width cols_image" style="width: 10%"><a href="{$wa->shop->productUrl($item.product)}"
+                                                               title="{$item.product.name|escape}">{$wa->shop->productImgHtml($item.product,
+            '40x40')}</a></td>
+        <td class="cols_name" style="width: 60%">
+            <a href="{$wa->shop->productUrl($item.product)}" class="product-name">{$item.product.name|truncate:40}</a>
+            {if $item.sku_name && $item.sku_name != $item.product.name}({$item.sku_name|escape}){/if}
+            {if !empty($item.services)}
+            <div class="services">
+                {foreach $item.services as $service_id => $s}
+                <!-- one option -->
+                <div
+                {if !empty($s.id)}data-id="{$s.id}"{/if}>
+                <label>
+                    <input {if !empty($s.id)}checked{/if} type="checkbox" name="services[{$item.id}][]"
+                    value="{$service_id}"> {$s.name|escape} {if $s.price && !isset($s.variants)}(<span>+{shop_currency($s.price, $s.currency)}</span>){/if}
+                </label>
+                {if isset($s.variants)}
+                <select name="service_variant[{$item.id}][{$service_id}]" {if empty($s.id)}disabled{/if}>
+                {foreach $s.variants as $variant_id => $v}
+                <option
+                {if $s.variant_id == $variant_id}selected{/if} value="{$variant_id}">{$v.name|escape}
+                (+{shop_currency($v.price, $s.currency)})</option>
+                {/foreach}
+                </select>
+                {/if}
+            </div>
+            {/foreach}
+
+            </div>
+            {/if}
+            {if !empty($item.error)}
+            <script>alert({json_encode($item.error)});</script>
+            {/if}
+        </td>
+        <td class="align-center nowrap product-count cols_qtty " style="width: 10%"><span name="quantity[{$item.id}]"
+                                                                                          value="{$item.quantity}"
+                                                                                          class="qty{if !empty($item.error)} error{/if}">{$item.quantity}</span>шт.
+        </td>
+        <td class="align-center item-total nowrap cols_price" style="width: 20%">{shop_currency($item.price, true)}</td>
+        <!--td class="align-center item-total nowrap cols_fullprice">{shop_currency($item.full_price, true)}</td-->
+        <td class="cols_delete"><a class="deleteico" href="#" title="[`Remove from cart`]"></a></td>
+
+    </tr>
+    {/foreach}
+
+    <tr class="total_tr" style="min-width: 326px">
+        {if $cart_total > 0}
+        <td style="width: 10%"></td>
+        <td style="width: 60%">Итого к оплате:</td>
+        <td style="width: 10%"></td>
+        <td class="cart-total" style="width: 20%"> {shop_currency($cart_total, true)}</td>
+
+        {else}
+
+        <td style="width: 326px; padding: 10px 5px;"> Корзина пуста</td>
+        {/if}
+    </tr>
+</table>
+{literal}
+<script type="text/javascript">
+
+    $("a.deleteico").click(function () {
+        var tr = $(this).closest('tr');
+        tr.find('td').wrapInner('<div class="temp overflow_hidden" />');
+        tr.find('td').animate({'padding-top': 0, 'padding-bottom': 0}, 500);
+        tr.find('.temp').animate({height: 0}, 500, function () {
+            tr.remove();
+        });
+        $.ajax({
+            url: "/cart/delete/",
+            type: "POST",
+            data: {id: tr.data('id')},
+            dataType: "json",
+            success: function (response) {
+                tr.remove();
+                if ((response.data.count == 0)) {
+                    $(".rv-button .cartheader").addClass("deactivate");
+                    $(".cart_panel").hide();
+
+                }
+
+                $(".cart-total").html(response.data.total);
+                $(".price.nowrap.cart-total").html(response.data.total);
+                $(".cart-count").html(response.data.count);
+
+                if(response.data.count == 0){
+                    $(".cartheader").addClass("deactivate");
+                    $("#cart-summary").addClass("empty");
+                }
+            }
+
+        });
+    });
+
+</script>
+{/literal}

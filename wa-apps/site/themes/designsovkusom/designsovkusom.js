@@ -1,65 +1,86 @@
-$(document).ready(function(){
-    $("#search").focus(function(){
+$(document).ready(function () {
+
+    $('a.goto').click(function() {
+        $("body,html").animate({
+            scrollTop: $( $(this).attr('rel') ).offset().top - 100
+        }, 800);
+        return false;
+
+    });
+
+
+
+
+    var skuid = $("#product-skus input:radio:checked").data('sku-id');
+    $("#artsku").text(skuid);
+
+    var cur_elem_name = $('#product-skus input:radio:checked').parent('#product-skus > li > label');
+    var notcur_elem_name = $('#product-skus input:radio:not(:checked)').parent('#product-skus > li > label');
+
+    $(cur_elem_name).find('.sku_total').css('border', '2px solid #f4731e');
+    $(notcur_elem_name).find('.sku_total').css('border', '2px solid white');
+
+
+    $("#searchs").focus(function () {
         $(".searchform").addClass("active_search");
     });
-    
-    $("#search").focusout(function(){
+
+    $("#searchs").focusout(function () {
         $(".searchform").removeClass("active_search");
     });
-    
-    $("#back-top").hide();
 
-	$(window).scroll(function (){
-		if ($(this).scrollTop() > 100){
-			$("#back-top").fadeIn();
-		} else{
-			$("#back-top").fadeOut();
-		}
-	});
+    $(".product-navigation .tab").click(function (e) {
+        value = $(this).attr("value");
+        $('li.tab').removeClass("selected");
+        $(".product-content .tab").hide();
+        $(this).addClass("selected");
+        $("#tab" + value).show();
+    });
 
-	$("#back-top a").click(function (){
-		$("body,html").animate({
-			scrollTop:0
-		}, 800);
-		return false;
-	});
-	
-	function checkCount(){
-        var viewed = $.cookie('dsvviewed');
-        var compare = $.cookie('shop_compare');
-        if(viewed){
-            viewed = viewed.split(',');
-            if(viewed.length > 0){
-                $("#count-viewed .count").html(viewed.length);
-                $("#count-viewed").addClass("highlight");
-            }
-        }
+    current_tab = $(".product-navigation li:first-child");
+    val = $(current_tab).attr("value");
+    $(current_tab).addClass("selected");
+    $(".product-content .tab").hide();
+    $("#tab" + val).show();
 
-        if(compare){
-            compare = compare.split(',');
-            if(compare.length > 0){
-                $("#count-compare .count").html(compare.length);
-                $("#count-compare").addClass("highlight");
-            }
-        }
+    $("#product-sort").change(function () {
+        location.assign($(this).val());
+    });
 
-        checkWishCount();
 
-    }
+    $('.product-view span').click(function () {
+        var item = $(this);
+        if (item.hasClass('selected')) return false;
 
-    function checkWishCount(){
-        var wishlist = $.cookie('dsvwishlist');
-        if(wishlist){
-            wishlist = wishlist.split(',');
-            if(wishlist.length>0){
-                $("#count-wishlist").addClass("highlight")
-                $("#count-wishlist .count").html(wishlist.length);
-            }
+        $('.product-view span').removeClass('selected');
+        item.addClass('selected');
+
+        if (item.data('view')) {
+            $('ul.product-list').addClass('blocks').removeClass('list');
+            $.cookie('dsv_view', 'blocks', { expires: 30, path: '/'});
         }
         else {
-            $("#count-wishlist").removeClass("highlight")
-            $("#count-wishlist .count").html('0');
+            $('ul.product-list').addClass('list').removeClass('blocks');
+            $.cookie('dsv_view', 'list', { expires: 30, path: '/'});
         }
-    }
-    checkCount();
+        return false;
+    });
+
+    $("#back-top").hide();
+
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 100) {
+            $("#back-top").fadeIn();
+        } else {
+            $("#back-top").fadeOut();
+        }
+    });
+
+    $("#back-top a").click(function () {
+        $("body,html").animate({
+            scrollTop: 0
+        }, 800);
+        return false;
+    });
 });
+

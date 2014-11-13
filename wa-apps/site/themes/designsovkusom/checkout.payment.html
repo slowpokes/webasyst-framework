@@ -1,0 +1,23 @@
+<div class="form">
+    <div id="payment_content" class="payment_form">
+        <form method="post" action="" id="payment_form">
+            {$payment = ''}
+            {foreach $checkout_payment_methods as $m}
+            <input type="hidden" name="payment_id" value="{$m.id}">
+            {$payment = $m.name}
+            {/foreach}
+            <h2>Оплата - {$payment}</h2>
+
+        </form>
+    </div>
+    <div id="order_summary">
+        {$items = $order.total}
+        <div class='oi'><div class='oi_title'>Сумма товаров:</div><div class='oi_value'>{shop_currency(($order.products_total), true)}</div></div>
+        {if $order.discount>0}
+        <div class='oi'><div class='oi_title'>Скидка:</div><div class='oi_value'>- {shop_currency(($order.discount), true)}</div></div>
+        {/if}
+        <div class='oi'><div class='oi_title'>Стоимость доставки:</div><div class='oi_value'>{shop_currency($order.shipping, true)}</div></div>
+        <div class='oi oi_final'><div class='oi_title'>Сумма заказа:</div><div class='oi_value'>{shop_currency(($order.total), true)}</div></div>
+    </div>
+</div>
+

@@ -1,0 +1,24 @@
+<div class="categ_page">
+    <div class="brand_page">
+        <div class="brand_info">
+            {if $brand.image}
+                <div class="brand_img"><img src="{$brand.image}"></div>
+            {/if}
+
+            <h1 class="category-name">
+                Товары бренда "{$brand.name|escape}"
+            </h1>
+
+            <div class="brand_description">
+                {$brand.description}
+            </div>
+        </div>
+
+        <div class="content_small">
+            <div id='category_products'>
+                {include file="category_brand.html"}
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{$wa_theme_url}category.js"></script>

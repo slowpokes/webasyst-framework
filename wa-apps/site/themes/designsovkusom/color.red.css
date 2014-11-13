@@ -3,10 +3,28 @@
 .main_menu ul li a:hover,
 .main_menu ul li a.active { border-bottom: 2px solid #c74b46;}
 .main_menu ul>li.first,
- .leftmenu>ul>li.first {
+.leftmenu>ul>li.first,
+#cart-cats {
 	background-color: #c74b46; 
 }
 .leftmenu>ul>li.first:hover { background-color: #c74b46; }
+
+.product_items>li:hover,
+.subcategory:hover { 
+    border: 1px solid #c74b46; 
+    -moz-box-shadow:0 1px 5px #c74b46;
+	-ms-box-shadow:0 1px 5px #c74b46;
+	-webkit-box-shadow:0 0px 5px #c74b46;
+	box-shadow: 0px 0px 5px #c74b46;
+}
+
+.bx-wrapper .bx-pager.bx-default-pager a.active {
+	background: #c74b46;
+}
+
+.bx-wrapper .bx-pager.bx-default-pager a:hover {
+	background: #953834;
+}
 
 .news_container,
 .sidebar-block-container.white {
@@ -15,7 +33,11 @@
 
 .news .post h3 a:hover {color: #c74b46;}
 
+
 .photos_container ul li:hover {
+	border: 1px solid #c74b46;
+}
+.recently-viewed li:hover {
 	border: 1px solid #c74b46;
 }
 

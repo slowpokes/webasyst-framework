@@ -1,0 +1,52 @@
+
+<div class="form">
+    <div id="shipping_content">
+        <h2>Выберите способ доставки</h2>
+        <form method="post" action="" id="shipping_form">
+            <div class="shipping_options">
+                {$external_methods = []}
+                {foreach $checkout_shipping_methods as $m}
+                <div class="shipping_{$m.id} shipping_option shipping_info" data-id="{$m.id}">
+
+                    <div class="shipping_price">{shop_currency($m.rate, $m.currency)}</div>
+                    <h3>
+                        <label>
+                            {if !empty($m.logo)}<img src="{$m.logo}" class="method-logo">{/if}
+                            <input type="radio" name="shipping_id" value="{$m.id}">
+                            <input type="hidden" value="delivery" name="rate_id[{$m.id}]">
+                            {$m.name|escape}
+                        </label>
+                    </h3>
+                    {if empty($m.error)}
+                    <div class="rate">
+                        <span class="hint" {if empty($m.est_delivery)}style="display:none"{/if}>
+                        [`Estimated delivery`]:<br>
+                        <strong class="est_delivery">{if !empty($m.est_delivery)}{$m.est_delivery}{/if}</strong>
+                        </span>
+                        <em class="hint error comment" {if empty($m.comment)}style="display:none"{/if}>
+                        <br>{if !empty($m.comment)}{$m.comment}{/if}
+                        </em>
+                    </div>
+                    {else}
+                    <div class="rate error">
+                        <span class="price nowrap" style="display:none"></span>
+                        <em class="hint error comment" style="display:none"></em>
+                        <span class="hint" style="display:none">
+                            <br>
+                            [`Estimated delivery`]:<br>
+                            <strong class="est_delivery"></strong>
+                        </span>
+                        <em class="shipping-error">{$m.error}</em>
+                    </div>
+                    {/if}
+                    <div class="shipping_description">{if $m.description}{$m.description}{/if}</div>
+                </div>
+                {foreachelse}
+                <div>
+                    <div class="error">[`Oops! We are sorry, but <strong>we can not ship this order to your selected destination</strong>. Checkout can not be completed.`]</div>
+                </div>
+                {/foreach}
+            </div>
+        </form>
+    </div>
+</div>

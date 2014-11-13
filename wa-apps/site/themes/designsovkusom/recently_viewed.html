@@ -1,0 +1,31 @@
+{if isset($smarty.cookies.dsvviewed)}
+    {$lastviews = $smarty.cookies.dsvviewed}
+    {assign var=last_views value=","|explode:$lastviews}
+    
+    {if $last_views ne '' && !isset($product)}
+    <div class="sidebar-block-container white">
+        <div class="sidebar-block">
+            <h3>недавно смотрели</h3>
+            <ul class="product-list recently-viewed">
+            {section name=i loop=$last_views step=-1}
+                {if $smarty.section.i.iteration > $theme_settings.recently_count}{break}{/if}
+                <li itemscope itemtype ="http://schema.org/Product">
+                    {$im=$wa->shop->product($last_views[i])}
+                    <div class="image">
+                        {$badge_html = $wa->shop->badgeHtml($im.badge)}
+                        {if $badge_html}
+                            <div class="corner top left">{$badge_html}</div>
+                        {/if}
+                        {$wa->shop->productImgHtml($im, '150x150', ['itemprop' => 'image', 'alt' => $im.name, 'default' => "`$wa_theme_url`img/dummy200.png"])}
+                    </div>
+                    <h5 itemprop="name">
+                        {$im.name}
+                    </h5>
+                    <a href="{$wa->shop->productUrl($im)}" class="rv-button green-button">Посмотреть</a>
+                </li>
+            {/section}
+            </ul>
+        </div>
+    </div>
+    {/if}
+{/if}

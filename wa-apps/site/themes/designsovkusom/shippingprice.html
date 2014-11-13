@@ -1,0 +1,64 @@
+<div>
+    <div class="shipping_result">
+
+        {if $region>0}
+            {if count($shipping_methods)>0}
+                <table class="shipping_table">
+                    <tr>
+                        <th colspan="2">Способ доставки</th>
+                        <th>Цена</th>
+                        <th>Сроки доставки</th>
+                    </tr>
+                        {foreach $shipping_methods as $method}
+                        <tr class="shipping_method">
+                            <td class="shm_img"><img src='{$method.logo}'></td>
+                            <td class="shm_name">{$method.name}</td>
+                            <td class="shm_price price">{wa_currency($method.rate, $method.currency)}</td>
+                            <td class="shm_time">{$method.est_delivery}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="shm_description">
+                                <div>{$method.description}</div>
+                            </td>
+                        </tr>
+                    {/foreach}
+                </table>
+            {else}
+                В данный регион доставка не осуществляется.
+            {/if}
+        {else}
+            <ul class="apps">
+                <li>Ваш регион — <a href="javascript:void(0);" class="city">
+                        <div class="delivery_city">{$wa->regionBlock()}</div>
+                    </a></li>
+            </ul>
+            <br>
+        {/if}
+    </div>
+
+
+    <div class="regions_table">
+        <table>
+            <tr>
+                <th></th>
+                {foreach $shipping_methods as $method}
+                    <th>{$method.name}</th>
+                {/foreach}
+            </tr>
+            {foreach $shipping_regions as $region}
+                <tr>
+                    <td class="sh_region_name">{$region.name}</td>
+                    {foreach $shipping_methods as $id=>$method}
+                        <td>
+                            {if isset($region.shipping[$id])}
+                                <div class="delivery_yes"></div>
+                            {else}
+                                <div class="delivery_no"></div>
+                            {/if}
+                        </td>
+                    {/foreach}
+                </tr>
+            {/foreach}
+        </table>
+    </div>
+</div>

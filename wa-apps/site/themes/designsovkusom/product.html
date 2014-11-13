@@ -1,0 +1,350 @@
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}jquery.bxslider.min.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}jquery.kladr.min.js"></script>
+{*автозаполнение улиц*}
+
+
+<script type="text/javascript" src="{$wa_theme_url}kladr.js"></script>
+
+<div class="content{if $product.badge} {$product.badge}{/if}" itemscope itemtype="http://schema.org/Product">
+    <div class="product-container">
+
+
+    <div class="product-page" id="overview">
+        <div class="image-container">
+            <div class="product-rating">
+                {if !empty($product.rating) && $product.rating > 0}
+                <span class="rating nowrap" itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" title="{sprintf('[`Average user rating: %product-price / 5`]', $product.rating)}">
+                    {$wa->shop->ratingHtml($product.rating, 10)}
+                    <span itemprop="ratingValue" style="display: none;">{$product.rating}</span>
+                    <span itemprop="reviewCount" style="display: none;">{$reviews_total_count}</span>
+                </span>
+                {/if}
+            </div><!-- /product-rating -->
+
+            <!-- image gallery -->
+            <div class="align-center">
+                <!-- ИЗОБРАЖЕНИЕ -->
+                <div class="image product-image">
+                    {if $product.images}
+                    <div class="corner top left">
+                        {$wa->shop->badgeHtml($product.badge)}
+                    </div>
+                    {/if}
+                    <a href="{$wa->shop->productImgUrl($product, '600x0')}" rel="lightbox-images" title="{$product.name}" id="image-link"><img id="product-image" border='0'  src="{$wa->shop->productImgUrl($product, '300x400')}">
+                    </a>
+                </div>
+                <!-- ГАЛЛЕРЕЯ -->
+                {if count($product.images) > 1}
+                <div class="gallary-container">
+                    <div id="gallary-prev"></div>
+                    <div id="gallary-next"></div>
+                    <div class="gallery" id="product-gallery">
+                        {foreach $product.images as $image name=image}
+
+
+                            <div class="image">
+                                <a class="igm" id="product-image-{$image.id}"class="igm" id="product-image-{$image.id}" href="{$wa->shop->productImgUrl(['id'=> $product.id, 'image_id' => $image.id, 'ext' => $image.ext], '600x0', ['alt' => $product.name|cat:' - ':$image.description|escape])}" data-small="{$wa->shop->productImgUrl(['id'=> $product.id, 'image_id' => $image.id, 'ext' => $image.ext], '300x400', ['alt' => $product.name|cat:' - ':$image.description|escape])}" data-mini="{$wa->shop->productImgUrl(['id'=> $product.id, 'image_id' => $image.id, 'ext' => $image.ext], '48', ['alt' => $product.name|cat:' - ':$image.description|escape])}" {if $smarty.foreach.image.iteration != 1}rel="lightbox-images"{/if} {if $smarty.foreach.image.iteration = 1} data-lightbox="test" {/if} title="{$product.name}">{$wa->shop->productImgHtml(['id'=> $product.id, 'image_id' => $image.id, 'ext' => $image.ext, 'image_desc' => $image.description], '96x96', ['alt' => $product.name|cat:' - ':$image.description|escape])}</a>
+                            </div>
+
+                        {/foreach}
+                    </div>
+                </div><!-- /gallary-container -->
+                {/if}
+            </div>
+
+            <div class="clear-left"></div>
+        </div>
+        <div class="cart-container">
+            <div class="product-header">
+                <h1 itemprop="name">
+                    {$product.name|escape}
+                </h1>
+                <h5 class="product_type">{$product.cf_type|escape}</h5>
+                <div class='artic'> Артикул: <span id="artsku"></span> </div>
+                <!-- <div class="add-links">
+                     <!-- compare
+                     <a {if $compare}style="display:none"{/if} class="compare-add" data-product="{$product.id}" href="#"><i class="icon compare"></i>Добавить к сравнению</a>
+                     <a {if !$compare}style="display:none"{/if} class="compare-remove" data-product="{$product.id}" href="#"><i class="icon compare"></i>[`Remove from comparison table`]</a>
+                     <a id="compare-link" {if count($compare) lt 2}style="display:none"{/if} rel="nofollow" href="{$wa->getUrl('/frontend/compare/', ['id' => implode(',', $compare) ])}" class="bold">[`Compare`] <span class="count">{count($compare)}</span></a>
+                     <a href="javaScript:window.print();"><i class="icon print"></i>Распечатать</a>
+                 </div>
+                 -->
+                <div class="clear-both"></div>
+            </div><!-- /product-header -->
+            {if $product.summary}
+                <!-- КРАТКОЕ ОПИСАНИЕ -->
+                <!--div class="product-summary">
+                    {$product.summary|truncate:350:"...":true}
+                        {foreach $brands as $b}
+                        {if $b.name == $brend}
+                        <a href="{$b.url}">{if $b.image}<img
+                                src="{$wa_url}wa-data/public/shop/brands/{$b.id}/{$b.id}{$b.image}">{else}{$b.name}{/if}</a>
+
+                        {/if}
+                        {/foreach}
+
+                </div--><!-- product-summary -->
+            {/if}
+
+            <div class="cart">
+                {include file="product.cart.html" inline}
+            </div>
+
+            {*
+            {if $product.tags}
+            <!-- ТЕГИ -->
+                <p class="tags" id="product-tags">
+                    <span class="weight600">[`Tags`]:</span>
+                    <span class="product-infos">
+                    {foreach $product.tags as $t}
+                        <a href="{$wa->getUrl('/frontend/tag', ['tag' => urlencode($t)])}">{$t}</a>
+                    {/foreach}
+                    </span>
+                </p>
+            {/if}
+            *}
+
+            {*if $product.categories}
+                <!-- КАТЕГОРИИ -->
+                <p id="product-categories">
+                    <span class="weight600">[`Categories`]:</span>
+                    {foreach $product.categories as $c}{if $c.status}
+                        <span class="product-infos"><a href="{$wa->getUrl('/frontend/category', ['category_url' => $c.full_url])}">{$c.name|escape}</a></span> &nbsp;
+                    {/if}{/foreach}
+                </p>
+            {/if*}
+
+            <!-- ПОДЕЛИТЬСЯ -->
+            <div class="product-share">
+                <script type="text/javascript" src="//yandex.st/share/share.js" charset="utf-8"></script>
+                <span class="weight600">Поделиться:</span>
+                <div class="yashare-auto-init" data-yashareL10n="ru" data-yashareQuickServices="yaru,vkontakte,facebook,twitter,odnoklassniki,moimir" data-yashareTheme="counter"></div>
+            </div>
+
+
+            <!-- plugin hook: 'frontend_product.cart' -->
+            {* @event frontend_product.%plugin_id%.cart *}
+            {foreach $frontend_product as $_}{$_.cart}{/foreach}
+        </div>
+        <div class="clear-both"></div>
+    </div><!-- /product-page -->
+
+        <div class="product-infos">
+            <div class="product-content">
+
+                {if $product.features}
+
+                    <div class="aux">
+                        <!-- product features -->
+                        {if $product.features}
+                            <div>
+                            <table class="features" id="product-features">
+                                <h2>Характеристики</h2>
+                                <col width="35%">
+
+                                <col width="65%">
+
+                                {foreach $product.features as $f_code => $f_value name=features}
+
+                                    <tr class="{if $features[$f_code].type == 'divider'}divider{/if}{if count($product.features)==1 || $smarty.foreach.features.last} no-border{/if}{if $smarty.foreach.features.index is odd} bg{/if}">
+                                        <td class="name" width="45%">
+                                            <span>{$features[$f_code].name|escape}</span>
+                                        </td>
+
+                                        <td class="value" itemprop="{$f_code|escape}">
+                                            {if is_array($f_value)}
+                                                {if $features[$f_code].type == 'color'}
+                                                    {implode('<br /> ', $f_value)}
+                                                {else}
+                                                    {implode(', ', $f_value)}
+                                                {/if}
+                                            {else}
+                                                {$f_value}
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                {/foreach}
+
+                            </table>
+                            </div>
+                        {/if}
+
+                        <!-- plugin hook: 'frontend_product.block_aux' -->
+                        {* @event frontend_product.%plugin_id%.block_aux *}
+                        <h3>Отзывы о {$product.name}</h3>
+                        <h4 class="add_rev">Добавить комментарий</h4>
+                        <br>
+                        {foreach $frontend_product as $_}{$_.block_aux}{/foreach}
+
+                        <div class="reviews-tab">
+                            <script type="text/javascript">
+                                $(function(){
+                                    var loading = $('<div><i class="icon16 loading"></i>Loading...</div>');
+                                    $('.reviews-tab')
+                                            .append(loading)
+                                            .load(location.href.replace(/\/#\/[^#]*|\/#|\/$/g, '') + '/reviews/ .reviews', { random: "1" },
+                                            function(){
+                                                $(this).prepend('<script type="text/javascript" src="/wa-apps/shop/js/rate.widget.js"><\/script>')
+                                                        .prepend('<script type="text/javascript" src="/wa-data/public/shop/themes/designsovkusom/reviews.js"><\/script>')
+                                                        .find('.loading').parent().remove();
+
+                                                $('div.wa-captcha .wa-captcha-refresh, div.wa-captcha .wa-captcha-img').unbind('click').click(function(){
+                                                    var div = $(this).parents('div.wa-captcha');
+                                                    var captcha = div.find('.wa-captcha-img');
+                                                    if(captcha.length) {
+                                                        captcha.attr('src', captcha.attr('src').replace(/\?.*$/,'?rid='+Math.random()));
+                                                        captcha.one('load', function() {
+                                                            div.find('.wa-captcha-input').focus();
+                                                        });
+                                                    };
+                                                    div.find('input').val('');
+                                                    return false;
+                                                });
+                                            }
+                                    );
+                                });
+                            </script>
+                        </div><!-- /tab2 -->
+                    </div>
+                {/if}
+                <script type="text/javascript">
+                    var flip = 0
+                    $(".add_rev").click(function() {
+                        $(".review-form" ).toggle( "slow")
+                    });
+                </script>
+                {if $product.description}
+                    <br>
+                    <div class="prod_desc">
+                    <h2>Описание</h2>
+                    <div class="description" id="product-description" itemprop="description">{$product.description}</div>
+                    </div>
+                {/if}
+
+
+
+                {$n=4}
+                {foreach $product.pages as $page}
+                    <div class="tab page" id="tab{$n}">{$page.content}</div>
+                    {$n=$n+1}
+                {/foreach}
+
+                <!-- plugin hook: 'frontend_product.block' -->
+                {* @event frontend_product.%plugin_id%.block *}
+                {foreach $frontend_product as $_}{$_.block}{/foreach}
+            </div><!-- /product-content -->
+
+        </div><!-- /product-info -->
+    </div><!-- /content-container -->
+    <div class="product-related">
+        <!-- RELATED PRODUCTS -->
+        {$upselling = $product->upSelling()}
+        {$crossselling = $product->crossSelling()}
+
+        {if $upselling || $crossselling}
+            {if $upselling}
+                {if count($upselling)>4}
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            $(".upselling ul").bxSlider({
+                                minSlides: 1,
+                                minSlides: 1,
+                                maxSlides: 4,
+                                slideWidth: 160,
+                                slideMargin: 31,
+                                moveSlides: 4, /*количество товаров при прокрутке*/
+                                nextSelector: '#upsell-next',
+                                prevSelector: '#upsell-prev',
+                                nextText: 'Следующий',
+                                prevText: 'Предыдущий',
+                                pager: false,
+                                infiniteLoop: false
+                            });
+                        });
+                    </script>
+                {/if}
+                <div class="upselling">
+                    <h3>
+                        [`See also`]
+                        {$compare_ids = array_merge(array($product.id), array_keys($upselling))}
+                        <input type="button" onClick="javascript:window.location='{$wa->getUrl('/frontend/compare', ['id' => implode(',', $compare_ids)])}';" value="[`Compare all`]" />
+
+                    </h3>
+                    <div id="upsell-prev"></div>
+                    <div id="upsell-next"></div>
+                    {include file="product-item.html" products=$upselling}
+                </div>
+            {/if}
+
+            {if $crossselling}
+                {if count($crossselling)>4}
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            $(".crossselling ul").bxSlider({
+                                minSlides: 2,
+                                maxSlides: 5,
+                                moveSlides: 1, /*количество товаров при прокрутке*/
+                                slideWidth: 160,
+                                slideMargin: 31,
+                                nextSelector: '#cross-next',
+                                prevSelector: '#cross-prev',
+                                nextText: 'Следующий',
+                                prevText: 'Предыдущий',
+                                pager: false
+                            });
+                        });
+                    </script>
+                {/if}
+                <div class="crossselling">
+                    <h3>С этим товаром покупают!</h3>
+                    <div id="cross-prev"></div>
+                    <div id="cross-next"></div>
+                    {include file="product-item.html" products=$crossselling}
+                </div>
+            {/if}
+        {/if}
+    </div><!-- /product-related -->
+</div><!-- /content -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#product-gallery").bxSlider({
+            minSlides: 3,
+            maxSlides: 3,
+            slideWidth: 80,
+            slideMargin: 9,
+            moveSlides: 1,
+            pager: false,
+            infiniteLoop:false
+        });
+
+        var id = $("#product_id").val();
+        var vswatch = $.cookie('dsvviewed');
+        if (vswatch) {
+            var cookies = $.cookie('dsvviewed');
+            var arr= cookies.split(',');
+            var temp=0;
+            for(i=0; i<arr.length; i++){
+                if (arr[i]==id){
+                    arr.splice(i,1);
+                    temp=1;
+
+                }
+            }
+            if (temp==0 && arr.length==4){
+                arr.shift();
+            }
+            arr.push(id);
+            vswatch = arr[0];
+            for (i=1; i<arr.length; i++){
+                vswatch += ',' + arr[i];
+                $.cookie('dsvviewed', vswatch, { expires: 1, path: '/' });
+            }
+        }
+        else {
+            vswatch = '' + id;
+            $.cookie('dsvviewed', vswatch, { expires: 1, path: '/' });
+        }
+    });
+</script>
+

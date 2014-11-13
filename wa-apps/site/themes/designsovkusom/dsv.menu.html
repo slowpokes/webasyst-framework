@@ -1,0 +1,19 @@
+<script type="text/javascript">
+    function lazyLoadHeader(){
+        $.get('/null/', function(data){
+            $(".main_menu").html($(data).find(".main_menu"));
+            initMenu();
+        });
+    }
+    lazyLoadHeader();
+    function initMenu (){
+        $('.firstli').hoverWithDelay(function () {
+            console.log(1);
+            $('ul', this).show();
+            $('a', this).addClass("active");
+        }, function () {
+            $('ul', this).hide();
+            $('a', this).removeClass("active");
+        }, 100);
+    }
+</script>

@@ -1,0 +1,17 @@
+<h1>Бренды на «{$letter}»</h1>
+<div class="brandtags">
+    <a href='#' data-id="0" class="selected">Все бренды</a>
+    {foreach $brandtags as $tag}
+    <a href='#' data-id="{$tag.id}" data-category="{$tag.category_id}">{$tag.brandtag}</a>
+    {/foreach}
+</div>
+
+<div class="brands_list">
+    {foreach $brands as $brand}
+        <div class="small_brand small_product" data-link="/brand/{$brand.link}/" data-brandtags='[0{foreach $brand.brandtags as $tag},{$tag}{/foreach}]'>
+            <div class="brand_img_block"><div class="brand_img">{if isset($brand.image)}<a href='/brand/{$brand.link}/'><img src="{$brand.image}"></a>{/if}</div></div>
+            <div class="brand_name"><a href='/brand/{$brand.link}/'><h3><span class="brand">{$brand.name}</span></h3></a></div>
+        </div>
+    {/foreach}
+    <div class="cb"></div>
+</div>
