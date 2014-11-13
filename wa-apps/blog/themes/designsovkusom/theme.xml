@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE theme PUBLIC "wa-app-theme" "http://www.webasyst.com/wa-content/xml/wa-app-theme.dtd">
+<theme id="designsovkusom" system="0" vendor="bd9" author="zVadim" app="blog" parent_theme_id="site:designsovkusom" version="1.1.0">
+    <name locale="en_US">designsovkusom</name>
+    <name locale="ru_RU">designsovkusom</name>
+    <files>
+        <file path="index.html" custom="0" parent="1">
+        </file>
+        <file path="dsv.menu.html" custom="0" parent="1">
+        </file>
+    </files>
+    <about locale="en_US">
+<![CDATA[
+]]>
+    </about>
+    <about locale="ru_RU">
+<![CDATA[
+]]>
+    </about>    
+</theme>
