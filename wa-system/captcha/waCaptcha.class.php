@@ -27,7 +27,7 @@ class waCaptcha extends waAbstractCaptcha
 
     public function getHtml($error = null, $absolute = false, $refresh = null)
     {
-        $captcha_url = wa()->getRootUrl($absolute, true).$this->getAppId().'/captcha.php?rid='.uniqid(time());
+        $captcha_url = wa()->getRootUrl($absolute, true).wa()->replaceName($this->getAppId()).'/captcha.php?rid='.uniqid(time());
         if ($refresh === null) {
             $refresh = _ws("Refresh CAPTCHA");
         }
