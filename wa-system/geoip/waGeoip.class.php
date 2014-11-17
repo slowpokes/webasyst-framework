@@ -45,7 +45,7 @@ class Geoip {
         if($cookie_sity) return $cookie_sity;
         $data = $this->getGeoData();
         if(isset($data['city'])) return $data['city'];
-        return '';
+        return 'Москва';
     }
 
     public function getRegion(){
@@ -54,7 +54,7 @@ class Geoip {
         if($cookie_region) return $cookie_region;
         $data = $this->getGeoData();
         if(isset($data['region_id'])) return $data['region_id'];
-        return '';
+        return '77';
     }
 
     public function getRegionName($id){
