@@ -83,7 +83,7 @@ class Geoip {
         }
         if($region>0)
             return array('city'=>$city, 'region'=>$region);
-        return null;
+        return array('city'=>'Москва', 'region'=>77);
     }
 
     public function saveData($data){
