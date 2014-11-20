@@ -16,6 +16,11 @@
 
     {$wa->js()}
     {$wa->headJs()}
+
+    <!-- plugin hook: 'frontend_head' -->
+    {* @event frontend_head.%plugin_id% *}
+    {foreach $frontend_head as $_}{$_}{/foreach}
+
     <script type="text/javascript" src="/wa-apps/shop/themes/aromateca/js/main.js"></script> {* общие скрипты для сайта *}
     {include file="$wa_active_theme_path/js.html"}
     <script>
