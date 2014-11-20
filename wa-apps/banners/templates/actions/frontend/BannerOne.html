@@ -1,0 +1,6 @@
+<div id="banners_{$uniq}" class="banners_banner" style="width: {$banner.width}px; height:{$banner.height}px; overflow: hidden"
+{foreach $banner.params as $key=>$value}data-{$key}='{$value}' {/foreach}>
+    {foreach $images as $image}
+        <a href="{$image.link|escape:'html'}" class="banners_slide"><img src="{$image.url_thumb|escape:'html'}" alt="{$image.alt|escape:'html'}" title="{$image.alt|escape:'html'}"></a>
+    {/foreach}
+</div>
