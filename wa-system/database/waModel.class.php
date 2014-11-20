@@ -1071,7 +1071,9 @@ class waModel
     private function getDBSheme(){
         if($this->use_config_db_name){
             $db = wa()->getDb();
-            return $db;
+            if($db){
+                return $db;
+            }
         }
         return 'default';
     }
