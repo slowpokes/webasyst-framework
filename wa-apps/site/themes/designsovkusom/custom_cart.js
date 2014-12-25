@@ -35,7 +35,7 @@ function clog(str) {
 function showCart() {
     $("body").addClass('freeze');
     $("#fast_cart_view").overlay().load();
-    $("#cart_fast_info").html("<div class='loading'></div>");
+    $("#cart_fast_info").html('<div class="preloader"><div class="status">&nbsp;</div></div>');
     $.get('/cart/', function (data) {
         console.log(data);
         var cont = $($.parseHTML(data)).find("#cart_content");
@@ -156,7 +156,7 @@ function createOrder(block) {
             });
         }
     });
-    block.html("<div class='loading'></div>");
+    block.html('<div class="preloader"><div class="status">&nbsp;</div></div>');
 }
 
 
@@ -307,7 +307,7 @@ function finalizeOrder(cont) {
             });
         }
     });
-    cont.html("<div class='loading'></div>");
+    cont.html('<div class="preloader"><div class="status">&nbsp;</div></div>');
 }
 
 function infoHoverInit() {

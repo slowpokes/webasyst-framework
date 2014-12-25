@@ -1,0 +1,152 @@
+<script type="text/javascript" src="{$wa_theme_url}cart.js"></script>
+
+{if !$cart.count}
+    <h1>[`Shopping cart`]</h1>
+    <p>[`Your shopping cart is empty.`]</p>
+{else}
+    <!-- general welcome text -->
+    <div class="cart-content">
+    
+        <h1>[`Shopping cart`]</h1>
+        <a href="{$wa_app_url}" class="back-to-shop">
+            <div>
+                <i class="icon to-shop float-left"></i>Вернуться<br><span>В МАГАЗИН</span>
+            </div>
+        </a>
+        <form method="post">
+            <table class="table cart">
+                <tr>
+                    <th>Название</th>
+                    <th></th>
+                    <th class="align-center">Количество</th>
+                    <th class="align-center">Сумма</th>
+                    <th></th>
+                </tr>
+                <!-- products -->
+                {foreach $cart.items as $item}
+                    <tr data-id="{$item.id}">
+                        <td class="min-width"><a href="{$wa->shop->productUrl($item.product)}" title="{$item.product.name|escape}">{$wa->shop->productImgHtml($item.product, '48x48')}</a></td>
+                        <td>
+                            <a href="{$wa->shop->productUrl($item.product)}" class="product-name">{$item.product.name|escape}</a>
+                            {if $item.sku_name && $item.sku_name != $item.product.name}({$item.sku_name|escape}){/if}
+                            <br />
+                            <br />
+                            {if !empty($item.services)}
+                            <div class="services">
+                                {foreach $item.services as $service_id => $s}
+                                <!-- one option -->
+                                <div {if !empty($s.id)}data-id="{$s.id}"{/if}>
+                                <label>
+                                    <input {if !empty($s.id)}checked{/if} type="checkbox" name="services[{$item.id}][]" value="{$service_id}"> {$s.name|escape} {if $s.price && !isset($s.variants)}(<span>+{shop_currency($s.price, $s.currency)}</span>){/if}
+                                </label>
+                                {if isset($s.variants)}
+                                <select name="service_variant[{$item.id}][{$service_id}]" {if empty($s.id)}disabled{/if}>
+                                    {foreach $s.variants as $variant_id => $v}
+                                    <option {if $s.variant_id == $variant_id}selected{/if} value="{$variant_id}">{$v.name|escape} (+{shop_currency($v.price, $s.currency)})</option>
+                                    {/foreach}
+                                </select>
+                                {/if}
+                                </div>
+                                {/foreach}
+
+                            </div>
+                            {/if}
+                            {if !empty($item.error)}<script>alert({json_encode($item.error)});</script>{/if}
+                        </td>
+                        <td class="align-center nowrap product-count"><input type="text" name="quantity[{$item.id}]" value="{$item.quantity}" class="qty{if !empty($item.error)} error{/if}"></td>
+                        <td class="align-center item-total nowrap">{shop_currency($item.full_price, true)}</td>
+                        <td><a class="delete" href="#" title="[`Remove from cart`]"><i class="icon remove"></i></a></td>
+                    </tr>
+                {/foreach}
+            </table>
+            <table class="table-total">
+                <tr>
+                    <td style="width:70%">
+                        <!-- купон на скидку -->
+                        {if shopDiscounts::isEnabled('coupons')}
+                            <div class="coupons">
+                            [`Discount coupon (if you have one)`]:<br /><br />
+                            <input type="text" name="coupon_code" value="{$coupon_code|escape}" class="coupon_code">
+                            <input type="submit" value="[`Apply`]" class="apply">
+                            </div>
+                        {/if}
+                        
+                        <!-- бонус баллы -->
+                        {if shopAffiliate::isEnabled() && !empty($add_affiliate_bonus)}
+                        <!-- <em class="affiliate float-right">{sprintf("[`This order will add +%s points to your affiliate bonus.`]", $add_affiliate_bonus)}</em> -->
+                        {/if}
+                    </td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>[`Discount`]</td>
+                                <td class="align-right nowrap discount">&minus; {shop_currency($discount, true)}</td>
+                            </tr>
+                            <tr>
+                                <td>[`Total`]</td>
+                                <td class="cart-total align-right total bold nowrap">{shop_currency($cart.total, true)}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <br/>
+                                    <input name="checkout" type="submit" value="[`Proceed to checkout`]" class="blue-button cart-confirm">
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    {if shopAffiliate::isEnabled() && $affiliate_bonus > 0}
+                <!-- affiliate bonus -->
+                <tr class="no-border">
+                    <td class="no-border">
+                        {sprintf('[`Your current affiliate bonus of %s points allows you to get an additonal discount of up to %s`]', $affiliate_bonus, shop_currency(shopAffiliate::convertBonus($affiliate_bonus)))}
+                        {if $use_affiliate}
+                        <a id="cancel-affiliate" href="#">[`Cancel`]</a>
+                        {else}
+                        <input type="submit" name="use_affiliate" value="[`Use bonus`]">
+                        {/if}
+                    </td>
+                    <td class="align-center">&minus; {if $use_affiliate}{shop_currency(shopAffiliate::convertBonus($used_affiliate_bonus))}{else}0{/if}</td>
+                </tr>
+                {/if}
+                </tr>
+            </table>
+
+            <!-- plugin hook: 'frontend_cart' -->
+            {* @event frontend_cart.%plugin_id% *}
+            {foreach $frontend_cart as $_}{$_}{/foreach}                    
+
+        </form>
+        
+    </div><!-- -->
+    {$crossselling = $wa->shop->crossSelling($cart.items, 'product_id')}
+    {if $crossselling}
+        {if count($crossselling)>5}
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $(".crossselling ul").bxSlider({
+            	    minSlides: 1,
+                    maxSlides: 5,
+                    slideWidth: 160,
+                    slideMargin: 31,
+                    moveSlides: 5, /*количество товаров при прокрутке*/
+                    nextSelector: '#cross-next',
+                    prevSelector: '#cross-prev',
+                    nextText: 'Следующий',
+                    prevText: 'Предыдущий',
+                    pager: false,
+                    infiniteLoop: false
+            	});
+            });
+        </script>
+        {/if}
+        <h3>С этим товаром покупают!</h3>
+        <div id="cross-prev"></div>
+        <div id="cross-next"></div>
+        <div class="crossselling">
+            {include file="product-item.html" products=$crossselling}
+        </div>
+    {/if}
+    
+{/if}

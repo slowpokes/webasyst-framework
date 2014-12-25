@@ -1,0 +1,83 @@
+<script type="text/javascript" src="{$wa_theme_url}jquery.bxslider.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function () {
+    $(".slider").bxSlider({
+        auto: true,
+        speed: 1000,
+    });
+    
+    $(".bestsellers ul").bxSlider({
+	    minSlides: 1,
+        maxSlides: 4,
+        slideWidth: 160,
+        slideMargin: 31,
+        moveSlides: 4, /*количество товаров при прокрутке*/
+        nextSelector: '#bestseller-next',
+        prevSelector: '#bestseller-prev',
+        nextText: 'Следующий',
+        prevText: 'Предыдущий',
+        pager: false,
+        infiniteLoop: false
+	});
+	
+	$(".leaders ul").bxSlider({
+	    minSlides: 1,
+        maxSlides: 4,
+        slideWidth: 160,
+        slideMargin: 31,
+        moveSlides: 4, /*количество товаров при прокрутке*/
+        nextSelector: '#leader-next',
+        prevSelector: '#leader-prev',
+        nextText: 'Следующий',
+        prevText: 'Предыдущий',
+        pager: false,
+        infiniteLoop: false
+	});
+});
+</script>
+
+<!-- get products from predefined product lists 'promo' and 'bestsellers' -->
+{$leaders = $wa->shop->productSet('leader')}
+{$bestsellers = $wa->shop->productSet('bestsellers')}
+    
+    <!-- plugin hook: 'frontend_homepage' -->
+    {* @event frontend_homepage.%plugin_id% *}
+    {foreach $frontend_homepage as $_}{$_}{/foreach}
+    
+    <div class="clear-both"></div>
+    
+    <div class="sidebar">
+        <!-- NAVIGATION -->
+        {include file="sidebar.html"}
+    </div>
+    
+    <div class="content notbl">
+        <!-- slider -->
+        {include file="`$wa_active_theme_path`/slider.html" album="1"}
+        
+        <!-- bestseller -->
+        <div class="product-list">
+            
+            {if $bestsellers && count($bestsellers)}
+            <h2>Лучшее предложение</h2>
+            <div class="bestsellers">
+                <div id="bestseller-prev"></div>
+                <div id="bestseller-next"></div>
+                {include file="product-item.html" products=$bestsellers}
+            </div>
+            {/if}
+            {if $leaders && count($leaders)}
+            <h2>Хиты продаж</h2>
+            <div class="leaders">
+                <div id="leader-prev"></div>
+                <div id="leader-next"></div>
+                {include file="product-item.html" products=$leaders}
+            </div>
+            {/if}
+        </div>
+        <!--<div class="clear-both"></div>-->
+        
+        {include file="dsv.home.html"}
+    </div>
+    <div class="clear-both"></div>
+

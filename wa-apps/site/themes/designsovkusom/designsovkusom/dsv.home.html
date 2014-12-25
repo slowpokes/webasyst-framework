@@ -1,0 +1,44 @@
+<div itemscope itemtype="http://schema.org/Store">
+    <h1 class="align-center">Добро пожаловать в <span itemprop="name">{sprintf('[`%s online store`]', $wa->shop->settings('name'))}</span></h1>
+    <meta itemprop="description" content="{$wa->meta('description')|escape}">
+    <div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+        <meta itemprop="streetAddress" content="">
+        <meta itemprop="addressLocality" content="">
+        <meta itemprop="addressRegion" content="">
+        <meta itemprop="postalCode" content="">
+        <meta itemprop="addressCountry" content="{$wa->shop->settings('country')|upper}">
+    </div>
+    <p class="shop-description">
+        <b>"Дизайн со вкусом"</b> - это профессиональный, современный и стильный шаблон, разработанный под основные приложения webasyst (магазин, блог, фото, сайт), созданный профессионалами команды разработчиков (художник/дизайнер интерфейсов, верстальщик, программист). Дизайна адаптирован под планшеты, в ближайшее время будет адаптация под мобильные устройства. Мы более 7 лет специализируемся на создании, обслуживании интернет-магазинов. Качественный и удобный дизайн подходит для любой сферы деятельности. С нашей стороны мы гарантируем качественную и своевременную поддержку, регулярные обновления в целях улучшения визуальных и функциональных требований.<br /><br />
+        <span class="gray">[`Edit this information in the <strong>home.html</strong> template file using built-in design editor in the store backend.`]</span>
+    </p>
+    
+    
+    <div class="shop-links">
+        <div>
+            <img src="{$wa_theme_url}img/dsv/link1.jpg" alt="Доставка и оплата" />
+            <h3>Доставка и оплата</h3>
+            <p>При оформлении заказа вы можете указать удобный для вас день и время доставки из предложенных...</p>
+            <a href="{$wa_app_url}dostavka-i-oplata/">
+                Подробнее...
+            </a>
+        </div>
+        <div>
+            <img src="{$wa_theme_url}img/dsv/link2.jpg" alt="Как купить" />
+            <h3>Как купить</h3>
+            <p>Выбрав понравившийся вам товар, нажмите кнопку "В КОРЗИНУ",  и товар автоматически отправится...</p>
+            <a href="{$wa_app_url}kak-kupit/">
+                Подробнее...
+            </a>
+        </div>
+        <div style="margin-right: 0">
+            <img src="{$wa_theme_url}img/dsv/link3.jpg" alt="Гарантии" />
+            <h3>Гарантии</h3>
+            <p>На большинство приборов, продаваемых в нашем магазине, гарантию предоставляет...</p>
+            <a href="{$wa_app_url}garantii/">
+                Подробнее...
+            </a>
+        </div>
+    </div>
+    
+</div>

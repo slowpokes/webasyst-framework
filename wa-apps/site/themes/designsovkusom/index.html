@@ -73,7 +73,6 @@
     </script>
 </head>
 <body id="top">
-
 <div class="preloader">
     <div class="status">&nbsp;</div>
 </div>
@@ -171,52 +170,7 @@
         <div class="sidebar-block-container subscrib">
             <div class="sidebar-block">
                 <h3>Подписка на рассылку</h3>
-
-                <form id="mailer-frontend-subscribe-form" action="http://new.1mmtt.ru/subscribe/subscribe/"
-                      method="post"
-                      target="mailer-frontend-subscribe-form-target">
-                    <label for="name">Имя</label>
-                    <span class="wa-value"><input type="text" id="name" name="name"></span>
-                    <label for="email">Email</label>
-                    <span class="wa-value"><input type="text" id="email" name="email"></span>
-
-                    <input type="hidden" name="charset" class="charset" value="">
-                    <input type="submit" class="rv-button orange-button" value="Подписаться">
-                    <i class="icon16 loading" style="display:none"></i>
-
-                    <div class="hidden block" style="display:none">
-                        <b>Благодарим вас за подписку.</b>
-                    </div>
-                </form>
-                <iframe name="mailer-frontend-subscribe-form-target" src="javascript:true"
-                        style="width:0;height:0;border:0px solid #fff;"></iframe>
-
-                <script>(function () {
-                        "use strict";
-                        $('#mailer-frontend-subscribe-form input.charset').val(document.charset || document.characterSet);
-                        $('#mailer-frontend-subscribe-form').submit(function () {
-                            var form = $(this);
-
-                            // Validate email
-                            var email_input = form.find('input[name="email"]');
-                            email_input.siblings('.errormsg').remove();
-                            if (!email_input.val()) {
-                                email_input.addClass('error').before('<span class="errormsg">Email - обязательное поле.</span>');
-                                return false;
-                            } else {
-                                email_input.removeClass('error');
-                            }
-
-                            // catch iframe load event when uploading finishes
-                            form.find('.loading').show();
-                            $('iframe[name="mailer-frontend-subscribe-form-target"]').load(function () {
-                                form.trigger('wa.submitted').children('.fields').hide().siblings('.hidden').show();
-                            });
-
-                            // allow form to submit via its target iframe
-                            return true;
-                        });
-                    })();</script>
+                {*$wa->mailer->form(1)*}
             </div>
         </div>
     </div>
