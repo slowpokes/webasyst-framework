@@ -108,18 +108,31 @@ class waContact implements ArrayAccess
     }
 
     /**
+     * Returns contact's photo URL @2x.
+     *
+     * @param int $size
+     * @return string
+     */
+    public function getPhoto2x($size)
+    {
+        return self::getPhotoUrl($this->id, $this->id ? $this->get('photo') : null, $size, $size, $this['is_company'] ? 'company' : 'person', true);
+    }
+
+    /**
      * Returns the photo URL of the specified contact.
      *
-     * @param $id Contact id
-     * @param $ts Contact photo id stored in contact's 'photo' property. If not specified, the URL of the default
+     * @param int $id Contact id
+     * @param int $ts Contact photo id stored in contact's 'photo' property. If not specified, the URL of the default
      *     userpic is returned.
      * @param int|string|null $width Image width. Arbitrary integer value, or string value 'original', which requires
      *     that method must return the URL of the original image originally uploaded from a user's computer. Defaults to 96.
      * @param int|string|null $height Image height (integer). If not specified, the integer value specified for the
      *     $width parameter is used.
+     * @param string $type
+     * @param bool $retina
      * @return string
      */
-    public static function getPhotoUrl($id, $ts, $width = null, $height = null, $type = 'person')
+    public static function getPhotoUrl($id, $ts, $width = null, $height = null, $type = 'person', $retina = null)
     {
         if ($width === 'original') {
             $size = 'original';
@@ -132,9 +145,16 @@ class waContact implements ArrayAccess
             $size = $width.'x'.$height;
         }
 
+        if ($retina === null) {
+            $retina = (wa()->getEnv() == 'backend');
+        }
+
         $dir = self::getPhotoDir($id, false);
         
         if ($ts) {
+            if ($size != 'original' && $retina) {
+                $size .= '@2x';
+            }
             if (waSystemConfig::systemOption('mod_rewrite')) {
                 return wa()->getDataUrl("photos/{$dir}{$ts}.{$size}.jpg", true, 'contacts');
             } else {
@@ -149,6 +169,9 @@ class waContact implements ArrayAccess
             if (!in_array($size, array(20, 32, 50, 96))) {
                 $size = 96;
             }
+            if ($retina) {
+                $size .= '@2x';
+            }
             if ($type == 'company') {
                 return wa()->getRootUrl().'wa-content/img/company'.$size.'.jpg';
             } else {
@@ -160,7 +183,7 @@ class waContact implements ArrayAccess
     public static function getPhotoDir($contact_id, $with_prefix = true)
     {
         $str = str_pad($contact_id, 4, '0', STR_PAD_LEFT);
-        $str = substr($str, -2).'/'.substr($str, -4, 2);
+        $str = substr($str, -2) . '/' . substr($str, -4, 2);
         $path = "{$str}/{$contact_id}/";
         if ($with_prefix) {
             return "photos/{$path}";
@@ -968,7 +991,7 @@ class waContact implements ArrayAccess
      *       with access rights elements' ids as array keys and 1 as their values.
      *     - false: array keys are incremented starting from 0, array item values containing the ids of access
      *       rights configuration elements of access rights multi-fields enabled for a user.
-     * @return int|bool
+     * @return int|bool|array
      */
     public function getRights($app_id, $name = null, $assoc = true)
     {
@@ -1197,6 +1220,62 @@ class waContact implements ArrayAccess
     public function getTime()
     {
         return waDateTime::format("datetime", null, $this->get('timezone'), $this->getLocale());
+    }
+    
+    public function getTopFields()
+    {
+        $top = array();
+        static $fields = null;
+        if ($fields === null) {
+            $fields = array(
+                waContactFields::getAll('person', true),
+                waContactFields::getAll('company', true),
+            );
+        }
+        
+        $country_model = new waCountryModel();
+        $iso3letters_map = $country_model->select('DISTINCT iso3letter')->fetchAll('iso3letter', true);
+        
+        foreach ($fields[intval($this['is_company'])] as $f) {
+            $info = $f->getInfo();
+            if ($f->getParameter('top') && ($value = $this->get($info['id'], 'top,html')) ) {
+                
+                if ($info['type'] == 'Address') {
+                    $data = $this->get($info['id']);
+                    $data_for_map = $this->get($info['id'], 'forMap');
+                    $value = (array) $value;
+                    foreach ($value as $k => &$v) {
+                        if (isset($data[$k]['data']['country']) && isset($iso3letters_map[$data[$k]['data']['country']])) {
+                            $v = '<img src="'.wa_url().'wa-content/img/country/'.strtolower($data[$k]['data']['country']).'.gif" /> ' . $v;
+                        }
+                        $map_url = '';
+                        if (is_string($data_for_map[$k])) {
+                            $map_url = $data_for_map[$k];
+                        } else {
+                            if (!empty($data_for_map[$k]['coords'])) {
+                                $map_url = $data_for_map[$k]['coords'];
+                            } else if (!empty($data_for_map[$k]['with_street'])) {
+                                $map_url = $data_for_map[$k]['with_street'];
+                            }
+                        }
+                        $v .= ' <a target="_blank" href="//maps.google.com/maps?q=' . urlencode($map_url) . '&z=15" class="small underline map-link">' . _w('map') . '</a>';
+                        $v = '<div data-subfield-index='.$k.'>'.$v.'</div>';
+                    }
+                    unset($v);
+                }
+                
+                $delimiter = ($info['type'] == 'Composite' || $info['type'] == 'Address') ? "<br>" : ", ";
+                
+                $top[] = array(
+                    'id' => $info['id'],
+                    'name' => $f->getName(),
+                    'value' => is_array($value) ? implode($delimiter, $value) : $value,
+                    'icon' => ($info['type'] == 'Email' || $info['type'] == 'Phone') ? strtolower($info['type']) : '',
+                    'pic' => ''
+                );
+            }
+        }
+        return $top;
     }
 }
 

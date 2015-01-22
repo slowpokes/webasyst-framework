@@ -288,11 +288,15 @@ HTML;
     public function css()
     {
         if (wa()->getEnv() == 'backend') {
-            $css = '<link href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.0.css?v'.$this->version(true).'" rel="stylesheet" type="text/css" >
+            $css = '<link href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.3.css?v'.$this->version(true).'" rel="stylesheet" type="text/css" >
 <!--[if IE 9]><link type="text/css" href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.0.ie9.css" rel="stylesheet"><![endif]-->
 <!--[if IE 8]><link type="text/css" href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.0.ie8.css" rel="stylesheet"><![endif]-->
 <!--[if IE 7]><link type="text/css" href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.0.ie7.css" rel="stylesheet"><![endif]-->
 <link type="text/css" rel="stylesheet" href="'.wa()->getRootUrl().'wa-content/font/ruble/arial/fontface.css">'."\n";
+            
+            if ( !waRequest::isMobile() )
+                $css .= '<meta name="viewport" content="width=device-width, initial-scale=1" />'."\n"; //for handling iPad and tablet computer default view properly
+            
         } else {
             $css = '';
         }
@@ -319,7 +323,7 @@ HTML;
                 $this->version = isset($app_info['version']) ? $app_info['version'] : '0.0.1';
                 if (SystemConfig::isDebug()) {
                     $this->version .= ".".time();
-                } elseif (!$app_id) {
+                } else {
                     $file = wa()->getAppPath('lib/config/build.php', $app_id);
                     if (file_exists($file)) {
                         $build = include($file);
@@ -680,7 +684,8 @@ HTML;
                         <a href="'.$this->getUrl('/forgotpassword').'">'._ws('Forgot password?').'</a>
                         &nbsp;
                         <a href="'.$this->getUrl('/signup').'">'._ws('Sign up').'</a>
-                </div>'.
+                    </div>
+                </div>'.(waRequest::param('secure') ? $this->csrf() : '').
             ($form ? '</form>' : '').'
         </div>';
     }
@@ -698,14 +703,11 @@ HTML;
         </div>
         <div class="wa-field">
             <div class="wa-value wa-submit">
-                <input type="submit" value="'._ws('Reset password').'" class="button" >
+                <input type="submit" value="'._ws('Reset password').'">
                 &nbsp;
                 <a href="'.$this->getUrl('/login').'">'._ws('I remember it now!').'</a>
             </div>
-        </div>
-        <div class="wa-field">
-            <a href="'.$this->getUrl('/login').'">'._ws('I remember it now!').'</a>
-        </div>
+        </div>'.(waRequest::param('secure') ? $this->csrf() : '').'
     </form>
 </div>';
 
@@ -732,7 +734,7 @@ HTML;
             <div class="wa-value wa-submit">
                 <input type="submit" value="'._ws('Save and log in').'">
             </div>
-        </div>
+        </div>'.(waRequest::param('secure') ? $this->csrf() : '').'
     </form>
 </div>';
     }
@@ -829,6 +831,9 @@ HTML;
         $html .= '<div class="wa-field"><div class="wa-value wa-submit">
             <input type="submit" class="button" value="'.$signup_submit_name.'"> '.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
         </div></div>';
+        if (waRequest::param('secure')) {
+            $html .= $this->csrf();
+        }
         $html .= '</form></div>';
         return $html;
     }
@@ -861,7 +866,8 @@ HTML;
             }
         }
         $params['namespace'] = 'data';
-        if ($f->isMulti()) {
+        $is_multi = $f->isMulti();
+        if ($is_multi) {
             $f->setParameter('multi', false);
         }
         $attrs = $error !== false ? 'class="wa-error"' : '';
@@ -880,10 +886,13 @@ HTML;
 			}
 			$html .= '</div></div>';
 		}
+        if ($is_multi) {
+            $f->setParameter('multi', $is_multi);
+        }
         return $html;
     }
 
-    public function authAdapters($return_array = false)
+    public function authAdapters($return_array = false, $options = array())
     {
         $adapters = wa()->getAuthAdapters();
         if ($return_array) {
@@ -903,12 +912,14 @@ HTML;
         $html .= '</ul><p>';
         $html .= _ws("Authorize either by entering your contact information, or through one of the websites listed above.");
         $html .= '</p></div>';
+        $w = isset($options['width']) ? $options['width'] : 600;
+        $h = isset($options['height']) ? $options['height'] : 500;
         $html .= <<<HTML
 <script type="text/javascript">
 $("div.wa-auth-adapters a").click(function () {
-    var left = (screen.width - 600) / 2;
-    var top = (screen.height - 400) / 2;
-    window.open($(this).attr('href'),'oauth', "width=600,height=400,left="+left+",top="+top+",status=no,toolbar=no,menubar=no");
+    var left = (screen.width - {$w}) / 2;
+    var top = (screen.height - {$h}) / 2;
+    window.open($(this).attr('href'),'oauth', "width={$w},height={$h},left="+left+",top="+top+",status=no,toolbar=no,menubar=no");
     return false;
 });
 </script>

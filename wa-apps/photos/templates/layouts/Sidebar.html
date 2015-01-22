@@ -7,6 +7,12 @@
         <a href="?module=upload" id="p-upload-link"><i class="icon16 upload"></i>[`Upload photos`]</a>
       </li>
       {/if}
+      <li id="sidebar-all-albums">
+        <span class="count" id="count">{if $top_level_albums_count > 0}{$top_level_albums_count}{/if}</span>
+        <a href="#/albums/">
+          <i class="icon16 apps"></i>[`Albums`]
+        </a>
+      </li>
       <li id="sidebar-all-photos">
         <span class="count" id="count">{if $count > 0}{$count}{/if}</span>
         <a href="#/">
@@ -19,6 +25,15 @@
           <i class="icon16 star"></i>[`Rated`]
         </a>
       </li>
+      {foreach $app_albums as $item}
+        <li>
+            <span class="count">{$item.count}</span>
+            <a href="#/app/{$item.id}">
+                <img class="p-app16x16icon-menu-v" src="{$item.icon}">
+                {$item.name}
+            </a>
+        </li>
+      {/foreach}      
       {* @event backend_sidebar.%plugin_id%.menu *}
       {foreach $backend_sidebar as $plugin_id => $item}
         {if !empty($item.menu)}
@@ -37,10 +52,11 @@
   <!-- collections -->
   <div class="block p-drop" id="album-list-container">
     {if $rights.upload}
-    <span class="count">
-      <a href="#" id="p-new-album" class="p-new-album"><i class="icon16 add" title="[`New album`]"></i></a>
-    </span>
+        <span class="count">
+          <a href="#" id="p-new-album" class="p-new-album"><i class="icon16 add" title="[`New album`]"></i></a>
+        </span>
     {/if}
+    <span class="count subtree never-recount" style="display:none;">{$albums_count}</span>
     <h5 class="heading collapse-handler" id="album-list-handler">
       <i class="icon16 darr"></i><a href="javascript:void(0);">[`Albums`]</a>
     </h5>
@@ -52,10 +68,10 @@
     </div>
   </div>
   <div class="block" {if !isset($cloud) || empty($cloud)}style="display:none;"{/if} id="tag-cloud-block">
-    <h5 class="heading">
+    <h5 class="heading collapse-handler">
       <i class="icon16 darr"></i>[`Tags`]
     </h5>
-    <div class="block tags p-plugin-tag-cloud" id="tag-cloud"></div>
+    <div class="block tags p-plugin-tag-cloud collapsible-content" id="tag-cloud"></div>
   </div>
 
   {* @event backend_sidebar.%plugin_id%.section *}
@@ -63,7 +79,7 @@
     <div class="block" id="sidebar-section-{$plugin_id}">{$item.section}</div>
   {/if}{/foreach}
 
-  {if $wa->user()->getRights($wa->app(), 'pages') || 
+  {if $wa->user()->getRights($wa->app(), 'pages') ||
     $wa->user()->getRights($wa->app(), 'design') ||
     $wa->user()->isAdmin('photos')}
     <div class="hr"></div>
@@ -84,15 +100,15 @@
       </ul>
     </div>
   {/if}
-      
+
   <br><br><br>
-  
-  <!-- sidebar width control -->    
+
+  <!-- sidebar width control -->
   <div id="p-sidebar-width-control" class="block p-sidebar-width-control">
     <a href="#" class="arrow left">&larr;</a>
     <a href="#" class="arrow right">&rarr;</a>
   </div>
-      
+
 </div>
 {capture name="template-album-list-item"}{literal}
   <li class="drag-newposition new-item"></li>

@@ -372,6 +372,20 @@ class waContactForm
                 continue;
             }
 
+            if ($fid === 'photo') {
+                $fake_user = new waContact();
+                $result .= '<div class="' . $class_field . ' ' . ($class_field.'-'.$f->getId()) . '"><div class="' . $class_name . '">' .
+                    _ws('Photo') . '</div><div class="' . $class_value . '">';
+                if (wa()->getUser()->get($fid)) {
+                    $result .= "\n" . '<img src="' . wa()->getUser()->getPhoto() . '">';
+                }
+                $result .= "\n" . '<img src="' . $fake_user->getPhoto() . '">';
+                $result .= "\n" . '<p><input type="file" name="' . $fid . '_file"></p>';
+                $result .= $this->html($fid, true);
+                $result .= "\n</div></div>";
+                continue;
+            }
+
             if ($f instanceof waContactHiddenField) {
                 $result .= $this->html($fid, true);
                 continue;
@@ -399,6 +413,7 @@ class waContactForm
             $result .= "\n</div></div>";
             //VADIM CODE END
         }
+        $result .= '<input type="hidden" name="_csrf" value="'.waRequest::cookie('_csrf', '').'" />';
         return $result;
     }
 

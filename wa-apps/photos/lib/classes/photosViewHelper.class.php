@@ -69,7 +69,7 @@ class photosViewHelper extends waAppViewHelper
             $a['name'] = htmlspecialchars($a['name']);
         }
         unset($a);
-        
+
         if ($custom_params) {
             $album_params_model = new photosAlbumParamsModel();
             $params = $album_params_model->get(array_keys($albums));
@@ -82,7 +82,7 @@ class photosViewHelper extends waAppViewHelper
             }
             unset($a);
         }
-        
+
         if ($return_html) {
             $tree = new photosViewTree($albums);
             return $tree->display('frontend');
@@ -126,17 +126,42 @@ class photosViewHelper extends waAppViewHelper
      * @param array $attributes user-attribure, e.g. class or style
      * @return string
      */
-    public function getImgHtml($photo, $size, $attributes = array())
+    public function getImgHtml($photo, $size, $attributes = array(), $style = true)
     {
         $attributes['data-size'] = $size;
         $attributes['data-photo-id'] = $photo['id'];
         $attributes['class'] = !empty($attributes['class']) ? $attributes['class'] : '';
         $attributes['class'] .= ' photo_img';    // !Important: obligatory class. Need in frontend JS
-        return photosPhoto::getEmbedImgHtml($photo, $size, $attributes);
+        return photosPhoto::getEmbedImgHtml($photo, $size, $attributes, $style);
     }
-    
+
     public function ratingHtml($rating, $size = 10, $show_when_zero = false)
     {
         return photosPhoto::getRatingHtml($rating, $size, $show_when_zero);
     }
+
+    public function childAlbums($parent_album_id=0)
+    {
+        $album_model = new photosAlbumModel();
+        $child_albums = $album_model->getChildren($parent_album_id);
+
+        foreach($child_albums as $i => &$ca) {
+            if (!$ca['status']) {
+                unset($child_albums[$i]);
+                continue;
+            }
+            $ca['full_url'] = photosFrontendAlbum::getLink($ca);
+        }
+        unset($ca);
+
+        $album_model->keyPhotos($child_albums);
+
+        foreach($child_albums as &$ca) {
+            $ca = photosFrontendAlbum::escapeFields($ca);
+        }
+        unset($ca);
+
+        return $child_albums;
+    }
 }
+

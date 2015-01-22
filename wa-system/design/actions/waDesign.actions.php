@@ -403,7 +403,7 @@ HTACCESS;
             );
             return false;
         }
-        if (!preg_match("/^[a-z0-9_\.-]+$/", $file)) {
+        if (!preg_match("/^[a-z0-9_\.-]+$/i", $file)) {
             $errors = array(
             _ws('Only latin characters (a—z, A—Z), numbers (0—9) and underline character (_) are allowed.'),
                 'input[name=file]'
@@ -767,6 +767,18 @@ HTACCESS;
             $duplicate = $theme->duplicate();
             $this->logAction('theme_duplicate', $theme->id);
             $this->displayJson(array('redirect'=>"{$this->design_url}theme={$duplicate->id}&action=theme"));
+        } catch (Exception $e) {
+            $this->displayJson(array(), $e->getMessage());
+        }
+    }
+
+    public function revertFileAction()
+    {
+        try {
+            $theme = new waTheme(waRequest::post('theme'));
+            $file = waRequest::post('file');
+            $theme->revertFile($file);
+            $this->displayJson(array());
         } catch (waException $e) {
             $this->displayJson(array(), $e->getMessage());
         }

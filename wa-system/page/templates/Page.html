@@ -1,19 +1,19 @@
 {if $ibutton}
-<link href="{$wa_url}wa-content/js/jquery-plugins/ibutton/jquery.ibutton.min.css" rel="stylesheet" type="text/css" >
-<script src="{$wa_url}wa-content/js/jquery-plugins/ibutton/jquery.ibutton.min.js"></script>
+<link href="{$wa_url}wa-content/js/jquery-plugins/ibutton/jquery.ibutton.min.css?v{$wa->version(true)}" rel="stylesheet" type="text/css" >
+<script src="{$wa_url}wa-content/js/jquery-plugins/ibutton/jquery.ibutton.min.js?v{$wa->version(true)}"></script>
 {/if}
 
-<link type="text/css" rel="stylesheet" href="{$wa_url}wa-content/js/redactor/redactor.css">
-<script src="{$wa_url}wa-content/js/redactor/redactor.min.js"></script>
-{if $lang!='en'}<script src="{$wa_url}wa-content/js/redactor/{$lang}.js"></script>{/if}
+<link type="text/css" rel="stylesheet" href="{$wa_url}wa-content/js/redactor/redactor.css?v{$wa->version(true)}">
+<script src="{$wa_url}wa-content/js/redactor/redactor.min.js?v{$wa->version(true)}"></script>
+{if $lang!='en'}<script src="{$wa_url}wa-content/js/redactor/{$lang}.js?v{$wa->version(true)}"></script>{/if}
 
 {if $options.js.ace}
-<script src="{$wa_url}wa-content/js/ace/ace.js"></script>
+<script src="{$wa_url}wa-content/js/ace/ace.js?v{$wa->version(true)}"></script>
 {/if}
 
 {if $options.js.storage}
-    <script src="{$wa_url}wa-content/js/jquery-plugins/jquery.json.js?v{$wa->version()}"></script>
-    <script src="{$wa_url}wa-content/js/jquery-plugins/jquery.store.js?v{$wa->version()}"></script>
+    <script src="{$wa_url}wa-content/js/jquery-plugins/jquery.json.js?v{$wa->version(true)}"></script>
+    <script src="{$wa_url}wa-content/js/jquery-plugins/jquery.store.js?v{$wa->version(true)}"></script>
     <script>
     if (!$.storage) {
         $.storage = new $.store();
@@ -28,7 +28,7 @@
 <script src="{$wa_url}wa-content/js/jquery-wa/editor.js?v{$wa->version()}"></script>
 {/if}
 
-<style>
+<style type="text/css">
     .wa-pages { margin-bottom: 80px; }
     .wa-pages h4.heading { word-wrap: break-word; word-break: break-all; position: relative; margin-right: 15px; }
     .wa-pages h4.heading span.count { position: absolute; right: -15px; }
@@ -65,7 +65,7 @@
     .wa-dropdown .wa-dropdown-content .field.subfield .name { margin-left: 20px; }
     .wa-dropdown .wa-dropdown-content .field.subfield .name .inline-link b i { font-weight: normal; font-size: 0.9em; }
     .wa-dropdown .wa-drop-link { position: relative; padding: 6px 0 0 ; display: block;}
-    .wa-dropdown .wa-dropdown-block { display: none; position: absolute; bottom:1.4em; right:0; background: #F3F3F3; border: 2px solid #AAAAAA; box-shadow: 0 2px 10px #777; -webkit-box-shadow: 0 2px 10px #777; -moz-box-shadow: 0 2px 10px #777; -o-box-shadow: 0 2px 10px #777; z-index: 100;}
+    .wa-dropdown .wa-dropdown-block { display: none; position: absolute; bottom:1.4em; right:0; background: #F3F3F3; border: 2px solid #AAAAAA; box-shadow: 0 2px 10px #777; -webkit-box-shadow: 0 2px 10px #777; -moz-box-shadow: 0 2px 10px #777; -o-box-shadow: 0 2px 10px #777; z-index: 1054; }
     .wa-dropdown ul.tabs { height: 45px; padding-top: 6px; }
     .wa-dropdown ul.tabs li.selected a { background: #fff;}
     .wa-dropdown ul.tabs li.no-tab { min-width: 70px;}

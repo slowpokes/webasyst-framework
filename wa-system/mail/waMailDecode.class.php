@@ -56,6 +56,30 @@ class waMailDecode
         $this->options = $options + $this->options;
     }
 
+    /** Parse a decoded email header into list of arrays [name => ..., email => ..., full => ...] */
+    public static function parseAddress($header)
+    {
+        $v = $header;
+        try {
+            $parser = new waMailAddressParser($v);
+            $v = $parser->parse();
+        } catch (Exception $e) {
+            if (preg_match('~<([^>]+)>~', $v, $m)) {
+                $email = $m[1];
+            } else if (preg_match('~(\S+\@\S+)~', $v, $m)) {
+                $email = $m[1];
+            } else {
+                $email = explode(' ', $v);
+                $email = $email[0];
+            }
+
+            $name = trim(preg_replace('~<?'.preg_quote($email, '~').'>?~', '', $v));
+            $v = array(array('name' => $name, 'email' => $email));
+        }
+        $v[0]['full'] = $header;
+        return $v;
+    }
+
     public function decode($file, $full_response = false)
     {
         if (is_resource($file)) {
@@ -113,19 +137,11 @@ class waMailDecode
                 $v = preg_replace("/[^a-z0-9:,\.\s\t\+-]/i", '', $v);
                 $v = date("Y-m-d H:i:s", strtotime($v));
             } elseif ($h == 'to' || $h == 'cc') {
-                $parser = new waMailAddressParser($v);
-                $v = $parser->parse();
-            } elseif ($h == 'from') {
-                if ($v) {
-                    try {
-                        $parser = new waMailAddressParser($v);
-                        $v = $parser->parse();
-                        if (isset($v[0])) {
-                            $v = $v[0];
-                        }
-                    } catch (Exception $e) {
-                        $v = array('name' => $v, 'email' => '');
-                    }
+                $v = self::parseAddress($v);
+            } elseif ($h == 'from' || $h == 'reply-to') {
+                $v = self::parseAddress($v);
+                if (isset($v[0])) {
+                    $v = $v[0];
                 }
             }
         }

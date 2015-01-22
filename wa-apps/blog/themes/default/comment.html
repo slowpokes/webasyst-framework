@@ -13,6 +13,10 @@
             <span class="staff">{$wa->accountName()}</span>
         {/if}
 
+        {if $comment.user.id}
+            <span class="staff">{$wa->accountName()}</span>
+        {/if}
+
         {* @event prepare_comments_frontend.%plugin_id%.authorname_suffix *}
         {if !empty($comment.plugins.authorname_suffix)}
             {foreach $comment.plugins.authorname_suffix as $plugin => $output}{$output}{/foreach}

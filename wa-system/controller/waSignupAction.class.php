@@ -15,7 +15,7 @@ class waSignupAction extends waViewAction
         }
         // check auth app and url
         $signup_url = wa()->getRouteUrl((isset($auth['app']) ? $auth['app'] : '').'/signup');
-        if (wa()->getConfig()->getRequestUrl(false, true) != $signup_url) {
+        if (urldecode(wa()->getConfig()->getRequestUrl(false, true)) != $signup_url) {
             $this->redirect($signup_url);
         }
         $errors = array();
@@ -151,6 +151,11 @@ class waSignupAction extends waViewAction
             if (!empty($data['email'])) {
                 $this->send($contact);
             }
+            /**
+             * @event signup
+             * @param waContact $contact
+             */
+            wa()->event('signup', $contact);
             // after sign up callback
             $this->afterSignup($contact);
 
@@ -222,7 +227,7 @@ class waSignupAction extends waViewAction
     {
         $config = wa()->getAuthConfig();
 
-        $confirmation_hash = hash('md5', time().'rfb2:zfbdbawrsddswr4$h5t3/.`w'.mt_rand().mt_rand().mt_rand());
+        $confirmation_hash = md5(time().'rfb2:zfbdbawrsddswr4$h5t3/.`w'.mt_rand().mt_rand().mt_rand());
         $contact->setSettings(wa()->getApp(), "email_confirmation_hash", $confirmation_hash);
         $ce = new waContactEmailsModel();
         $unconfirmed_email = $ce->getByField(array(
