@@ -1,45 +1,54 @@
 {* post list: default view mode *}
 
 {foreach $posts as $post}
-    <div class="post" id="post-{$post.id}" {if $wa->param('blog_url')}itemprop="blogPosts" {/if}itemscope itemtype="http://schema.org/BlogPosting">
-        <h2>
-            <a href="{$post.link}" itemprop="url">{$post.title}</a>
+    <div class="post" id="post-{$post.id}" {if $wa->param('blog_url')}itemprop="blogPosts" {/if}itemscope
+         itemtype="http://schema.org/BlogPosting">
+        <div class="news_date_wrap">
+            <div class="news_date">
 
-            {* @event prepare_posts_frontend.%plugin_id%.post_title *}
-            {if !empty($post.plugins.post_title)}
-                {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
+                <span class="news_date_d">{waDateTime::date('j', $post.datetime)}</span>
+                <span class="news_date_m">{waDateTime::date('f', $post.datetime)}</span>
+
+            </div>
+        </div>
+        <div class="new_content_wrap">
+            <div class="news_title">
+                <div class="news_title_wrap">
+                    <h2>
+                        <a href="{$post.link}" itemprop="url">{$post.title}</a>
+
+                        {* @event prepare_posts_frontend.%plugin_id%.post_title *}
+                        {if !empty($post.plugins.post_title)}
+                            {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
+                        {/if}
+
+                    </h2>
+                </div>
+            </div>
+
+            {* @event prepare_posts_frontend.%plugin_id%.before *}
+            {if !empty($post.plugins.before)}
+                <div class="text_before">
+                    {foreach $post.plugins.before as $plugin => $output}{$output}{/foreach}
+                </div>
             {/if}
 
-        </h2>
-        <div class="credentials">
-
-            <span class="hint date">{$post.datetime|wa_datetime:"humandate"}</span>
-
-        </div>
-
-        {* @event prepare_posts_frontend.%plugin_id%.before *}
-        {if !empty($post.plugins.before)}
-            <div class="text_before">
-                {foreach $post.plugins.before as $plugin => $output}{$output}{/foreach}
+            <div class="text news_body">
+                {$post.text|truncate:300}
+                {if $post.cutted}
+                    <a href="{$post.link}">{$post.cut_link_label|default:'[`Continue reading →`]'}</a>
+                {/if}
             </div>
-        {/if}
 
-        <div class="text">
-            {$post.text}
-            {if $post.cutted}
-                <a href="{$post.link}">{$post.cut_link_label|default:'[`Continue reading →`]'}</a>
+            {* @event prepare_posts_frontend.%plugin_id%.after *}
+            {if !empty($post.plugins.after)}
+                <div class="text_after">
+                    {foreach $post.plugins.after as $plugin => $output}{$output}{/foreach}
+                </div>
             {/if}
         </div>
-
-        {* @event prepare_posts_frontend.%plugin_id%.after *}
-        {if !empty($post.plugins.after)}
-            <div class="text_after">
-                {foreach $post.plugins.after as $plugin => $output}{$output}{/foreach}
-            </div>
-        {/if}
-
     </div>
-{foreachelse}
+    {foreachelse}
     {if $page lt 2}
         {_w('%d post','%d posts',0)}
     {/if}

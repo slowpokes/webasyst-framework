@@ -15,7 +15,7 @@
         {include file="stream_posts.html" inline}
     {/if}
 
-    {if $is_lazyloading or ($page eq 1)}
+    {*if $is_lazyloading or ($page eq 1)}
         <div class="pageless-wrapper"{if !$is_lazyloading} style="display:none;"{/if}>
 
             {if $page lt $pages}
@@ -29,7 +29,7 @@
             {/if}
 
         </div>
-    {/if}
+    {/if*}
 
     {if !$is_lazyloading}
 </div>
