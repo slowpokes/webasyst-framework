@@ -95,53 +95,6 @@ class waContactNameField extends waContactStringField
         return $name;
     }
 
-    public function prepareSave($value, waContact $contact = null) {
-
-        if (!$contact) {
-            return $value;
-        }
-        if ($contact['is_company']) {
-            $name = $contact['company'];
-        } else {
-            $fst = trim($contact['firstname']);
-            $mdl = trim($contact['middlename']);
-            $lst = trim($contact['lastname']);
-            $cmp = trim($contact['company']);
-            $eml = trim($contact->get('email', 'default'));
-
-            $name = array();
-            if ($fst || $fst === '0' || $mdl || $mdl === '0' || $lst || $lst === '0')
-            {
-                $name[] = $lst;
-                $name[] = $fst;
-                $name[] = $mdl;
-            }
-            else if ($cmp || $cmp === '0')
-            {
-                $name[] = $cmp;
-            }
-            else if ($eml)
-            {
-                $pos = strpos($eml, '@');
-                if ($pos == false) {
-                    $name[] = $eml;
-                } else {
-                    $name[] = substr($eml, 0, $pos);
-                }
-            }
-            foreach ($name as $i => $n) {
-                if (!$n && $n !== '0') {
-                    unset($name[$i]);
-                }
-            }
-            $name = trim(implode(' ', $name));
-        }
-        if (!$name && $name !== '0') {
-            $name = $contact->getId() ? $contact->getId() : '';
-        }
-        return $name;
-    }
-
     public function set(waContact $contact, $value, $params = array(), $add = false)
     {
         $value = trim($value);
