@@ -161,6 +161,10 @@ class waContactNameField extends waContactStringField
             }
             $name = strtok($email, '@');
         }
+
+        if (!$name && !empty($contact['name'])) {
+            $name = $contact['name'];
+        }
         return $name;
-    }    
+    }
 }

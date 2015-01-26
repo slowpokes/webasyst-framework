@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE theme PUBLIC "wa-app-theme" "http://www.webasyst.com/wa-content/xml/wa-app-theme.dtd">
+<<<<<<< HEAD
 <theme id="default" system="0" vendor="webasyst" author="Webasyst" app="site" version="2.1.0">
+=======
+<theme id="default" system="0" vendor="webasyst" author="Webasyst" app="site" version="2.2.0">
+>>>>>>> upstream/master
     <name locale="en_US">Default 2.0</name>
     <name locale="ru_RU">Дефолт 2.0</name>
     <description locale="en_US">Adaptive design theme for all base Webasyst apps</description>
@@ -24,6 +28,13 @@
     		<description locale="en_US">App specific header content</description>
     		<description locale="ru_RU">Содержимое «шапки» приложения</description>
     	</file>
+<<<<<<< HEAD
+=======
+    	<file path="banner.html" custom="0">
+    		<description locale="en_US">App specific banner content</description>
+    		<description locale="ru_RU">Контент в области баннера</description>
+    	</file>
+>>>>>>> upstream/master
     	<file path="main.html" custom="0">
     		<description locale="en_US">Main layout for Site app content</description>
     		<description locale="ru_RU">Основной вывод приложения «Сайт»</description>
@@ -81,8 +92,13 @@
             <name locale="ru_RU">Логотип</name>
         </setting>
         <setting var="banner_caption" control_type="text">
+<<<<<<< HEAD
             <value locale="en_US">Best site ever</value>
             <value locale="ru_RU">Самый крутой сайт!</value>
+=======
+            <value locale="en_US"></value>
+            <value locale="ru_RU"></value>
+>>>>>>> upstream/master
             <name locale="en_US">Site-wide banner caption</name>
             <name locale="ru_RU">Заголовок на основном баннере</name>
         </setting>
@@ -115,6 +131,10 @@
                 <option value="img/backgrounds/themesettings/abstract_vivid.jpg"></option>
                 <option value="img/backgrounds/themesettings/abstract_brown.jpg"></option>
                 <option value="img/backgrounds/themesettings/abstract_orange.jpg"></option>
+<<<<<<< HEAD
+=======
+                <option value="img/backgrounds/themesettings/special_winter.jpg"></option>
+>>>>>>> upstream/master
             </options>
         </setting>
         <setting var="custom_background" control_type="image">
@@ -136,6 +156,7 @@
                 <option value="">
                     <name locale="ru_RU">Светлый</name>
                     <name locale="en_US">Light</name>
+<<<<<<< HEAD
                 </option>
                 <option value="text_scheme_dark">
                     <name locale="ru_RU">Темный</name>
@@ -149,6 +170,21 @@
                     <name locale="ru_RU">Зеленый</name>
                     <name locale="en_US">Green</name>
                 </option>
+=======
+                </option>
+                <option value="text_scheme_dark">
+                    <name locale="ru_RU">Темный</name>
+                    <name locale="en_US">Dark</name>
+                </option>
+                <option value="text_scheme_red">
+                    <name locale="ru_RU">Красный</name>
+                    <name locale="en_US">Red</name>
+                </option>
+                <option value="text_scheme_green">
+                    <name locale="ru_RU">Зеленый</name>
+                    <name locale="en_US">Green</name>
+                </option>
+>>>>>>> upstream/master
                 <option value="text_scheme_blue">
                     <name locale="ru_RU">Синий</name>
                     <name locale="en_US">Blue</name>

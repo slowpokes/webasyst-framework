@@ -12,7 +12,7 @@ msgstr ""
 "%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.6.9\n"
+"X-Generator: Poedit 1.6.10\n"
 "Language: ru_RU\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: .\n"
@@ -347,10 +347,6 @@ msgstr[2] "%d комментариев"
 msgid "Editing post %s"
 msgstr "Редактирование записи «%s»"
 
-#: /wa-apps/blog/templates/actions/backend/Backend.html:29
-msgid "Blog settings"
-msgstr "Настройки блога"
-
 #: /wa-apps/blog/templates/actions/backend/Backend.html:36
 msgid "Select posts"
 msgstr "Выбрать записи"
@@ -494,8 +490,8 @@ msgid "Frontend settings"
 msgstr "Настройки общедоступной части"
 
 #: /wa-apps/blog/templates/actions/settings/Settings.html:63
-msgid "Homepage &lt;title&gt;"
-msgstr "Заголовок главной страницы &lt;title&gt;"
+msgid "Homepage <title>"
+msgstr "Заголовок главной страницы <title>"
 
 #: /wa-apps/blog/templates/actions/settings/Settings.html:72
 msgid "Title format"
@@ -1274,6 +1270,12 @@ msgstr[0] "через %d день"
 msgstr[1] "через %d дня"
 msgstr[2] "через %d дней"
 
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "минуту"
+msgstr[1] "минуты"
+msgstr[2] "минут"
+
 #: /wa-apps/blog/lib/cli/blogReminder.cli.php:71
 msgid ""
 "You have following posts scheduled for publication in the <strong>%s</"
@@ -1281,6 +1283,9 @@ msgid ""
 msgstr ""
 "У вас есть записи, запланированные к публикации в блоге «<strong>%s</"
 "strong>»:"
+
+msgid "right now"
+msgstr "прямо сейчас"
 
 #: /wa-apps/blog/lib/cli/blogReminder.cli.php:80
 msgid "today"
@@ -1451,3 +1456,147 @@ msgstr ""
 #: /wa-apps/blog/lib/config/site.php:124
 msgid "0 for published, 1 for deleted"
 msgstr "0 для опубликованных, 1 для удаленных"
+
+msgid "Upload"
+msgstr "Загрузить"
+
+msgid "Select"
+msgstr "Выбрать"
+
+msgid "Insert"
+msgstr "Вставить"
+
+msgid ""
+"This blog is not visible on your sites now, because there were no routing "
+"rules added for Blog app with this particular blog. To make this blog "
+"visible on your site, create a route using the form below or using <a href="
+"\"%s\">Site app</a> routing settings."
+msgstr ""
+"Этот блог не виден на сайте, потому что для него не заданы правила "
+"маршрутизации. Чтобы опубликовать блог на сайте, добавьте правило "
+"маршрутизации с помощью формы ниже или в разделе «<a href=\"%s\">Структура</"
+"a>» в приложении «Сайт»."
+
+msgid "Specify the public URL for this new blog on your site:"
+msgstr "Введите адрес для этого блога на сайте:"
+
+msgid "Do not publish this blog on the site just yet"
+msgstr "Пока не публиковать этот блог на сайте"
+
+#: /wa-apps/blog/templates/actions/backend/Backend.html:86
+msgid "Blog settings"
+msgstr "Настройки блога"
+
+#: /wa-apps/blog/templates/actions/backend/Backend.html:232
+#: /wa-apps/blog/templates/actions/post/Post.html:144
+msgid "Photo album"
+msgstr "Фотоальбом"
+
+#: /wa-apps/blog/templates/actions/backend/Backend.html:279
+msgid "Start by <a href=\"%s\">writing your first post</a>."
+msgstr "Начните с <a href=\"%s\">создания записи</a>."
+
+#: /wa-apps/blog/templates/actions/backend/Backend.html:281
+msgid ""
+"Start by <a href=\"%s\">writing a post</a> or <a href=\"%s\">importing "
+"posts</a><br> from your existing blog."
+msgstr ""
+"Начните с <a href=\"%s\">создания записи</a> или с <a href=\"%s\">импорта "
+"записей</a><br> из вашего существующего блога."
+
+#: /wa-apps/blog/templates/actions/blog/BlogSettings.html:209
+msgid "Or enter image URL (image will be scaled to 16x16px)"
+msgstr ""
+"Или введите адрес изображения (изображение будет автоматически уменьшено до "
+"16х16 пикселей)"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:9
+msgid "Live preview is not available for private and not published blogs."
+msgstr "Предпросмотр недоступен для закрытых и неопубликованных блогов."
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:155
+msgid "Mirror mode"
+msgstr "Режим параллельного редактирования"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:282
+msgid "Visual"
+msgstr "Визуальный редактор"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:306
+msgid "Photo Album"
+msgstr "Фотоальбом"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:319
+msgid "Attach photo album"
+msgstr "Прикрепить фотоальбом"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:329
+msgid "(no name)"
+msgstr "(без названия)"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:329
+msgid "private album"
+msgstr "закрытый альбом"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:337
+msgid ""
+"Photos from the selected album will be automatically embedded after the post "
+"content. Photos descriptions and sort order will be defined by Photos app."
+msgstr ""
+"Фотографии из выбранного альбома будут автоматически добавлены после "
+"содержимого записи. Описания и порядок сортировки фотографий определяется "
+"приложением «Фото»."
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:341
+msgid "Post URL"
+msgstr "Адрес записи"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:346
+msgid "Replace with the direct link to this album"
+msgstr "Заменить прямой ссылкой на фотоальбом"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:348
+msgid ""
+"Great for photo galleries. Blog post will be published in the blog on a "
+"regular basis (in both post stream and RSS), but the main post title link "
+"will lead to the album page directly (Photos app)."
+msgstr ""
+"Содержимое записи будет опубликовано в общей ленте и в RSS как обычно, "
+"однако основная ссылка на запись будет заменена прямой ссылкой на выбранный "
+"фотоальбом в фотогалерее (в поселении приложения «Фото»)."
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:475
+#: /wa-apps/blog/js/postEdit.js:1355
+msgid "Select from Photos app"
+msgstr "Выбрать из «Фото»"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:477
+msgid "Total photos selected:"
+msgstr "Выбрано фотографий:"
+
+#: /wa-apps/blog/templates/actions/settings/Settings.html:186
+msgid "Photo storage"
+msgstr "Хранилище фотографий"
+
+#: /wa-apps/blog/templates/actions/settings/Settings.html:192
+#: /wa-apps/blog/templates/actions/settings/Settings.html:207
+msgid "Folder"
+msgstr "Папка"
+
+#: /wa-apps/blog/templates/actions/settings/Settings.html:199
+#: /wa-apps/blog/templates/actions/settings/Settings.html:214
+msgid "Photos app"
+msgstr "Приложение «Фото»"
+
+#: /wa-apps/blog/lib/actions/backend/blogBackendUpload.controller.php:92
+msgid "Save error"
+msgstr "Ошибка сохранения"
+
+#: /wa-apps/blog/lib/actions/backend/blogBackendUpload.controller.php:45
+msgid "No files to upload!"
+msgstr "Не выбран ни один файл для загрузки!"
+
+#: /wa-apps/blog/templates/actions/post/PostEdit.html:478
+#: /wa-apps/blog/js/postEdit.js:989
+msgid "Photos from the attached album will be displayed here."
+msgstr "Здесь будут показаны фотографии из прикрепленного фотоальбома."

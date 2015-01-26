@@ -40,7 +40,7 @@ class waDateTime
         }
     }
 
-    protected static function getAllTimeZones()
+    public static function getAllTimeZones()
     {
         $file = dirname(__FILE__)."/data/timezones.php";
         if (file_exists($file)) {
@@ -52,45 +52,49 @@ class waDateTime
         foreach ($data as $time_zone_id) {
             $t = explode('/', $time_zone_id, 2);
             $date_time = new DateTime('now');
-            $date_time->setTimezone(new DateTimeZone($time_zone_id));
+            $tz = new DateTimeZone($time_zone_id);
+            $date_time->setTimezone($tz);
             $offset = (float)$date_time->getOffset()/3600;
+            $group = count($tz->getTransitions(strtotime('-1 year'), time()));
             if (isset($t[1])) {
-                $time_zones[$offset][$t[0]][] = $t[1];
+                $time_zones[$offset][$group][$t[0]][] = $t[1];
             } else {
-                $time_zones[$offset][''][] = $t[0];
+                $time_zones[$offset][$group][''][] = $t[0];
             }
         }
 
         ksort($time_zones);
 
         $result = array();
-        foreach ($time_zones as $offset => $offset_zones) {
-            if ($offset >= 10) {
-                $offset = '+'.$offset;
-            } elseif ($offset >= 0 && $offset < 10) {
-                $offset = '+0'.$offset;
-            } elseif ($offset < 0 && $offset > -10) {
-                $offset = '−0'.abs($offset);
-            } elseif ($offset <= -10) {
-                $offset = '−'.abs($offset);
-            }
-            foreach ($offset_zones as $continent => $zones) {
-                if (count($zones) <= 5) {
-                    $result[($continent ? $continent."/" : '').$zones[0]] = array($offset, $zones);
-                } else {
-                    $i = 0;
-                    $n = count($zones);
-                    while ($i < $n) {
-                        $tmp = array();
-                        for ($j = 0; $j < 5 && $i + $j < $n; $j++) {
-                            $z = $zones[$i + $j];
-                            if (($k = strpos($z, '/')) !== false) {
-                                $z = substr($z, $k + 1);
+        foreach ($time_zones as $offset => $group_offset_zones) {
+            foreach ($group_offset_zones as $group => $offset_zones) {
+                if ($offset >= 10) {
+                    $str_offset = '+' . $offset;
+                } elseif ($offset >= 0 && $offset < 10) {
+                    $str_offset = '+0' . $offset;
+                } elseif ($offset < 0 && $offset > -10) {
+                    $str_offset = '−0' . abs($offset);
+                } elseif ($offset <= -10) {
+                    $str_offset = '−' . abs($offset);
+                }
+                foreach ($offset_zones as $continent => $zones) {
+                    if (count($zones) <= 5) {
+                        $result[($continent ? $continent . "/" : '') . $zones[0]] = array($str_offset, $zones);
+                    } else {
+                        $i = 0;
+                        $n = count($zones);
+                        while ($i < $n) {
+                            $tmp = array();
+                            for ($j = 0; $j < 5 && $i + $j < $n; $j++) {
+                                $z = $zones[$i + $j];
+                                if (($k = strpos($z, '/')) !== false) {
+                                    $z = substr($z, $k + 1);
+                                }
+                                $tmp[] = $z;
                             }
-                            $tmp[] = $z;
+                            $result[$continent . "/" . $zones[$i]] = array($str_offset, $tmp);
+                            $i += 5;
                         }
-                        $result[$continent."/".$zones[$i]] = array($offset, $tmp);
-                        $i += 5;
                     }
                 }
             }
@@ -139,18 +143,20 @@ class waDateTime
         // hack to insert localized month name
         if (strpos($format, 'F') !== false) {
             $month = $date_time->format('F');
+
+            $old_locale = waLocale::getLocale();
+            if ($locale && $locale != $old_locale) {
+                wa()->setLocale($locale);
+            }
             $local = _ws($month, $month, 2);
             $result = str_replace(
-            array(
-                    "@$month@",
-            $month
-            ),
-            array(
-            mb_strtolower($local),
-            $local
-            ),
-            $result
+                array("@$month@", $month),
+                array(mb_strtolower($local), $local),
+                $result
             );
+            if ($locale && $locale != $old_locale) {
+                wa()->setLocale($old_locale);
+            }
         }
         return $result;
     }
@@ -263,7 +269,7 @@ class waDateTime
             $locale = waSystem::getInstance()->getLocale();
         }
         $locale = waLocale::getInfo($locale);
-        $date_formats = $locale['date_formats'];
+        $date_formats = isset($locale['date_formats']) ? $locale['date_formats'] : array();
 
         $default = array(
             'humandate' => 'd f Y',
@@ -274,9 +280,6 @@ class waDateTime
             'fulldatetime' => 'Y-m-d H:i:s',
             'timestamp' => 'U',
         );
-
-
-
 
         if (isset($date_formats[$format])) {
             return $date_formats[$format];

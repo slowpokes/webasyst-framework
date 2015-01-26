@@ -403,7 +403,7 @@ HTACCESS;
             );
             return false;
         }
-        if (!preg_match("/^[a-z0-9_\.-]+$/", $file)) {
+        if (!preg_match("/^[a-z0-9_\.-]+$/i", $file)) {
             $errors = array(
             _ws('Only latin characters (a—z, A—Z), numbers (0—9) and underline character (_) are allowed.'),
                 'input[name=file]'
