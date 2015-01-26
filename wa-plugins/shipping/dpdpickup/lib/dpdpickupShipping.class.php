@@ -1,6 +1,6 @@
 <?php
 
-class hermespickupShipping extends waShipping
+class dpdpickupShipping extends waShipping
 {
 
     public function calculate(){
@@ -26,18 +26,12 @@ class hermespickupShipping extends waShipping
                                     'est_delivery' => $time,
                                     'currency'     => 'RUB',
                                     'rate'         => $rate,
-                                    'name' => self::getComment($params),//$params['id'].' - '.$params['name']." (".$params['address'].")",
+                                    'name' => $params['name']." (".$params['address'].")",
                                     'comment' => self::getComment($params),
                                     'force_subrates' => true,
-                                    'params' => array(
-                                        'subcomment' => self::getSubComment($params),
-                                        'id' => $params['id'],
-                                        'link' => 'http://pschooser.hermes-dpd.ru/PSChooser/PSDetails?PSId='.$params['id'],
-                                    ),
                                 );
                             }
                         }
-                        ksort($result);
                         return $result;
                     }
                 }
@@ -47,15 +41,10 @@ class hermespickupShipping extends waShipping
     }
 
     private static function getComment($params){
-        return self::getSubComment($params);
         $str = '';
         $str .= "<b>Адрес:</b>\n";
         $str .= $params['address']."\n";
         return str_replace("\n", "<br>", $str);
-    }
-
-    private static function getSubComment($params){
-        return $params['id'].' - '.$params['city']." - ".$params['address'].' - '.$params['name'];
     }
 
     public function allowedCurrency()
@@ -228,7 +217,7 @@ class hermespickupShipping extends waShipping
 
     private static function getAllPoints(){
         $model = new waModel();
-        $data = $model->query("SELECT * FROM shipment_hermes_points")->fetchAll();
+        $data = $model->query("SELECT * FROM shipment_dpd_points")->fetchAll();
         return $data;
     }
 
