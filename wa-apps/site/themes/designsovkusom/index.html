@@ -63,19 +63,9 @@
 
     {$wa->headJs()} {* links Google Analytics tracking code and current site's custom JS (Site app) *}
 
-    <script type="text/javascript">
-        jQuery(window).load(function () {
-            // will first fade out the loading animation
-            jQuery(".status").fadeOut();
-            // will fade out the whole DIV that covers the website.
-            jQuery(".preloader").delay(1000).fadeOut("slow");
-        })
-    </script>
 </head>
 <body id="top">
-<div class="preloader">
-    <div class="status">&nbsp;</div>
-</div>
+
 
 
 <div id='select_region' class="overlay">
@@ -170,7 +160,7 @@
         <div class="sidebar-block-container subscrib">
             <div class="sidebar-block">
                 <h3>Подписка на рассылку</h3>
-                {*$wa->mailer->form(1)*}
+                {$wa->mailer->form(1)}
             </div>
         </div>
     </div>
