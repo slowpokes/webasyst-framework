@@ -1,6 +1,7 @@
 <div class="content notbl full">
-    <div class="content-container">
+    <div class="content-cont">
         {if $products}
+            <h2>{$set.name}</h2>
         <div id="product-list">
             {include file='product-item.html' line_count = 5}
         </div>

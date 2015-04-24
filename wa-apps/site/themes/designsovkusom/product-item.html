@@ -5,7 +5,7 @@
 {/if}
 
 {if !isset($line_count)}
-{$line_count = 4}
+    {$line_count = 4}
 {/if}
 
 <div class="sort-view">
@@ -17,86 +17,188 @@
             {if !isset($active_sort)}
                 {$active_sort = $wa->get('sort', 'create_datetime')}
             {/if}
-            
-            Сортировать по: 
+
+            Сортировать по:
             <select id="product-sort">
-                <option {if !$active_sort} class="selected" selected{/if} value="{$wa->currentUrl(0, 1)}">[`New & Popular`]</option>
+                <option {if !$active_sort} class="selected" selected{/if} value="{$wa->currentUrl(0, 1)}">[`New &
+                    Popular`]
+                </option>
                 {foreach $sort_fields as $sort => $name}
-                <option value="?sort={$sort}&order={$sort_default[$sort]}" {if $active_sort == $sort} class="selected" selected{/if}>{$name} </option>
-                {if $wa->get('sort') == $sort}
-                    {$wa->title( $wa->title()|cat:' — '|cat:$name)}
-                    <option value="?sort={$sort}&order={if $wa->get("order")=="asc" && $active_sort == $sort}desc{else}asc{/if}">{$name} {if $wa->get("order")=="asc" && $active_sort == $sort}&darr;{else}&uarr;{/if}</option>
-                {/if}
+                    <option value="?sort={$sort}&order={$sort_default[$sort]}" {if $active_sort == $sort} class="selected" selected{/if}>{$name} </option>
+                    {if $wa->get('sort') == $sort}
+                        {$wa->title( $wa->title()|cat:' — '|cat:$name)}
+                        <option value="?sort={$sort}&order={if $wa->get("order")=="asc" && $active_sort == $sort}desc{else}asc{/if}">{$name} {if $wa->get("order")=="asc" && $active_sort == $sort}&darr;{else}&uarr;{/if}</option>
+                    {/if}
                 {/foreach}
             </select>
         </div>
     {/if}
-    {if isset($category)}
-    <div class="product-view">
-            <tr>
-                <td><span class="blocks{if $dsv_view=="blocks"} selected{/if}" data-view="1"><i class="icon block"></i></span></td>
-                <td><span class="list{if $dsv_view=="list"} selected{/if}" data-view="0"><i class="icon list"></i></span></td>
-            </tr>
-        </table>
-        <div class="clear:both"></div>
-    </div>
+    {if isset($category) || isset($brand)}
+        <div class="product-view">
+            <td><span class="blocks{if $dsv_view=="blocks"} selected{/if}" onclick="changeView()" data-view="1"><i
+                            class="icon block"></i></span></td>
+            <td><span class="list{if $dsv_view=="list"} selected{/if}" onclick="changeView()" data-view="0"><i
+                            class="icon list"></i></span></td>
+
+            <div class="clear:both"></div>
+        </div>
     {/if}
 </div>
 
 <!-- products thumbnail list view -->
-<ul class="product_items product-list{if $dsv_view && isset($category)} {$dsv_view}{else} blocks{/if}">
 
-{foreach $products as $p}
-    <li itemscope itemtype ="http://schema.org/Product" {if empty($cart)}{*if $p@iteration is div by $line_count}style="margin-right: 0;"{/if*}{/if} {if $p.badge}class="{$p.badge}"{/if}>
-        <a href="{$p.frontend_url}"  title="{$p.name}{if $p.summary} &mdash; {strip_tags($p.summary)}{/if}">
-            <div class="imagess">
-                {$badge_html = $wa->shop->badgeHtml($p.badge)}
-                {if $badge_html}
-                    <div class="corner top left">{$badge_html}</div>
-                {/if}
-                {$wa->shop->productImgHtml($p, '300x400', ['itemprop' => 'image', 'alt' => $p.name, 'default' => "`$wa_theme_url`img/dummy200.png"])}
-            </div>
-            <div class="product-info">
-                <h5 itemprop="name">
-                    {$p.name}
-                </h5>
-                <h5>{$p.cf_type}</h5>
+<ul {if isset($search)} style="width: 1300px; margin-left: 10px" {/if} id="bxsl"
+                                                                       class="product_items product-list{if $dsv_view && isset($category)} {$dsv_view}{else} blocks{/if}">
 
-                <div class="description">
-                    {$p.name}{if $p.summary} &mdash; {strip_tags($p.summary)}{/if}
-                </div>
-                
-                <div itemprop="offers" class="offers" itemscope itemtype="http://schema.org/Offer">
-                    <div class="prices">
-                        {if $p.rating > 0}
-                            <span class="rating nowrap">{$wa->shop->ratingHtml($p.rating)}</span>
+
+    {foreach $products as $key => $p name=p}
+        <li class="bxslli" itemscope
+            itemtype="http://schema.org/Product" {if empty($cart)}{*if $p@iteration is div by $line_count}style="margin-right: 0;"{/if*}{/if} {if $p.badge}class="{$p.badge}"{/if}>
+            <a href="{$p.frontend_url}" title="{$p.name}{if $p.summary} &mdash; {strip_tags($p.summary)}{/if}">
+                <div class="inner_product">
+                    {if count($p.images) > 1}
+                        {foreach $p.skus as $sku}
+                            {$sku_gal[] = $sku.image_id}
+                        {/foreach}
+                        {if !isset($cross)}
+                            <div class="sku_images" data-hide="{','|implode:$sku_gal}">
+                                <div class="sku_images_over">
+                                    {$i = 0}
+                                    {foreach $p.images as $image name=image}
+                                        {if $image.sku_image == 0}
+                                            <div class="image">
+                                                <div class="igm" id="product-image-{$image.id}" class="igm"
+                                                     id="product-image-{$image.id}" data-ids="{$image.id}"
+                                                     href="{$wa->shop->productImgUrl(['id'=> $p.id, 'image_id' => $image.id, 'ext' => $image.ext], '600x0', ['alt' => $p.name|cat:' - ':$image.description|escape])}"
+                                                     data-small="{$wa->shop->productImgUrl(['id'=> $p.id, 'image_id' => $image.id, 'ext' => $image.ext], '200h200', ['alt' => $p.name|cat:' - ':$image.description|escape])}"
+                                                     data-mini="{$wa->shop->productImgUrl(['id'=> $p.id, 'image_id' => $image.id, 'ext' => $image.ext], '48', ['alt' => $p.name|cat:' - ':$image.description|escape])}"
+                                                     rel="lightbox-images" {if $smarty.foreach.image.iteration = 1} data-lightbox="test" {/if}
+                                                     title="{$p.name}">{$wa->shop->productImgHtml(['id'=> $p.id, 'image_id' => $image.id, 'ext' => $image.ext, 'image_desc' => $image.description], '54x72', ['alt' => $p.name|cat:' - ':$image.description|escape])}</div>
+                                            </div>
+                                        {/if}
+                                        {if $i < count($sku_gal) - 1}
+                                            {$i = $i + 1}
+                                        {/if}
+                                    {/foreach}
+                                </div>
+                            </div>
                         {/if}
-                        {if $p.compare_price > 0 && $p.rating == 0}<span class="compare-at-price nowrap"> {shop_currency($p.compare_price)} </span>{/if}
-                        <span class="price nowrap" itemprop="price">{shop_currency($p.price)}</span>
+                    {/if}
+                    <div class="imagess">
+                        {$badge_html = $wa->shop->badgeHtml($p.badge)}
+                        {if $badge_html}
+                            <div class="corner top left">{$badge_html}</div>
+                        {/if}
 
+                        {$wa->shop->productImgHtml($p, '200h200', ['itemprop' => 'image', 'alt' => $p.name, 'default' => "`$wa_theme_url`img/dummy200.png"])}
+                        <div class="default_image"
+                             style="display: none">{$wa->shop->productImgHtml($p, '200h200', ['itemprop' => 'image', 'alt' => $p.name, 'default' => "`$wa_theme_url`img/dummy200.png"])}</div>
+
+                        {if isset($p.features[7].values.0)}
+                        <span class="badge_sex {if $p.features[7].values.0 == 'Мужские'}sex_men{elseif $p.features[7].values.0 == "Женские"}sex_women{else}sex_unisex{/if}">
+                         {/if}
                     </div>
-                        <form class="addtocart" {if isset($p.sku_count)&&$p.sku_count > 1}data-url="{$p.frontend_url}?cart=1"{/if} method="post" action="{$wa->getUrl('/frontendCart/add')}" data-sumbolrub>
-                        <input type="hidden" name="product_id" value="{$p.id}">
-                        {if $wa->shop->settings('ignore_stock_count') || $p.count === null || $p.count > 0}
-                            <input type="submit" class="rv-button orange-button" value="[`Add to cart`]">
-                            <link itemprop="availability" href="http://schema.org/InStock" />
-                        {else}
-                            <input type="submit" class="rv-button orange-button" value="[`Add to cart`]" disabled class="disabled">
-                            <link itemprop="availability" href="http://schema.org/OutOfStock" />
-                            
-                        {/if}
-                        </form>
-                        <!--a href="{$p.frontend_url}"><input type="submit" value="Подробнее" class="details"></a-->
+                    <div class="product-info">
+                        <h5 itemprop="name" data-name='{$p.name}' data-url="{$p.frontend_url}?cart=1">
+                            {if isset($cross)}
+                                {$p.name|truncate:35}
+                            {else}
+                                {$p.name|truncate:45}
+                            {/if}
+                        </h5>
+                        <h6>{$p.cf_type}</h6>
 
-                </div>
-            </div>
-        </a>
-    </li>
-{/foreach}
+
+                        <div itemprop="offers" class="offers" itemscope itemtype="http://schema.org/Offer">
+                            <div class="description">
+                                Артикул: {$p.sku_id+10000}
+                            </div>
+                            <div class="prices">
+                                {*if $p.rating > 0}
+                                    <span class="rating nowrap">{$wa->shop->ratingHtml($p.rating)}</span>
+                                {/if*}
+                                {if $p.compare_price > 0}
+                                    <span class="compare-at-price nowrap"> {shop_currency($p.compare_price)} </span>
+                                {/if}
+                                <span class="price nowrap" itemprop="price">{shop_currency($p.price)}</span>
+
+                            </div>
+                            {if isset($cross)}
+                                <a class="show_details" href="{$p.frontend_url}"><input type="submit" value="Посмотреть"
+                                                                                        class="details"></a>
+                            {/if}
+                            <div class="add_cart">
+                                <form {if !empty($p.skus)}data-count-sku="{$p.skus|count}" {/if}class="addtocart"
+                                      {if $p.skus|count > 1}data-url="{$p.frontend_url}?cart=1"{/if} method="post"
+                                      action="{$wa->getUrl('/frontendCart/add')}" data-sumbolrub>
+                                    <input type="hidden" name="product_id" value="{$p.id}">
+                                    <input type="submit" class="rv-button orange-button" value="[`Add to cart`]">
+                                    <link itemprop="availability" href="http://schema.org/InStock"/>
+                                </form>
+                                <!--div class="product-share">
+                                    <script type="text/javascript" src="//yastatic.net/share/share.js"
+                                            charset="utf-8"></script>
+                                    <div class="yashare-auto-init" data-yashareL10n="ru" data-yashareType="small"
+                                         data-yashareQuickServices="vkontakte,facebook,twitter,odnoklassniki,moimir"
+                                         data-yashareTheme="counter"></div>
+                                </div-->
+                                <!-- Put this script tag to the <head> of your page -->
+
+                                <div class="clear"></div>
+                            </div>
+
+                        </div>
+                    </div>
+            </a>
+
+        </li>
+    {/foreach}
 </ul>
+{if isset($pages_count)}
+    <div class="block lazyloading-paging">
 
-{if isset($pages_count) && $pages_count > 1}
-<div class="block">
-    {wa_pagination total=$pages_count attrs=['class' => "menu-h"] nb=3}
-</div>
+        {wa_pagination total=$pages_count attrs=['class' => "menu-h"] nb=3}
+
+    </div>
+{else}
 {/if}
+
+{literal}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var images = $('.igm');
+            images.map(function () {
+                if (hide) {
+                    var hide = $(this).parents('.sku_images').data('hide');
+                    hide = hide.toString();
+                    if (hide.indexOf($(this).data('ids')) + 1) {
+                        $(this).parent().remove();
+                    }
+                }
+            })
+        });
+
+    </script>
+{/literal}
+<script type="text/javascript">
+    function changeView()
+    {
+            $('.product-view span').click(function () {
+                var item = $(this);
+                if (item.hasClass('selected')) return false;
+
+                $('.product-view span').removeClass('selected');
+                item.addClass('selected');
+
+                if (item.data('view')) {
+                    $('ul.product-list').addClass('blocks').removeClass('list');
+                    $.cookie('dsv_view', 'blocks', { expires: 30, path: '/'});
+                }
+                else {
+                    $('ul.product-list').addClass('list').removeClass('blocks');
+                    $.cookie('dsv_view', 'list', { expires: 30, path: '/'});
+                }
+                return false;
+            });}
+</script>

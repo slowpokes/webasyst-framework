@@ -12,6 +12,7 @@
     </div>
     <div id="order_summary">
         {$items = $order.total}
+
         <div class='oi'><div class='oi_title'>Сумма товаров:</div><div class='oi_value'>{shop_currency(($order.products_total), true)}</div></div>
         {if $order.discount>0}
         <div class='oi'><div class='oi_title'>Скидка:</div><div class='oi_value'>- {shop_currency(($order.discount), true)}</div></div>

@@ -22,15 +22,15 @@
 {/if}
 
 <!-- ФИЛЬТРЫ -->
-<!-- filtering by product features -->    
+<!-- filtering by product features -->
 {if !empty($filters)}
     <div class="filters ajax">
         <form method="get" action="{$wa->currentUrl()}">
         {foreach $filters as $fid => $filter}
             <p>
             {if $fid == 'price'}
-            
-                {$c = $wa->shop->currency(true)}
+
+    {$c = $wa->shop->currency(true)}
                 <div class="filter-name"><b>[`Price`]</b></div>
                 <div>
                     [`from`] <input type="text" name="price_min" class="price_min" {if $wa->get('price_min')}placeholder="{(int)$wa->get('price_min')}"{/if} placeholder="0">
@@ -99,7 +99,7 @@
     <div class="news_container">
         <div class="news">
             <a href="/blog/">Новости</a>
-            
+
             {foreach $latest_posts as $post}
             <div class="post">
                 <span>{$post.datetime|wa_datetime:"humandate"}</span>

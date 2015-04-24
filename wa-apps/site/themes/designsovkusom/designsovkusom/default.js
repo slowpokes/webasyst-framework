@@ -28,6 +28,7 @@ $(document).ready(function () {
     });
 
     $("#main").on('submit', '.product-list form.addtocart', function () {
+
         var f = $(this);
         if (f.data('url')) {
             var d = $('#dialog');
@@ -43,7 +44,7 @@ $(document).ready(function () {
             });
             return false;
         }
-        $.post(f.attr('action') + '?html=0', f.serialize(), function (response) { 
+        $.post(f.attr('action') + '?html=0', f.serialize(), function (response) {
             if (response.status == 'ok') {
                 var cart_total = $(".cart-total");
                 var cart_count = $(".cart-count");
@@ -53,14 +54,20 @@ $(document).ready(function () {
                     $(".content").parent().load(location.href, function () {
                         cart_total.html(response.data.total);
                         cart_count.html(response.data.count);
+
+                        $('.cart_icon').attr('src', '/wa-apps/shop/themes/designsovkusom/img/basketon.png');
+                        $("#cart-summary").removeClass("empty");
+                        $(".cart-count").removeClass("empty");
                     });
                 } else {
                     if (f.closest(".product-list").get(0).tagName.toLowerCase() == 'table') {
                         var origin = f.closest('tr');
                         var block = $('<div></div>').append($('<table></table>').append(origin.clone()));
+
                     } else {
                         var origin = f.closest('li');
                         var block = $('<div></div>').append(origin.html());
+
                     }
                     block.css({
                         'z-index': 10,

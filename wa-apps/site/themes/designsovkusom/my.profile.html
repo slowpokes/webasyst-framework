@@ -1,30 +1,27 @@
-<!--div class="sidebar">
-    <!-- NAVIGATION
-    {include file="sidebar.html"}
-</div-->
-<div class="content">
-    {$wa->myNav('menu-h bottom-padded')}
-    <div id="page" style="margin-top:20px">
-        <h1>[`My profile`]</h1>
-        <div class="profile-container">
+<h1>Мои данные</h1>
 
-            {if $saved}
-                <strong><i class="icon16 saved"></i><span style="color:green">[`Contact information successfully updated!`]</span></strong>
-            {/if}
-            
-            <form action="" method="post">
-                <div class="wa-form">
-                
-                    {$form->html()}
-                
-                    <div class="wa-field">
-                        <div class="wa-value">
-                            <input type="submit" value="[`Save`]" class="blue-button save">
-                        </div>
-                    </div>
+{if $saved}
+    <p class="text-success lead">[`Contact information successfully updated!`] <i class="fa fa-check fa-lg"></i></p>
+{/if}
+
+<form action="" method="post">
+    <div class="wa-form">
+
+        {$form->html()}
+
+        <div class="wa-field">
+            <div class="wa-value profile_save">
+                <input type="submit" value="[`Save`]" class="orange-button save">
                 </div>
-            </form>
-            <div class="clear-left"></div>
         </div>
-    </div>
-</div>
+        </div>
+</form>
+
+{$wa->globals('isMyAccount', true)}
+{literal}
+    <script type="text/javascript">
+        $('input[name="profile[phone]"]').msk("+7 (999) 999-99-99", {empty_string: "7 ___ _______"});
+        Dadataprofile();
+
+    </script>
+{/literal}

@@ -1,3 +1,8 @@
+<script type="text/javascript">
+    alert(1);
+
+
+</script>
 <div class="cart-content">
     <div id="checkout_address">
         <h1 class="order_flow">
@@ -5,12 +10,10 @@
             <span class="current">Адрес доставки</span> &rarr;
             <span class="next">Подтверждение заказа</span>
         </h1>
-        <div class="address">
-            <input id="citys" type="text" value="" placeholder="Город">
-        </div>
-        <div class="wa-form form address_form">
-            <form method="post" action="" id="address_form">
 
+        <div class="wa-form form address_form">
+            <h2> Контактные данные</h2>
+            <form method="post" action="" id="address_form">
                 <div class="wa-field">
                     <div class="wa-name">Фамилия</div>
                     <div class="wa-value">
@@ -33,8 +36,9 @@
                 <div class="wa-field">
                     <div class="wa-name">Email</div>
                     <div class="wa-value">
-                        <input type="text" value="{$customer->get('email', 'default')}" name="customer[email]">
-                        <!--span class="info_hover">Укажите свой email чтобы получать новости со скидками</span-->
+                        <input type="text" data-validation="email" value="{$customer->get('email', 'default')}"
+                               id="customer[email]" name="customer[email]">
+                        <span class="info_hover "> <span class="mail_info"> Укажите свой email чтобы получать новости со скидками</span>
                     </div>
                 </div>
 
@@ -42,11 +46,19 @@
                     <div class="wa-name">Область</div>
                     <div class="wa-value">
                         {*$region*}
-                        <input type="text" hidden="hidden" id="region" value=""
+                        <input hidden="hidden" type="text" id="region" value=""
                                name="customer[address.shipping][region]">
                         {if isset($errors)&&$errors['region']}
                             <div class="error_hint">{$errors['region']}</div>
                         {/if}
+                    </div>
+                </div>
+                <div class="wa-field">
+                    <div class="wa-name">Область</div>
+                    <div class="wa-value">
+                        {*$region*}
+                        <input type="text" id="region_text" value=""
+                               name="customer[address.shipping][region_text]">
                     </div>
                 </div>
 
@@ -75,7 +87,7 @@
                     </div>
                 </div>
 
-                <div class="wa-field field_dynamic field_region_Москва">
+                <div class="wa-field field_dynamic field_region_77">
                     <div class="wa-name">Метро</div>
                     <div class="wa-value">
                         <select name="customer[address.shipping][metro]">
@@ -100,25 +112,8 @@
                     <div class="wa-name">Дом</div>
                     <div class="wa-value">
                         <div class="inp_middle">
-                            <input class="i_small" id="building" type="text" value="{$address['house']|default:''}"
+                            <input class="i_small" id="house" type="text" value="{$address['house']|default:''}"
                                    name="customer[address.shipping][house]">
-                        </div>
-                        <div class="field_small">
-                            <div class="name_small">Корпус</div>
-                            <div class="inp_small"><input class="i_small" type="text" id="buildingAdd"
-                                                          value="{$address['house3']|default:''}"
-                                                          name="customer[address.shipping][house3]"></div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="wa-field">
-                    <div class="wa-name">Строение</div>
-                    <div class="wa-value">
-                        <div class="inp_middle">
-                            <input class="i_small" type="text" value="{$address['house2']|default:''}"
-                                   name="customer[address.shipping][house2]">
                         </div>
                         <div class="field_small">
                             <div class="name_small">Квартира (офис)</div>
@@ -126,16 +121,34 @@
                                                           value="{$address['app']|default:''}"
                                                           name="customer[address.shipping][app]"></div>
                         </div>
+                        <!--div class="field_small">
+                            <div class="name_small">Корпус</div>
+                            <div class="inp_small"><input class="i_small" type="text" id="buildingAdd"
+                                                          value="{$address['house3']|default:''}"
+                                                          name="customer[address.shipping][house3]"></div>
+                        </div-->
                     </div>
                 </div>
 
-                <div class="wa-field field_dynamic field_region_Москва">
+
+                <!--div class="wa-field">
+                    <div class="wa-name">Строение</div>
+                    <div class="wa-value">
+                        <div class="inp_middle">
+                            <input class="i_small" type="text" value="{$address['house2']|default:''}"
+                                   name="customer[address.shipping][house2]">
+                        </div>
+
+                    </div>
+                </div-->
+
+                <div class="wa-field field_dynamic field_region_77">
                     <div class="wa-name">Дата доставки</div>
                     <div class="wa-value">
                         <input type="text" value="{$params['shipping_date']|default:''}" name="order[shipping_date]">
                     </div>
                 </div>
-                <div class="wa-field field_dynamic field_region_Москва ">
+                <div class="wa-field field_dynamic field_region_77">
                     <div class="wa-name">Время доставки</div>
                     <div class="wa-value">
                         <select name="order[shipping_time]">
@@ -148,10 +161,10 @@
                     </div>
                 </div>
 
-                <div class="wa-field field_dynamic field_region_all field_region_not_Москва">
+                <div class="wa-field field_dynamic field_region_all field_region_not_77">
                     <div class="wa-name">Индекс</div>
                     <div class="wa-value">
-                        <input type="text" id="zip" value="{$address['zip']|default:''}"
+                        <input readonly type="text" id="zip" value="{$address['zip']|default:''}"
                                name="customer[address.shipping][zip]">
                         {if isset($errors)&&$errors['zip']}
                             <div class="error_hint">{$errors['zip']}</div>
@@ -165,6 +178,9 @@
                         <textarea name="order[comment]">{$params['comment']|default:''}</textarea>
                     </div>
                 </div>
+
+                <p id="address_text" class="value" style="color: #BBB"></p>
+
 
                 <div hidden="hidden" class="wa-field" style="position: absolute; top: 692px;">
                     <div class="wa-name">Карта</div>
@@ -180,4 +196,5 @@
 </div>
 <script>
     updateRegion();
+
 </script>

@@ -4,22 +4,49 @@
     <div class="brands_list">
         <div>
             {$letter = ''}
+            {$i = 0}
+
             {foreach $brands as $brand name=brand}
+
             {if $brand.letter!=$letter}
             {$smarty.foreach.brand.iteration = 0}
         </div>
-        {if $letter!=''}<a id="{$brand.letter}">
-                <div class="brands_letter_end"></div></a>{/if}
-        <div class="brands_letter letter_{$brand.letter}"><a href='/brands/?letter={$brand.letter}'>{$brand.letter}</a>
-        </div>
-        <div class="brands_letter_list">
-            {$letter = $brand.letter}
-            {/if}
-            {if $smarty.foreach.brand.iteration % 5 == 0}{/if}
 
-            <span><a href='/brand/{$brand.link}'>{$brand.name}</a></span>
+        {if $letter!=''}<a id="{$brand.letter}" rel="#{$brand.letter}">
+                <div class="brands_letter_end"></div></a>{/if}
+
+        <div class="brands_letter letter_{$brand.letter}">
+            {$brand.letter}
+        </div>
+
+        <div class="brands_letter_list" id="list_{$brand.letter}">
+            {$letter = $brand.letter}
+
+            {/if}
+
+
+            {if $smarty.foreach.brand.iteration % 5 == 0}{/if}
+            {if $product_brands.brands[$i].products_count > 0}
+                <span><a href='/brand/{$brand.link}'>{$brand.name}</a></span>
+            {/if}
+            {$i = $i + 1}
+
 
             {/foreach}
+
         </div>
+
     </div>
+
 </div>
+<script type="text/javascript">
+    var lists = $('[id *= "list_"]');
+    for (var i = 0; i < lists.length; i++) {
+        //console.log($(lists[i]).length);
+        if (!$(lists[i]).has('span').length) { // если нет ни одно бренда
+            $(lists[i]).prev("div").hide();
+            $(lists[i]).prevAll('a').first().hide();
+            $(lists[i]).hide();
+        }
+        }
+</script>

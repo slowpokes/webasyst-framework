@@ -13,9 +13,3 @@
         <a href="{$wa->getUrl('/frontend/myProfile')}">[`My profile`]</a>
     </li>
 {/if}
-
-<!-- plugin hook: 'frontend_my_nav' -->
-{* @event frontend_my_nav.%plugin_id% *}
-{foreach $frontend_my_nav as $_plugin => $_}
-<li class="shop {if waRequest::param('plugin') == str_replace('-plugin', '', $_plugin)}selected{/if}">{$_}</li>
-{/foreach}

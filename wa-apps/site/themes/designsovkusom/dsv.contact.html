@@ -1,2 +1,10 @@
-<p><span class="phone_pre">(495)</span> <span class="phone_header">221-5-381</span><br>
-<span style="font-size: 12px; padding-right: 25px">с 9:00 до 21:00 без выходных</span></p>
+<p><span class="phone_pre">8(495)</span> <span class="phone_header">221-5-381</span><br>
+    <span style="font-size: 12px;">с 9:00 до 21:00 без выходных</span></p>
+
+<div class="search">
+    <form method="get" action="{$wa->getUrl('/frontend/search')}" class="searchform">
+        <input type="search" name="query" {if !empty($query)}value="{$query}"{/if} id="search"
+               placeholder="Поиск товара">
+        <button title="Найти"><i class="icon lens"></i></button>
+    </form>
+</div>

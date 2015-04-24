@@ -1,0 +1,11 @@
+<nav class="footer-nav">
+    <ul>
+        {foreach $shop_pages as $page}
+
+            {if isset($page.footer_about)&&($page.footer_about=='true')}
+                <li><a href="{$page.url}" title="{$page.title}"><span
+                                style="/*color: #5d5f5d;*/">{$page.name}</span></a></li>
+            {/if}
+        {/foreach}
+    </ul>
+</nav>

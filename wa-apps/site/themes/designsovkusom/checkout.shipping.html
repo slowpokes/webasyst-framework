@@ -8,11 +8,11 @@
                 {foreach $checkout_shipping_methods as $m}
                 <div class="shipping_{$m.id} shipping_option shipping_info" data-id="{$m.id}">
 
-                    <div class="shipping_price">{shop_currency($m.rate, $m.currency)}</div>
+                    <div class="shipping_price">{if $m.rate}{shop_currency($m.rate, $m.currency)}{/if}</div>
                     <h3>
                         <label>
                             {if !empty($m.logo)}<img src="{$m.logo}" class="method-logo">{/if}
-                            <input type="radio" name="shipping_id" value="{$m.id}">
+                            <input type="radio" name="shipping_id" checked value="{$m.id}">
                             <input type="hidden" value="delivery" name="rate_id[{$m.id}]">
                             {$m.name|escape}
                         </label>
@@ -20,19 +20,18 @@
                     {if empty($m.error)}
                     <div class="rate">
                         <span class="hint" {if empty($m.est_delivery)}style="display:none"{/if}>
-                        [`Estimated delivery`]:<br>
+                        [`Estimated delivery`]:
                         <strong class="est_delivery">{if !empty($m.est_delivery)}{$m.est_delivery}{/if}</strong>
                         </span>
-                        <em class="hint error comment" {if empty($m.comment)}style="display:none"{/if}>
-                        <br>{if !empty($m.comment)}{$m.comment}{/if}
-                        </em>
+                        <span class="info_hover" {if empty($m.comment)}style="display:none"{/if}>
+                        <span class="b2c_cities">{if !empty($m.comment)}{$m.comment}{/if}</span>
+                        </span>
                     </div>
                     {else}
                     <div class="rate error">
                         <span class="price nowrap" style="display:none"></span>
-                        <em class="hint error comment" style="display:none"></em>
+                        <span class="info_hover" style="display:none"></span>
                         <span class="hint" style="display:none">
-                            <br>
                             [`Estimated delivery`]:<br>
                             <strong class="est_delivery"></strong>
                         </span>
@@ -43,10 +42,10 @@
                 </div>
                 {foreachelse}
                 <div>
-                    <div class="error">[`Oops! We are sorry, but <strong>we can not ship this order to your selected destination</strong>. Checkout can not be completed.`]</div>
+                    <div class="error"><strong>Для выбора способа доставки укажите город доставки</strong>
+                    </div>
                 </div>
                 {/foreach}
             </div>
         </form>
     </div>
-</div>

@@ -62,7 +62,27 @@
                     {/foreach}
                 </ul>
             </div>
-
+            <div class="currencies float-left">
+                {if count($currencies) > 1}
+                    Валюта:
+                    {$currency = $wa->shop->currency()}
+                {foreach $currencies as $c_code => $c}
+                    <a rel="{$c_code}"
+                       {if $c_code == $currency}class="selected"{/if}>{if $c.code=="RUB"}{$c.sign_html}{else}{$c.sign}{/if}</a>
+                {/foreach}
+                    <script>
+                        $(".currencies a").click(function () {
+                        var url = location.href;
+                        if (url.indexOf('?') == -1) {
+                            url += '?';
+                        } else {
+                            url += '&';
+                        }
+                        location.href = url + 'currency=' + $(this).attr("rel");
+                    });
+                    </script>
+                {/if}
+            </div>
             <div class="auth float-left">
                 {if $wa->isAuthEnabled()}
                     {if $wa->user()->isAuth()}

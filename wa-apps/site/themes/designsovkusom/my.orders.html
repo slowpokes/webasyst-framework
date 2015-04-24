@@ -1,23 +1,12 @@
-<!--div class="sidebar">
-    <!-- NAVIGATION
-    {include file="sidebar.html"}
-</div-->
-<div class="content">
-    {$wa->myNav('menu-h bottom-padded')}
-    
-    <h1 >[`My orders`]</h1>
-    <a href="/my/profile">Редактировать профиль</a>
-
-    
-    <table class="table my-orders">
-        <tr style="border:0">
-            <th>Номер</th>
-            <th>Статус</th>
-            <th>Наименование</th>
-            <th>Доставка</th>
-            <th>Оплата</th>
-            <th>Дата</th>
-        </tr>
+<table class="table my-orders">
+    <tr style="border:0">
+        <th>Номер</th>
+        <th>Статус</th>
+        <th>Наименование</th>
+        <th>Доставка</th>
+        <th>Оплата</th>
+        <th>Дата</th>
+    </tr>
     {foreach $orders as $o}
         <tr>
             <td class="nowrap align-center">
@@ -33,7 +22,9 @@
             <td>
                 {if !empty($o.items)}
                     {foreach $o.items as $i}
-                        {$i.name|escape|truncate:30:"...":true} <span class="gray">x {$i.quantity}</span><br />
+                        {$i.name|escape|truncate:30:"...":true}
+                        <span class="gray">x {$i.quantity}</span>
+                        <br/>
                     {/foreach}
                 {/if}
             </td>
@@ -55,10 +46,9 @@
                 <span>{$o.create_datetime|wa_date:'humandate'}</span>
             </td>
         </tr>
-    {foreachelse}
+        {foreachelse}
         <tr class="no-border">
             <td colspan="6">[`You have no order history yet.`]</td>
         </tr>
     {/foreach}
-    </table>
-</div>
+</table>
