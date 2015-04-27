@@ -7716,9 +7716,13 @@ input[type=text], input[type=number], input[type=password], textarea {
     margin-bottom: 19px;
     margin-top: 20px;
     padding: 20px;
-    border-top: 2px solid #fd720b;
+    border-bottom: 2px solid #FD720B;
 }
 
+.news_date {
+    color: gray;
+    font-size: 14px;
+}
 #page .content_small {
     float: left;
     width: 690px;
@@ -7738,7 +7742,6 @@ li.closed > ul {
 }
 
 .post .text {
-    border-bottom: 1px solid #c4c4c4;
     padding-bottom: 30px;
 
 }

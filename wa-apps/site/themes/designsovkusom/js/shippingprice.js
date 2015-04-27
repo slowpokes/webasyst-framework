@@ -65,11 +65,16 @@ function shippingRegionChange(region, mini) {
             $("#shipping_results").html(data_mini);
         }
         else {
-            console.log('full');
             var data = $(result).find(".shipping_result");
             $("#shipping_results").html(data);
         }
 
     });
+
+    $.get('/data/shippingprice/', function (result) {
+        $("#shipping_regions").html($(result).find(".regions_table"));
+
+    });
+
 }
 
