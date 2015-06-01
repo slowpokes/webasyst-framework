@@ -10,6 +10,7 @@
     <meta name="Keywords" content="{$wa->meta('keywords')|escape}"/>
     <meta name="Description" content="{$wa->meta('description')|escape}"/>
     <script type="text/javascript" src="{$wa_theme_url}js/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="{$wa_theme_url}js/materialize.js"></script>
 
     {if !empty($canonical)}
         <link rel="canonical" href="{$canonical}"/>
@@ -21,7 +22,7 @@
     <!--link href="{$wa_theme_url}grid.min.css" rel="stylesheet" type="text/css"-->
     <!--link href="{$wa_theme_url}tinycarousel.css?v{$wa_theme_version}" rel="stylesheet" type="text/css"-->
     <link href="{$wa_theme_url}css/jquery.kladr.min.css" rel="stylesheet" type="text/css">
-
+    <link href="{$wa_theme_url}css/materialize.css" rel="stylesheet" type="text/css">{*DEV VER*}
     <link href="{$wa_theme_url}css/pickmeup.min.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" media="print" href="{$wa_theme_url}css/print.css?v{$wa_theme_version}">
 
@@ -176,31 +177,53 @@
 <div class="clear-both"></div>
 <div id="footer">
     <div class="container">
-        <div id="copyright">
-        </div>
-
-
         <div class="copyright">
-            <span class="copy">&copy; <a href="{$wa_url}">{$wa->accountName()}</a> {time()|wa_datetime:"Y"} </span>
 
-            <div class="social">
-                <ul>
-                    {include file="dsv.social.html"}
-                </ul>
-            </div>
-            <div class="shop-info">
-                <ul>
-                    {include file="dsv.address.html"}
-                </ul>
-            </div>
-            <div class="shop-info">
-                <ul>
-                    {include file="unisender.html"}
-                    {*$wa->mailer->form(1)*}
-                </ul>
+            <div class="row" style="margin-top: 20px">
+
+                <div class="col s9">
+                    <div class="col s8" style="margin-top: 20px">
+                        {$wa->block("magic_sitemap")}
+                    </div>
+                    <div class="col s4" style="margin-top: 20px">
+                        <div class="shop-info">
+                            <ul>
+                                {include file="dsv.address.html"}
+                            </ul>
+                        </div>
+                    </div>
+                    <!--div class="col s2" style="margin-top: 80px">
+                        <div class="social">
+                            <ul class="soc">
+                                {*include file="dsv.social.html"*}
+                            </ul>
+                        </div>
+                    </div-->
+
+
+                </div>
+
+
+                <div class="col s3">
+                    <div class="shop-info" style="padding-left: 50px;">
+                        <ul>
+                            {include file="unisender.html"}
+                        </ul>
+                    </div>
+                </div>
+
             </div>
 
+
+            <div class="row">
+                <div class="col s12">
+                    <span class="copy">Magic-Parfum.ru &copy;
+                        2010-2015. Мэджик-парфюм — интернет-магазин парфюмерии.</span>
+                </div>
+
+            </div>
         </div>
+
 
     </div>
 </div>

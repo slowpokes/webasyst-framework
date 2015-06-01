@@ -154,214 +154,43 @@
 <form method="POST" action="http://api.unisender.com/ru/subscribe?hash=5pd6jbwck3rpeko1iurfnberwyopeqzsgfrt91jy"
       name="subscribtion_form" onsubmit="return us_.onSubmit(this);" us_mode="embed">
     <div class="desktop">
-        <table style="width: 100%; box-sizing: border-box; float: left;"
-               align="center" cellpadding="0" cellspacing="0">
-            <tbody>
-            <tr>
-                <td>
-                    <table style=" border-radius: 0px; border: medium none; margin: 0px auto; border-spacing: 0px; margin-left: 30px"
-                           align="center" cellpadding="0" cellspacing="0">
-                        <tbody>
-                        <tr>
-                            <td>
-                                <table style="border-spacing: 0px;" cellpadding="0" cellspacing="0">
-                                    <tbody>
-                                    <tr>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <table style="border-spacing: 0px;" cellpadding="0" cellspacing="0">
-                                                <tbody>
-                                                <tr>
-                                                    <td style="vertical-align: top;">
-                                                        <table style="border-spacing: 0px;" cellpadding="0"
-                                                               cellspacing="0">
-                                                            <tbody>
-                                                            <tr>
-                                                                <td valign="top" width="320">
-                                                                    <table style="table-layout: fixed; border-spacing: 0px;"
-                                                                           border="0" cellpadding="0" cellspacing="0">
-                                                                        <colgroup>
-                                                                            <col width="320">
-                                                                        </colgroup>
-                                                                        <tbody>
-                                                                        <tr>
-                                                                            <td style="padding: 8px; font-size: 12px; font-family: Arial,Helvetica,sans-serif; color: rgb(34, 34, 34); vertical-align: top;"
-                                                                                width="320">
-                                                                                <div>
-                                                                                    <div></div>
-                                                                                    <div>
-                                                                                        <label style="padding: 0px 0px 5px; vertical-align: middle; width: 33%; display: inline-block;"><span>Имя</span><b
-                                                                                                    style="font-size:14px;font-family:Georgia;line-height:10px; color: red">
-                                                                                                *</b></label>
 
-                                                                                        <div style="display: inline-block; width: 66%;">
-                                                                                            <input _required="1"
-                                                                                                   _label="Имя"
-                                                                                                   _validator="string"
-                                                                                                   name="f_1416591"
-                                                                                                   style="border-radius: 3px; font: 13px/1 Arial,Helvetica; padding: 0px 8px; width: 100%; border-width: 1px; border-style: solid; border-color: rgb(193, 201, 203); background-color: rgb(255, 255, 255); background-image: none; height: 30px;"
-                                                                                                   type="text">
+        <h2>Подпишитесь на рассылку!</h2>
 
-                                                                                            <div class="error-block"
-                                                                                                 style="display:none;color:#ff592d;font:11px/18px Arial;"></div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </td>
-                                                                        </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <table style="border-spacing: 0px;" cellpadding="0" cellspacing="0">
-                                                <tbody>
-                                                <tr>
-                                                    <td style="vertical-align: top;">
-                                                        <table style="border-spacing: 0px;" cellpadding="0"
-                                                               cellspacing="0">
-                                                            <tbody>
-                                                            <tr>
-                                                                <td valign="top" width="320">
-                                                                    <table style="table-layout: fixed; border-spacing: 0px;"
-                                                                           border="0" cellpadding="0" cellspacing="0">
-                                                                        <colgroup>
-                                                                            <col width="320">
-                                                                        </colgroup>
-                                                                        <tbody>
-                                                                        <tr>
-                                                                            <td style="padding: 8px; font-size: 12px; font-family: Arial,Helvetica,sans-serif; color: rgb(34, 34, 34); vertical-align: top;"
-                                                                                width="320">
-                                                                                <div>
-                                                                                    <div></div>
-                                                                                    <div>
-                                                                                        <label style="padding: 0px 0px 5px; vertical-align: middle; width: 33%; display: inline-block;"><span>E-mail</span>
-                                                                                            <b
-                                                                                                    style="font-size:14px;font-family:Georgia;line-height:10px; color: red">
-                                                                                                *</b></label>
+        <div class="wa-field">
+            <div class="wa-name">Ваше имя</div>
+            <div class="wa-value">
+                <input style="width: 210px;"
+                       id="first_name_subscribe"
+                       type="text"
+                       class="validate"
+                       required="1"
+                       _label="Имя"
+                       _validator="string"
+                       name="f_1416591">
+            </div>
+        </div>
 
-                                                                                        <div style="display: inline-block; width: 66%;">
-                                                                                            <input _label="E-mail"
-                                                                                                   name="email"
-                                                                                                   _validator="email"
-                                                                                                   _required="1"
-                                                                                                   style="font: 13px/1 Arial,Helvetica; border-radius: 3px; padding: 0px 8px; width: 100%; border-width: 1px; border-style: solid; border-color: rgb(193, 201, 203); background-color: rgb(255, 255, 255); background-image: none; height: 30px;"
-                                                                                                   type="text">
+        <div class="wa-field">
+            <div class="wa-name">Ваш E-mail</div>
+            <div class="wa-value">
+                <input style="width: 210px;"
+                       id="email_subscribe"
+                       type="text"
+                       class="validate"
+                       required="1"
+                       _label="E-mail"
+                       _validator="email"
+                       name="email">
+            </div>
+        </div>
 
-                                                                                            <div class="error-block"
-                                                                                                 style="display:none;color:#ff592d;font:11px/18px Arial;"></div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </td>
-                                                                        </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <table style="border-spacing: 0px;" cellpadding="0" cellspacing="0">
-                                                <tbody>
-                                                <tr>
-                                                    <td style="vertical-align: top;">
-                                                        <table style="border-spacing: 0px;" cellpadding="0"
-                                                               cellspacing="0">
-                                                            <tbody>
-                                                            <tr height="60">
-                                                                <td height="60" valign="top" width="320">
-                                                                    <table style="table-layout: fixed; border-spacing: 0px;"
-                                                                           border="0" cellpadding="0" cellspacing="0">
-                                                                        <colgroup>
-                                                                            <col width="320">
-                                                                        </colgroup>
-                                                                        <tbody>
-                                                                        <tr height="60">
-                                                                            <td style="background-image: none;"
-                                                                                height="60" width="320">
-                                                                                <table style="height: 100%; width: 100%; table-layout: fixed; border-spacing: 0px; margin-left: 10px;"
-                                                                                       border="0" cellpadding="0"
-                                                                                       cellspacing="0">
-                                                                                    <tbody>
-                                                                                    <tr>
-                                                                                        <td style="width: 100%; text-align: center;">
-                                                                                            <table style="height: 100%; width: 100%; table-layout: fixed; border-spacing: 0px;"
-                                                                                                   border="0"
-                                                                                                   cellpadding="0"
-                                                                                                   cellspacing="0">
-                                                                                                <tbody>
-                                                                                                <tr>
-                                                                                                    <td style="width: 100%; text-align: center; margin-left: 10px">
-                                                                                                        <table style="display: inline-table;  border-spacing: 0px;"
-                                                                                                               width="100%"
-                                                                                                               border="0"
-                                                                                                               cellpadding="0"
-                                                                                                               cellspacing="0">
-                                                                                                            <tbody>
-                                                                                                            <tr>
-                                                                                                                <td style="box-sizing: border-box; border-radius: 5px; border: medium none; padding: 7px 20px 7px; background-color: rgb(254, 99, 9); height: 45px;"
-                                                                                                                    valign="middle"
-                                                                                                                    align="center">
-                                                                                                                    <button href="javascript:;"
-                                                                                                                            target="_blank"
-                                                                                                                            style="width: 100%; display: inline-block; cursor: pointer; text-decoration: none; font-size: 18px; font-family: Arial,Helvetica,sans-serif; line-height: 21.6px; color: rgb(255, 255, 255); background-color: rgb(254, 99, 9); border: 0px none; box-sizing: border-box;">
-                                                                                                                        Подписаться
-                                                                                                                    </button>
-                                                                                                                </td>
-                                                                                                            </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                </tbody>
-                                                                                            </table>
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                    </tbody>
-                                                                                </table>
-                                                                            </td>
-                                                                        </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+
+        <button value="Подписаться" style="width: 220px" class="btn waves-effect waves-light" type="submit"
+                name="action">Подписаться
+            <i class="mdi-communication-email right"></i>
+        </button>
+
     </div>
     <input name="charset" value="" type="hidden">
     <input name="default_list_id" value="5115198" type="hidden">

@@ -91,7 +91,13 @@
                         {/if}
                         <input type="hidden" name="auth_provider" value="{$current_auth_source|default:blogCommentModel::AUTH_GUEST}">
                         <input type="hidden" name="parent" value="0">
-                        <input type="submit" value="[`Add comment`]" class="rv-button orange-button" id="comment_submit">
+                        <!--input type="submit" value="[`Add comment`]" class="rv-button orange-button" id="comment_submit"-->
+
+                        <button id="comment_submit" value="[`Add comment`]" style="width: 220px"
+                                class="btn waves-effect waves-light" type="submit" name="action">[`Add comment`]
+                            <i class="mdi-communication-email right"></i>
+                        </button>
+
                         <img src="{$wa_url}wa-content/img/loading16.gif" style="display: none;" alt="">
                     </div>
                 </div>
