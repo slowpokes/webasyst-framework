@@ -1,0 +1,27 @@
+<div class="sidebar hide-for-mobile">
+    {include file="sidebar.html"}
+</div>
+
+<div class="content">
+
+    <h1 class="category-name">
+        {$title}
+    </h1>
+    
+    <!-- plugin hook: 'frontend_search' -->
+    {* @event frontend_search.%plugin_id% *}
+    {foreach $frontend_search as $_}{$_}{/foreach}
+
+    {if !$products}
+        [`No products were found.`]
+    {else}
+        <div id="product-list">
+            {include file='product-item.html'}
+        </div>
+        {*
+            or use the line below if you want plain table view instead of thumbs
+            {include file='list-thumbs.html'}
+        *}
+    {/if}
+
+</div>

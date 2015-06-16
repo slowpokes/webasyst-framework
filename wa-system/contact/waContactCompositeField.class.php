@@ -226,14 +226,24 @@ class waContactCompositeField extends waContactField
             } else {
                 if ($is_ext && $ext) {
                     $data = $contact->get($this->id);
+                    $prev_sort = null;//VADIM CODE
                     foreach ($data as $sort => $row) {
                         if ($row['ext'] == $ext) {
+                            $prev_sort = $sort;//VADIM CODE
                             unset($data[$sort]);
                         }
                     }
+                    //VADIM CODE START
                     foreach ($value as $v) {
-                        $data[] = $v;
+                        if(($v['ext'] == $ext)&&($prev_sort!==null)){
+                            $data[$prev_sort] = $v;
+                        }
+                        else{
+                            $data[] = $v;
+                        }
                     }
+                    ksort($data);
+                    //VADIM CODE END
                     return $data;
                 } else {
                     return $value;
@@ -369,14 +379,14 @@ class waContactCompositeField extends waContactField
             if ($field instanceof waContactHiddenField) {
                 $result[] = $field->getHTML($params_subfield, $attrs_one);
             } else {
-                $field_class = 'field-'.$this->getId().'-'.$field->getId();
-                if (wa()->getEnv() == 'frontend') {
-                    $field_class = 'wa-'.$field_class;
-                }
-                $result[] = '<span class="'.($field->isRequired() ? $required_class : '').'field '.$field_class.'"><span>'.$field->getName().'</span>'.$field->getHTML($params_subfield, $attrs_one).$errors_html.'</span>';
+                $result[] = '<div class="'.($field->isRequired() ? $required_class : '').'wa-field" data-id="'.$params_subfield['parent'].'.'.$field->getId().'"><div class="wa-name">'.$field->getName().'</div><div class="wa-value">'.$field->getHTML($params_subfield, $attrs_one).$errors_html.'</div></div>'; // VADIM CODE
             }
         }
-        return implode($result);
+        //VADIM CODE START
+        $cl = '';
+        if(isset($params['multi_index'])){$cl = 'multi_block_'.$params['multi_index'];}
+        return '<div class="multi_block '.$cl.'">'.implode($result)."</div>";
+        //VADIM CODE END
     }
 
     public function getHtmlOneWithErrors($errors, $params = array(), $attrs = '')

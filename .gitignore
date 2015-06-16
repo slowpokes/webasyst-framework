@@ -2,4 +2,8 @@ wa-cache
 wa-data
 wa-log
 .fw_compatible
-
+.idea
+wa-log
+*.md5
+wa-config
+wa-apps/warehouse

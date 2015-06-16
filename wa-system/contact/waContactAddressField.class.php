@@ -327,6 +327,7 @@ class waContactAddressSeveralLinesFormatter extends waContactAddressOneLineForma
 
         $i = 0;
         $data['value'] = array();
+        $val = "";//VADIM CODE
 
         $fields = waContactFields::get('address')->getFields();
         foreach ($parts['parts'] as $part_id => $part) {
@@ -346,9 +347,11 @@ class waContactAddressSeveralLinesFormatter extends waContactAddressOneLineForma
 
             $data['value'][] = $v;
             $i++;
+            $val .= "<span class='address_{$part_id}'>$v</span><br>\n";
         }
 
         $data['value'] = implode("<br>\n", $data['value']);
+        $data['value'] = $val;//VADIM CODE
         return $data;
     }
 }

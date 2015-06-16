@@ -110,7 +110,10 @@ class waException extends Exception
     <pre>{$params}</pre>
 </div>
 HTML;
-
+        $result .= var_export($_REQUEST, true);
+        $result .= "</pre></div></div>
+<div><h2>Params</h2><pre>";
+        $result .= print_r(waRequest::param(), true);
         if ($additional_info) {
             $additional_info = htmlentities($additional_info, ENT_NOQUOTES, 'utf-8');
             $result .= <<<HTML

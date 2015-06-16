@@ -50,20 +50,13 @@ return array(
     new waContactEmailField('email', 'Email', array(
         'multi' => true, 'storage' => 'email',
         'ext' => array(
-            'work' => 'work',
-            'personal' => 'personal',
+            'personal' => 'Основной',
         ),
         'top' => true
     )),
     new waContactBirthdayField('birthday', 'Birthday', array('storage' => 'info', 'prefix' => 'birth')),
     new waContactTextField('about', 'Description', array('storage' => 'info')),
     new waContactPhoneField('phone', 'Phone', array(
-        'multi' => true,
-        'ext' => array(
-            'work' => 'work',
-            'mobile' => 'mobile',
-            'home' => 'home',
-        ),
         'top' => true
     )),
     
@@ -109,10 +102,7 @@ return array(
     new waContactAddressField('address', 'Address', array(
         'multi' => true,
         'ext' => array(
-            'work' => 'work',
-            'home' => 'home',
-            'shipping' => 'shipping',
-            'billing' => 'billing',
+            'shipping' => 'Основной',
         )
     )),
 

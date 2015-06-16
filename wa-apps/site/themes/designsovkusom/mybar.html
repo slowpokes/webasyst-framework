@@ -1,0 +1,58 @@
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
+
+<div class="information person">
+
+
+    <div class="set_wrapper">
+        <div id="lk" class="tab-content">
+            <div class="content">
+            </div>
+        </div>
+        <div id="profile" class="tab-content">
+            <div class="set jcarousel">
+
+            </div>
+        </div>
+        <div id="order" class="tab-content">
+            <div class="set jcarousel">
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- plugin hook: 'frontend_product.block_aux' -->
+    {* @event frontend_product.%plugin_id%.block_aux *}
+
+
+</div>
+
+
+{literal}
+    <script type="text/javascript">
+        $("#info_tab > li > a").click(function () {
+            var set_name = $(this).parent().data('set');
+            $("#info_tab > li.current").removeClass('current');
+            $(this).parent().addClass('current');
+            $('.tab-content').hide();
+            $('#' + set_name).show();
+            window.history.pushState({}, '', set_name);
+            return false;
+        });
+        $(document).ready(function () {
+            $.get("/my/profile/", function (data) {
+                $("#profile").html(data);
+            });
+        });
+        $(document).ready(function () {
+            $.get("/my/orders/", function (data) {
+                $("#order").html(data);
+            });
+        });
+        $(".breadcrumbs").hide();
+
+        var pathname = window.location.pathname;
+
+
+    </script>
+{/literal}

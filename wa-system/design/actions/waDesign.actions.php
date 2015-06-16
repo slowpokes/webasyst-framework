@@ -19,7 +19,8 @@ class waDesignActions extends waActions
     public function defaultAction()
     {
         $app_id = $this->getAppId();
-        $app = wa()->getAppInfo($app_id);
+        $app_fake_id = $this->getAppFakeId();// VADIM CODE
+        $app = wa()->getAppInfo($app_fake_id);// VADIM CODE
 
         if (empty($app['themes'])) {
             throw new waException('App does not support themes.');
@@ -256,7 +257,7 @@ class waDesignActions extends waActions
 
     protected function getRoutes($all = false)
     {
-        $routes = wa()->getRouting()->getByApp($this->getAppId());
+        $routes = wa()->getRouting()->getByApp(wa()->getAppFake());// VADIM CODE
 
         $result = array();
         foreach ($routes as $d => $domain_routes) {
@@ -274,7 +275,7 @@ class waDesignActions extends waActions
 
     public function saveAction()
     {
-        $app_id = $this->getAppId();
+        $app_id = $this->getAppFakeId();
         $theme_id = waRequest::get('theme_id');
         $file = waRequest::get('file');
 
@@ -288,7 +289,6 @@ class waDesignActions extends waActions
         if ($theme['type'] == waTheme::ORIGINAL) {
             $theme->copy();
         }
-
         // create file
         if (!$file) {
             // parent
@@ -544,6 +544,7 @@ HTACCESS;
     public function themeAction()
     {
         $app_id = $this->getAppId();
+        $app_id = wa()->replaceName($app_id);//VADIM CODE
         $theme_id = waRequest::get('theme');
         $parent_themes = array();
         $apps = wa()->getApps();
@@ -838,7 +839,7 @@ HTACCESS;
             $duplicate = $theme->duplicate();
             $this->logAction('theme_duplicate', $theme->id);
             $this->displayJson(array('redirect'=>"{$this->design_url}theme={$duplicate->id}&action=theme"));
-        } catch (Exception $e) {
+        } catch (waException $e) {
             $this->displayJson(array(), $e->getMessage());
         }
     }

@@ -53,7 +53,7 @@
         			    <img src="{$wa_url}{$app.icon.24}" />
         				<select class="s-select-app" name="params[app]">
                             {foreach $apps as $app}
-                            <option value="{$app.id}" data-img="{$app.icon.24}">{$app.name}</option>
+                            <option value="{$app.fake_id}" data-img="{$app.icon.24}">{$app.name}</option>
                             {/foreach}
                             <option value="" data-img="wa-apps/site/img/arrow.png">[`Redirect`]...</option>
                         </select>

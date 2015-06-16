@@ -281,6 +281,7 @@ class waSystemConfig
 
     public function getAppsPath($app, $path = null)
     {
+        $app = wa()->replaceNameToReal($app);
         if ($app == 'webasyst') {
             return $this->getRootPath().DIRECTORY_SEPARATOR.'wa-system'.DIRECTORY_SEPARATOR.$app.($path ? DIRECTORY_SEPARATOR.$path : '');
         } else {
@@ -389,6 +390,7 @@ class waSystemConfig
             return new webasystConfig($environment, $root_path);
         }
 
+        $application = wa()->getAppName($application);//VADIM CODE
         if (file_exists($file = $root_path.'/wa-apps/'.$application.'/lib/config/'.$class_name.'.class.php')) {
             require_once($file);
             return new $class_name($environment, $root_path, $application, $locale);

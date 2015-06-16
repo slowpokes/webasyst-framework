@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>{$wa->title()|escape}</title>
+    <meta name="Keywords" content="{$wa->meta('keywords')|escape}" />
+    <meta name="Description" content="{$wa->meta('description')|escape}" />
+
+    <link href="/wa-apps/shop/themes/aromateca/css/style.css" rel="stylesheet" type="text/css">
+    {include file="$wa_active_theme_path/app_head.html"}
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="/wa-apps/shop/themes/aromateca/js/jquery.tools.min.js"></script>
+
+    {$wa->js()}
+    {$wa->headJs()}
+
+    <!-- plugin hook: 'frontend_head' -->
+    {* @event frontend_head.%plugin_id% *}
+    {foreach $frontend_head as $_}{$_}{/foreach}
+
+    <script type="text/javascript" src="/wa-apps/shop/themes/aromateca/js/main.js"></script> {* общие скрипты для сайта *}
+    {include file="$wa_active_theme_path/js.html"}
+    <script>
+        $(document).ready(function () {
+            mainInit();
+        });
+    </script>
+
+</head>
+<body>
+<div class="wrapper">
+    {include file="$wa_active_theme_path/header.html"}
+    <div class="cb"></div>
+    {include file="$wa_active_theme_path/top_menu.html"}
+    <div class="main_content">
+        {$content}
+        <div class="cb"></div>
+    </div>
+    <script>$('.main_content').css('height', 'auto');</script>
+    <div class="push"></div>
+</div>
+{include file="footer.html"}
+{include file="$wa_active_theme_path/noindex.html"}
+
+</body>
+</html>

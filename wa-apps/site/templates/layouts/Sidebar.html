@@ -43,6 +43,22 @@
         <li id="s-link-routing"><a href="#/routing/"><i class="icon16 split"></i>[`Structure`]</a></li>
         <li id="s-link-personal"><a href="#/personal/"><i class="icon16 access"></i>[`Personal`]</a></li>
         <li id="s-link-settings"><a href="#/settings/"><i class="icon16 settings"></i>[`Settings`]</a></li>
+        <li id="s-link-redirect"><a href="#/redirect/"><i class="icon16 export"></i>Редиректы</a></li>
+        <script>
+            $(function(){
+                $.wa.site.redirectAction = function (params) {
+                    if(params){
+                        params = params.replace('?', '&');
+                    }
+                    else{
+                        params = '';
+                    }
+                    $("#s-content").load('?module=redirect&domain_id=' + this.domain + params, function () {
+                        $.wa.site.active($("#s-link-redirect"));
+                    });
+                }
+            });
+        </script>
 
         {* @event backend_sidebar.%plugin_id%.menu_li *}
         <!-- plugin hook: "backend_sidebar.menu" -->

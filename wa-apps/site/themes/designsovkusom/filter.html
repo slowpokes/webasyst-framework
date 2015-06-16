@@ -1,0 +1,95 @@
+
+<!-- ФИЛЬТРЫ -->
+<!-- filtering by product features -->
+{if !empty($filters)}
+    <div class="filters ajax">
+        <form method="get" action="{$wa->currentUrl()}">
+            {foreach $filters as $fid => $filter name=filter}
+                <p>
+                {if $fid == 'price'}
+                <div class="filter-box filter-price">
+                    {$c = $wa->shop->currency(true)}
+                    <div class="filter-name"><b>[`Price`]</b></div>
+                    <div class="filter-content">
+                        <div style="display: none">
+                            [`from`] <input type="text" name="price_min" class="price_min" value="{(int)$price_min}"
+                                            placeholder="{(int)$price_min}" placeholder="0">
+                            [`to`] <input type="text" name="price_max" class="price_max" value="{(int)$price_max}"
+                                          placeholder="{(int)$wa->get('price_max')}" placeholder="&infin;"> {$c.sign}
+                        </div>
+                        <div style="margin: 10px 0">
+                            <input type="text" id="ionrange" value="{(int)$cat_price_min};{(int)$cat_price_max}"
+                                   data-postfix=" {$c.sign}" data-hideminmax="true" data-step="10"
+                                   data-from="{(int)$price_min}" data-to="{(int)$price_max}">
+                        </div>
+                    </div>
+                    </div>
+                {else}
+                <div class="filter-box filter_{$smarty.foreach.filter.iteration}" style="padding-top: 10px">
+                    <div class="filter-name"><b>{$filter.name|escape}</b></div>
+                    <div class="filter-content">
+                        {if $filter.type == 'boolean'}
+                            <div>
+                                <label><input type="radio" name="{$filter.code}"{if $wa->get($filter.code)} checked{/if}
+                                              value="1"> [`Yes`]</label><br>
+                                <label><input type="radio"
+                                              name="{$filter.code}"{if $wa->get($filter.code) === '0'} checked{/if}
+                                              value="0"> [`No`]</label><br>
+                                <label><input type="radio"
+                                              name="{$filter.code}"{if $wa->get($filter.code, '') === ''} checked{/if}
+                                              value=""> [`Any`]</label><br>
+                            </div>
+                        {else}
+                            <div>
+                                {foreach $filter.values as $v_id => $v}
+                                    <label>
+                                        <input type="checkbox" name="{$filter.code}[]"
+                                               {if in_array($v_id, (array)$wa->get($filter.code, array()))}checked{/if}
+                                               value="{$v_id}"> {$v}
+                                    </label>
+                                {/foreach}
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+                {/if}
+                </p>
+            {/foreach}
+            {if $wa->get('sort')}<input type="hidden" name="sort" value="{$wa->get('sort')|escape}">{/if}
+            {if $wa->get('order')}<input type="hidden" name="order" value="{$wa->get('order')|escape}">{/if}
+        </form>
+        <script type="text/javascript" src="{$wa_theme_url}js/ion.rangeslider.min.js"></script>
+        {literal}
+        <script type="text/javascript">
+            $("#ionrange").ionRangeSlider({
+                min: 0,
+                max: 50000,
+                type: "double",
+                step: 100,
+                postfix: " руб",
+                hasGrid: true,
+                hideMinMax: true,
+                hideFromTo: true,
+                prettify: true,
+                onChange: function(obj){
+                    $(".price_min").attr("placeholder",obj.fromNumber);
+                    $(".price_max").attr("placeholder",obj.toNumber);
+                },
+                onFinish: function(obj){
+                    $(".price_min").val(obj.fromNumber);
+                    $(".price_max").val(obj.toNumber);
+                    $(".price_min").change();
+                }
+            });
+
+
+            initFilters($(".filters"));
+            $('.filter_2').brandFilter();
+        </script>
+        {/literal}
+    </div>
+{/if}
+
+<!-- plugin hook: 'frontend_nav' -->
+{* @event frontend_nav.%plugin_id% }
+{foreach $frontend_nav as $_}{$_}{/foreach*}

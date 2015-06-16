@@ -49,7 +49,11 @@
 </head>
 <body id="{$wa_app}">
 
+<<<<<<< HEAD
+    <nav id="sidebar" role="navigation" class="{if $theme_settings.sidebar_color_scheme}{str_replace('img/backgrounds/themesettings/','', str_replace('.png','',$theme_settings.sidebar_color_scheme))}{/if}{if $wa->isAuthEnabled()} bottom-padded{/if}">
+=======
     <nav id="sidebar" role="navigation"{if $wa->isAuthEnabled()} class="bottom-padded"{/if}>
+>>>>>>> upstream/master
 
         <button id="tablet-toggle-sidebar"></button>
 

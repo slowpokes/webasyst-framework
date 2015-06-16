@@ -374,11 +374,25 @@ class waContactForm
                 continue;
             }
 
+            if ($fid === 'photo') {
+                $fake_user = new waContact();
+                $result .= '<div class="' . $class_field . ' ' . ($class_field.'-'.$f->getId()) . '"><div class="' . $class_name . '">' .
+                    _ws('Photo') . '</div><div class="' . $class_value . '">';
+                if (wa()->getUser()->get($fid)) {
+                    $result .= "\n" . '<img src="' . wa()->getUser()->getPhoto() . '">';
+                }
+                $result .= "\n" . '<img src="' . $fake_user->getPhoto() . '">';
+                $result .= "\n" . '<p><input type="file" name="' . $fid . '_file"></p>';
+                $result .= $this->html($fid, true);
+                $result .= "\n</div></div>";
+                continue;
+            }
+
             if ($f instanceof waContactHiddenField) {
                 $result .= $this->html($fid, true);
                 continue;
             }
-
+            
             $field_class = $class_field.'-'.$f->getId();
             if (strpos($fid, '.') !== false) {
                 $field_class .= ' '.$class_field.'-'.str_replace('.', '-', $fid);
@@ -386,10 +400,20 @@ class waContactForm
             if ($f->isRequired()) {
                 $field_class .= ' '.(wa()->getEnv() == 'frontend' ? 'wa-required' : 'required');
             }
-            $result .= '<div class="' . $class_field . ' ' . $field_class . '"><div class="' . $class_name . '">' .
-                $f->getName(null, true) . '</div><div class="' . $class_value . '">';
-            $result .= "\n" . $this->html($fid, $with_errors, $placeholders);
+            //VADIM CODE START
+            $result .= '<div class="'.$class_field.' '.$field_class.'" ';
+            if(isset($this->values[$fid])&&is_array($this->values[$fid])){
+                foreach($this->values[$fid] as $el_id=>$el){
+                    if(isset($el['ext'])){
+                        $result .= ' data-ext-'.$el_id.'="'.$el['ext'].'" ';
+                    }
+                }
+            }
+            $result .= ' data-id="'.$fid.'"><div class="'.$class_name.'">';
+            $result .= $f->getName(null, true).'</div><div class="'.$class_value.'">';
+            $result .= "\n".$this->html($fid, $with_errors);
             $result .= "\n</div></div>";
+            //VADIM CODE END
         }
         $result .= '<input type="hidden" name="_csrf" value="'.waRequest::cookie('_csrf', '').'" />';
         return $result;

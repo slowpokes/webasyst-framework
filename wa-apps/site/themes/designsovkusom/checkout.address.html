@@ -1,0 +1,200 @@
+<script type="text/javascript">
+    alert(1);
+
+
+</script>
+<div class="cart-content">
+    <div id="checkout_address">
+        <h1 class="order_flow">
+            <span class="next cart_return">Корзина</span> &rarr;
+            <span class="current">Адрес доставки</span> &rarr;
+            <span class="next">Подтверждение заказа</span>
+        </h1>
+
+        <div class="wa-form form address_form">
+            <h2> Контактные данные</h2>
+            <form method="post" action="" id="address_form">
+                <div class="wa-field">
+                    <div class="wa-name">Фамилия</div>
+                    <div class="wa-value">
+                        <input type="text" id="lastname" value="{$customer->get('lastname', 'default')}"
+                               name="customer[lastname]">
+                        {if isset($errors)&&$errors['lastname']}
+                            <div class="error_hint">{$errors['lastname']}</div>
+                        {/if}
+                    </div>
+                </div>
+                <div class="wa-field">
+                    <div class="wa-name">Имя</div>
+                    <div class="wa-value">
+                        <input type="text" value="{$customer->get('firstname', 'default')}" name="customer[firstname]">
+                        {if isset($errors)&&$errors['firstname']}
+                            <div class="error_hint">{$errors['firstname']}</div>
+                        {/if}
+                    </div>
+                </div>
+                <div class="wa-field">
+                    <div class="wa-name">Email</div>
+                    <div class="wa-value">
+                        <input type="text" data-validation="email" value="{$customer->get('email', 'default')}"
+                               id="customer[email]" name="customer[email]">
+                        <span class="info_hover "> <span class="mail_info"> Укажите свой email чтобы получать новости со скидками</span>
+                    </div>
+                </div>
+
+                <div hidden="hidden" class="wa-field">
+                    <div class="wa-name">Область</div>
+                    <div class="wa-value">
+                        {*$region*}
+                        <input hidden="hidden" type="text" id="region" value=""
+                               name="customer[address.shipping][region]">
+                        {if isset($errors)&&$errors['region']}
+                            <div class="error_hint">{$errors['region']}</div>
+                        {/if}
+                    </div>
+                </div>
+                <div class="wa-field">
+                    <div class="wa-name">Область</div>
+                    <div class="wa-value">
+                        {*$region*}
+                        <input type="text" id="region_text" value=""
+                               name="customer[address.shipping][region_text]">
+                    </div>
+                </div>
+
+                {*<div class="wa-field field_dynamic field_region_all field_region_Москва">
+                    <div class="wa-name">Район</div>
+                    <div class="wa-value">
+                        <select name="customer[address.shipping][area]">
+                            <option data-code='0'>-</option>
+                            {foreach $areas as $st}
+                            <option
+                            {if isset($address['area'])&&$address['area']==$st}selected{/if}
+                            data-code='{$st.code}'>{$st.name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                *}
+                <div class="wa-field">
+                    <div class="wa-name">Город</div>
+                    <div class="wa-value">
+                        <input type="text" id="city"
+                               name="customer[address.shipping][city]">
+                        {if isset($errors)&&$errors['city']}
+                            <div class="error_hint">{$errors['city']}</div>
+                        {/if}
+                    </div>
+                </div>
+
+                <div class="wa-field field_dynamic field_region_77">
+                    <div class="wa-name">Метро</div>
+                    <div class="wa-value">
+                        <select name="customer[address.shipping][metro]">
+                            <option>-</option>
+                            {foreach $metro as $st}
+                                <option
+                                        {if isset($address['metro'])&&$address['metro']==$st}selected{/if}>{$st}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="wa-field">
+                    <div class="wa-name">Улица</div>
+                    <div class="wa-value">
+                        <input type="text" id="street" value="{$address['street_name']|default:''}"
+                               name="customer[address.shipping][street_name]">
+                    </div>
+                </div>
+
+                <div class="wa-field">
+                    <div class="wa-name">Дом</div>
+                    <div class="wa-value">
+                        <div class="inp_middle">
+                            <input class="i_small" id="house" type="text" value="{$address['house']|default:''}"
+                                   name="customer[address.shipping][house]">
+                        </div>
+                        <div class="field_small">
+                            <div class="name_small">Квартира (офис)</div>
+                            <div class="inp_small"><input class="i_small" type="text"
+                                                          value="{$address['app']|default:''}"
+                                                          name="customer[address.shipping][app]"></div>
+                        </div>
+                        <!--div class="field_small">
+                            <div class="name_small">Корпус</div>
+                            <div class="inp_small"><input class="i_small" type="text" id="buildingAdd"
+                                                          value="{$address['house3']|default:''}"
+                                                          name="customer[address.shipping][house3]"></div>
+                        </div-->
+                    </div>
+                </div>
+
+
+                <!--div class="wa-field">
+                    <div class="wa-name">Строение</div>
+                    <div class="wa-value">
+                        <div class="inp_middle">
+                            <input class="i_small" type="text" value="{$address['house2']|default:''}"
+                                   name="customer[address.shipping][house2]">
+                        </div>
+
+                    </div>
+                </div-->
+
+                <div class="wa-field field_dynamic field_region_77">
+                    <div class="wa-name">Дата доставки</div>
+                    <div class="wa-value">
+                        <input type="text" value="{$params['shipping_date']|default:''}" name="order[shipping_date]">
+                    </div>
+                </div>
+                <div class="wa-field field_dynamic field_region_77">
+                    <div class="wa-name">Время доставки</div>
+                    <div class="wa-value">
+                        <select name="order[shipping_time]">
+                            {foreach $time as $st}
+                                <option
+                                        {if
+                                        isset($params['shipping_date'])&&$params['shipping_date']==$st}selected{/if}>{$st}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="wa-field field_dynamic field_region_all field_region_not_77">
+                    <div class="wa-name">Индекс</div>
+                    <div class="wa-value">
+                        <input readonly type="text" id="zip" value="{$address['zip']|default:''}"
+                               name="customer[address.shipping][zip]">
+                        {if isset($errors)&&$errors['zip']}
+                            <div class="error_hint">{$errors['zip']}</div>
+                        {/if}
+                    </div>
+                </div>
+
+                <div class="wa-field">
+                    <div class="wa-name">Комментарий к заказу</div>
+                    <div class="wa-value">
+                        <textarea name="order[comment]">{$params['comment']|default:''}</textarea>
+                    </div>
+                </div>
+
+                <p id="address_text" class="value" style="color: #BBB"></p>
+
+
+                <div hidden="hidden" class="wa-field" style="position: absolute; top: 692px;">
+                    <div class="wa-name">Карта</div>
+                    <div class="wa-value">
+                        <div id="map" class="add-panel__map" style="width: 670px; height: 200px"></div>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+<script>
+    updateRegion();
+
+</script>

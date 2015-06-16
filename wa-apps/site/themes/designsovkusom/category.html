@@ -1,0 +1,90 @@
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}js/category.js"></script>
+        <div class="categ_page">
+
+
+<div class="content notbl">
+    <div class="sidebar">
+        {if $current_category}
+        <div class="category_sidebar filters">
+            {$wa->shop->showCategoryLinks($current_category)}
+            {$categories = $wa->shop->categories($current_category, -1, true)}
+
+            <table class="homepage_categories">
+                {foreach $categories as $tc_id => $top_category}
+                {if $tc_id is div by $homepage_columns}<tr>{/if}
+                <td>
+                    <div>
+                        <a class="top_category" href="{$top_category.url}">{$top_category.name|escape}</a>
+                    </div>
+                    <div>
+                        {foreach $top_category.childs as $child_category name=child_categories}
+                        <a href="{$child_category.url}">{$child_category.name|escape}</a>{if !$smarty.foreach.child_categories.last}, {/if}
+                        {/foreach}
+                    </div>
+                </td>
+                {if $tc_id+1 is div by $homepage_columns}<tr>{/if}
+                {/foreach}
+            </table>
+        </div>
+            {else}
+        <div class="category_sidebar filters">{$wa->shop->showCategoryLinks(0)}</div>
+        {/if}
+
+        {include file="filter.html"}
+        {*if $category.description}
+        <div class="category_sidebar filters">
+            {$category.description}
+        </div>
+        {/if*}
+    </div>
+    <div class="content-container">
+
+        {$cat=$wa->shop->category($current_category)}
+        {*if $cat.custom_image}
+        <img src="{$cat.custom_image}" class="category_image" width="724px" height="200px">
+        {/if*}
+        {if isset($category.params.image_url)}
+            <a href="{$category.params.image_url}">
+                <div class="category_logo"><img src="{shopCategoryImagesPlugin::getCategoryImageUrl($category.id)}">
+                </div>
+            </a>
+        {/if}
+        <div class="category_products">
+        <div id="product-list">
+            {if !$products}
+            {if !empty($filters)}
+            [`No products were found.`]
+            {else}
+            [`This category does not contain any products.`]
+            {/if}
+            {else}
+                {include file='product-item.html' sorting=!empty($category.params.enable_sorting) }
+            {/if}
+        </div>
+        <!-- description -->
+            {if $category.description}
+            <div class="description" style="width: 980px">
+            <p>{$category.description}</p>
+                {/if}
+            </div>
+            {if $category.tags}
+                <!-- ТЕГИ -->
+                {$t = (explode(",",$category.tags))}
+                <p class="tags" id="product-tags" style="margin-top: 20px">
+                    <!--span class="weight600">[`Tags`]:</span-->
+                        <span class="product-infos">
+                        {foreach $t as $ts}
+                            <a href="{$wa->getUrl('/frontend/tag', ['tag' => urlencode($ts)])}">{$ts}</a>
+                        {/foreach}
+                        </span>
+                </p>
+            {/if}
+        </div>
+    </div>
+    <!-- /content-container -->
+</div><!-- /content -->
+
+<div class="clear-both"></div>
+
+</div>

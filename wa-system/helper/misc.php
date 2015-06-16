@@ -240,6 +240,16 @@ function wa_make_pattern($string, $separator = '/')
     $cleanup_pattern = '@('.implode('|',$metacharacters).')@';
     return preg_replace($cleanup_pattern,'\\\\$1',$string);
 }
+// VADIM CODE START
+function remove_from_query_string($needle) {
+    $query_string = $_SERVER['QUERY_STRING']; // Work on a seperate copy and preserve the original for now
+    $query_string = preg_replace("/\&$needle=[a-zA-Z0-9].*?(\&|$)/", '&',   $query_string);
+    $query_string = preg_replace("/(&)+/","&",$query_string); // Supposed to pull out all repeating &s, however it allows 2 in a row(&&). Good enough for now
+    $_SERVER['QUERY_STRING'] = $query_string;
+    unset($_GET[$needle]);
+}
+
+// VADIM CODE END
 
 /**
  * Calculate diff of multidimensional and hierarchical arrays

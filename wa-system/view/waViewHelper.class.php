@@ -683,7 +683,7 @@ HTML;
                 $field_name = ucfirst($field_id);
             }
         }
-        return '<div class="wa-form">'.
+        return '<div class="wa-form login_form">'. // VADIM CODE
             ($form ? '<form action="'.($form === 2 ? $this->loginUrl() : '').'" method="post">' : '').'
                 <div class="wa-field wa-field-'.$field_id.'">
                     <div class="wa-name">'.$field_name.'</div>
@@ -701,7 +701,10 @@ HTML;
                 <div class="wa-field">
                     <div class="wa-value wa-submit">
                         <input type="hidden" name="wa_auth_login" value="1">
-                        <input type="submit" value="'._ws('Sign In').'">
+                        <input type="submit" class="button" value="'._ws('Sign In').'">
+                    </div>
+                </div>
+                <div class="wa-field">
                         &nbsp;
                         <a href="'.$this->getUrl('/forgotpassword').'">'._ws('Forgot password?').'</a>
                         &nbsp;
@@ -858,7 +861,7 @@ HTML;
         }
         $signup_submit_name = !empty($config['params']['button_caption']) ? htmlspecialchars($config['params']['button_caption']) : _ws('Sign Up');
         $html .= '<div class="wa-field"><div class="wa-value wa-submit">
-            <input type="submit" value="'.$signup_submit_name.'"> '.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
+            <input type="submit" class="button" value="'.$signup_submit_name.'"> '.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
         </div></div>';
         if (waRequest::param('secure')) {
             $html .= $this->csrf();
@@ -1083,4 +1086,78 @@ HTML;
         }
         return self::$helpers[$app];
     }
+
+    //VADIM CODE START
+    public function backend()
+    {
+        return wa()->getConfig()->getBackendUrl(true);
+    }
+
+    public function vdebug(){
+        return Debug::getHtml();
+    }
+
+    public function cityBlock(){
+        $geoip = new Geoip();
+        $city = $geoip->getCity();
+        if($city)
+            return "Ваш город: <span class='city_name'>$city</span>";
+        return "";
+    }
+
+    public function regionBlock(){
+        $geoip = new Geoip();
+        $region_id = $geoip->getRegion();
+        if($region_id>0){
+        }
+        else{
+            $region_id = 77; 
+        }
+        $region = $geoip->getRegionName($region_id);
+        return "<span id='region_name' class='region_name region_handler' data-id='$region_id'>$region</span>";
+    }
+
+    public function geoData(){
+        $geoip = new Geoip();
+        $data = $geoip->getData();
+        if($data){
+            return "putGeoData('{$data['city']}', {$data['region']})";
+        }
+        return '';
+    }
+
+    public function regions(){
+        $geoip = new Geoip();
+        $data = $geoip->allRegions();
+        $str = "";
+        foreach($data as $region){
+            $str .= "<option value='{$region['code']}'>{$region['name']}</option>";
+        }
+        return $str;
+    }
+
+    public function regionsList(){
+        $geoip = new Geoip();
+        $data = $geoip->allRegions();
+        $str = "<ul>";
+        foreach($data as $region){
+            $str .= "<li><a href='#' data-code='{$region['code']}'>{$region['name']}</a></li>";
+        }
+        $str .= "</ul>";
+        return $str;
+    }
+
+    public function getAppTitle(){
+        $fake = wa()->getAppFake();
+        $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
+        if(isset($all_apps[$fake]['title_html'])){
+            return $all_apps[$fake]['title_html'];
+        }
+        elseif(isset($all_apps[$fake]['title'])){
+            return $all_apps[$fake]['title'];
+        }
+        return '';
+    }
+
+    //VADIM CODE END
 }

@@ -244,6 +244,7 @@ class waRouting
     {
         static $_page_routes;
 
+        $app_id = waSystem::getAppName($app_id); //VADIM CODE
         if ($_page_routes === null || !isset($_page_routes[$app_id])) {
 
             if ($cache = wa($app_id)->getCache()) {
@@ -287,6 +288,7 @@ class waRouting
 
     protected function getAppRoutes($app, $route = array(), $dispatch = false)
     {
+        wa()->setApp(wa()->getAppName($app), $app); // VADIM CODE
         $routes = waSystem::getInstance($app, null, $dispatch)->getConfig()->getRouting($route, $dispatch);
         $routes = $this->formatRoutes($routes, true);
         if ($dispatch && wa($app)->getConfig()->getInfo('pages') && $app != 'site') {
@@ -373,8 +375,9 @@ class waRouting
         }
         $parts = explode('/', $path);
         $app = $parts[0];
+        $app = wa()->replaceName($app); // VADIM CODE
         if (!$app) {
-            $app = $this->system->getApp();
+            $app = $this->system->getAppFake(); // VADIM CODE
         }
         if (!wa()->appExists($app)) {
             return null;
@@ -432,6 +435,17 @@ class waRouting
         $max = -1;
         $result = null;
 
+        // VADIM CODE START
+        if(isset($params['fast'])&&$params['fast']&&$path=='shop/frontend/product'){
+            foreach ($routes as $domain => $domain_routes) {
+                foreach($domain_routes as $r){
+                    if($r['app']==$app){
+                        return "http://$domain/product/".$params['product_url'].'/';
+                    }
+                }
+            }
+        }
+        // VADIM CODE END
         foreach ($routes as $domain => $domain_routes) {
             foreach ($domain_routes as $r) {
                 $i = $this->countParams($r, $params);

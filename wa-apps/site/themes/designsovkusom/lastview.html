@@ -1,0 +1,56 @@
+<!-- НЕДАВНО СМОТРЕЛИ -->
+
+{if isset($smarty.cookies.dsvviewed)}
+
+    {$lastviews = $smarty.cookies.dsvviewed}
+    {assign var=last_views value=","|explode:$lastviews}
+
+    {if $last_views ne ''}
+        <div id="lssl" class="lastview">
+            <h3>Вы недавно смотрели!</h3>
+
+            <div id="last-prev"></div>
+            <div id="last-next"></div>
+            <ul class="product_items product-list blocks">
+                {section name=i loop=$last_views step=-1}
+
+                    {$im=$wa->shop->product($last_views[i])}
+
+                    <li style="height: 275px;" itemscope itemtype ="http://schema.org/Product" {if empty($cart)}{*if $im@iteration is div by $line_count}style="margin-right: 0;"{/if*}{/if} {if $im.badge}class="{$im.badge}"{/if}>
+                        <a href="{$wa_url}product/{$im.url}"  title="{$im.name}{if $im.summary} &mdash; {strip_tags($im.summary)}{/if}">
+                            <div class="imagess">
+                                {$badge_html = $wa->shop->badgeHtml($im.badge)}
+                    {if $badge_html}
+                        <div class="corner top left">{$badge_html}</div>
+                    {/if}
+
+                    {$wa->shop->productImgHtml($im, '200h200', ['itemprop' => 'image', 'alt' => $im.name, 'default' => "`$wa_theme_url`img/dummy200.png"])}
+                            </div>
+                            <div class="product-info">
+                                <h5 itemprop="name">
+                                    {$im.name|truncate:30}
+                                </h5>
+                                <h6>{$im.type.name}</h6>
+
+
+
+                                <div itemprop="offers" class="offers" itemscope itemtype="http://schema.org/Offer">
+                                    <div class="description">
+                                        Артикул: {$im.sku_id+10000}
+                                    </div>
+                                    <div class="prices">
+                                        <span class="price nowrap" itemprop="price">{shop_currency($im.price)}</span>
+
+                                    </div>
+                                    <a class="show_details" href="{$wa_url}product/{$im.url}"><input type="submit" value="Посмотреть" class="details"></a>
+
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    </a>
+                {/section}
+            </ul>
+        </div>
+    {/if}
+{/if}

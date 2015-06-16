@@ -788,6 +788,13 @@ abstract class waContactField
                         return $result[0];
                     }
                 }
+                $str = '';
+                //VADIM CODE START
+                foreach($result as $id=>$el){
+                    $str .= '<p class="field_separator field_separator_'.$id.'" data-id="'.$id.'">'.$el.'</p>';
+                }
+                return $str;
+                //VADIM CODE END
                 return '<p>'.implode('</p><p>', $result).'</p>';
             } else {
                 // Multi-field with no values

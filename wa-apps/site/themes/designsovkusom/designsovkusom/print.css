@@ -1,0 +1,15 @@
+@media print {
+    body {color: #000;background: #fff;}
+    h1 {color: #000;background: none;}
+    nav, aside {display: none;}
+    body, article {width: 100%;margin: 0;padding: 0;}
+    @page {margin: 2cm;}
+    img {max-width: 100% !important;}
+    article {page-break-before: always;}
+    ul, img {page-break-inside: avoid;}
+    .sidebar,.wrapper_top,.wrapper,.wrapper_menu,#footer,.product-navigation,.add-links a,.breadcrumbs,div.tab,.product-share, .product-submit-dialog, .crossselling, .upselling {display: none;}
+    .tab {display: none !important;}
+    #tab1 {display:block !important;}
+    .content {margin:0; display: block; width: 100%;}
+    input[type="checkbox"],select {display: none;}
+}

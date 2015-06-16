@@ -1,0 +1,54 @@
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
+<div class="sidebar">
+    {include file="sidebar.html"}
+</div>
+
+<div class="content">
+    <div class="content-container">
+        <h1 class="category-name">
+            {$category.name|escape} [<span>{$wa->shop->productsCount("category/`$category.id`")}</span>]
+        </h1>
+        
+        <!-- plugin hook: 'frontend_category' -->
+        {* @event frontend_category.%plugin_id% *}
+        {foreach $frontend_category as $_}{$_}{/foreach}
+        
+        <!-- description -->
+        {if $category.description}
+            <p>{$category.description}</p>
+        {/if}
+    
+        <!-- subcategories -->
+        {if $category.subcategories}
+            <div class="sub-categories">
+                {foreach $category.subcategories as $sc}
+                <a href="{$sc.url}" title="{$sc.name}" class="subcategory{if $sc@first} first{/if}"{if $sc@iteration is div by 5}style="margin-left:0px"{/if}>
+                    <div class="subcat_image">
+                        {$cat=$wa->shop->category($sc.id)}
+                        {if $cat.params}<img src="{$cat.params.image}">{/if}
+                        <div class="align-helper"></div>
+                    </div>
+                    <div class="subcat_name">
+                        {$sc.name|truncate:30:"..."} [<span>{$wa->shop->productsCount("category/`$sc.id`")}</span>]
+                    </div>
+                </a>
+                {/foreach}
+            </div>
+        {/if}
+        <div class="clear-left"></div>
+        <div class="subcat-divider"></div>
+    
+        <div id="product-list">
+        {if !$products}
+            {if !empty($filters)}
+                [`No products were found.`]
+            {else}
+                [`This category does not contain any products.`]
+            {/if}
+        {else}
+            {include file='product-item.html' sorting=!empty($category.params.enable_sorting)}
+        {/if}
+        </div>
+    </div><!-- /content-container -->
+</div><!-- /content -->
+<div class="clear-both"></div>

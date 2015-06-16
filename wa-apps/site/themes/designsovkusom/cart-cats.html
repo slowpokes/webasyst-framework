@@ -1,0 +1,31 @@
+{$cats = $wa->shop->categories(0, null, true)}
+{if !empty($cats)}
+<div class="leftmenu clear-both">
+    <div id="cart-cats"><i class="icon categories"></i>Категории</div>
+    <ul>
+        {foreach from=$cats item=cat name=leftmenu}
+            {$subcats = $wa->shop->categories($cat.id,null,true)}
+            <li {if count($subcats)>0}class="category_tree"{/if}>
+                <a href="{$cat.url}">{$cat.name}</a>
+                {if count($subcats)>0}
+                <ul>
+                    {foreach from=$subcats item=subcat name=subleftmenu}
+                        <li {if $smarty.foreach.subleftmenu.first}class="first"{/if}{if $smarty.foreach.subleftmenu.last}class="last"{/if}><a href="{$subcat.url}">{$subcat.name}</a></li>
+                    {/foreach}
+                </ul>
+            {/if}
+            </li>
+        {/foreach}
+    </ul>
+</div>
+{/if}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#cart-cats").hover(function(){
+            $(".leftmenu ul").show();
+        });
+        $(".leftmenu ul").mouseleave(function(){
+            $(this).hide();
+        });
+    });
+</script>

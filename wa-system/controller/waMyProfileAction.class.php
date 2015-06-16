@@ -19,7 +19,14 @@ abstract class waMyProfileAction extends waViewAction
 
         $this->form->setValue($this->contact);
 
+        $this->updateAddress($this->contact);//VADIM CODE
         $saved = waRequest::post() && $this->saveFromPost($this->form, $this->contact);
+
+        //VADIM CODE START
+        if($saved){
+            $this->redirect('/my/profile/');
+        }
+        //VADIM CODE END
 
         $this->view->assign('saved', $saved);
         $this->view->assign('contact', $this->contact);
@@ -182,6 +189,74 @@ abstract class waMyProfileAction extends waViewAction
         ));
     }
 
+    //VADIM CODE START
+    private function updateAddress(waContact $contact){
+        if(isset($_POST['customer']['address'])){
+            //исправляем поля если только один адрес
+            foreach($_POST['customer']['address'] as $key=>$val){
+                if(!is_int($key)){
+                    $_POST['customer']['address'][0][$key] = $val;
+                    unset($_POST['customer']['address'][$key]);
+                }
+            }
+
+            //добавление нового адреса
+            $add = waRequest::post('add', null, 'array');
+            if($add){
+                if(isset($add['address'])){
+                    if(count($_POST['customer']['address'])==1){
+                        $arr = $_POST['customer']['address'][0];
+                        $arr['ext'] = '';
+                        $_POST['customer']['address'][] = $arr;
+                    }
+                    $arr = array('ext'=>'', 'country' => 'rus');
+                    $_POST['customer']['address'][] = $arr;
+                }
+            }
+
+            // восстанавливаем shipping адрес
+            $addr = $contact->get('address');
+            if(!isset($_POST['customer']['address'][0])){
+                $_POST['customer']['address'][0] = $addr[0];
+                ksort($_POST['customer']['address']);
+            }
+
+            // формирование названия адреса
+            foreach($_POST['customer']['address'] as $key=>$val){
+                if($key==0){
+                    $_POST['customer']['address'][$key]['ext'] = 'shipping';
+                }
+                else{
+                    if(isset($addr[$key]['ext'])){
+                        $_POST['customer']['address'][$key]['ext'] = $addr[$key]['ext'];
+                    }
+                    else{
+                        $_POST['customer']['address'][$key]['ext'] = "custom_$key";
+                    }
+                }
+            }
+
+            // удаление адреса
+            $delete = waRequest::post('delete', null, 'array');
+            if($delete){
+                if(isset($delete['address'])){
+                    if($delete['address']>0){
+                        foreach($delete['address'] as $id=>$smth){
+                            if(isset($_POST['customer']['address'][$id])){
+                                array_splice($_POST['customer']['address'], $id, 1);
+                            }
+                            if(count($_POST['customer']['address'])==2){
+                                array_splice($_POST['customer']['address'], 0, 1);
+                                $_POST['customer']['address'][0]['ext'] = 'shipping';
+                            }
+                        }
+                    }
+                }
+            }
+            ksort($_POST['customer']['address']);
+        }
+    }
+    //VADIM CODE END
     /**
      * @description Get HTML with contact info (field name => field html)
      * @return array

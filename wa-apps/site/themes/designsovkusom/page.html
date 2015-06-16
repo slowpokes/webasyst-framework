@@ -1,0 +1,36 @@
+
+<div class="content">
+    <div id="page" class="pg" role="main">
+
+        {$shop_pages=$wa->shop->pages()}
+        <ul id="nav_page" class="page_tab">
+            {foreach $shop_pages as $pages}
+                {if !isset($pages.show) || $pages.show == false}
+                    <li data-set="{$pages.id}" data-url="{$pages.url}"><a href="#">{$pages.name}</a></li>
+                {/if}
+            {/foreach}
+        </ul>
+
+
+        {foreach $shop_pages as $pages}
+            {$i = 0}
+            <div id="{$pages.id}" data-urls="{$pages.url}" class="tabs-content">
+                {$t[$i] = $wa->shop->page($pages.id)}
+                <h1> {$t[$i]['name']}</h1>
+                {$t[$i]['content']}
+            </div>
+        {/foreach}
+
+        <div class="clear-both"></div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    var pathname = window.location.pathname;
+    $('.tabs-content').hide();
+    $("*[data-urls='" + pathname + "']").show();
+
+    $("#nav_page > li.current").removeClass('current');
+    $("*[data-url='" + pathname + "']").addClass('current');
+    //tes.show();
+</script>

@@ -61,6 +61,7 @@ class waModel
 
     //private $readonly   = false;
 
+    protected $use_config_db_name = false; //VADIM CODE
     /**
      * @param string $type
      * @param bool $writable
@@ -69,6 +70,7 @@ class waModel
     {
         $this->writable = $writable;
         $this->type = $type ? $type : 'default';
+        $this->type = $this->getDBSheme(); // VADIM CODE
         $this->adapter = waDbConnector::getConnection($this->type, $this->writable);
         if ($this->table && !$this->fields) {
             $this->getMetadata();
@@ -165,6 +167,7 @@ class waModel
             $table = $this->table;
         }
         if ($table) {
+            Debug::describe($table, $keys); //VADIM CODE
             return $this->adapter->schema($table, $keys);
         } else {
             return array();
@@ -229,7 +232,11 @@ class waModel
     private function run($sql, $unbuffer = false)
     {
         $sql = trim($sql);
+        Debug::queryStart();//VADIM CODE
         $result = $this->adapter->query($sql);
+        if (Debug::enabled()){//VADIM CODE
+            Debug::query($sql, $result, $this->adapter->errorCode(), $this->adapter->error(), debug_backtrace());//VADIM CODE
+        }//VADIM CODE
         if (!$result) {
             $error = "Query Error\nQuery: ".$sql.
                      "\nError: ".$this->adapter->errorCode().
@@ -326,6 +333,11 @@ class waModel
             if (!is_array($params)) {
                 $params = array($params);
             }
+            //VADIM CODE START
+            Debug::sql($sql);
+            $res = $this->prepare($sql)->query($params);
+            return $res;
+            //VADIM CODE END
             return $this->prepare($sql)->query($params);
         }
 
@@ -342,6 +354,9 @@ class waModel
 
                 return $result;
             }
+            else{//VADIM CODE
+                Debug::setCached();//VADIM CODE
+            }//VADIM CODE
             $this->cache = null;
             return $cache;
         }
@@ -1059,4 +1074,24 @@ class waModel
         }
         return $schema;
     }
+
+    // VADIM CODE START
+    private function getDBSheme(){
+        if($this->use_config_db_name){
+            $db = wa()->getDb();
+            if($db){
+                return $db;
+            }
+        }
+        return 'default';
+    }
+
+    public function setDb($db){
+        $this->type = $db;
+    }
+
+    public function showScheme(){
+        echo "\nDB sheme is ".$this->getDBSheme()."\n";
+    }
+    // VADIM CODE END
 }

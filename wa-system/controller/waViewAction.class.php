@@ -64,6 +64,9 @@ abstract class waViewAction extends waController
     protected function setThemeTemplate($template)
     {
         $this->template = 'file:'.$template;
+        if($template=='error.html'){
+            throw new waException("Error page generated", 404);
+        }
         return $this->view->setThemeTemplate($this->getTheme(), $template);
     }
 
@@ -149,6 +152,9 @@ abstract class waViewAction extends waController
 
     public function display($clear_assign = true)
     {
+        $this->view->assign('_message', waMessage::getMessage('message'));
+        $this->view->assign('_error', waMessage::getMessage('error'));
+        $this->view->assign('_result', waMessage::getMessage('result'));
         $this->view->cache($this->cache_time);
         if ($this->cache_time && $this->isCached()) {
             return $this->view->fetch($this->getTemplate(), $this->cache_id);

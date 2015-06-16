@@ -35,6 +35,7 @@ class waAppSettingsModel extends waModel
 
     public function get($app_id, $name = null, $default = '')
     {
+        $app_id = wa()->replaceName($app_id);// VADIM CODE
         $key = $this->getCacheKey($app_id);
         if (!isset(self::$settings[$app_id])) {
             $cache = $this->getCache($app_id);
@@ -68,6 +69,7 @@ class waAppSettingsModel extends waModel
 
     public function set($app_id, $name, $value)
     {
+        $app_id = wa()->replaceName($app_id);// VADIM CODE
         $key = $this->getCacheKey($app_id);
         $this->getCache($app_id)->delete();
         if ($this->getByField(array('app_id' => $key, 'name' => $name))) {
@@ -81,6 +83,7 @@ class waAppSettingsModel extends waModel
 
     public function del($app_id, $name = null)
     {
+        $app_id = wa()->replaceName($app_id);// VADIM CODE
         $key = $this->getCacheKey($app_id);
         $this->getCache($app_id)->delete();
         $params = array('app_id' => $key);

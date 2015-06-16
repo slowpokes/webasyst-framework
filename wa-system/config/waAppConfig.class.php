@@ -198,8 +198,8 @@ class waAppConfig extends SystemConfig
     {
         $files = array(
             $this->getAppPath().'/lib/config/config.php', // defaults
-            $this->getPath('config').'/apps/'.$this->application.'/config.php' // custom
-        );
+            $this->getPath('config').'/apps/'.wa()->replaceName($this->application).'/config.php' // custom
+            );
         foreach ($files as $file_path) {
             if (file_exists($file_path)) {
                 $config = include($file_path);

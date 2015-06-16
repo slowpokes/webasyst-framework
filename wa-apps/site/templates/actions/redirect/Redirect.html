@@ -1,0 +1,157 @@
+<script type="text/javascript">
+    document.title = 'Редиректы - {$domain}' ;
+</script>
+<div class="content">
+    <div class="s-editor s-white">
+        <div class="block s-grey-toolbar">
+            <h4 style="margin-left: 4px; margin-top:2px;">Редиректы</h4>
+        </div>
+        <div class="block s-routing-header">
+            <a href="#" class="inline-link" id="s-redirect-add"><i class="icon16 add"></i><b><i>Добавить редирект</i></b></a>
+        </div>
+        <div class="block double-padded">
+            <div id="add_form_block" class="hidden">
+                <form method="post" id="add_form">
+                    <div class="field-group">
+                        <div class="field">
+                            <div class="name">Старый URL</div>
+                            <div class="value">
+                                <input type="text" value="" name="url" class="long"/>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">Новый URL</div>
+                            <div class="value">
+                                <input type="text" value="" name="redirect" class="long"/>
+                            </div>
+                        </div>
+                        <input type="hidden" value="{$domain_id}" name="domain_id" class="long"/>
+                        <div class="field">
+                            <div class="value">
+                                <input id="btn_add" type="submit" value="Сохранить" class="button green"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="paging">
+                {wa_pagination total=$pages_count nb=3 page=$paging.page url='#/redirect/'}
+            </div>
+            <div>
+                <table class="zebra" id="redirect_table">
+                    <thead>
+                    <tr>
+                        <th><a href="#" data-sort="status">Статус</a></th>
+                        <th><a href="#" data-sort="url">Старый URL</a></th>
+                        <th><a href="#" data-sort="redirect">Новый URL</a></th>
+                        <th> </th>
+                    </tr>
+                    </thead>
+                {foreach $urls as $url}
+                    <tr>
+                        {if ($url.redirect==''||($url.redirect=='/'))}<td><i class="icon16 status-red"></i></td>
+                        {else}<td><i class="icon16 status-green"></i></td>
+                        {/if}
+                        <td><a href="http://{$domain_replace}/{$url.url}" target="_blank">http://{$domain_replace}/{$url.url}</a></td>
+                        <td><a href="http://{$domain}{$url.redirect}" target="_blank">http://{$domain}{$url.redirect}</td>
+                        <td><a href="#" class="edit_row" data-id="{$url.id}"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="{$url.id}"><i class="icon16 delete"></i></a></td>
+                    </tr>
+                {/foreach}
+                </table>
+            </div>
+            <div class="paging">
+                {wa_pagination total=$pages_count nb=3 page=$paging.page url='#/redirect/'}
+            </div>
+        </div>
+        <div class="clear-left"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $("#s-redirect-add").click(function(){
+        $("#add_form_block").toggle();
+        return false;
+    });
+    $("#btn_add").click(function(){
+        $.post("?module=redirect&action=add&domain_id={$domain_id}" , $('#add_form').serialize(), function (json) {
+            $("#redirect_table > tbody").prepend(getLineStr(json.data.info));
+        }, "json");
+        return false;
+    });
+    $(".del_row").on('click', function(){
+        var el = $(this);
+        $.post("?module=redirect&action=delete&domain_id={$domain_id}" , { id:el.data('id') }, function (json) {
+            el.parents('tr').remove();
+        }, "json");
+        return false;
+    });
+    $(".edit_row").on('click', function(){
+        var redirect = prompt('URL куда:', '');
+        if(redirect){
+            var el = $(this);
+            $.post("?module=redirect&action=update&domain_id={$domain_id}" , { id:el.data('id'),redirect:redirect }, function (json) {
+                el.parents('tr').replaceWith(getLineStr(json.data.info));
+            }, "json");
+        }
+        return false;
+    });
+    $("#redirect_table > thead").find('a').click(function(){
+        var url = '#/redirect/?page={$paging.page}';
+        url += '&sort='+$(this).data('sort');
+        if($(this).data('sort')=='{$paging.sort}'){
+            {if $paging.order==''}
+            url += '&order=desc';
+            {/if}
+        }
+        window.location.hash = url;
+        return false;
+    });
+    function getLineStr(info){
+        var str = '<tr>';
+        if ((info.redirect=='')||(info.redirect=='/')){
+            str += '<td><i class="icon16 status-red"></i></td>';
+        }
+        else{
+            str += '<td><i class="icon16 status-green"></i></td>';
+        }
+        str += '<td><a href="http://{$domain_replace}/'+info.url+'" target="_blank">http://{$domain_replace}/'+info.url+'</td><td><a href="http://{$domain}'+info.redirect+'" target="_blank">http://{$domain}'+info.redirect+'</td><td><a href="#" class="edit_row" data-id="'+info.id+'"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="'+info.id+'"><i class="icon16 delete"></i></a></td></tr>'
+        return str;
+    }
+</script>
+
+<style>
+    table.zebra a{
+        display: inline;
+    }
+    table.zebra{
+        width: auto;
+    }
+
+    table tr td:last-child{
+        white-space: nowrap;
+    }
+
+    .paging{
+        margin: 20px 0;
+    }
+
+    .paging ul{
+        padding: 0;
+        margin: 0;
+    }
+
+    .paging li{
+        display: inline-block;
+        vertical-align: top;
+        margin: 0 5px;
+        pad
+    }
+
+    .paging li a{
+        padding: 5px 10px;
+    }
+
+    .paging li.selected a{
+        background: #eee;
+    }
+</style>

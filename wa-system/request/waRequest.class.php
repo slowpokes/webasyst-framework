@@ -460,6 +460,18 @@ class waRequest
         return self::param('theme', 'default');
     }
 
+    // VADIM CODE START
+    public static function getArrayValue($array, $search_key, $search_value, $result_key){
+        if(!isset($array[$search_key])) return null;
+        foreach($array[$search_key] as $key=>$item){
+            if($item==$search_value){
+                if(isset($array[$result_key][$key])) return $array[$result_key][$key];
+                return null;
+            }
+        }
+        return null;
+    }
+    // VADIM CODE END
     public static function isHttps()
     {
         if (!empty($_SERVER['HTTP_X_HTTPS']) && strtolower($_SERVER['HTTP_X_HTTPS']) != 'off') {

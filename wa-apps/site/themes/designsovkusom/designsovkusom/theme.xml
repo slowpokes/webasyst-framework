@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE theme PUBLIC "wa-app-theme" "http://www.webasyst.com/wa-content/xml/wa-app-theme.dtd">
+<theme id="designsovkusom" system="" vendor="988467" author="Designsovkusom" app="shop" version="1.0.0">
+    <name locale="en_US">Designsovkusom</name>
+    <name locale="ru_RU">Дизайн со вкусом</name>
+    <files>
+        <file path="index.html" custom="0">
+            <description locale="en_US">Common layout</description>
+            <description locale="ru_RU">Основной макет</description>
+        </file>
+        <file path="default.css" custom="0">
+            <description locale="en_US">Core CSS file</description>
+            <description locale="ru_RU">Основной файл CSS-стилей</description>
+        </file>
+        <file path="mobile.css" custom="0">
+            <description locale="en_US">Additional CSS for multi-touch mobile devices</description>
+            <description locale="ru_RU">Дополнительный CSS для мобильных устройств</description>
+        </file>
+        <file path="category.html" custom="0">
+            <description locale="en_US">Wrapper for a category page</description>
+            <description locale="ru_RU">Обертка для страницы категории</description>
+        </file>
+        <file path="list-thumbs.html" custom="0">
+            <description locale="en_US">Product list thumbnail view</description>
+            <description locale="ru_RU">Список товаров эскизами</description>
+        </file>
+        <file path="list-table.html" custom="0">
+            <description locale="en_US">Product list table view</description>
+            <description locale="ru_RU">Список товаров таблицей</description>
+        </file>
+        <file path="product.html" custom="0">
+            <description locale="en_US">Dedicated product page</description>
+            <description locale="ru_RU">Шаблон основной страницы товара</description>
+        </file>
+        <file path="product.cart.html" custom="0">
+            <description locale="en_US">Product add to cart block</description>
+            <description locale="ru_RU">Блок добавления товара в корзину</description>
+        </file>
+        <file path="product.js" custom="0">
+            <description locale="en_US">Product page JS</description>
+            <description locale="ru_RU">JS-скрипты страницы товара</description>
+        </file>
+        <file path="product.page.html" custom="0">
+            <description locale="en_US">Product static subpage content</description>
+            <description locale="ru_RU">Информационная подстраница товара</description>
+        </file>
+        <file path="review.html" custom="0">
+            <description locale="en_US">A single product review template</description>
+            <description locale="ru_RU">Шаблон вывода одного отзыва о товаре</description>
+        </file>
+        <file path="reviews.html" custom="0">
+            <description locale="en_US">Product review list</description>
+            <description locale="ru_RU">Список отывов о товаре</description>
+        </file>
+        <file path="compare.html">
+            <description locale="en_US">Product comparison</description>
+            <description locale="ru_RU">Сравнение товаров</description>
+        </file>
+        <file path="cart.html" custom="0">
+            <description locale="en_US">Shopping cart page</description>
+            <description locale="ru_RU">Страница с товарами корзины</description>
+        </file>
+        <file path="cart.js" custom="0">
+            <description locale="en_US">Cart JS</description>
+            <description locale="ru_RU">JS-скрипты корзины</description>
+        </file>
+        <file path="checkout.html" custom="0">
+            <description locale="en_US">Checkout core wrapper</description>
+            <description locale="ru_RU">Единый шаблон страниц оформления заказа</description>
+        </file>
+        <file path="checkout.shipping.html" custom="0">
+            <description locale="en_US">Checkout: shipping option selection</description>
+            <description locale="ru_RU">Оформление заказа: выбор способа доставки</description>
+        </file>
+        <file path="checkout.payment.html" custom="0">
+            <description locale="en_US">Checkout: payment option selection</description>
+            <description locale="ru_RU">Оформление заказа: выбор способа доставки</description>
+        </file>
+        <file path="checkout.contactinfo.html" custom="0">
+            <description locale="en_US">Checkout: customer contact information form</description>
+            <description locale="ru_RU">Оформление заказа: выбор способа доставки</description>
+        </file>
+        <file path="checkout.confirmation.html" custom="0">
+            <description locale="en_US">Checkout: order confirmation</description>
+            <description locale="ru_RU">Оформление заказа: выбор способа доставки</description>
+        </file>
+        <file path="checkout.success.html" custom="0">
+            <description locale="en_US">Checkout: thank you page</description>
+            <description locale="ru_RU">Оформление заказа: выбор способа доставки</description>
+        </file>
+        <file path="checkout.error.html" custom="0">
+            <description locale="en_US">Checkout: error page</description>
+            <description locale="ru_RU">Оформление заказа: выбор способа доставки</description>
+        </file>
+        <file path="my.nav.html" custom="0">
+            <description locale="en_US">Customer account navigation menu</description>
+            <description locale="ru_RU">Меню навигации в личном кабинете покупателя</description>
+        </file>
+        <file path="my.affiliate.html" custom="0">
+            <description locale="en_US">Customer account interface: affiliate program</description>
+            <description locale="ru_RU">Личный кабинет покупателя: партнерская программа</description>
+        </file>
+        <file path="my.profile.html" custom="0">
+            <description locale="en_US">Customer account interface: contact info editing form</description>
+            <description locale="ru_RU">Личный кабинет покупателя: редактирование контактной информации</description>
+        </file>
+        <file path="my.orders.html" custom="0">
+            <description locale="en_US">Customer account interface: order list</description>
+            <description locale="ru_RU">Личный кабинет покупателя: список заказов</description>
+        </file>
+        <file path="my.order.html" custom="0">
+            <description locale="en_US">Customer account interface: single order information</description>
+            <description locale="ru_RU">Личный кабинет покупателя: информация о заказе</description>
+        </file>
+        <file path="home.html" custom="0">
+            <description locale="en_US">Storefront homepage</description>
+            <description locale="ru_RU">Главная витрина магазина</description>
+        </file>
+        <file path="search.html" custom="0">
+            <description locale="en_US">Wrapper for product search (filtering) results, e.g. by name, tag, or manufacturer</description>
+            <description locale="ru_RU">Обертка для страницы поиска (фильтрации) товаров, например, по тегу, ключевому слову или производителю</description>
+        </file>
+        <file path="page.html" custom="0">
+            <description locale="en_US">Static page content</description>
+            <description locale="ru_RU">Содержимое информационной страницы</description>
+        </file>
+        <file path="sidebar.html" custom="0">
+            <description locale="en_US">Navigation sidebar</description>
+            <description locale="ru_RU">Колонка навигации по магазину</description>
+        </file>
+        <file path="login.html">
+            <description locale="en_US">Login page</description>
+            <description locale="ru_RU">Страница входа для пользователей</description>
+        </file>
+        <file path="signup.html">
+            <description locale="en_US">Sign up page</description>
+            <description locale="ru_RU">Страница регистрации пользователей</description>
+        </file>
+        <file path="forgotpassword.html">
+            <description locale="en_US">Forgot password page</description>
+            <description locale="ru_RU">Страница сброса пароля</description>
+        </file>
+        <file path="error.html">
+            <description locale="en_US">404 and other errors</description>
+            <description locale="ru_RU">404 и другие ошибки</description>
+        </file>
+        <file path="default.js">
+            <description locale="en_US">Default theme JS</description>
+            <description locale="ru_RU">Скрипты темы «Дефолт»</description>
+        </file>
+        <file path="lazyloading.js">
+            <description locale="en_US">Lazy loading JS</description>
+            <description locale="ru_RU">Скрипты загрузки контента «на лету»</description>
+        </file>        
+    <file path="designsovkusom.css" custom="1"/><file path="designsovkusom.js" custom="1"/><file path="jquery.bxslider.min.js" custom="1"/><file path="jquery.bxslider.css" custom="1"/><file path="slider.html" custom="1"/><file path="product-item.html" custom="1"/><file path="rangeslider.min.js" custom="1"/><file path="ion.rangeslider.min.js" custom="1"/><file path="lightbox-2.6.min.js" custom="1"/><file path="recently_viewed.html" custom="1"/><file path="dsv.logo.html" custom="1"/><file path="dsv.contact.html" custom="1"/><file path="dsv.social.html" custom="1"/><file path="dsv.home.html" custom="1"/><file path="dsv.user.css" custom="1"/><file path="print.css" custom="1"/><file path="dsv.address.html" custom="1"/></files>
+    <settings>
+		<setting var="logo_slogan" control_type="text">
+			<value>Современный интернет-магазин</value>
+			<name locale="en_US">Text under logo</name>
+			<name locale="ru_RU">Подпись под логотипом</name>
+		</setting>
+		<setting var="vk" control_type="text">
+			<value>http://www.vk.com/</value>
+			<name locale="en_US">vkontakte community link</name>
+			<name locale="ru_RU">ссылка на сообщество вконтакте</name>
+		</setting>
+		<setting var="ok" control_type="text">
+			<value>http://www.odnoklassniki.ru/</value>
+			<name locale="en_US">odnoklassniki community link</name>
+			<name locale="ru_RU">ссылка на сообщество одноклассники</name>
+		</setting>
+		<setting var="tt" control_type="text">
+			<value>https://twitter.com/</value>
+			<name locale="en_US">twitter page</name>
+			<name locale="ru_RU">ссылка на twitter</name>
+		</setting>
+		<setting var="fb" control_type="text">
+			<value>https://www.facebook.com/</value>
+			<name locale="en_US">facebook community page</name>
+			<name locale="ru_RU">ссылка на сообщество facebook</name>
+		</setting>
+		<setting var="gg" control_type="text">
+			<value>https://plus.google.com/</value>
+			<name locale="en_US">google plus page</name>
+			<name locale="ru_RU">ссылка на google plus</name>
+		</setting>
+		<setting var="address" control_type="text">
+			<value>Москва, ул. Достоевского, 38</value>
+			<name locale="en_US">address in footer</name>
+			<name locale="ru_RU">Адрес внизу сайта</name>
+		</setting>
+		<setting var="news" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Show news in shop</name>
+            <name locale="ru_RU">Отображать новости в магазине</name>
+        </setting>
+		<setting var="photos" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Show last photos in shop</name>
+            <name locale="ru_RU">Отображать последние фотографии в магазине</name>
+        </setting>
+		<setting var="tags" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Show tags in shop</name>
+            <name locale="ru_RU">Отображать теги в магазине</name>
+        </setting>
+		<setting var="recently_count" control_type="select">
+			<value>2</value>
+			<name locale="ru_RU">Количество недавно просмотренных товаров</name>
+			<name locale="en_US">Count recently viewed products</name>
+			<options>
+				<option value="1">
+					<name locale="ru_RU">1</name>
+					<name locale="en_US">1</name>
+				</option>
+				<option value="2">
+					<name locale="ru_RU">2</name>
+					<name locale="en_US">2</name>
+				</option>
+				<option value="3">
+					<name locale="ru_RU">3</name>
+					<name locale="en_US">3</name>
+				</option>
+				<option value="4">
+					<name locale="ru_RU">4</name>
+					<name locale="en_US">4</name>
+				</option>
+			</options>
+		</setting>
+    </settings>
+    <thumbs>
+        <thumb>48x48</thumb>
+        <thumb>96x96</thumb>
+        <thumb>200</thumb>
+        <thumb>750x0</thumb>
+    </thumbs>
+</theme>

@@ -183,7 +183,7 @@ class waContact implements ArrayAccess
     public static function getPhotoDir($contact_id, $with_prefix = true)
     {
         $str = str_pad($contact_id, 4, '0', STR_PAD_LEFT);
-        $str = substr($str, -2).'/'.substr($str, -4, 2);
+        $str = substr($str, -2) . '/' . substr($str, -4, 2);
         $path = "{$str}/{$contact_id}/";
         if ($with_prefix) {
             return "photos/{$path}";
@@ -344,12 +344,30 @@ class waContact implements ArrayAccess
                 }
                 // for non-multi fields return field value
                 else {
+                    //VADIM CODE START
+                    if(is_array($result)){
+                        if(isset($result['value'])){
+                            return $result['value'];
+                        }
+                        return null;
+                    }
+                    else{
+                        return $result;
+                    }
+                    //VADIM CODE END
                     return is_array($result) ? $result['value'] : $result;
                 }
             }
             // 'html' format: ???
             else if ($format == 'html') {
                 if ($field->isMulti()) {
+                    //VADIM CODE START
+                    $str = '';
+                    foreach($result as $key=>$line){
+                        $str .= "<span class='multi_value line_$key'>$line</span>";
+                    }
+                    return $str;
+                    //VADIM CODE END
                     return implode(', ', $result);
                 } else {
                     return $result;
@@ -977,6 +995,7 @@ class waContact implements ArrayAccess
      */
     public function getRights($app_id, $name = null, $assoc = true)
     {
+        $app_id = wa()->replaceName($app_id);//VADIM CODE
         if ($name !== null && substr($name, -1) === '%') {
             if (!$this->id) {
                 return array();

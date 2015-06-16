@@ -15,8 +15,10 @@ class waSystem
 {
     protected static $instances = array();
     protected static $current = 'wa-system';
+    private static $app_names = null; //VADIM CODE
 
     protected static $apps;
+    protected static $apps_real; // VADIM CODE
     protected static $handlers = array();
     protected static $factories_common = array();
     protected static $factories_config = array();
@@ -25,6 +27,7 @@ class waSystem
 
     protected $url;
 
+    protected static $db; // VADIM CODE
     /**
      * @var SystemConfig|waAppConfig
      */
@@ -68,6 +71,8 @@ class waSystem
      */
     public static function getInstance($name = null, waSystemConfig $config = null, $set_current = false)
     {
+        $name_fake = $name; // VADIM CODE
+        $name = self::getAppName($name); // VADIM CODE
         if ($name === null) {
             if ($config && $config instanceof waAppConfig) {
                 $name = $config->getName();
@@ -99,6 +104,7 @@ class waSystem
         }
         if ($set_current) {
             self::setActive($name);
+            self::setApp($name, $name_fake); //VADIM CODE
         } elseif (!self::$current || self::$current == 'wa-system') {
             self::$current = $name;
         }
@@ -558,8 +564,7 @@ class waSystem
                 }
 
                 $app_system = self::getInstance($app, null, true);
-
-                if ($app != 'webasyst' && $this->getEnv() == 'backend' && !$this->getUser()->getRights($app_system->getConfig()->getApplication(), 'backend')) {
+                if ($app != 'webasyst' && $this->getEnv() == 'backend' && !$this->getUser()->getRights(wa()->getAppFake(), 'backend')) {//VADIM CODE
                     //$this->getResponse()->redirect($this->getConfig()->getBackendUrl(true), 302);
                     throw new waRightsException('Access to this app denied', 403);
                 }
@@ -845,6 +850,16 @@ class waSystem
                 self::$apps = array();
                 foreach ($all_apps as $app => $enabled) {
                     if ($enabled) {
+                        // VADIM CODE START
+                        $fake_name = $app;
+                        $title = '';
+                        $db = '';
+                        if(is_array($enabled)){
+                            $app = $enabled['app'];
+                            $title = $enabled['title'];
+                            $db = $enabled['db'];
+                        }
+                        // VADIM CODE END
                         waLocale::loadByDomain($app, $locale);
                         $app_config = $this->getAppPath('lib/config/app.php', $app);
                         if (!file_exists($app_config)) {
@@ -866,6 +881,13 @@ class waSystem
                         }
                         $app_info['id'] = $app;
                         $app_info['name'] = _wd($app, $app_info['name']);
+                        //VADIM CODE START
+                        if($title) $app_info['name'] = $title;
+                        $app_info['db'] = '';
+                        if($db) $app_info['db'] = $db;
+                        $app_info['fake_id'] = '';
+                        if($fake_name) $app_info['fake_id'] = $fake_name;
+                        //VADIM CODE END
                         if (isset($app_info['icon'])) {
                             if (is_array($app_info['icon'])) {
                                 foreach ($app_info['icon'] as $size => $url) {
@@ -895,7 +917,8 @@ class waSystem
                                 $app_info['icon'][16] = $app_info['icon'][24];
                             }
                         }
-                        self::$apps[$app] = $app_info;
+                        self::$apps[$fake_name] = $app_info; // VADIM CODE
+                        self::$apps_real[$app] = $app_info; // VADIM CODE
                     }
                 }
                 if (!file_exists($file) || filemtime($file) < filemtime($this->getConfig()->getPath('config', 'apps'))) {
@@ -1043,6 +1066,9 @@ class waSystem
     {
         if ($app === null) {
             $app = $this->getApp();
+            if($app=='shop'){
+                $app = $this->getAppFake();//VADIM CODE
+            }
         }
         if ($this->getEnv() == 'backend') {
             $url = $this->config->getRootUrl();
@@ -1099,6 +1125,7 @@ class waSystem
         if ($app_id === null) {
             $app_id = self::getApp();
         }
+        $app_id = wa()->replaceName($app_id);// VADIM CODE
         if (!isset(self::$models['app_settings'])) {
             self::$models['app_settings'] = new waAppSettingsModel();
         }
@@ -1336,8 +1363,9 @@ class waSystem
             $app_id = $this->getConfig()->getApplication();
         }
 
+        $app_id_real = wa()->getAppName($app_id);//VADIM CODE
         $theme_paths = array(
-            'original' => $this->getAppPath('themes', $app_id),
+            'original' => $this->getAppPath('themes', $app_id_real),
             'custom'   => $this->getDataPath('themes', true, $app_id, false),
         );
 
@@ -1365,6 +1393,95 @@ class waSystem
         }
         return $themes;
     }
+
+    // VADIM CODE START
+    public static function getAppName($name){
+        if(is_null($name)){
+            return null;
+        }
+        $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
+        if(isset($all_apps[$name])){
+            if(is_array($all_apps[$name])){
+                self::$app_names['fake'] = $name;
+                self::$db = $all_apps[$name]['db'];
+                return $all_apps[$name]['app'];
+            }
+            return $name;
+        }
+        return $name;
+    }
+
+    public static function setAppTemp($name){
+        $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
+        if(isset($all_apps[$name])){
+            if(is_array($all_apps[$name])){
+                self::$app_names['fake'] = $name;
+                self::$db = $all_apps[$name]['db'];
+            }
+            else{
+                self::$app_names['fake'] = '';
+                self::$db = 'default';
+            }
+        }
+    }
+
+    public static function getDb()
+    {
+        return self::$db;
+    }
+
+    public function appRealExists($app_id)
+    {
+        $this->getApps();
+        return $app_id === 'webasyst' || isset(self::$apps_real[$app_id]);
+    }
+
+    public static function getAppFake($default = null)
+    {
+        //echo self::$app_names['fake'].";";
+        if(self::$app_names['fake']!=''){
+            return self::$app_names['fake'];
+        }
+        return $default;
+    }
+
+    public static function getAppReal()
+    {
+        return self::$app_names['real'];
+    }
+
+    public function replaceName($name){
+        if(is_array($name)){
+            foreach($name as &$value){
+                if($value=='shop'){
+                    $value = self::getAppFake($name);
+                }
+            }
+            return $name;
+        }
+        if($name=='shop') {
+            return self::getAppFake($name);
+        }
+        return $name;
+    }
+
+    public function replaceNameToReal($name){
+        $all_apps = include(wa()->getConfig()->getPath('config', 'apps'));
+        if(isset($all_apps[$name])){
+            if(isset($all_apps[$name]['app'])){
+                return $all_apps[$name]['app'];
+            }
+        }
+        return $name;
+    }
+
+    public static function setApp($real, $fake){
+        if($real=='shop'){
+            self::$app_names = array('real'=>$real, 'fake'=>$fake);
+        }
+    }
+
+    // VADIM CODE END
 }
 
 /**

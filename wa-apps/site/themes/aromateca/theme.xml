@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE theme PUBLIC "wa-app-theme" "http://www.webasyst.com/wa-content/xml/wa-app-theme.dtd">
+<theme id="aromateca" system="0" vendor="bd9" author="Vadim" app="site" version="1.0">
+    <name locale="en_US">aromateca.ru</name>
+    <name locale="ru_RU">aromateca.ru</name>
+    <description locale="ru_RU">no</description>
+    <files>
+        <file path="index.html" custom="0">
+        </file>
+        <file path="header.html" custom="0">
+        </file>
+    </files>
+    <about locale="en_US">
+        <![CDATA[
+                ]]>
+    </about>
+    <about locale="ru_RU">
+        <![CDATA[
+                ]]>
+    </about>
+</theme>

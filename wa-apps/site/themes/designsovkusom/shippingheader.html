@@ -1,0 +1,21 @@
+<li>
+    <span class="city_header">
+        <a href="javascript:void(0);" class="city">
+            <span onclick="delivCity(this);" class="delivery_city">{$wa->regionBlock()}
+                <span id="reg_arrow">&#x25BC;</span>
+            </span>
+        </a>
+    </span>
+
+
+    <span class="date_header">
+    {if $mindeliv > 0}
+        <span style="margin-left: 10px;">
+            <a href="{$wa->domainUrl()}/dostavka-po-rossii/"> <span class="mindeliv"> {$mindeliv} </span> </a>
+        </span>
+    {/if}
+    </span>
+</li>
+
+
+

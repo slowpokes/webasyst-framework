@@ -1,0 +1,38 @@
+
+<div class="content-container">
+    <div id="product-list">
+        {if !$products}
+            {if !empty($filters)}
+                [`No products were found.`]
+            {else}
+                [`This category does not contain any products.`]
+            {/if}
+        {else}
+
+            {include file='product-item.html' sorting = 1}
+
+        {/if}
+    </div>
+</div>
+<script type="text/javascript">
+    function changeView()
+    {
+            $('.product-view span').click(function () {
+                var item = $(this);
+                if (item.hasClass('selected')) return false;
+
+                $('.product-view span').removeClass('selected');
+                item.addClass('selected');
+
+                if (item.data('view')) {
+                    $('ul.product-list').addClass('blocks').removeClass('list');
+                    $.cookie('dsv_view', 'blocks', { expires: 30, path: '/'});
+                }
+                else {
+                    $('ul.product-list').addClass('list').removeClass('blocks');
+                    $.cookie('dsv_view', 'list', { expires: 30, path: '/'});
+                }
+                return false;
+            });}
+</script>
+<div class="clear-both"></div>

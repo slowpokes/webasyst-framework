@@ -1,0 +1,15 @@
+{if $album ne ''}
+{$slides = $wa->photos->photos("album/`$album`")}
+    {if count($slides)>0}
+    <div class="slider_container">
+        <ul class="slider">
+            {foreach $slides as $slide}
+            <li>
+                {$photo = $wa->photos->photo($slide.id)}
+                <a href="{$slide.description}">{$wa->photos->getImgHtml($photo, '970x0', ['alt' => '{$slide.name}'])}</a>
+            </li>
+            {/foreach}
+        </ul>
+    </div>
+    {/if}
+{/if}

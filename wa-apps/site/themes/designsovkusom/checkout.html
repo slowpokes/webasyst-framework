@@ -1,0 +1,13 @@
+
+
+<div class="checkout" id="checkout_content">
+    {if isset($checkout_steps)}
+    {foreach $checkout_steps as $step_id => $s}
+    {if $checkout_current_step == $step_id}
+    {include file="checkout.`$step_id`.html"}
+    {/if}
+    {/foreach}
+    {else}
+    {include file="checkout.`$checkout_current_step`.html"}
+    {/if}
+</div>

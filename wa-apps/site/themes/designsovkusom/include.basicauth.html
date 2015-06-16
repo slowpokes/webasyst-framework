@@ -1,0 +1,28 @@
+<div id="checkout_block" class="checkout">
+    <div class="wa-form form">
+        <form method="post" action="">
+            <div class="wa-field">
+                <div class="wa-name">Ваше имя</div>
+                <div class="wa-value">
+                    <input type="text" value="{$customer->get('firstname', 'default')}" name="customer[firstname]"
+                           placeholder="Введите имя">
+                    {if isset($errors)&&$errors['firstname']}<div class="error_hint">{$errors['firstname']}</div>{/if}
+                </div>
+            </div>
+            <div class="wa-field">
+                <div class="wa-name">Телефон</div>
+                <div class="wa-value">
+                    <input class="" type="text" value="{$customer->get('phone', 'default')}" name="customer[phone]">
+                    {if isset($errors)&&$errors['phone']}<div class="error_hint">{$errors['phone']}</div>{/if}
+                </div>
+            </div>
+        </form>
+
+        <div class="wa-field">
+
+            <div class="wa-value wa-submit">
+                <input id="order_create"  type="button" value="Оформить заказ" class="order_cr rv-button orange-button">
+            </div>
+        </div>
+    </div>
+</div>

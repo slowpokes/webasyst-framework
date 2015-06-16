@@ -1,0 +1,105 @@
+<style>
+    table.zebra td {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .del-block, .click-block {
+        display: inline-block;
+        
+    }
+    input.banner-size {
+        border: 0px none;
+        background: inherit;
+        cursor: pointer;
+    }
+    input.banner-size.width {
+        text-align: right;
+    }
+    input.banner-size.edit {
+        border: 1px solid #666666;
+        cursor: text;
+    }
+    body.wait {
+        cursor: wait;
+    }
+    
+    input.banner-name.hidden {
+        display: none;
+    }
+    .banner-edit-ico {
+        cursor: pointer;
+    }
+    
+</style>
+
+<div class="dialog small width500px" id="banner-del" style="display:none">
+    <div class="dialog-background"></div>
+    <div class="dialog-window">
+    	<form method="post" enctype="multipart/form-data"  action="?action=bannerDel">
+            <input type="hidden" value="" name="banner_id" id="bannerdel_id" />
+    	<div class="dialog-content">
+    		<div class="dialog-content-indent">
+    			<h1>[`Delete this banner with all images?`]</h1>
+    		</div>
+    	</div>
+    	<div class="dialog-buttons">
+    		<div class="dialog-buttons-gradient">
+    			<input type="submit" class="button red" value="[`Delete`]" /> [`or`]
+    			<a href="javascript:void(0)" class="inline-link cancel"><b><i>[`cancel`]</i></b></a>
+    		</div>
+    	</div>
+    	</form>
+    </div>		
+</div>
+
+<div class="block">
+	<h1 class="wa-page-heading">[`All banners`]</h1>
+    <div>[`Attention! The routing rule must be specified for the application ('Private settlement' in Site->Structure->Banner)`]</div>
+    <div>&nbsp;</div>
+   	<table class="zebra">
+        <tr>
+            <th>
+                [`Name`]
+            </th>
+            <th>
+                [`Size`]
+            </th>
+            <th>
+                [`Clicks`]
+            </th>
+            <th>
+                [`Code`]
+            </th>
+            <th>
+                &nbsp;
+            </th>
+        </tr>
+   		{foreach from=$banners item=b}
+    	<tr>
+        	<td>
+                <b><a href="#/banner/{$b.id}/" style="display: inline-block; padding-right: 10px;" id="banner-name-link-{$b.id}">{$b.title}</a>
+                <input type="text" value="{$b.title}" class="banner-param banner-name hidden" id="banner-name-edit-{$b.id}" data-id="{$b.id}" ></b> 
+                <i class="icon16 edit banner-edit-ico" data-id="{$b.id}" id="banner-edit-ico-{$b.id}" title="[`Click for edit`]"></i><br />
+            </td>
+            <td>
+                <input type="text" value="{$b.width}" name="width" size="4" maxlength="4" class="banner-param banner-size width" data-id="{$b.id}" title="[`Click for edit`]"> &times; <input type="text" value="{$b.height}" name="height" size="4" maxlength="4" class="banner-param banner-size height" data-id="{$b.id}" title="[`Click for edit`]">
+            </td>
+            <td>
+                <div class="click-block">
+                    {$b.click}
+                </div>
+            </td>
+            <td>
+                {literal}{$wa->banner->getBanner({/literal}{$b.id})}
+            </td>
+            <td>
+                <div class="del-block" >
+                    <a class="banner-del-link" href="#" class="bold no-underline" id="{$b.id}">
+                        <i class="icon16 delete"></i><strong class="underline">[`Delete this banner`]</strong>
+                    </a>
+                </div>
+        	</td>
+      	</tr>
+      	{/foreach}
+    </table>
+</div>			

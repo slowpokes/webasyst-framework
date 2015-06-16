@@ -41,6 +41,7 @@ class waContactRegionField extends waContactField
 
     public function format($data, $format = null, $full_composite=null)
     {
+        $full_composite['country'] = 'RUS';
         if (empty($full_composite['country'])) {
             return $format === 'value' ? htmlspecialchars($data) : $data;
         }
@@ -93,6 +94,7 @@ class waContactRegionField extends waContactField
         //
 
         // When country is selected and has regions, build a <select> with appropriate options.
+        if($country=='')$country = 'rus'; // VADIM CODE
         $region_select = null;
         if ($country && !is_array($country)) {
             // List of regions for this country
@@ -252,6 +254,7 @@ class waContactRegionField extends waContactField
 });};</script>
 EOJS;
 
+        return $html; // VADIM CODE
         return $html.$js;
     }
 }

@@ -1,0 +1,70 @@
+{literal}
+    <script type="text/javascript">
+        $.get('/null', function (result) {
+
+            var $menu = $(result).find(".main_menu").html();
+            var $cart = $(result).find(".wrapper_cart").html();
+            $(".main_menu").html($menu);
+            $(".wrapper_cart").append($cart);
+
+
+        });
+        var lists = $('[class *= "menu_bl_"]');
+        for (var i = 0; i < lists.length; i++) {
+            if (!$(lists[i]).children(".column").has("span").length) {
+                console.log($(lists[i]).attr("data-letter"));
+                $(".menubrand").find("#bl_" + $(lists[i]).attr("data-letter")).hide();
+            }
+
+        }
+
+        /**
+         * Menu
+         */
+
+        jQuery.fn.hoverWithDelay = function (inCallback, outCallback, delay) {
+            this.each(function (i, el) {
+                var timer;
+                $(this).hover(function () {
+                    timer = setTimeout(function () {
+                        timer = null;
+                        inCallback.call(el);
+                    }, delay);
+                }, function () {
+                    if (timer) {
+                        clearTimeout(timer);
+                        timer = null;
+                    } else
+                        outCallback.call(el);
+                });
+            });
+        };
+
+        $("body").on("hover", ".firstli", function () {
+            $('ul', this).show();
+            $('a', this).addClass("active");
+        });
+
+        $("body").on("mouseleave", ".firstli", function () {
+            $('ul', this).hide();
+            $('a', this).removeClass("active");
+        });
+
+        $("body").on("hover", ".goto", (function () {
+            $(".activ").removeClass("activ");
+            $(".show_lvl3").removeClass("show_lvl3");
+            $("#" + this.id).addClass("activ");
+            $(".menu_" + this.id).addClass("show_lvl3");
+
+        }));
+        $("body").on("mouseleave", ".menubrand", (function () {
+            $(this).children('.goto').removeClass('activ');
+            $(this).children('.block_brand').removeClass('show_lvl3');
+        }));
+
+
+    </script>
+{/literal}
+
+<ul class="main_menu" role="navigation">
+</ul>
