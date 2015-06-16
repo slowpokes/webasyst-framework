@@ -1,8 +1,8 @@
 <div class="sidebar blog_sidebar brand_page">
     <div class="sidebar_links brand_sidebar_links">
         {$month_year = array()}
-        {$month_rus = ['00' => 'Хуябрь', '01' => 'Январь', '02' => 'Февраль', '03' => 'Март', '04' => 'Апрель', '05' => 'Май', '06' => 'Июнь', '07' => 'Июль', '08' => 'Август', '09' => 'Сентябрь',
-        '10' => 'Октябрь', '11' => 'Ноябрь', '12' => 'Декабрь'] }
+        {$month_rus = array('Хуябрь', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь',
+        'Октябрь', 'Ноябрь', 'Декабрь')}
         {$latest_posts = $wa->blog->posts()}
         {foreach $latest_posts as $p}
             {if !isset($month_year[$p.datetime|date_format:'Y'])}
@@ -16,12 +16,11 @@
         <ul>
             {foreach $month_year as $key=>$month}
                 <li class="closed depth_0">
-                    <a href="/blog/{$key}" class="sidebar_link">{$key}</a>
+                    <a href="#" class="sidebar_link">{$key}</a>
                     <ul>
-                        {foreach $month as $key_month => $m}
-
+                        {foreach $month as $m}
                             <li class="closed depth_1">
-                                <a href="/blog/{$key}/{$key_month}" class="sidebar_link">{$month_rus[$m[0].datetime|date_format:'n']}</a>
+                                <a href="#" class="sidebar_link">{$month_rus[$m[0].datetime|date_format:'n']}</a>
                                 <ul>
                                     {foreach $m as $p}
                                         <li class="depth_2 {if isset($post)&&($post.id==$p.id)}current{/if}">
@@ -37,10 +36,25 @@
         </ul>
     </div>
 </div>
+{literal}
 <script>
-   openLink($(".blog_sidebar").find('.current'));
+    openLink($(".blog_sidebar").find('.current'));
 
-   function openLink(element){
-       element.parentsUntil("div").removeClass('closed');
-   }
+    function openLink(element) {
+        element.parentsUntil("div").removeClass('closed');
+    }
+
+    $("body").on("click", ".sidebar_link", function () {
+        var li = $(this).parent();
+        if (li.hasClass('closed')) {
+            li.removeClass('closed');
+        }
+        else {
+            li.addClass('closed');
+            li.find('li').addClass('closed');
+        }
+        return false;
+    });
+
 </script>
+{/literal}

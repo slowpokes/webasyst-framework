@@ -39,8 +39,8 @@ $(document).ready(function () {
 <!-- get products from predefined product lists 'promo' and 'bestsellers' -->
 {$leaders = $wa->shop->productSet('leader')}
 {$bestsellers = $wa->shop->productSet('bestsellers')}
-    
-    <!-- plugin hook: 'frontend_homepage' -->
+
+<!-- plugin hook: 'frontend_homepage' -->
     {* @event frontend_homepage.%plugin_id% *}
     {foreach $frontend_homepage as $_}{$_}{/foreach}
     

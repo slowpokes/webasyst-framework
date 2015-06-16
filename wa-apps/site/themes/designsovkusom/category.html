@@ -1,7 +1,7 @@
 <script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}category.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}js/category.js"></script>
         <div class="categ_page">
-<div class="category_logo"></div>
+
 
 <div class="content notbl">
     <div class="sidebar">
@@ -32,11 +32,23 @@
         {/if}
 
         {include file="filter.html"}
+        {*if $category.description}
+        <div class="category_sidebar filters">
+            {$category.description}
+        </div>
+        {/if*}
     </div>
     <div class="content-container">
+
         {$cat=$wa->shop->category($current_category)}
-        {if $cat.custom_image}
+        {*if $cat.custom_image}
         <img src="{$cat.custom_image}" class="category_image" width="724px" height="200px">
+        {/if*}
+        {if isset($category.params.image_url)}
+            <a href="{$category.params.image_url}">
+                <div class="category_logo"><img src="{shopCategoryImagesPlugin::getCategoryImageUrl($category.id)}">
+                </div>
+            </a>
         {/if}
         <div class="category_products">
         <div id="product-list">
@@ -47,14 +59,27 @@
             [`This category does not contain any products.`]
             {/if}
             {else}
-            {include file='product-item.html' sorting=!empty($category.params.enable_sorting)}
+                {include file='product-item.html' sorting=!empty($category.params.enable_sorting) }
             {/if}
         </div>
         <!-- description -->
-        <div class="description" style="width: 715px">{if $category.description}
+            {if $category.description}
+            <div class="description" style="width: 980px">
             <p>{$category.description}</p>
+                {/if}
+            </div>
+            {if $category.tags}
+                <!-- ТЕГИ -->
+                {$t = (explode(",",$category.tags))}
+                <p class="tags" id="product-tags" style="margin-top: 20px">
+                    <!--span class="weight600">[`Tags`]:</span-->
+                        <span class="product-infos">
+                        {foreach $t as $ts}
+                            <a href="{$wa->getUrl('/frontend/tag', ['tag' => urlencode($ts)])}">{$ts}</a>
+                        {/foreach}
+                        </span>
+                </p>
             {/if}
-        </div>
         </div>
     </div>
     <!-- /content-container -->
@@ -62,32 +87,4 @@
 
 <div class="clear-both"></div>
 
-<!--
-<div class="content-container">
-
-<h1 class="category-name">
-{$category.name|escape} [<span>{$wa->shop->productsCount("category/`$category.id`")}</span>]
-</h1>
-
-<!-- plugin hook: 'frontend_category'
-{* @event frontend_category.%plugin_id% *}
-{foreach $frontend_category as $_}{$_}{/foreach}
-
-<!-- subcategories
-{if $category.subcategories}
-<div class="sub-categories">
-  {foreach $category.subcategories as $sc}
-  <a href="{$sc.url}" title="{$sc.name}" class="subcategory"{*if $sc@iteration is div by 4} style="margin-right:0px"{/if*}>
-      <div class="subcat_image">
-          {$cat=$wa->shop->category($sc.id)}
-          <img src="{if (isset($cat.custom_image)&&($cat.custom_image))}{$cat.custom_image}{elseif isset($cat.params.image)}{$cat.params.image}{else}{$wa_theme_url}img/dummy200.png{/if}">
-          <div class="align-helper"></div>
-      </div>
-      <div class="subcat_name">
-          {$sc.name|truncate:30:"..."} [<span>{$wa->shop->productsCount("category/`$sc.id`")}</span>]
-      </div>
-  </a>
-  {/foreach}
 </div>
-{/if}
---></div>

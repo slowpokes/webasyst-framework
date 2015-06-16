@@ -1,3 +1,4 @@
+
 <div class="checkout-content" data-step-id="contactinfo">
     <div id="checkout-contact-form">
         {if !$wa->user()->isAuth()}
@@ -27,7 +28,8 @@
                     </div>
                     <div class="wa-value">
                         {if !empty($errors.email)}<p>{/if}
-                        <input {if !empty($errors.email)}class="error"{/if} name="login" type="text" value="{$wa->post('login', $customer->get('email', 'default'))|escape}">
+                            <input {if !empty($errors.email)}class="error"{/if} name="login" type="text"
+                                   value="{$wa->post('login', $customer->get('email', 'default'))|escape}">
                         {if !empty($errors.email)}</p>
                         <em class="errormsg">{$errors.email}</em>
                         {/if}

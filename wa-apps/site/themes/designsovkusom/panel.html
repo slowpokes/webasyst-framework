@@ -1,18 +1,18 @@
 {$cart.items = $wa->shop->cart()->items()}
 {$cart_total = $wa->shop->cart()->total()}
 
-
+<div class="cart_header">Ваша корзина</div>
 <table>
     <!-- products -->
+
     {foreach $cart.items as $item}
-
-
     <tr data-id="{$item.id}" data-price="{$item.price}">
         <td class="min-width cols_image" style="width: 10%"><a href="{$wa->shop->productUrl($item.product)}"
                                                                title="{$item.product.name|escape}">{$wa->shop->productImgHtml($item.product,
             '40x40')}</a></td>
         <td class="cols_name" style="width: 60%">
-            <a href="{$wa->shop->productUrl($item.product)}" class="product-name">{$item.product.name|truncate:40}</a>
+            <a href="{$wa->shop->productUrl($item.product)}"
+               class="product-name">{$item.product.name|truncate:40}</a><br>
             {if $item.sku_name && $item.sku_name != $item.product.name}({$item.sku_name|escape}){/if}
             {if !empty($item.services)}
             <div class="services">
@@ -53,27 +53,30 @@
     </tr>
     {/foreach}
 
-    <tr class="total_tr" style="min-width: 326px">
-        {if $cart_total > 0}
-        <td style="width: 10%"></td>
-        <td style="width: 60%">Итого к оплате:</td>
-        <td style="width: 10%"></td>
-        <td class="cart-total" style="width: 20%"> {shop_currency($cart_total, true)}</td>
-
-        {else}
-
-        <td style="width: 326px; padding: 10px 5px;"> Корзина пуста</td>
-        {/if}
-    </tr>
 </table>
+{if $cart_total > 0}
+    <div class="cart_footer">
+        <p class="align-center"><strong>Сумма товаров: <span
+                        class="fcart-total">{shop_currency($cart_total, true)}</span></strong>
+        </p>
+        <input type="submit" class="rv-button cartheader" value="Перейти в корзину">
+    </div>
+{else}
+    <div class="fcart-footer">
+        <p class="align-center"><strong>Сумма товаров: <span
+                        class="fcart-total">{shop_currency($cart_total, true)}</span></strong>
+        </p>
+
+    </div>
+{/if}
 {literal}
 <script type="text/javascript">
 
-    $("a.deleteico").click(function () {
+    $(".cols_delete").click(function () {
         var tr = $(this).closest('tr');
         tr.find('td').wrapInner('<div class="temp overflow_hidden" />');
-        tr.find('td').animate({'padding-top': 0, 'padding-bottom': 0}, 500);
-        tr.find('.temp').animate({height: 0}, 500, function () {
+        //tr.find('td').animate({'padding-top': 0, 'padding-bottom': 0}, 500);
+        tr.find('.temp').slideUp(function () {
             tr.remove();
         });
         $.ajax({
@@ -96,6 +99,8 @@
                 if(response.data.count == 0){
                     $(".cartheader").addClass("deactivate");
                     $("#cart-summary").addClass("empty");
+                    $(".cart-count").addClass("empty");
+                    $('.cart_icon').attr('src', '/wa-apps/shop/themes/designsovkusom/img/basket3.png');
                 }
             }
 

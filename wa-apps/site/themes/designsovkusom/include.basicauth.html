@@ -4,7 +4,8 @@
             <div class="wa-field">
                 <div class="wa-name">Ваше имя</div>
                 <div class="wa-value">
-                    <input type="text" value="{$customer->get('firstname', 'default')}" name="customer[firstname]" placeholder="Введите имя русскими буквами">
+                    <input type="text" value="{$customer->get('firstname', 'default')}" name="customer[firstname]"
+                           placeholder="Введите имя">
                     {if isset($errors)&&$errors['firstname']}<div class="error_hint">{$errors['firstname']}</div>{/if}
                 </div>
             </div>
@@ -16,10 +17,9 @@
                 </div>
             </div>
         </form>
+
         <div class="wa-field">
-            <div class="wa-name">
-                <a href="javascript: closeCart();" class="close_cart">продолжить покупки</a>
-            </div>
+
             <div class="wa-value wa-submit">
                 <input id="order_create"  type="button" value="Оформить заказ" class="order_cr rv-button orange-button">
             </div>

@@ -1,7 +1,6 @@
 {* one review output *}
 
 {if !empty($ajax_append)}<li data-id={$review.id} data-parent-id="{$review.parent_id}">{/if}
-
 <div class="review" itemprop="review" itemscope itemtype="http://schema.org/Review">
     <div class="summary">
         [`By`]
@@ -13,7 +12,7 @@
         <meta itemprop="datePublished" content="{$review.datetime|date_format:'Y-m-d'}">
         <span class="date" title="{$review.datetime|wa_datetime}">{$review.datetime|wa_datetime:"humandatetime"}</span>
         <h6>
-            {if !$review.parent_id && !empty($review.rate)}
+            {*if !$review.parent_id && !empty($review.rate)}
             <span itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
                 {$rate = round($review.rate)}
                 <meta itemprop="worstRating" content = "1">
@@ -21,23 +20,22 @@
                 <meta itemprop="bestRating" content = "5">
                 {$wa->shop->ratingHtml($rate)}
             </span>
-            {/if}
+            {/if*}
         </h6>
-        
-        
-        
+
+
     </div>
     <span itemprop="name" class="float-left" style="margin-right: 3px; font-weight: bold;">{if $review.title}{$review.title}{/if}</span>
     {if $review.text}
         <p itemprop="description">{$review.text}</p>
     {/if}
     <div class="clear-left"></div>
-    
-    {if $reply_allowed}
+
+    {*if $reply_allowed}
         <div class="actions">
             <a href="{if isset($reply_link)}{$reply_link}{else}#{/if}" class="review-reply inline-link"><b><i>[`reply`]</i></b></a>
         </div>
-    {/if}
+    {/if*}
 </div>
 
 {if !empty($ajax_append)}<ul class="menu-v with-icons reviews-branch"></ul></li>{/if}

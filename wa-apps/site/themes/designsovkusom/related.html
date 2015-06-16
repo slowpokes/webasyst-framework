@@ -1,0 +1,32 @@
+<div class="product-related">
+    <!-- RELATED PRODUCTS -->
+    {$upselling = $product->upSelling()}
+    {$crossselling = $product->crossSelling()}
+    {$cross = 'cross'}
+
+    {if $upselling || $crossselling}
+        {if $upselling}
+            <div class="upselling">
+                <h3>
+                    [`See also`]
+                    {$compare_ids = array_merge(array($product.id), array_keys($upselling))}
+                    <input type="button"
+                           onClick="javascript:window.location='{$wa->getUrl('/frontend/compare', ['id' => implode(',', $compare_ids)])}';"
+                           value="[`Compare all`]"/>
+
+                </h3>
+
+                <div id="upsell-prev"></div>
+                <div id="upsell-next"></div>
+                {include file="product-item.html" products=$upselling}
+            </div>
+        {/if}
+
+        {if $crossselling}
+            <h3>С этим товаром покупают!</h3>
+            <div id="cros" class="lastview" style="margin-left: 5px; ">
+                {include file="product-item.html" products=$crossselling cross=$cross}
+            </div>
+        {/if}
+    {/if}
+</div><!-- /product-related -->

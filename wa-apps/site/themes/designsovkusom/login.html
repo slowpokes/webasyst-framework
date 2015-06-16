@@ -1,16 +1,42 @@
 {if !isset($checkout_steps)}
-<!--div class="sidebar">
-    {include file="sidebar.html"}
-</div-->
-<div class="content">
+
+<div class="content auth_sl">
     <div class="authform-container">
-        <h1>Авторизация на сайте</h1>
+        <h1>Вход в личный кабинет</h1>
         {$wa->authAdapters()}
         <div class="clear-both"></div>
         <div class="authform" role="main">
-{/if}
-        {$wa->loginForm($error, empty($without_form))}
-{if !isset($checkout_steps)}
+            {/if}
+            <div class="wa-form login_form">
+                <form action="" method="post">
+                    <div class="wa-field wa-field-email">
+                        <div class="wa-name">Email</div>
+                        <div class="wa-value">
+                            <input name="login" value="" type="text">
+                        </div>
+                    </div>
+                    <div class="wa-field wa-field-password">
+                        <div class="wa-name">Пароль</div>
+                        <div class="wa-value">
+                            <input name="password" type="password">
+
+                        </div>
+                    </div>
+                    <div class="wa-field">
+                        <div class="wa-value wa-submit">
+                            <input name="wa_auth_login" value="1" type="hidden">
+                            <input class="button" value="Войти" type="submit">
+                        </div>
+                    </div>
+                    <div class="wa-field">
+                        &nbsp;
+                        <a href="/forgotpassword/">Забыли пароль?</a>
+                        &nbsp;
+                        <a href="/signup/">Зарегистрироваться</a>
+                    </div>
+                </form>
+            </div>
+            {if !isset($checkout_steps)}
         </div>
     </div>
 </div>

@@ -1,13 +1,5 @@
 
 
-<!-- following CSS hides top navigation menu; remove <style>…</style> to unhide -->
-<style>
-    #header, #footer, .currency-toggle { display: none; }
-    .app-header { display: none; }
-    .container.paper { background: transparent; box-shadow: none; }
-    .wrapper_top, .wrapper_menu { display:none; }
-</style>
-
 <div class="checkout" id="checkout_content">
     {if isset($checkout_steps)}
     {foreach $checkout_steps as $step_id => $s}

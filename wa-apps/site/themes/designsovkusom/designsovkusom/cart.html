@@ -64,7 +64,7 @@
                     <td style="width:70%">
                         <!-- купон на скидку -->
                         {if shopDiscounts::isEnabled('coupons')}
-                            <div class="coupons">
+                            <div class="coupons" style="padding-top: 275px">
                             [`Discount coupon (if you have one)`]:<br /><br />
                             <input type="text" name="coupon_code" value="{$coupon_code|escape}" class="coupon_code">
                             <input type="submit" value="[`Apply`]" class="apply">

@@ -1,5 +1,5 @@
 <script type="text/javascript" src="{$wa_app_static_url}designsovkusom/js/rate.widget.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}designsovkusom/reviews.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}js/designsovkusom/reviews.js"></script>
 
 {$wa->title(sprintf('[`%s reviews`]', $product.name))}
 <h1>{sprintf('[`%s reviews`]', $product.name|escape)}</h1>
@@ -117,14 +117,14 @@
         <td class="review-add-label">[`Your name`]</td>
         <td><input type="text" name="name" id="review-name" value=""></td>
     </tr>
-    <tr class="review-field">
+    <!--tr class="review-field">
         <td class="review-add-label">[`Email`]</td>
         <td><input type="text" name="email" id="review-email"></td>
     </tr>
     <tr class="review-field">
         <td class="review-add-label">[`Website`]</td>
         <td><input type="text" name="site" id="review-site"></td>
-    </tr>
+    </tr-->
 </table>
 </div>
 
@@ -141,7 +141,7 @@
 
 <br>
 <table>
-    <tr class="review-field">
+    <!--tr class="review-field">
         <td class="review-add-label"><label for="review-title">[`Title`]</label></td>
         <td><input type="text" name="title" id="review-title" class="bold"></td>
     </tr>
@@ -156,22 +156,22 @@
             </a>
             <input name="rate" type="hidden" value="0">
         </td>
-    </tr>
+    </tr-->
     <tr class="review-field">
         <td class="review-add-label" style="vertical-align: top"><label for="review-text">[`Review`]</label></td>
-        <td><textarea id="review-text" name="text" rows="10" cols="45"></textarea></td>
+        <td><textarea id="review-text" name="text" rows="5" cols="45"></textarea></td>
     </tr>
 </table>
 <div class="review-submit">
     {if $request_captcha && empty($current_user_id)}
     {$wa->captcha()}
     {/if}
-    <input type="submit" class="save orange-button" value="[`Add review`]">
+    <input type="submit" class="save button orange-button" value="[`Add review`]">
                         <span class="review-add-form-status ajax-status" style="display: none;">
                             <i class="ajax-statuloading icon16 loading"><!--icon --></i>
                         </span>
 
-    <em class="hint">Ctrl+Enter</em>
+
     <input type="hidden" name="parent_id" value="0">
     <input type="hidden" name="product_id" value="{if isset($product.id)}{$product.id}{else}0{/if}">
     <input type="hidden" name="auth_provider"
@@ -186,8 +186,11 @@
 
 <!-- existing reviews list -->
 <ul class="menu-v with-icons reviews-branch">
+    {if !empty($reviews)}
+
+
     {foreach $reviews as $review}
-    <li data-id={$review.id} data-parent-id="0">
+        <li data-id={$review.id} data-parent-id="0">
         {include file="review.html" reply_allowed=$reply_allowed inline}
         {if !empty($review.comments)}
         {review_reviews reviews=$review.comments}
@@ -196,6 +199,10 @@
         {/if}
     </li>
     {/foreach}
+    {else}
+        Пока нет ни одного отзыва. Оставьте отзыв первым.
+    {/if}
+
 </ul>
 </div>
 <!-- reviews end -->

@@ -1,24 +1,31 @@
 <div class="categ_page">
-    <div class="brand_page">
+    <div class="brands_page">
         <div class="brand_info">
-            {if $brand.image}
+            {*if $brand.image
                 <div class="brand_img"><img src="{$brand.image}"></div>
-            {/if}
+            {/if*}
 
             <h1 class="category-name">
                 Товары бренда "{$brand.name|escape}"
             </h1>
 
-            <div class="brand_description">
-                {$brand.description}
-            </div>
-        </div>
 
+        </div>
+        <div class="sidebar">
+            <div class="category_sidebar filters">{$wa->shop->showCategories2($categories, 0, $url_params)}</div>
+            {include file="filter.html"}
+        </div>
         <div class="content_small">
             <div id='category_products'>
                 {include file="category_brand.html"}
+
+                <div class="brand_description">
+                    {$brand.description}
+                </div>
             </div>
         </div>
+        <div class="clear-both"></div>
     </div>
 </div>
-<script type="text/javascript" src="{$wa_theme_url}category.js"></script>
+<script type="text/javascript" src="{$wa_theme_url}js/category.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>

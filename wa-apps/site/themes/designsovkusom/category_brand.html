@@ -1,7 +1,3 @@
-<div class="sidebar">
-    <div class="category_sidebar filters">{$wa->shop->showCategories2($categories, 0, $url_params)}</div>
-    {include file="filter.html"}
-</div>
 
 <div class="content-container">
     <div id="product-list">
@@ -17,6 +13,26 @@
 
         {/if}
     </div>
-
 </div>
+<script type="text/javascript">
+    function changeView()
+    {
+            $('.product-view span').click(function () {
+                var item = $(this);
+                if (item.hasClass('selected')) return false;
+
+                $('.product-view span').removeClass('selected');
+                item.addClass('selected');
+
+                if (item.data('view')) {
+                    $('ul.product-list').addClass('blocks').removeClass('list');
+                    $.cookie('dsv_view', 'blocks', { expires: 30, path: '/'});
+                }
+                else {
+                    $('ul.product-list').addClass('list').removeClass('blocks');
+                    $.cookie('dsv_view', 'list', { expires: 30, path: '/'});
+                }
+                return false;
+            });}
+</script>
 <div class="clear-both"></div>
