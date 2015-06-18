@@ -50,7 +50,6 @@ class b2cShipping extends waShipping
         foreach($cities as $c){
             $str .= "<div class='shipping_comment'>$c</div>";
         }
-        $str .= "</span>";
         return $str;
     }
 
