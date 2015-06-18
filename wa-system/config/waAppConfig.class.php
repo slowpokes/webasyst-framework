@@ -609,7 +609,7 @@ class waAppConfig extends SystemConfig
             if (!file_exists($file) || SystemConfig::isDebug()) {
                 waFiles::create(waConfig::get('wa_path_cache')."/apps/".$this->application.'/config');
                 // read plugins from file wa-config/[APP_ID]/plugins.php
-                $path = $this->getConfigPath('plugins.php', true);
+                $path = $this->getConfigPath('plugins.php', true, wa()->getAppFake());//VADIM CODE
                 if (!file_exists($path)) {
                     $this->plugins = array();
                     return $this->plugins;
