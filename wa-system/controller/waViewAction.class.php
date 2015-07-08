@@ -65,7 +65,7 @@ abstract class waViewAction extends waController
     {
         $this->template = 'file:'.$template;
         if($template=='error.html'){
-            throw new waException("Error page generated", 404);
+            //throw new waException("Error page generated", 404);
         }
         return $this->view->setThemeTemplate($this->getTheme(), $template);
     }
