@@ -1,11 +1,15 @@
-<form id="post-form" action="" method="post">
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/fileupload/jquery.fileupload.js"></script>
+
+
+<form id="post-form" action="" method="post" enctype="multipart/form-data">
     {$wa->csrf()}
 
     <div class="hidden sidebar right200px realtime-preview">
         <div class="column-resize-handler"></div>
         <div class="block">
             <iframe id="realtime-preview-iframe" src="about:blank" sandbox="allow-scripts"></iframe>
-            <div id="not-available-message" style="color: #888; padding: 150px 0 0 0; text-align: center; display: none;">
+            <div id="not-available-message"
+                 style="color: #888; padding: 150px 0 0 0; text-align: center; display: none;">
                 [`Live preview is not available for private and not published blogs.`]
             </div>
             <input type="hidden" name="realtime_on" value="">
@@ -18,13 +22,15 @@
             <!-- allow comments -->
             <div class="block">
                 <h6>[`Allow comments`]</h6>
+
                 <div class="b-ibutton-checkbox" id="allow-comment-switcher-ibutton-checkbox">
                     {if !$show_comments}
                         <span id="allow-comment-switcher-off-label" class="b-unselected">[`Off`]</span>
                     {else}
                         <ul class="menu-h">
                             <li><span id="allow-comment-switcher-off-label" class="b-unselected">[`Off`]</span></li>
-                            <li><input id="allow-comment-switcher" type="checkbox" name="comments_allowed" value="1" {if $post.comments_allowed}checked="checked"{/if}></li>
+                            <li><input id="allow-comment-switcher" type="checkbox" name="comments_allowed" value="1"
+                                       {if $post.comments_allowed}checked="checked"{/if}></li>
                             <li><span id="allow-comment-switcher-on-label">[`On`]</span></li>
                         </ul>
                     {/if}
@@ -36,37 +42,59 @@
                 <h6>[`Author`]</h6>
                 <select class="b-toolbar-select" name="contact_id">
                     {foreach $users as $id => $name}
-                        <option {if $id == $post.contact_id}selected="selected"{/if} value="{$id}">{$name|escape}</option>
+                        <option {if $id == $post.contact_id}selected="selected"{/if}
+                                value="{$id}">{$name|escape}</option>
                     {/foreach}
                 </select>
+            </div>
+
+            <div class="block">
+                <h6>Основная картинка</h6>
+                {if $post.main_image}
+                    <div class="image_block">
+                        <img id="main_image" data-id="{$post.id}" style="width: 100%" src="{$post.main_image}"/>
+
+                        <ul class="menu-v with-icons compact">
+                            <li><a href="#" id="imagedelete-dialog-confirm"><i class="icon16 delete"></i>Удалить
+                                    картинку</a></li>
+                        </ul>
+                    </div>
+                {/if}
+                <input class="input-file" type="file" name="file" multiple>
+
+                <div class="loading" style="display:none; margin-top: 10px">
+                    <i class="icon16 loading"></i> Загружаю...
+                </div>
+
             </div>
 
             <!-- publication datetime -->
             <div class="block">
 
                 {if ($post.status eq blogPostModel::STATUS_DRAFT) || ($post.status eq blogPostModel::STATUS_DEADLINE)}
-
                     <h6>[`Publication deadline`]</h6>
-
                     <div id="publication-deadline-changable-part">
 
                         {if ($post.datetime || $wa->get('date')) && $post.status eq blogPostModel::STATUS_DEADLINE}
-                            <i class="icon16 exclamation"></i>{if !$wa->get('date')}{$post.datetime|wa_date}{else}{date('d.m.Y', strtotime($wa->get('date')))}{/if}
+                            <i class="icon16 exclamation"></i>
+                            {if !$wa->get('date')}{$post.datetime|wa_date}{else}{date('d.m.Y', strtotime($wa->get('date')))}{/if}
                             <a id="deadline-edit" href="javascript:void(0);" class="small dialog-edit">[`edit`]</a>
                         {else}
-                            <i class="icon16 exclamation"></i><a id="deadline-edit" href="javascript:void(0);" class="dialog-edit">[`Not set`]</a>
+                            <i class="icon16 exclamation"></i>
+                            <a id="deadline-edit" href="javascript:void(0);" class="dialog-edit">[`Not set`]</a>
                             <span class="hint">[`Deadline is for plan purposes only. It will not automatically published the post, but will highlight the post if publication date is overdue.`]</span>
                         {/if}
                     </div>
-
-                    <!-- jquery template {capture name="publication-deadline-setted-template-js"}{literal} -->
-                        <i class="icon16 exclamation"></i>${date}
-                        <a id="deadline-edit" href="javascript:void(0);" class="small dialog-edit">[`edit`]</a>
+                        <!-- jquery template {capture name="publication-deadline-setted-template-js"}{literal} -->
+                    <i class="icon16 exclamation"></i>
+                    ${date}
+                    <a id="deadline-edit" href="javascript:void(0);" class="small dialog-edit">[`edit`]</a>
                     <!-- {/literal}{/capture} -->
 
-                    <!-- jquery template {capture name="publication-deadline-unsetted-template-js"}{literal} -->
-                        <i class="icon16 exclamation"></i><a id="deadline-edit" href="javascript:void(0);" class="dialog-edit">[`Not set`]</a>
-                        <span class="hint">[`Deadline is for plan purposes only. It will not automatically published the post, but will highlight the post if publication date is overdue.`]</span>
+                        <!-- jquery template {capture name="publication-deadline-unsetted-template-js"}{literal} -->
+                    <i class="icon16 exclamation"></i>
+                    <a id="deadline-edit" href="javascript:void(0);" class="dialog-edit">[`Not set`]</a>
+                    <span class="hint">[`Deadline is for plan purposes only. It will not automatically published the post, but will highlight the post if publication date is overdue.`]</span>
                     <!-- {/literal}{/capture} -->
                     {capture append="dialogs"}
                         {include file='./../../dialogs/postDeadline.html' inline}
@@ -74,23 +102,26 @@
                     {/capture}
 
                 {elseif $post.status != blogPostModel::STATUS_SCHEDULED}
-
                     <h6>[`Published`]</h6>
-
                     <span id="current-time" title="{$post.datetime}">{$post.datetime|wa_datetime:'humandatetime'}</span>
-
-                    <a class="inline-link small no-wrap" id="inline-edit-datetime" href="javascript:void(0);"><i class="icon10 edit"></i><b><i>[`edit`]</i></b></a>
-
+                    <a class="inline-link small no-wrap" id="inline-edit-datetime" href="javascript:void(0);"><i
+                                class="icon10 edit"></i><b><i>[`edit`]</i></b></a>
                     <div class="datetime" style="display: none">
-                        <input class="datepicker" name="datetime[]" type="text" value="{$post.datetime|wa_date}" size="8">
+                        <input class="datepicker" name="datetime[]" type="text" value="{$post.datetime|wa_date}"
+                               size="8">
 
-                        <input type="text" name="datetime[]" class="time" value="{$post.datetime|wa_datetime:'H'}" size="1" maxlength="2" autocomplete="off">:<input type="text" class="time" name="datetime[]" value="{$post.datetime|wa_datetime:'i'}" size="1" maxlength="2" autocomplete="off">
+                        <input type="text" name="datetime[]" class="time" value="{$post.datetime|wa_datetime:'H'}"
+                               size="1" maxlength="2" autocomplete="off">:<input type="text" class="time"
+                                                                                 name="datetime[]"
+                                                                                 value="{$post.datetime|wa_datetime:'i'}"
+                                                                                 size="1" maxlength="2"
+                                                                                 autocomplete="off">
 
                         <br>
-                        <span class="hint">(<span class="user-date-format"><!-- format placeholder --></span> [`format`], [`current time is`] <span class="current-user-time">{time()|wa_date:'time'}</span>)</span>
+                        <span class="hint">(<span class="user-date-format"><!-- format placeholder --></span> [`format`], [`current time is`] <span
+                                    class="current-user-time">{time()|wa_date:'time'}</span>)</span>
 
                     </div>
-
                     {capture append="dialogs"}
                         {include file='./../../dialogs/postDelete.html' inline}
                     {/capture}
@@ -102,20 +133,24 @@
             <!--  meta and custom parameters -->
             <div class="block">
                 <h6>[`Meta`]</h6>
+
                 <p class="small">
                     <span id="b-post-edit-meta-title" {if !$post.meta_title}style="display:none;"{/if}>
-                        <span class="gray" >[`Title`]:</span> <span class="val">{$post.meta_title|escape}</span><br>
+                        <span class="gray">[`Title`]:</span> <span class="val">{$post.meta_title|escape}</span><br>
                     </span>
                     <span id="b-post-edit-meta-keywords" {if !$post.meta_keywords}style="display:none;"{/if}>
-                        <span class="gray">[`Meta Keywords`]:</span> <span class="val">{$post.meta_keywords|escape}</span><br>
+                        <span class="gray">[`Meta Keywords`]:</span> <span
+                                class="val">{$post.meta_keywords|escape}</span><br>
                     </span>
-                    <span  id="b-post-edit-meta-description" {if !$post.meta_description}style="display:none;"{/if}>
-                        <span class="gray" >[`Meta Description`]:</span> <span class="val">{$post.meta_description|escape}</span><br>
+                    <span id="b-post-edit-meta-description" {if !$post.meta_description}style="display:none;"{/if}>
+                        <span class="gray">[`Meta Description`]:</span> <span
+                                class="val">{$post.meta_description|escape}</span><br>
                     </span>
                     <span id="b-post-edit-custom-params" {if !$params}style="display:none;"{/if}>
                         {foreach $params as $k => $v}{$k}={$v|escape}<br>{/foreach}
                     </span>
-                    <span class="gray" id="b-post-edit-no-meta" {if $post.meta_title || $post.meta_keywords || $post.meta_description || $params}style="display:none;"{/if}>[`No meta parameters are defined for this blog post.`]</span>
+                    <span class="gray" id="b-post-edit-no-meta"
+                          {if $post.meta_title || $post.meta_keywords || $post.meta_description || $params}style="display:none;"{/if}>[`No meta parameters are defined for this blog post.`]</span>
                     <a href="#" id="b-post-edit-custom-params-link" class="nowrap">[`Edit meta`]</a>
                 </p>
                 {capture append="dialogs"}
@@ -129,7 +164,7 @@
                 {foreach $backend_post_edit as $plugin => $output}
                     {if isset($output.sidebar)}
                         <!-- begin backend.post_edit.{$plugin}.sidebar -->
-                            {$output.sidebar}
+                        {$output.sidebar}
                         <!-- end {$plugin} -->
                     {/if}
                 {/foreach}
@@ -140,7 +175,8 @@
             {if $post.id}
                 <div class="block">
                     <ul class="menu-v with-icons compact">
-                        <li><a href="#{*?module=post&amp;action=delete&amp;id={$post.id*}" class="dialog-confirm" id="postdelete-dialog-confirm"><i class="icon16 delete"></i>[`Delete post`]</a></li>
+                        <li><a href="#{*?module=post&amp;action=delete&amp;id={$post.id*}" class="dialog-confirm"
+                               id="postdelete-dialog-confirm"><i class="icon16 delete"></i>[`Delete post`]</a></li>
                     </ul>
                 </div>
             {/if}
@@ -161,27 +197,35 @@
                         <a href="#{$post.blog_id}" class="inline-link current-blog">
                             {$blogs[$post.blog_id].icon_html|default:''}
                             <b><i>{$blogs[$post.blog_id].name|escape|truncate:32}</i></b>
-                            {if $blogs[$post.blog_id].status ==  blogBlogModel::STATUS_PRIVATE}<i class="icon10 lock-bw no-overhanging"></i>{/if}
+                            {if $blogs[$post.blog_id].status ==  blogBlogModel::STATUS_PRIVATE}
+                                <i class="icon10 lock-bw no-overhanging"></i>
+                            {/if}
                             <input type="hidden" name="blog_id" value="{$post.blog_id}">
                             <i class="icon10 darr"></i>
                         </a>
 
                         <!-- jquery template {capture name="selected-blog-template-js"}{literal} -->
-                            <a href="#${blog.id}" class="inline-link current-blog">
-                                {{html blog.icon_html}}
-                                <b><i>{{if blog.name.length > 32}}${blog.name.substring(0, 29)}...{{else}}${blog.name}{{/if}}</i></b>
-                                {{if (blog.status == '{/literal}{blogBlogModel::STATUS_PRIVATE}{literal}')}}<i class="icon10 lock-bw no-overhanging"></i>{{/if}}
-                                <input type="hidden" name="blog_id" value="${blog.id}">
-                                <i class="icon10 darr"></i>
-                            </a>
+                        <a href="#${blog.id}" class="inline-link current-blog">
+                            {{html blog.icon_html}}
+                            <b><i>{{if blog.name.length > 32}}${blog.name.substring(0,
+                                    29)}...{{else}}${blog.name}{{/if}}</i></b>
+                            {{if (blog.status == '{/literal}{blogBlogModel::STATUS_PRIVATE}{literal}')}}<i
+                                    class="icon10 lock-bw no-overhanging"></i>{{/if}}
+                            <input type="hidden" name="blog_id" value="${blog.id}">
+                            <i class="icon10 darr"></i>
+                        </a>
                         <!-- {/literal}{/capture} -->
                         {if $allow_change_blog}
                             <ul class="menu-v">
                                 {foreach $blogs as $id => $blog_}{if $blog_.rights ge blogRightConfig::RIGHT_READ_WRITE}
-                                    <li id="blog-selector-{$id}" class="{if $id eq $blog.id}selected{/if}" data-blog-status="{if $blog_.status == blogBlogModel::STATUS_PRIVATE}private{else}public{/if}">
-                                        {if $blog_.color != 'b-white'}<span class="count"><i class="icon10 color {$blog_.color}"></i></span>{/if}
+                                    <li id="blog-selector-{$id}" class="{if $id eq $blog.id}selected{/if}"
+                                        data-blog-status="{if $blog_.status == blogBlogModel::STATUS_PRIVATE}private{else}public{/if}">
+                                        {if $blog_.color != 'b-white'}<span class="count"><i
+                                                    class="icon10 color {$blog_.color}"></i></span>{/if}
                                         <a href="#{$id}" class="inline-link change-blog">
-                                            {$blog_.icon_html|default:''}{$blog_.name|escape|truncate:32}{if $blog_.status ==  blogBlogModel::STATUS_PRIVATE} <i class="icon10 lock-bw no-overhanging"></i>{/if}
+                                            {$blog_.icon_html|default:''}{$blog_.name|escape|truncate:32}{if $blog_.status ==  blogBlogModel::STATUS_PRIVATE}
+                                                <i class="icon10 lock-bw no-overhanging"></i>
+                                            {/if}
                                         </a>
                                     </li>
                                 {/if}{/foreach}
@@ -191,9 +235,11 @@
                 </ul>
             </div>
 
-            <div class="block double-padded b-post b-bottom-extra-padded {$blog.color}"{if isset($post.id) && $post.id} id="b-post-{$post.id}"{/if} style="position: static;">
+            <div class="block double-padded b-post b-bottom-extra-padded {$blog.color}"{if isset($post.id) && $post.id} id="b-post-{$post.id}"{/if}
+                 style="position: static;">
 
-                <input id="post-title" name="title" type="text" value="{$post.title|escape}" class="b-post-title" maxlength="255" placeholder="[`Post title`]">
+                <input id="post-title" name="title" type="text" value="{$post.title|escape}" class="b-post-title"
+                       maxlength="255" placeholder="[`Post title`]">
                 <br>
 
                 {* POST URL *}
@@ -203,28 +249,35 @@
 
                 <div id="post-url-field-no-settlements" class="hidden no-settlements">
                     <p class="small" style="line-height: 1.0em;">
-                        [`Posts of this blog are not visible in the public frontend because there are no routing rules for the Blog app in your website settings. Use Site app (Routing section) to settle Blog app on your website and to start publishing.`]
+                        [`Posts of this blog are not visible in the public frontend because there are no routing rules
+                        for the Blog app in your website settings. Use Site app (Routing section) to settle Blog app on
+                        your website and to start publishing.`]
                     </p>
                 </div>
 
                 {if !$no_settlements}
-                    <div id="post-url-field" {if ($blog.status == blogBlogModel::STATUS_PRIVATE && !$unsuccessful_save) || ($is_adding && $post.title|escape|strlen == 0 && !$unsuccessful_save)}style="display:none;"{/if} {if $no_settlements}class="no-settlements"{/if}>
+                    <div id="post-url-field"
+                         {if ($blog.status == blogBlogModel::STATUS_PRIVATE && !$unsuccessful_save) || ($is_adding && $post.title|escape|strlen == 0 && !$unsuccessful_save)}style="display:none;"{/if} {if $no_settlements}class="no-settlements"{/if}>
                         {if $post.status == blogPostModel::STATUS_PUBLISHED}
                         <i class="icon10 yes"></i>
                         <span class="small">[`Published`]:
-                        {else}
-                        <span class="{if $is_adding}small{else}hint{/if}">[`Preview`]:
-                        {/if}
-                            <span id="url-editable" {if $is_adding || $unsuccessful_save}style="display:none;"{/if}>
+                            {else}
+                            <span class="{if $is_adding}small{else}hint{/if}">[`Preview`]:
+                                {/if}
+                                <span id="url-editable" {if $is_adding || $unsuccessful_save}style="display:none;"{/if}>
                                 {$link = $post.link}
-                                {$full_link = "{if $link}{$link|escape}{if $post.url}{$post.url|escape}{/if}/{if isset($preview_hash)}?preview={$preview_hash}{/if}{/if}"}
-                                <a id="url-link" target="_blank" href="{$full_link}">{$post.link|escape}<span class="slug">{if $post.url}{$post.url|escape}/{else}<!-- slug placeholder -->{/if}</span></a>
-                                <a id="url-edit-link" href="javascript:void(0);" class="inline-link inline-edit"><i class="icon10 edit"></i><b><i>[`edit`]</i></b></a>
+                                    {$full_link = "{if $link}{$link|escape}{if $post.url}{$post.url|escape}{/if}/{if isset($preview_hash)}?preview={$preview_hash}{/if}{/if}"}
+                                    <a id="url-link" target="_blank" href="{$full_link}">{$post.link|escape}<span
+                                                class="slug">{if $post.url}{$post.url|escape}/{else}<!-- slug placeholder -->{/if}</span></a>
+                                <a id="url-edit-link" href="javascript:void(0);" class="inline-link inline-edit"><i
+                                            class="icon10 edit"></i><b><i>[`edit`]</i></b></a>
                             </span>
                             <span id="url-edit" {if !$is_adding && !$unsuccessful_save}style="display:none;"{/if}>
                                 {strip}
                                     <span id="pure-url">{$post.link|escape}</span>
-                                    <input type="text" id="post-url" name="url" value="{$post.url|escape}" {if isset($validate_messages) && !empty($validate_messages)}class="error"{/if}>/
+                                    <input type="text" id="post-url" name="url" value="{$post.url|escape}"
+                                           {if isset($validate_messages) && !empty($validate_messages)}class="error"{/if}>
+                                    /
                                 {/strip}
                             </span>
                         </span>
@@ -236,15 +289,18 @@
                                     {if $post.status == blogPostModel::STATUS_PUBLISHED}
                                         <i class="icon10 yes"></i>
                                         <span class="small">[`Published`]:
-                                            <a target="_blank" href="{$full_link}">{$link|escape}<span class="slug">{if $post.url}{$post.url|escape}/{else}<!-- slug placeholder -->{/if}</span></a>
+                                            <a target="_blank" href="{$full_link}">{$link|escape}<span
+                                                        class="slug">{if $post.url}{$post.url|escape}/{else}<!-- slug placeholder -->{/if}</span></a>
                                         </span>
                                     {else if $is_adding}
                                         <span class="small">[`Preview`]:
-                                            {$link|escape}<span class="slug">{if $post.url}{$post.url|escape}/{else}<!-- slug placeholder -->{/if}</span>
+                                            {$link|escape}<span
+                                                    class="slug">{if $post.url}{$post.url|escape}/{else}<!-- slug placeholder -->{/if}</span>
                                         </span>
                                     {else}
                                         <span class="hint">[`Preview`]:
-                                            <a target="_blank" href="{$full_link}">{$link|escape}<span class="slug">{if $post.url}{$post.url|escape}/{else}<!-- slug placeholder -->{/if}</span></a>
+                                            <a target="_blank" href="{$full_link}">{$link|escape}<span
+                                                        class="slug">{if $post.url}{$post.url|escape}/{else}<!-- slug placeholder -->{/if}</span></a>
                                         </span>
                                     {/if}
                                     <br>
@@ -252,11 +308,17 @@
                             {/if}
                         </div>
 
-                        {if $unsuccessful_save}
-                            <div id="message-post-url" class="hint errormsg">{$validate_messages.url}</div>
-                        {else}
-                            <div id="message-post-url" class="hint"></div>
-                        {/if}
+                            {if $unsuccessful_save}
+                                <div id="message-post-url" class="hint errormsg">{$validate_messages.url}</div>
+
+
+
+                                                                                                                                    {else}
+
+
+
+                                <div id="message-post-url" class="hint"></div>
+                            {/if}
 
                     </div>
                 {/if} {*/$no_settlements*}
@@ -269,7 +331,7 @@
                     {foreach $backend_post_edit as $plugin => $output}
                         {if isset($output.toolbar)}
                             <!-- begin backend_post_edit.{$plugin}.toolbar -->
-                                {$output.toolbar}
+                            {$output.toolbar}
                             <!-- end {$plugin} -->
                         {/if}
                     {/foreach}
@@ -293,7 +355,7 @@
                             {if isset($output.editor_tab)}
                                 <li>
                                     <!-- begin backend_post_edit.{$plugin}.toolbar -->
-                                        {$output.editor_tab}
+                                    {$output.editor_tab}
                                     <!-- end {$plugin} -->
                                 </li>
                             {/if}
@@ -305,13 +367,15 @@
                         <li>
                             <a id="photo_bridge" href="javascript:void(0);">
                                 [`Photo Album`]
-                                <i class="icon10 yes show-when-album-selected" style="{if empty($post.album_id)}display:none;{/if}"></i>
+                                <i class="icon10 yes show-when-album-selected"
+                                   style="{if empty($post.album_id)}display:none;{/if}"></i>
                             </a>
                         </li>
                     {/if}
                 </ul>
                 <textarea id="post_text" name="text" cols="60" rows="20" style="border:0">{$post.text|escape}</textarea>
-                <div  class="b-post-editor-wrapper" id="post_text_wrapper">
+
+                <div class="b-post-editor-wrapper" id="post_text_wrapper">
                     {if blogPhotosBridge::isAvailable()}
                         <div id="blog-photo_bridge-editor" class="hidden">
                             <div class="double-padded block">
@@ -325,17 +389,21 @@
                                                 {function upload_album_menu parent=0 level=0}
                                                     {foreach $albums as $a}
                                                         {if $a.parent_id == $parent}
-                                                          <option value="{$a.id}"{if $post.album_id == $a.id} selected{/if} data-frontend-link="{$a.frontend_link|escape}">{strip}
-                                                            {if $parent}{'-'|str_repeat:$level}{*'*}&nbsp;{/if}
-                                                            {$a.name|default:'[`(no name)`]'|escape|truncate:64}{if $a.status != 1} ([`private album`]){/if}
-                                                          {/strip}</option>
-                                                          {call upload_album_menu parent=$a.id level=($level+1)}
+                                                            <option value="{$a.id}"{if $post.album_id == $a.id} selected{/if}
+                                                                    data-frontend-link="{$a.frontend_link|escape}">{strip}
+                                                                    {if $parent}{'-'|str_repeat:$level}{*'*}&nbsp;{/if}
+                                                                    {$a.name|default:'[`(no name)`]'|escape|truncate:64}{if $a.status != 1} ([`private album`]){/if}
+                                                                {/strip}</option>
+                                                            {call upload_album_menu parent=$a.id level=($level+1)}
                                                         {/if}
                                                     {/foreach}
                                                 {/function}
                                                 {call upload_album_menu}
                                             </select>
-                                            <p class="hint">[`Photos from the selected album will be automatically embedded after the post content. Photos descriptions and sort order will be defined by Photos app.`]</p>
+
+                                            <p class="hint">[`Photos from the selected album will be automatically
+                                                embedded after the post content. Photos descriptions and sort order will
+                                                be defined by Photos app.`]</p>
                                         </div>
                                     </div>
                                     <div class="hidden field">
@@ -343,10 +411,15 @@
                                         <div class="value">
                                             <label>
                                                 <input type="hidden" name="album_link_type" value="blog">
-                                                <input type="checkbox" name="album_link_type" value="photos"{if $post.album_link_type == 'photos'} checked{/if}>
+                                                <input type="checkbox" name="album_link_type"
+                                                       value="photos"{if $post.album_link_type == 'photos'} checked{/if}>
                                                 [`Replace with the direct link to this album`]
                                                 <strong id="album-frontend-link" class="hint"></strong>
-                                                <p class="hint">[`Great for photo galleries. Blog post will be published in the blog on a regular basis (in both post stream and RSS), but the main post title link will lead to the album page directly (Photos app).`]</p>
+
+                                                <p class="hint">[`Great for photo galleries. Blog post will be published
+                                                    in the blog on a regular basis (in both post stream and RSS), but
+                                                    the main post title link will lead to the album page directly
+                                                    (Photos app).`]</p>
                                             </label>
                                         </div>
                                     </div>
@@ -363,17 +436,22 @@
                     <div id="b-post-draft-settings">
                         <div class="float-right b-aux-link">
                             <i class="icon16 clock"></i>
-                            <a id="schedule-edit" href="javascript:void(0);" class="no-underline dialog-edit">[`Schedule publication`]</a>
+                            <a id="schedule-edit" href="javascript:void(0);" class="no-underline dialog-edit">[`Schedule
+                                publication`]</a>
                         </div>
                         {if ($allow_change_blog > 1) && ($post.status neq blogPostModel::STATUS_PUBLISHED)}
-                            <input id="postpublish-edit" type="button" class="button green dialog-edit" value="[`Publish`]" >
+                            <input id="postpublish-edit" type="button" class="button green dialog-edit"
+                                   value="[`Publish`]">
                             {capture append="dialogs"}
                                 {include file='./../../dialogs/postPublish.html' inline}
                             {/capture}
                         {else}
-                            <input id="b-post-save-button" type="button" class="button green" name="published" value="[`Publish`]" >
+                            <input id="b-post-save-button" type="button" class="button green" name="published"
+                                   value="[`Publish`]">
                         {/if}
-                        <input id="b-post-save-draft-button" type="button" class="button grey" name="{if $post.status eq blogPostModel::STATUS_DEADLINE}deadline{else}draft{/if}" value="[`Save draft`]" >
+                        <input id="b-post-save-draft-button" type="button" class="button grey"
+                               name="{if $post.status eq blogPostModel::STATUS_DEADLINE}deadline{else}draft{/if}"
+                               value="[`Save draft`]">
                         <span class="hint">Ctrl+S</span>
                         <span id="form-status">
                             <span id="saved-status" style="display: none;">
@@ -400,9 +478,12 @@
 
                         <div class="float-right b-aux-link">
                             <i class="icon10 no-bw"></i>
-                            <a name="unpublish" href="#unpublish" class="no-underline js-submit" title="[`Unpublish this blog post?`]">[`Unpublish`]</a>
+                            <a name="unpublish" href="#unpublish" class="no-underline js-submit"
+                               title="[`Unpublish this blog post?`]">[`Unpublish`]</a>
                         </div>
-                        <input id="b-post-save-button" type="button" class="button green" name="{if $post.status eq blogPostModel::STATUS_SCHEDULED}scheduled{else}published{/if}" value="[`Save`]" >
+                        <input id="b-post-save-button" type="button" class="button green"
+                               name="{if $post.status eq blogPostModel::STATUS_SCHEDULED}scheduled{else}published{/if}"
+                               value="[`Save`]">
                         <span class="hint">Ctrl+S</span>
                         <span id="form-status">
                             <span id="saved-status" style="display: none;">
@@ -447,13 +528,16 @@
 <script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.datepicker.min.js"></script>
 <script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.draggable.min.js"></script>
 {if $lang!='en'}
-    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/i18n/jquery.ui.datepicker-{$wa->locale()}.js"></script>
+    <script type="text/javascript"
+            src="{$wa_url}wa-content/js/jquery-ui/i18n/jquery.ui.datepicker-{$wa->locale()}.js"></script>
 {/if}
 
 <script src="{$wa_app_static_url}js/redactor_plugins.js?v{$wa->version()}"></script>
 <link type="text/css" rel="stylesheet" href="{$wa_url}wa-content/js/redactor/redactor.css?v{$wa->version(true)}">
 <script src="{$wa_url}wa-content/js/redactor/redactor.min.js?v{$wa->version(true)}"></script>
-{if $lang!='en'}<script src="{$wa_url}wa-content/js/redactor/{$lang}.js?v{$wa->version(true)}"></script>{/if}
+{if $lang!='en'}
+    <script src="{$wa_url}wa-content/js/redactor/{$lang}.js?v{$wa->version(true)}"></script>
+{/if}
 
 <script type="text/javascript" src="{$wa_url}wa-content/js/ace/ace.js?v{$wa->version(true)}"></script>
 <script type="text/javascript" src="{$wa_url}wa-content/js/elrte/elrte.min.js"></script>
@@ -463,8 +547,8 @@
 <script type="text/javascript" src="{$wa_url}wa-content/js/elrte/elrte-wa.js"></script>
 
 {wa_js file="js/blog-post-edit.min.js"}
-    {$wa_app_static_url}js/postmessage.js
-    {$wa_app_static_url}js/postEdit.js
+{$wa_app_static_url}js/postmessage.js
+{$wa_app_static_url}js/postEdit.js
 {/wa_js}
 
 <script type="text/javascript">
@@ -476,7 +560,7 @@
         "Select from Photos app": "[`Select from Photos app`]",
         "Insert": "[`Insert`]",
         "Total photos selected:": "[`Total photos selected:`]",
-        "Photos from the attached album will be displayed here.":"[`Photos from the attached album will be displayed here.`]",
+        "Photos from the attached album will be displayed here.": "[`Photos from the attached album will be displayed here.`]",
         'input_maxlength':{json_encode('[`Max %d characters`]')}
     });
     $.wa_blog_options = $.extend(true, $.wa_blog_options, {
@@ -484,11 +568,11 @@
         'editor': {
             'blogs':{json_encode($blogs)},
             'current_blog_id':{$blog.id},
-            'editor_id':'post_text',
-            'wa_url':"{$wa_url}",
-            'wa_app_static_url':"{$wa_app_static_url}",
+            'editor_id': 'post_text',
+            'wa_url': "{$wa_url}",
+            'wa_app_static_url': "{$wa_app_static_url}",
             'cut_link_label_default': "[`Continue reading →`]",
-            'version':'{$wa->version()}'
+            'version': '{$wa->version()}'
         }
     });
 
@@ -496,17 +580,21 @@
         '_csrf': "{waRequest::cookie('_csrf', '')}"
     });
 
+
     {if waRequest::request('realtime_on')}
-        $(function() {
-            $('#realtime-preview-toggle').click();
-        });
+    $(function () {
+        $('#realtime-preview-toggle').click();
+    });
     {/if}
 </script>
 
 {foreach $smarty.capture as $name => $template}
-{if strpos($name,'template-js')}
-<script type="text/x-jquery-tmpl" id="{$name}">
+    {if strpos($name,'template-js')}
+        <script type="text/x-jquery-tmpl" id="{$name}">
 <!-- begin {$name} {$template|replace:'</':'<\/'} end {$name} -->
-</script>
-{/if}
+
+
+
+        </script>
+    {/if}
 {/foreach}

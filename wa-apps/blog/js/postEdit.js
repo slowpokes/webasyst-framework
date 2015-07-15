@@ -1,4 +1,6 @@
 (function($) {
+
+
     $.wa_blog.editor = {
 
         options : {
@@ -124,8 +126,8 @@
 
                 if (maxlength && input.val().length >= maxlength && !msg.length) {
                     input.after('<em class="hint maxlength">'
-                            + $_('input_maxlength').replace(/%d/, maxlength)
-                            + '</em>');
+                    + $_('input_maxlength').replace(/%d/, maxlength)
+                    + '</em>');
                 } else if ((!maxlength || input.val().length < maxlength) && msg.length) {
                     msg.remove();
                 }
@@ -139,7 +141,7 @@
             $('.b-post-editor-toggle li a').click(this.editorTooggle);
 
             $(document).keydown(function(e) {
-                  // ctrl + s
+                // ctrl + s
                 if (e.ctrlKey && e.keyCode == 83) {
                     self.onSaveHotkey(e);
                 }
@@ -180,13 +182,13 @@
 
                 $('.dialog-edit').each(function() {
                     /*$(this).parents('.block:first').click(function(e) {
-                        if ($(e.target).hasClass('dialog-edit')) {
-                            return linkClickHandler.call(e.target);
-                        }
-                    });*/
+                     if ($(e.target).hasClass('dialog-edit')) {
+                     return linkClickHandler.call(e.target);
+                     }
+                     });*/
                     $(this).click(function(e) {
-                            e.preventDefault();
-                            return linkClickHandler.call(e.target);
+                        e.preventDefault();
+                        return linkClickHandler.call(e.target);
                     });
                 });
 
@@ -383,7 +385,7 @@
                 function handler()
                 {
                     var onLabelSelector = '#' + this.id + '-on-label',
-                    offLabelSelector = '#' + this.id + '-off-label';
+                        offLabelSelector = '#' + this.id + '-off-label';
 
                     if (!this.checked) {
                         $(onLabelSelector).addClass('b-unselected');
@@ -465,7 +467,7 @@
                     }
 
                     var className = descriptor.is_adding ? 'small'
-                                        : descriptor.is_published ? 'small' : 'hint';
+                        : descriptor.is_published ? 'small' : 'hint';
 
                     var previewText = $('#post-url-field span:first').contents().filter(function() { return this.nodeType == 3; }).get(0).nodeValue;
 
@@ -478,17 +480,17 @@
                                 slug: cachedSlug,
                                 link: descriptor.other_links[k],
                                 href : descriptor.preview_hash
-                                            ? descriptor.other_links[k] + cachedSlug + '/?preview=' + descriptor.preview_hash
-                                            : descriptor.other_links[k] + cachedSlug + '/'
+                                    ? descriptor.other_links[k] + cachedSlug + '/?preview=' + descriptor.preview_hash
+                                    : descriptor.other_links[k] + cachedSlug + '/'
                             });
                         }
                         var tmpl = descriptor.is_adding
                             ?   '<span class="${className}">${previewText}${link}' +
-                                    '<span class="slug">{{if slug}}${slug}/{{/if}}</span>' +
-                                '</span><br>'
+                        '<span class="slug">{{if slug}}${slug}/{{/if}}</span>' +
+                        '</span><br>'
                             : '<span class="${className}">${previewText}<a target="_blank" href="${href}">${link}' +
-                                    '<span class="slug">{{if slug}}${slug}/{{/if}}</span></a>' +
-                                '</span><br>';
+                        '<span class="slug">{{if slug}}${slug}/{{/if}}</span></a>' +
+                        '</span><br>';
 
                         var icon = $('#post-url-field').children(':first');
 
@@ -680,8 +682,8 @@
                             }
                         }
                         if ($('#post-id').val() && (this.id == 'b-post-save-button' ||
-                                this.id == 'b-post-save-draft-button' ||
-                                this.id == 'b-post-save-custom-params'))
+                            this.id == 'b-post-save-draft-button' ||
+                            this.id == 'b-post-save-custom-params'))
                         {
                             inline = true;
                         }
@@ -739,9 +741,46 @@
                 {
                     if (beforeSave() !== false) {
                         //hideErrors();
+                        getFiles();
                         submit(afterSave);
                     }
                 }
+
+                // ZV CODE START
+                function getFiles() {
+                    var formData = new FormData($('form')[0]);
+                    $.ajax({
+                        url: '?module=post&action=image',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        async: false
+                    }).done(function (response) {
+                        $(".input-file").attr("data-url", response.data);
+                    });
+                }
+
+                $("#imagedelete-dialog-confirm").on("click", function () {
+                    var post_id = 'id=' + $("#main_image").attr("data-id");
+                    var input = $(".input-file");
+                    $.ajax({
+                        type: 'POST',
+                        cache: false,
+                        data: post_id,
+                        async: false,
+                        url: '?module=post&action=imagedelete'
+                    }).success(function () {
+                        $(".image_block").slideUp("normal", function () {
+                            $(this).remove();
+                        });
+                        input.val('');
+                    });
+                });
+
+                // ZV CODE END
 
                 function onFail(errors)
                 {
@@ -762,6 +801,7 @@
 
                 function submit(fn)
                 {
+                    var main_image = $(".input-file").attr("data-url");
                     var text = $.wa_blog.editor.wysiwygToHtml($('#post_text', '#post-form').val());
                     $('#post_text', '#post-form').val(text);
 
@@ -769,6 +809,10 @@
 
                     data += inline ? '&inline=1' : '';
                     data += !$.wa_blog.editor.transliterated ? '&transliterate=1' : '';
+                    if (typeof main_image != 'undefined') {
+                        data += "&main_image=" + main_image; //ZV CODE
+                    }
+
 
                     fn = fn || function() {};
 
@@ -794,6 +838,7 @@
                                     $('#post-id').val(response.data.id);
                                 }
                                 updateStatusIcon('saved');
+
                             }
 
                             inline = false;
@@ -960,8 +1005,8 @@
 
                 // Update iframe height when content changes
                 /*$.pm.bind('update_height', function(data) {
-                    $iframe.height(parseInt(data));
-                });*/
+                 $iframe.height(parseInt(data));
+                 });*/
 
                 // Height of an iframe depends on height of a window
                 $(window).resize(function() {
@@ -1548,7 +1593,7 @@
         editorTooggle : function() {
             var self = $(this);
             if (!self.hasClass('selected')
-                    && $.wa_blog.editor.selectEditor(self.attr('id'))) {
+                && $.wa_blog.editor.selectEditor(self.attr('id'))) {
                 $('.b-post-editor-toggle li.selected').removeClass('selected');
                 self.parent().addClass('selected');
             }
