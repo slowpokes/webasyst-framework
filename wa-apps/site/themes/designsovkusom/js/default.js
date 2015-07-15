@@ -1,5 +1,19 @@
 $(document).ready(function () {
 
+    $(".sidebar_link").click(function () {
+        var li = $(this).parent();
+        if (li.hasClass('closed')) {
+            console.log(1);
+            li.removeClass('closed');
+        }
+        else {
+            li.addClass('closed');
+            console.log(2);
+            li.find('li').addClass('closed');
+        }
+        return false;
+    });
+
 
     $('.product-list li').live("hover", function () {
         if (!$(this).hasClass('main_block')) {
