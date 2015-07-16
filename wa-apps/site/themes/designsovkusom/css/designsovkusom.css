@@ -653,12 +653,12 @@ body.freeze {
 }
 
 .sex_men {
-    background: url(../img/men_sex.png) no-repeat;
+    background: url(../img/men_new.png) no-repeat;
     background-size: 20px;
 }
 
 .sex_women {
-    background: url(../img/women_sex.png) no-repeat;
+    background: url(../img/women_new.png) no-repeat;
     background-size: 15px;
 }
 
@@ -666,6 +666,15 @@ body.freeze {
     background: url(../img/unisex_sex.png) no-repeat;
     background-size: 15px;
 }
+
+.news_date_wrap {
+    padding-top: 20px;
+}
+
+.news_date {
+    font-size: 20px;
+}
+
 
 #footer .info {
     padding: 0 20px;
@@ -721,7 +730,6 @@ body.freeze {
 .filter-disable {
     color: #999;
 }
-
 .wa-field-photo > .wa-name {
     top: -10px !important;
 }
@@ -794,7 +802,6 @@ div.post:nth-child(1) > li:nth-child(1) {
 .post_text img {
     display: none;
 }
-
 .all_news {
     background: #F9F9F9 none repeat scroll 0% 0%;
     position: relative;
@@ -1204,10 +1211,6 @@ div.post:nth-child(1) > li:nth-child(1) {
     margin-right: 15px;
 }
 
-li.closed > ul {
-    display: none;
-}
-
 .leftmenu {
     -moz-box-shadow: 0 1px 6px rgba(0, 0, 0, .1);
     -ms-box-shadow: 0 1px 6px rgba(0, 0, 0, .1);
@@ -1568,8 +1571,6 @@ li.closed > ul {
     font-weight: 700;
     padding-bottom: 5px;
 }
-
-
 
 .recently-viewed li .image {
     text-align: center;
@@ -2526,6 +2527,7 @@ tr.total_tr {
     height: 0px;
 
 }
+
 
 .list .bx-next {
     margin-left: 230px !important;
@@ -3554,6 +3556,7 @@ input.radio:checked ~ label {
     display: none;
 }
 
+
 .list .badge_sex {
     left: 82px;
     top: 6px;
@@ -3794,6 +3797,9 @@ input.radio:checked ~ label {
     display: block;
 }
 
+.closed {
+    display: none !important;
+}
 
 .depth_0 {
     color: rgba(251, 132, 44, 0.92);
@@ -5238,6 +5244,10 @@ blockquote cite {
     opacity: .8 !important;
     cursor: pointer;
     color: #fe6309;
+}
+
+.grey_color {
+    color: #808080;
 }
 
 .green-button {
@@ -7925,7 +7935,6 @@ ul:after {
 .set .shipping_table tr {
     border-bottom: 1px solid #CECECE;
 }
-
 .shm_end {
     border-bottom: 1px solid #cbcbcb;
     padding-bottom: 15px;
@@ -8050,13 +8059,10 @@ ul.page_tab li.current a {
 
 .post h2 {
     font-size: 26px;
-    text-align: center;
-    color: #515151;
     font-weight: 600;
-    margin-bottom: 19px;
-    margin-top: 20px;
-    padding: 20px;
-    border-top: 2px solid rgba(251, 132, 44, 0.92);
+    padding-top: 20px;
+    color: rgba(251, 132, 44, 0.92);
+    text-decoration: underline;
 }
 
 #page .content_small {
@@ -8234,4 +8240,8 @@ input::-webkit-inner-spin-button {
 
 .categ_page {
     min-height: 600px;
+}
+
+.form a {
+    color: rgba(251, 132, 44, 0.92);
 }
