@@ -3797,9 +3797,6 @@ input.radio:checked ~ label {
     display: block;
 }
 
-.closed {
-    display: none !important;
-}
 
 .depth_0 {
     color: rgba(251, 132, 44, 0.92);
@@ -8063,6 +8060,7 @@ ul.page_tab li.current a {
     padding-top: 20px;
     color: rgba(251, 132, 44, 0.92);
     text-decoration: underline;
+    line-height: 1;
 }
 
 #page .content_small {
