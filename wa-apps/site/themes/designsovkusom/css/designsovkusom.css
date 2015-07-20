@@ -8210,10 +8210,17 @@ input::-webkit-inner-spin-button {
 
 }
 
+.news_title_wrap {
+    padding-bottom: 20px;
+
+}
 .dialog-window .cart .add2cart .compare-at-price {
     display: none !important;
 }
 
+.depth_2 a:hover {
+    color: rgba(251, 132, 44, 0.92);
+}
 .button, .wa-form .wa-field .wa-value.wa-submit a {
     float: left;
 
@@ -8228,6 +8235,11 @@ input::-webkit-inner-spin-button {
 
 .suggestions-wrapper .suggestions-suggestions strong {
     color: #F46F0C !important;
+}
+
+.show_all_news {
+    font-size: 12px !important;
+    color: grey !important;
 }
 
 .act {

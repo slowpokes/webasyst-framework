@@ -33,7 +33,7 @@
             {/if}
 
             <div class="text news_body">
-                {$post.text|truncate:1000}
+                {$post.text|truncate:1000:" ... <a style='color:rgba(251, 132, 44, 0.92)' href='{$post.link}'> читать далее >> </a>"}
                 {if $post.cutted}
                     <a href="{$post.link}">{$post.cut_link_label|default:'[`Continue reading →`]'}</a>
                 {/if}

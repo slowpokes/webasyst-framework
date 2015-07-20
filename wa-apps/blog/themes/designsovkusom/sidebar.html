@@ -16,7 +16,8 @@
         <ul>
             {foreach $month_year as $key=>$month}
                 <li class="closed depth_0">
-                    <a href="#" class="sidebar_link">{$key}</a>
+                    <a href="#" class="sidebar_link">{$key}</a><a class="show_all_news" href="/blog/{$key}"> посмотреть
+                        все</a>
                     <ul>
                         {foreach $month as $m}
                             <li class="closed depth_1">
@@ -43,6 +44,11 @@
     function openLink(element) {
         element.parentsUntil("div").removeClass('closed');
     }
+    $(document).ready(function () {
+        $(".brand_sidebar_links").find(".depth_0").first().removeClass("closed");
+        $(".brand_sidebar_links").find(".depth_1").first().removeClass("closed");
+    });
+
 
     $("body").on("click", ".sidebar_link", function () {
         var li = $(this).parent();
