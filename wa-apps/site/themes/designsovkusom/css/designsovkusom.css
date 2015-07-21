@@ -8238,8 +8238,10 @@ input::-webkit-inner-spin-button {
 }
 
 .show_all_news {
-    font-size: 12px !important;
-    color: grey !important;
+    font-size: 10px !important;
+    color: #808080 !important;
+    text-align: right;
+    float: right;
 }
 
 .act {

@@ -25,7 +25,8 @@
                                 <ul>
                                     {foreach $m as $p}
                                         <li class="depth_2 {if isset($post)&&($post.id==$p.id)}current{/if}">
-                                            <a href="{$p.link}">{$p.title}</a>
+                                            <span style="color: gray;font-size: 12px;margin-left: -10px;">{waDateTime::date('j f', $p.datetime)}</span><a
+                                                    href="{$p.link}">{$p.title}</a>
                                         </li>
                                     {/foreach}
                                 </ul>
