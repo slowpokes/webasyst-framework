@@ -741,7 +741,10 @@
                 {
                     if (beforeSave() !== false) {
                         //hideErrors();
-                        getFiles();
+                        if ($(".input-file").length) {
+                            getFiles();
+                        }
+
                         submit(afterSave);
                     }
                 }
@@ -801,7 +804,10 @@
 
                 function submit(fn)
                 {
-                    var main_image = $(".input-file").attr("data-url");
+                    if ($(".input-file").length) {
+                        var main_image = $(".input-file").attr("data-url");
+                    }
+
                     var text = $.wa_blog.editor.wysiwygToHtml($('#post_text', '#post-form').val());
                     $('#post_text', '#post-form').val(text);
 

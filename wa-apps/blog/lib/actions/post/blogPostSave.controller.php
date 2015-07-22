@@ -57,8 +57,11 @@ class blogPostSaveController extends waJsonController
             'meta_description'   => waRequest::post('meta_description', null, waRequest::TYPE_STRING_TRIM),
             'album_id'           => waRequest::post('album_id', null, waRequest::TYPE_INT),
             'album_link_type'    => waRequest::post('album_link_type', null, waRequest::TYPE_STRING_TRIM),
-            'main_image' => waRequest::post('main_image') // ZV CODE
+            //'main_image'         => waRequest::post('main_image') // ZV CODE
         );
+        if (waRequest::post('main_image')) {
+            $post['main_image'] = waRequest::post('main_image');
+        }
 
         if ($post['album_id'] && blogPhotosBridge::isAvailable()) {
             wa('photos');

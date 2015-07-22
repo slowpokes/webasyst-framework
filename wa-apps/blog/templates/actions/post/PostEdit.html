@@ -59,12 +59,13 @@
                                     картинку</a></li>
                         </ul>
                     </div>
+                {else}
+                    <input class="input-file" type="file" name="file" multiple>
+                    <div class="loading" style="display:none; margin-top: 10px">
+                        <i class="icon16 loading"></i> Загружаю...
+                    </div>
                 {/if}
-                <input class="input-file" type="file" name="file" multiple>
 
-                <div class="loading" style="display:none; margin-top: 10px">
-                    <i class="icon16 loading"></i> Загружаю...
-                </div>
 
             </div>
 
@@ -313,7 +314,9 @@
 
 
 
-                                                                                                                                    {else}
+
+                                                                                                                                                                        {else}
+
 
 
 
@@ -592,6 +595,7 @@
     {if strpos($name,'template-js')}
         <script type="text/x-jquery-tmpl" id="{$name}">
 <!-- begin {$name} {$template|replace:'</':'<\/'} end {$name} -->
+
 
 
 
