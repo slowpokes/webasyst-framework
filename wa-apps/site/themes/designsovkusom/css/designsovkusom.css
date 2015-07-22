@@ -8257,3 +8257,16 @@ input::-webkit-inner-spin-button {
 .form a {
     color: rgba(251, 132, 44, 0.92);
 }
+
+.content .post a {
+    color: rgba(251, 132, 44, 0.92);
+}
+
+.latest-posts {
+    font-size: 14px;
+}
+
+.latest-posts .date {
+    font-size: 11px;
+    color: #808080;
+}
