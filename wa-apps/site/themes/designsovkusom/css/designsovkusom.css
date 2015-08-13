@@ -1247,6 +1247,9 @@ div.post:nth-child(1) > li:nth-child(1) {
     left: 100%
 }
 
+.latest-posts {
+    font-size: 14px;
+}
 .blog_sidebar {
     padding: 10px;
     border-top: 3px solid rgba(251, 132, 44, 0.92);

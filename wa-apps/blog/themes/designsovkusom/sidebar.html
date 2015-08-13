@@ -69,6 +69,18 @@
 </script>
 {/literal}
 *}
+{literal}
+    <script>
+        $(document).ready(function () {
+            $(".post a").each(function () {
+                if ($(this).attr("href") == window.location) {
+                    $(this).addClass("bold");
+                }
+            });
+        });
+
+    </script>
+{/literal}
 {$latest_posts = $wa->blog->posts(null, 10)}
 {if !empty($latest_posts)}<!-- latest posts-->
     <div class="sidebar blog_sidebar brand_page col l3 m3 hide-on-small-only">
@@ -78,9 +90,9 @@
             <div class="latest-posts">
                 {foreach $latest_posts as $post}
                     <div class="post">
-                        <div class="page-info">
+                        <!--div class="page-info">
                             <div class="date">{$post.datetime|wa_datetime:"date"}</div>
-                        </div>
+                        </div-->
                         <p><a href="{$post.link}">{$post.title}</a></p>
                         <br>
                     </div>
