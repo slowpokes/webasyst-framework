@@ -21,6 +21,7 @@
     <link href="{$wa_theme_url}css/kickstart-grid.css" rel="stylesheet" type="text/css">
     <!--link href="{$wa_theme_url}grid.min.css" rel="stylesheet" type="text/css"-->
     <!--link href="{$wa_theme_url}tinycarousel.css?v{$wa_theme_version}" rel="stylesheet" type="text/css"-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="{$wa_theme_url}css/jquery.kladr.min.css" rel="stylesheet" type="text/css">
     <link href="{$wa_theme_url}css/materialize.css" rel="stylesheet" type="text/css">{*DEV VER*}
     <link href="{$wa_theme_url}css/pickmeup.min.css" rel="stylesheet" type="text/css">
@@ -57,237 +58,341 @@
 
 </head>
 <body id="top">
-<div id='select_region' class="overlay">
-    <div class="overlay_container">
-        <div id='select_reg'>
-            <h1> Выберите Ваш регион: </h1>
-            {$wa->regionsList()}
-        </div>
-    </div>
-</div>
+
 <div class="container">
-    <div class="wrapper_top">
-        <div class="float-left">
-            <div class="header_region">
-                <span class="before_city">Ваш регион — </span> <span class="city_container"></span>
-                <span class="before_date">  Доставка в Ваш регион в течение</span><span class="date_container"></span>
+    <div class="row">
+
+        <div id='select_region' class="modal_material">
+            <div class="modal-content">
+                <div id='select_reg'>
+                    <h1> Выберите Ваш регион: </h1>
+                    {$wa->regionsList()}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-orange btn-flat">Закрыть</a>
             </div>
         </div>
-        <a href="{$wa_url}contacts" class="contact_header"><img src="{$wa_theme_url}img/phone.png"/> <span
-                    style="margin-left: 5px">Контакты</span></a>
 
-        <div class="auth float-right">
+        <div class="wrapper_top valign-wrapper">
+            <div class="header_region valign col l6 m5">
+                <span class="before_city hide-region-on-small">Ваш регион — </span> <span
+                        class="city_container hide-on-small-and-down"></span>
+                <span class="before_date hide-info-on-med hide-region-on-small">  Доставка в течение</span><span
+                        class="date_container hide-info-on-med hide-region-on-small"></span>
+            </div>
+            <a href="{$wa_url}contacts" class="contact_header hide-on-small-only valign col l1 m2"> <span><i
+                            class="tiny mdi-hardware-phone-iphone"
+                            style="color: rgba(251, 132, 44, 0.92);"></i>Контакты</span></a>
 
-            {if $wa->isAuthEnabled()}
-                {if $wa->user()->isAuth()}
-                    <img src="{$wa_theme_url}img/login.png" style="vertical-align: text-bottom">
-                    <a href="{$wa->getUrl('/frontend/my')}">{$wa->user('firstname')}</a>
-                    |
-                    <a href="?logout">[s`Log out`]</a>
-                {else}
-                    <img src="{$wa_theme_url}img/login.png">
-                    <a href="{$wa->loginUrl()}">Войти</a>
-                    &nbsp;&nbsp;|
-                    <a href="{$wa->signupUrl()}">Зарегистрироваться</a>
+
+            <a href="{$wa_url}o_magazine" class="contact_header hide-on-small-only valign col l2 m2"><span>
+                    <i class="small material-icons">info_outline</i>Полезная информация</span></a>
+
+            <div class="auth center-on-small-only valign col l3 m3 s12">
+
+                {if $wa->isAuthEnabled()}
+                    {if $wa->user()->isAuth()}
+                        <img src="{$wa_theme_url}img/login.png" style="vertical-align: text-bottom">
+                        <a href="/my/profile/">{$wa->user('firstname')}</a>
+                        |
+                        <a href="?logout">[s`Log out`]</a>
+                    {else}
+                        <img src="{$wa_theme_url}img/login.png">
+                        <a href="{$wa->loginUrl()}">Войти</a>
+                        &nbsp;&nbsp;|
+                        <a href="{$wa->signupUrl()}">Зарегистрироваться</a>
+                    {/if}
                 {/if}
-            {/if}
-        </div>
-
-    </div>
-    <!-- container -->
-</div>
-<!-- wrapper top -->
-
-<div class="wrapper">
-    <div class="container" style="position:relative; ">
-        <div id="header">
-            <!-- Логотип -->
-            <div class="logo">
-                <a href="{$wa_url}">
-                    {include file="dsv.logo.html"}
-                </a>
             </div>
-            <!-- Контакты -->
-            <div class="contacts">
-                {include file="dsv.contact.html"}
-            </div>
-            <div class="wrapper_cart"></div>
-
 
         </div>
-
-        <!-- header -->
-    </div>
-    <!-- container -->
-</div>
-<!-- wrapper -->
-
-
-<div class="wrapper_menu">
-    <div class="container">
-        {include file="dsv.menu.html"}
-    </div>
-</div>
-
-<div id="main">
-    <div class="container app-header">
-
-    </div>
-    <div class="container" style="padding: 20px; min-height: 600px">
-
-        <!-- navigation breadcrumbs -->
-        {if isset($breadcrumbs)}
-            <div class="breadcrumbs">
-                <img class="back_button" src="{$wa_theme_url}img/back.png"> <a class="nocover"
-                                                                               href="javascript:void(0);"
-                                                                               onclick="javascript:history.back();">Вернуться
-                    | </a>
-                {if $breadcrumbs}
-                    <a href="{$wa_app_url}">Главная</a>
-                    {foreach $breadcrumbs as $breadcrumb name=breadcrumb}
-
-                        >
-                        <a href="{$breadcrumb.url}">{$breadcrumb.name|escape}</a>
-                    {/foreach}
-                {else} {/if}
-            </div>
-            <!-- current page core content -->
-            {if isset($breadcrumbs)}
-                <div class="breadcrumbs-on">
-
-            {/if}
-
-            {$content}
-            </div>
-        {else}
-            {$content}
-        {/if}
-
-
-        <!-- ПОДПИСКА -->
-        <!--div class="sidebar-block-container subscrib">
-            <div class="sidebar-block">
-                <h3>Подписка на рассылку</h3>
-
-            </div>
-        </div-->
-    </div>
-</div>
-
-<div class="clear-both"></div>
-<div id="footer">
-    <div class="container">
-        <div class="copyright">
-
-            <div class="row" style="margin-top: 20px">
-
-                <div class="col s9">
-                    <div class="col s8" style="margin-top: 20px">
-                        {$wa->block("magic_sitemap")}
-                    </div>
-                    <div class="col s4" style="margin-top: 20px">
-                        <div class="shop-info">
-                            <ul>
-                                {include file="dsv.address.html"}
-                            </ul>
-                        </div>
-                    </div>
-                    <!--div class="col s2" style="margin-top: 80px">
-                        <div class="social">
-                            <ul class="soc">
-                                {*include file="dsv.social.html"*}
-                            </ul>
-                        </div>
-                    </div-->
-
-
-                </div>
-
-
-                <div class="col s3">
-                    <div class="shop-info" style="padding-left: 50px;">
-                        <ul>
-                            {include file="unisender.html"}
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-
+        <!-- wrapper top -->
+        <div class="wrapper">
 
             <div class="row">
-                <div class="col s12">
-                    <span class="copy">Magic-Parfum.ru &copy;
-                        2010-2015. Мэджик-парфюм — интернет-магазин парфюмерии.</span>
+                <div id="header">
+                    <div class="valign-wrapper">
+                        <!-- Логотип -->
+                        <div class="row" style="width: 100%;">
+                            <div class="logo col s12 m3 l3">
+                                <a href="{$wa_url}">
+                                    {include file="dsv.logo.html"}
+                                </a>
+                            </div>
+                            <!-- Контакты -->
+                            <div class="contacts col s12 m3 l3" style="padding-top: 25px">
+                                <p><span class="phone_pre">8(495)</span> <span class="phone_header">221-5-381</span><br>
+                                    <span style="font-size: 12px;">с 9:00 до 21:00 без выходных</span></p>
+                            </div>
+
+                            <div class="search col s12 m3 l3" style="padding-top: 20px;  ">
+                                <form method="get" action="{$wa->getUrl('/frontend/search')}" class="searchform">
+
+                                    <input type="search" name="query" {if !empty($query)}value="{$query}"{/if}
+                                           id="search"
+                                           placeholder="Поиск товара">
+                                    <button style="margin: -1px 0px 1px -39px !important; border-radius: 0 !important; height: 38px !important; "
+                                            class="btn-floating btn waves-effect waves-light "><i
+                                                class="material-icons">search</i></button>
+                                </form>
+                            </div>
+
+                            <!-- cart summary -->
+                            <div class="wrapper_cart col s12 m3 l offset-s3" style="padding-top: 20px">
+
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <!-- header -->
+
+            <!-- container -->
+        </div>
+
+        <!-- wrapper -->
+
+
+        <div class="wrapper_menu">
+            <div class="container_block">
+                {include file="dsv.menu.html"}
+            </div>
+        </div>
+
+        <div id="main">
+            <div class="container app-header">
+
+            </div>
+            <div class="container_block col s12" style="padding: 20px; min-height: 600px; background: #fff">
+
+                <!-- navigation breadcrumbs -->
+                {if isset($breadcrumbs)}
+                    <div class="breadcrumbs">
+                        <img class="back_button" src="{$wa_theme_url}img/back.png"> <a class="nocover"
+                                                                                       href="javascript:void(0);"
+                                                                                       onclick="javascript:history.back();">Вернуться
+                            | </a>
+                        {if $breadcrumbs}
+                            <a href="{$wa_app_url}">Главная</a>
+                            {foreach $breadcrumbs as $breadcrumb name=breadcrumb}
+
+                                >
+                                <a href="{$breadcrumb.url}">{$breadcrumb.name|escape}</a>
+                            {/foreach}
+                        {else} {/if}
+                    </div>
+                    <!-- current page core content -->
+                    {if isset($breadcrumbs)}
+                        <div class="breadcrumbs-on">
+
+                    {/if}
+
+                    {$content}
+                    </div>
+                {else}
+                    {$content}
+                {/if}
+
 
             </div>
         </div>
 
+        <div class="clear-both"></div>
+        <div id="footer" {if $wa->currentUrl() != "/"}style="margin-top: -20px" {/if}>
 
-    </div>
-</div>
+            <div id="copyright">
 
-<div id="dialog" class="dialog">
-    <div class="dialog-background"></div>
-    <div class="dialog-window">
-        <!-- common part -->
-        <div class="cart">
+
+            </div>
+            {if $wa->currentUrl() == "/"}
+                <div class="info">
+                    <ul>
+                        {$latest_posts = $wa->blog->posts(4,4)}
+                        <h1 class='center'>Новости</h1>
+
+                        <div>
+                            {foreach $latest_posts as $post}
+                                <div class="col l3 m6 s12">
+                                    <div class="post">
+
+                                        <a href="{$post.link}">
+                                            <li>
+                                                <div class="credentials">
+                                                    {$post.datetime|wa_datetime:"humandate"}
+                                                </div>
+                                                <h3 style="margin-bottom: 5px; !important">
+                                                    {$post.title}
+                                                    {* @event prepare_posts_frontend.%plugin_id%.post_title *}
+                                                    {if !empty($post.plugins.post_title)}
+                                                        {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
+                                                    {/if}
+                                                </h3>
+                                                {if $post.main_image && isset($post.main_image)}
+                                                    <img class="main_image" data-id="{$post.id}"
+                                                         src="{$post.main_image}"/>
+                                                {/if}
+
+
+                                                <div class="post_text">{$post.text|truncate:380:" ...  <div style='color:rgba(251, 132, 44, 0.92)'>читать далее >></div>"}</div>
+
+
+                                            </li>
+                                        </a>
+                                    </div>
+                                </div>
+                            {/foreach}
+                        </div>
+                    </ul>
+
+                </div>
+            {/if}
+
+            <div class="copyright  {if $action == 'product' || $action == 'category'}row{/if}">
+
+                {if $wa->currentUrl() == "/"} {*если это главная*}
+                    <div class="row">
+                        <div class="all_news">
+                            <a href="/blog">
+                                <button style="display: block; margin: 0px auto;" value="Посмотреть все новости"
+                                        class="btn waves-effect waves-light" type="submit">Посмотреть все новости
+                                    <i style="vertical-align: top;" class="material-icons">visibility</i>
+                                </button>
+                            </a>
+                        </div>
+                        <div class="col s12 main_desc">
+                            <h1 class="center">Интернет магазин парфюмерии «Magic-parfum.ru»</h1>
+
+                            <p class="desc_text">
+                                {$wa->block("magic_main_info")}
+                            </p>
+                            <a href="javascript:void(0);" id="show_full_desc"
+                               style="width: 185px; padding-top: 5px; margin-top: 10px; text-decoration: underline; color: rgba(251, 132, 44, 0.92);">
+                                Читать полностью >></a>
+                        </div>
+
+                    </div>
+                    {include file="dsv.footer.html"}
+                {/if}
+                <div class="row" style="margin-top: 20px">
+
+                    <div class="col s12 l9">
+                        <div class="col s12 l8" style="margin-top: 20px">
+                            {$wa->block("magic_sitemap")}
+                        </div>
+                        <div class="col s12 l4" style="margin-top: 20px">
+                            <div class="shop-info">
+                                <ul>
+                                    {include file="dsv.address.html"}
+                                </ul>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="col l3 s12">
+                        <div class="shop-info" style="padding-left: 50px; padding-top: 20px">
+                            <ul>
+                                {include file="unisender.html"}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col s12">
+                    <span class="copy">Magic-Parfum.ru &copy;
+                        2010-2015. Мэджик-парфюм — интернет-магазин парфюмерии.</span>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="dialog" class="dialog">
+                <div class="dialog-background"></div>
+                <div class="dialog-window">
+                    <!-- common part -->
+                    <div class="cart">
+
+                    </div>
+                    <!-- /common part -->
+
+                </div>
+            </div>
+            {$wa->block("magic_metrika")}
+            <div class="modal"><!-- Place at bottom of page --></div>
+            {include file="noindex.html"}
+
+            <p id="back-top"><a href="#top" title="ВВЕРХ"><span></span></a></p>
+            <script type="text/javascript" src="{$wa_theme_url}js/jquery.bxslider.min.js"></script>
+            <script type="text/javascript" src="{$wa_theme_url}js/jquery.jcarousel.min.js"></script>
+            <!--script type="text/javascript" src="{$wa_theme_url}js/jcarousel.respon.js"></script-->
+            <!--script type="text/javascript" src="{$wa_theme_url}js/slimbox2.js?v{$wa_theme_version}"></script-->
+            <script type="text/javascript" src="{$wa_theme_url}js/lazyloading.js?v{$wa_theme_version}"></script>
+            <script type="text/javascript" src="{$wa_theme_url}js/jquery.maskedinput.js"></script>
+            <script type="text/javascript" src="{$wa_theme_url}js/custom_cart.js"></script>
+            <script type="text/javascript" src="{$wa_theme_url}js/jquery.dadata.min.js"></script>
+            <!--script type="text/javascript" src="{$wa_theme_url}js/jquery.pickmeup.min.js"></script-->
+            <script type="text/javascript" src="{$wa_theme_url}js/default.js?v{$wa_theme_version}"></script>
+            <script type="text/javascript" src="{$wa_theme_url}js/jquery.validate.min.js"></script>
+            <!--script type="text/javascript" src="{$wa_theme_url}js/jquery.modal.js"></script-->
+            <script type="text/javascript" src="{$wa_theme_url}js/shippingprice.js"></script>
+
+
+            <!--script src="{$wa_theme_url}js/jquery.kladr.min.js" type="text/javascript"></script-->
+            <script src="{$wa_theme_url}js/dadata.js" type="text/javascript"></script>
+            {literal}
+                <script type="text/javascript">
+
+
+                    $(document).ready(function () {
+
+                        $('.datepicker').pickadate({
+                            selectMonths: true, // Creates a dropdown to control month
+                            selectYears: 15 // Creates a dropdown of 15 years to control year
+                        });
+
+
+                        $("#show_full_desc").click(function () {
+                            if ($(".desc_text").hasClass("full_desc")) {
+                                $(".desc_text").removeClass("full_desc");
+                                $(this).text("Подробнее >>");
+                            }
+                            else {
+                                $(".desc_text").addClass("full_desc");
+                                $(this).text("Скрыть <<");
+                            }
+
+
+                        });
+                        // $('input[name="order[shipping_date]"]').pickmeup();
+                        $('.carousel').bxSlider({
+                            auto: true,
+                            pager: false,
+                            autoControls: false,
+                            pause: 3000,
+                            slideSelector: '.brand_img',
+                            minSlides: 6,
+                            maxSlides: 6,
+                            moveSlides: 1,
+                            slideMargin: 16,
+                            slideWidth: 200,
+                            adaptiveHeight: true,
+                            responsive: true
+                        });
+
+
+                        // Dadata();
+                    });
+
+
+                </script>
+            {/literal}
 
         </div>
-        <!-- /common part -->
 
-    </div>
-</div>
-
-{include file="noindex.html"}
-
-<p id="back-top"><a href="#top" title="ВВЕРХ"><span></span></a></p>
-<script type="text/javascript" src="{$wa_theme_url}js/jquery.bxslider.min.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/jquery.jcarousel.min.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/slimbox2.js?v{$wa_theme_version}"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/lazyloading.js?v{$wa_theme_version}"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/jquery.maskedinput.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/custom_cart.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/jquery.dadata.min.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/jquery.pickmeup.min.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/default.js?v{$wa_theme_version}"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/jquery.validate.min.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/shippingprice.js"></script>
-<script type="text/javascript" src="{$wa_theme_url}js/jquery.modal.js"></script>
-
-
-<!--script src="{$wa_theme_url}js/jquery.kladr.min.js" type="text/javascript"></script-->
-<script src="{$wa_theme_url}js/dadata.js" type="text/javascript"></script>
-{literal}
-    <script type="text/javascript">
-        /*---------------------------------
-         ZOOM PRODUCT
-         -----------------------------------*/
-        /* $(".zoom").elevateZoom({ zoomType: "lens", lensShape: "round", lensSize: 200});*/
-        //
-        $(document).ready(function () {
-
-            $('input[name="order[shipping_date]"]').pickmeup();
-            $('.carousel').bxSlider({
-                auto: true,
-                pager: false,
-                autoControls: false,
-                pause: 3000,
-                slideSelector: '.brand_img',
-                minSlides: 6,
-                maxSlides: 6,
-                moveSlides: 1,
-                slideMargin: 16,
-                slideWidth: 200,
-                adaptiveHeight: true,
-                responsive: true
-            });
-            // Dadata();
-        });
-
-
-    </script>
-{/literal}
 </body>
 </html>

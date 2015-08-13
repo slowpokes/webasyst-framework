@@ -71,7 +71,7 @@
 *}
 {$latest_posts = $wa->blog->posts(null, 10)}
 {if !empty($latest_posts)}<!-- latest posts-->
-    <div class="sidebar blog_sidebar brand_page">
+    <div class="sidebar blog_sidebar brand_page col l3 m3 hide-on-small-only">
         <div class="sidebar_links brand_sidebar_links">
             <h1>Новости</h1>
 
@@ -81,7 +81,7 @@
                         <div class="page-info">
                             <div class="date">{$post.datetime|wa_datetime:"date"}</div>
                         </div>
-                        <p><a href="{$post.link}">{$post.text|strip_tags|truncate:100}</a></p>
+                        <p><a href="{$post.link}">{$post.title}</a></p>
                         <br>
                     </div>
                 {/foreach}

@@ -1,6 +1,6 @@
 {* post list: view mode depends on the context: either "stream_search.html" or "stream_posts.html" *}
 {include 'sidebar.html' inline}
-<div class="content" style="width: 960px;">
+<div class="content col s12 l9 m9">
 
 {if !$is_lazyloading}
 <div id="post-stream" role="main" class="lazyloading" {if $wa->param('blog_url')}itemscope itemtype="http://schema.org/Blog"{/if}>
