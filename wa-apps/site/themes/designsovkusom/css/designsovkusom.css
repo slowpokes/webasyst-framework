@@ -21,7 +21,7 @@ address, cite, dfn, var {
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
-    /*font-family: "Open Sans";*/
+    font-family: Calibri normal, "Lucida Grande", Arial, sans-serif;
 }
 
 a, a img, abbr, acronym, applet, fieldset, form, iframe, img, object, table {
@@ -1247,7 +1247,7 @@ div.post:nth-child(1) > li:nth-child(1) {
     left: 100%
 }
 
-.latest-posts {
+.latest-posts p {
     font-size: 14px;
 }
 .blog_sidebar {
@@ -2388,7 +2388,6 @@ tr.total_tr {
     border: 2px solid transparent;
     background: #FFF none repeat scroll 0% 0%;
     height: 410px;
-    z-index: 30;
 }
 
 #cros .product_items.blocks .inner_product {
