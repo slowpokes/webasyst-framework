@@ -5,7 +5,7 @@
 DirectoryIndex index.php
 Options -Indexes
 # Comment the following line, if option Multiviews not allowed here
-Options -MultiViews
+#Options -MultiViews
 
 AddDefaultCharset utf-8
 

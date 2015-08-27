@@ -1,6 +1,9 @@
-<div class="sidebar blog_sidebar brand_page">
+{*<div class="sidebar blog_sidebar brand_page">
     <div class="sidebar_links brand_sidebar_links">
-        {$month_year = array()}
+
+
+
+       {$month_year = array()}
         {$month_rus = array('Хуябрь', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь',
         'Октябрь', 'Ноябрь', 'Декабрь')}
         {$latest_posts = $wa->blog->posts()}
@@ -16,7 +19,8 @@
         <ul>
             {foreach $month_year as $key=>$month}
                 <li class="closed depth_0">
-                    <a href="#" class="sidebar_link">{$key}</a>
+                    <a href="#" class="sidebar_link">{$key}</a><a class="show_all_news" href="/blog/{$key}"> посмотреть
+                        все</a>
                     <ul>
                         {foreach $month as $m}
                             <li class="closed depth_1">
@@ -24,7 +28,8 @@
                                 <ul>
                                     {foreach $m as $p}
                                         <li class="depth_2 {if isset($post)&&($post.id==$p.id)}current{/if}">
-                                            <a href="{$p.link}">{$p.title}</a>
+                                            <span style="color: gray;font-size: 12px;margin-left: -10px;">{waDateTime::date('j f', $p.datetime)}</span><a
+                                                    href="{$p.link}">{$p.title}</a>
                                         </li>
                                     {/foreach}
                                 </ul>
@@ -43,6 +48,11 @@
     function openLink(element) {
         element.parentsUntil("div").removeClass('closed');
     }
+    $(document).ready(function () {
+        $(".brand_sidebar_links").find(".depth_0").first().removeClass("closed");
+        $(".brand_sidebar_links").find(".depth_1").first().removeClass("closed");
+    });
+
 
     $("body").on("click", ".sidebar_link", function () {
         var li = $(this).parent();
@@ -58,3 +68,36 @@
 
 </script>
 {/literal}
+*}
+{literal}
+    <script>
+        $(document).ready(function () {
+            $(".post a").each(function () {
+                if ($(this).attr("href") == window.location) {
+                    $(this).addClass("bold");
+                }
+            });
+        });
+
+    </script>
+{/literal}
+{$latest_posts = $wa->blog->posts(null, 10)}
+{if !empty($latest_posts)}<!-- latest posts-->
+    <div class="sidebar blog_sidebar brand_page col l3 m3 hide-on-small-only">
+        <div class="sidebar_links brand_sidebar_links">
+            <h1>Новости</h1>
+
+            <div class="latest-posts">
+                {foreach $latest_posts as $post}
+                    <div class="post">
+                        <div class="page-info">
+                            <div style="color: #808080" class="date">{$post.datetime|wa_datetime:"date"}</div>
+                        </div>
+                        <p><a href="{$post.link}">{$post.title}</a></p>
+                        <br>
+                    </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+{/if}

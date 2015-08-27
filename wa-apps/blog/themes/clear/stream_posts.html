@@ -56,7 +56,7 @@
                 <a href="{$post.link}">{$post.cut_link_label|default:'[`Continue reading →`]'}</a>
             {/if}
         </div>
-        
+
         {* attached album photo thumbs *}
         {if $post.album_id && $post.album.id && $post.album.photos}
             {$photos_loaded = 1} {* required for proper photo thumbs retinification *}

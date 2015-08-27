@@ -7,6 +7,7 @@ class blogPostImageController extends waJsonController
     protected function process()
     {
         $f = waRequest::file('file');
+
         $this->name = $f->name;
     	if ($this->processFile($f)) {
     	    $this->response =  wa()->getDataUrl('img/'.$this->name, true, null, true);

@@ -3,17 +3,11 @@
 {foreach $posts as $post}
     <div class="post" id="post-{$post.id}" {if $wa->param('blog_url')}itemprop="blogPosts" {/if}itemscope
          itemtype="http://schema.org/BlogPosting">
-        <div class="news_date_wrap">
-            <div class="news_date">
 
-                <span class="news_date_d">{waDateTime::date('j', $post.datetime)}</span>
-                <span class="news_date_m">{waDateTime::date('f', $post.datetime)}</span>
-
-            </div>
-        </div>
         <div class="new_content_wrap">
             <div class="news_title">
                 <div class="news_title_wrap">
+
                     <h2>
                         <a href="{$post.link}" itemprop="url">{$post.title}</a>
 
@@ -23,6 +17,12 @@
                         {/if}
 
                     </h2>
+
+                    <span class="grey_color news_date_d">{waDateTime::date('j', $post.datetime)}</span>
+                    <span class="grey_color news_date_m">{waDateTime::date('f', $post.datetime)}</span>
+                    <span class="grey_color news_date_m">{waDateTime::date('Y', $post.datetime)} года</span>
+
+
                 </div>
             </div>
 
@@ -34,7 +34,7 @@
             {/if}
 
             <div class="text news_body">
-                {$post.text|truncate:300}
+                {$post.text|truncate:1000:" ... <a style='color:rgba(251, 132, 44, 0.92)' href='{$post.link}'> читать далее >> </a>"}
                 {if $post.cutted}
                     <a href="{$post.link}">{$post.cut_link_label|default:'[`Continue reading →`]'}</a>
                 {/if}

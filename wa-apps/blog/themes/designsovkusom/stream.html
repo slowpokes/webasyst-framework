@@ -1,12 +1,12 @@
 {* post list: view mode depends on the context: either "stream_search.html" or "stream_posts.html" *}
 {include 'sidebar.html' inline}
-<div class="content" style="width: 1020px;">
+<div class="content col s12 l9 m9">
 
 {if !$is_lazyloading}
 <div id="post-stream" role="main" class="lazyloading" {if $wa->param('blog_url')}itemscope itemtype="http://schema.org/Blog"{/if}>
     {/if}
-
-    {if !$is_lazyloading and !empty($stream_title)}<h1>{$stream_title}</h1>{/if}
+    {$t = waRequest::param()}
+    {if !$is_lazyloading and !empty($stream_title)}<h1>Лента новостей за {$t.year} год</h1>{/if}
     <a name="page_{$page}"></a>
 
     {if $is_search}
