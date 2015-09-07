@@ -30,9 +30,7 @@
     <link href="{$wa_theme_url}css/mobile.css?v{$wa_theme_version}"
             {if !$wa->isMobile()} media="screen and (max-width: 760px)"{/if}
           rel="stylesheet" type="text/css">
-    {if $wa->isMobile()}
-        <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1; user-scalable=0;">
-    {/if}
+    <meta name="viewport" content="width=1300">
     <link href="https://dadata.ru/static/css/lib/suggestions-15.2.css" type="text/css" rel="stylesheet"/>
     {$wa->css()} {* links active plugins CSS *}
 
