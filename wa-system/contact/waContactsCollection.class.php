@@ -752,7 +752,7 @@ class waContactsCollection
     public function getSQL($with_primary_email = false)
     {
         $this->prepare();
-        $sql = "FROM wa_contact c";
+        $sql = "FROM bd9.wa_contact c";
 
         if ($this->joins) {
             foreach ($this->joins as $join) {
