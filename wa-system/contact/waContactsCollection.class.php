@@ -528,7 +528,7 @@ class waContactsCollection
                                 $whr[] = "{$al1}.ext = '".$model->escape($ext)."'";
                             }
                             $al2 = $this->addJoin('wa_contact_data', ":table.contact_id = c.id AND :table.field = 'address:country'");
-                            $al3 = $this->addJoin('wa_region', ":table.code = {$al1}.value AND :table.country_iso3 = {$al2}.value");
+                            $al3 = $this->addJoin('bd9.wa_region', ":table.code = {$al1}.value AND :table.country_iso3 = {$al2}.value");
                             $whr[] = "{$al3}.country_iso3 = '{$country_iso3}'";
                             $whr[] = "{$al3}.code = '{$code}'";
                             $whr = implode(" AND ", $whr);
@@ -542,7 +542,7 @@ class waContactsCollection
                             if ($op === "*=") {
                                 // if search by like, search by wa_region.name but taking into account country
                                 $al2 = $this->addJoin('wa_contact_data', ":table.contact_id = c.id AND :table.field = 'address:country'");
-                                $al3 = $this->addLeftJoin('wa_region', ":table.code = {$al1}.value AND :table.country_iso3 = {$al2}.value");
+                                $al3 = $this->addLeftJoin('bd9.wa_region', ":table.code = {$al1}.value AND :table.country_iso3 = {$al2}.value");
                                 $whr .= " OR {$al3}.name ".$this->getExpression($op, $term);
                             }
                         }
@@ -752,7 +752,7 @@ class waContactsCollection
     public function getSQL($with_primary_email = false)
     {
         $this->prepare();
-        $sql = "FROM wa_contact c";
+        $sql = "FROM bd9.wa_contact c";
 
         if ($this->joins) {
             foreach ($this->joins as $join) {
