@@ -1,11 +1,16 @@
 <div class="footer">
     <div class="subscribe">
         <div class="subscribe_form">
-            <form id="mailer-frontend-subscribe-form" action="/subscribe/subscribe/" method="post" target="mailer-frontend-subscribe-form-target">
-                Подпишитесь на наши новости и акции  <input type="hidden" name="name" value=""><input type="text" class="subscribe_input subscribe_email" name="email"> <input type="submit" class="button subscribe_input" value="Подписаться">
+            <form target="_blank" action="http://cp.unisender.ru/ru/subscribe?hash=5pd6jbwck3rpeko1iurfnberwyopeqzsgfrt91jy" method="POST">
+                Подпишитесь на наши новости и акции
+                <input type="hidden" value="" name="f_1416591">
+                <input type="text" value="" name="email" class="subscribe_input subscribe_email" style="color: #000">
+                <input type="submit" class="button subscribe_input" value="Подписаться">
+                <input type="hidden" value="utf-8" name="charset">
+                <input type="hidden" value="6000478" name="default_list_id">
+                <input type="hidden" value="2" name="overwrite">
+                <input type="hidden" value="1" name="is_v5">
             </form>
-            <span class="submit_ok" style="display:none;">Вы успешно подписались на новости и скидки!</span>
-            <iframe name="mailer-frontend-subscribe-form-target" src="javascript:true" style="width:0;height:0;border:0px solid #fff;"></iframe>
         </div>
     </div>
     <div class="footer_content">
