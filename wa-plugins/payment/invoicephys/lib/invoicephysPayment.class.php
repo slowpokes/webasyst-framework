@@ -63,10 +63,7 @@ class invoicephysPayment extends waPayment implements waIPayment, waIPaymentCapt
             $view = wa()->getView();
 
             $view->assign('order', $order);
-<<<<<<< HEAD
-=======
             $view->assign('settings', $this->getSettings(), true);
->>>>>>> upstream/master
 
             return $view->fetch($this->path.'/templates/form.html');
         } else {
