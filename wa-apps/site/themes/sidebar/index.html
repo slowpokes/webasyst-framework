@@ -30,7 +30,7 @@
     
     {include file="`$wa_active_theme_path`/head.html" inline}
     
-    {$wa->headJs()} {* links Google Analytics tracking code and current site's custom JS (Site app) *}
+    {$wa->head()} {* links Google Analytics tracking code and current site's custom JS (Site app) *}
     
     <!--[if lt IE 9]>
     <script>
@@ -49,11 +49,7 @@
 </head>
 <body id="{$wa_app}">
 
-<<<<<<< HEAD
-    <nav id="sidebar" role="navigation" class="{if $theme_settings.sidebar_color_scheme}{str_replace('img/backgrounds/themesettings/','', str_replace('.png','',$theme_settings.sidebar_color_scheme))}{/if}{if $wa->isAuthEnabled()} bottom-padded{/if}">
-=======
     <nav id="sidebar" role="navigation"{if $wa->isAuthEnabled()} class="bottom-padded"{/if}>
->>>>>>> upstream/master
 
         <button id="tablet-toggle-sidebar"></button>
 

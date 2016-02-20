@@ -43,17 +43,28 @@ class installerAppsRemoveAction extends waViewAction
             unset($info);
 
             $this->apps = new waInstallerApps();
-            $app_list = $this->apps->getApps(array('installed' => true));
+            $options = array(
+                'installed' => true,
+            );
+            $app_list = $this->apps->getApps($options);
             $deleted_apps = array();
             foreach ($app_list as $info) {
                 $app_id = $info['slug'];
-                if (isset($app_ids[$app_id]) && ($app_ids[$app_id]['vendor'] == $info['vendor'])) {
-                    if (!empty($info['installed']['system'])) {
-                        throw new waException(sprintf(_w('Can not delete system application "%s"'), $info['name']));
+                if (isset($app_ids[$app_id])) {
+                    if ($app_ids[$app_id]['vendor'] == $info['vendor']) {
+                        if (!empty($info['installed']['system'])) {
+                            throw new waException(sprintf(_w('Can not delete system application "%s"'), $info['name']));
+                        }
+                        $deleted_apps[] = $this->deleteApp($app_id);
                     }
-                    $deleted_apps[] = $this->deleteApp($app_id);
+                    unset($app_ids[$app_id]);
                 }
             }
+
+            foreach ($app_ids as $app_id => $info) {
+                $deleted_apps[] = $this->cleanupApp($app_id);
+            }
+
             wa()->setActive('installer');
             if (!$deleted_apps) {
                 throw new waException(_w('Application not found'));
@@ -97,20 +108,26 @@ class installerAppsRemoveAction extends waViewAction
                         $plugin_instance->uninstall();
                     }
                 } catch (Exception $ex) {
-                    waLog::log($ex->getMessage(),'installer.log');
+                    waLog::log($ex->getMessage(), 'installer.log');
                 }
                 $this->apps->updateAppPluginsConfig($app_id, $plugin, null);
 
                 //wa-apps/$app_id/plugins/$slug
                 $paths[] = wa()->getAppPath("plugins/".$plugin, $app_id);
-                while ($path = array_shift($paths)) {
-                    waFiles::delete($path, true);
+                while ($paths) {
+                    waFiles::delete(array_shift($paths), true);
                 }
                 $paths = array();
             }
         }
 
         $config->uninstall();
+        $this->cleanupApp($app_id);
+        return $name;
+    }
+
+    private function cleanupApp($app_id)
+    {
         $this->apps->updateAppConfig($app_id, null);
         $paths[] = wa()->getTempPath(null, $app_id); //wa-cache/temp/$app_id/
         $paths[] = wa()->getAppCachePath(null, $app_id); //wa-cache/apps/$app_id/
@@ -135,6 +152,6 @@ class installerAppsRemoveAction extends waViewAction
 
             }
         }
-        return $name;
+        return $app_id;
     }
 }

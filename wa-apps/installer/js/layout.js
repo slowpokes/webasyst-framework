@@ -17,15 +17,16 @@ $.layout = {
     },
     options: {
         default_list: 'apps',
-        default_query: {
-            plugins: 'wa-plugins/payment'
-        },
+        default_query: {},
         title: 'Installer',
         debug: true,
         duration: 500,
-        animation: false
+        animation: false,
+        inline_query: ['commercial', 'sort']
 
     },
+    $sidebar: null,
+    $list: null,
     queue: [],
     time: {
         start: new Date(),
@@ -41,10 +42,11 @@ $.layout = {
     handlers: {
         list: {
             related: ['query', 'filter'],
-            parent: []
+            parent: null,
+            child: 'item'
         },
         item: {
-            parent: ['list']
+            parent: 'list'
         },
         tab: {}
     },
@@ -57,7 +59,15 @@ $.layout = {
         },
         getTitle: function () {
             return document.title;
-        }
+        },
+        updateTitle: function (container_id) {
+            if (this.titles[container_id]) {
+                this.setTitle(this.titles[container_id]);
+            } else {
+                this.titles[container_id] = this.getTitle();
+            }
+        },
+        titles: {}
     },
 
     init: function (options) {
@@ -73,7 +83,7 @@ $.layout = {
                 $.layout.dispatch();
             });
         } else {
-            this.error('Ajax history failed');
+            this.error('Ajax history failed', 'jQuery extension History required');
         }
         $.wa.errorHandler = function (xhr) {
             return self.helper.ajaxErrorHandler(xhr);
@@ -88,16 +98,16 @@ $.layout = {
 
     /**
      *
-     * @param String path
-     * @return {
-     *  'list':String,
-     *  'query':String,
-     *  'item':String,
-     *  'tab':String,
-     *  'tail':String,
-     *  'raw':String,
-     *  'filter':{}
-     * }
+     * @param {String} path
+     * @return {{
+     *  list:{String},
+     *  query:{String},
+     *  item:{String},
+     *  tab:{String},
+     *  tail:{String},
+     *  raw:{String},
+     *  filter:{}
+     * }}
      */
     parsePath: function (path) {
         /**
@@ -136,6 +146,9 @@ $.layout = {
         var query_size;
 
         switch (list) {
+            case 'featured':
+                item = '';
+                break;
             case 'apps':
                 item = matches.shift() || '';
                 break;
@@ -150,6 +163,19 @@ $.layout = {
                     }
                 } else {
                     query = this.options.default_query.plugins;
+                }
+                break;
+            case 'widgets':
+                if (matches.length) {
+                    query_size = (matches[0] == 'wa-plugins') ? 2 : 1;
+                    query = matches.slice(0, query_size).join('/') || '';
+                    matches = matches.slice(query_size);
+                    if (item = matches.shift() || '') {
+                        item = query + '/' + item;
+                        // query = this.path.query;
+                    }
+                } else {
+                    query = this.options.default_query.widgets;
                 }
                 break;
             case 'themes':
@@ -171,31 +197,43 @@ $.layout = {
 
     /**
      *
-     * @param {} selector
-     * @return {$}
+     * @param {String} selector
+     * @return {jQuery}
      */
     container: function (selector) {
-        return $('#wa-app > div' + (selector ? '#' + selector : '') + '.content');
+        return this.$app.find('> div' + (selector ? '#' + selector : '') + '.content');
     },
 
     /**
      *
-     * @param String path
+     * @param {Object|String} path
      */
     dispatch: function (path) {
+        if (!this.$app) {
+            this.$app = $('#wa-app');
+        }
+        if (!this.$sidebar) {
+            this.$sidebar = this.$app.find('> div.sidebar:first');
+        }
         if (path === undefined) {
             path = window.location.hash;
         }
         if (typeof(path) == 'string') {
             path = this.parsePath(path);
         }
-        $.layout.trace('$.layout.dispatch', [this.path, path.raw]);
+        $.layout.trace('$.layout.dispatch started', [this.path, path.raw]);
 
         var queue = [];
         var Parent = null;
+        var child;
 
-        for (subject in this.handlers) {
+        for (var subject in this.handlers) {
+            /**
+             *
+             * @type {*|String}
+             */
             var Subject = this.helper.ucfirst(subject);
+
             if (path[subject] != this.path[subject]) {
                 $.layout.trace('$.layout.dispatch ' + subject + ': ', this.path[subject] + '→' + path[subject]);
 
@@ -206,15 +244,27 @@ $.layout = {
                         queue.push('load' + Parent);
                     }
                 }
+
+                if (this.handlers[subject]['child']) {
+                    child = this.handlers[subject]['child'];
+                    if (path[child] && (path[child] != this.path[child])) {
+
+                        this.updateRelated(subject, path);
+                        $.layout.trace('$.layout.dispatch pass throw to child ' + child + ': ', this.path[child] + '→' + path[child]);
+                        continue;
+                    }
+                }
+
                 if (path[subject]) {
                     queue.push('load' + Subject);
                     queue.push('load' + Subject + this.helper.ucfirst(path[subject]));
                 }
                 break;
             } else {
+                var changed = false;
                 if (this.handlers[subject]['related']) {
                     var related = this.handlers[subject]['related'];
-                    var changed = false;
+
                     for (var i = 0; i < related.length; i++) {
                         var rel = related[i];
 
@@ -244,12 +294,40 @@ $.layout = {
             }
             Parent = Subject;
         }
+
+        $.layout.trace('$.layout.dispatch complete with queue', queue.length);
         var name;
         while (name = queue.shift()) {
+            $.layout.trace('$.layout.dispatch queue', name);
             // standard convention: if method return false than stop bubble up
             if (this.call(name, [path]) === false) {
                 queue = [];
                 return false;
+            }
+        }
+    },
+
+    updateRelated: function (subject, path) {
+        this.path[subject] = path[subject];
+        if (this.handlers[subject]['related']) {
+            var related = this.handlers[subject]['related'];
+
+            for (var i = 0; i < related.length; i++) {
+                var rel = related[i];
+
+                switch (typeof(path[rel])) {
+                    case 'object':
+                        if ($.param(this.path[rel]) != $.param(path[rel])) {
+                            this.path[rel] = path[rel];
+                        }
+                        break;
+                    case 'string':
+                        if (this.path[rel] != path[rel]) {
+                            this.path[rel] = path[rel];
+                        }
+                        break;
+                }
+
             }
         }
     },
@@ -270,14 +348,14 @@ $.layout = {
     },
 
     blurList: function () {
-        $('#wa-app > div.sidebar li.selected').removeClass('selected');
+        this.$sidebar.find('li.selected').removeClass('selected');
         this.path.query = false;
         this.path.item = false;
         this.path.tab = false;
         this.container().find('form').unbind();
         if (this.options.animation) {
             this.container().html('<div class="block"><i class="icon16 loading"></i></div>');
-            $('#wa-app > div.content:not(:first)').remove();
+            this.$app.find('div.content:not(:first)').remove();
         }
     },
 
@@ -287,22 +365,33 @@ $.layout = {
         if (path.query) {
             url += '&slug=' + path.query;
         }
+        url = url.replace(/\\bsort=[^\\/&]+/, '');
         var filter;
         if (path.filter && (filter = decodeURIComponent($.param({'filter': path.filter})))) {
-            url += '&' + filter;
+            var regexp;
+            for (var i = 0; i < this.options.inline_query.length; i++) {
+                regexp = new RegExp('&?\\bfilter\\[' + this.options.inline_query[i] + '\\]=[^&]+');
+                filter = filter.replace(regexp, '');
+            }
+            if (filter.length) {
+                url += '&' + filter;
+            }
         }
         var id = this.helper.getListId(path);
         var $container = this.container(id);
-        if ($container.length && ($container.html() != 'null')) {
-            self.focusList(path);
-            self.dispatch(path);
+        if ($container.length && ($container.html() != 'null') && ($container.html() != '')) {
+            this.focusList(path);
+            this.dispatch(path);
         } else {
-            $('#wa-app > div.content:last').after('<div class="content left200px" id="' + id + '" style="display:none;"><i class="icon16 loading"></i></div>');
+            if (!$container.length) {
+                this.$app.append('<div class="content left200px" id="' + id + '" style="display:none;"><i class="icon16 loading"></i></div>');
+                $container = this.container(id);
+            }
             $.layout.trace('$.layout.loadList', url);
             $.layout.loadContent(url, function () {
                 self.focusList(path);
                 self.dispatch(path);
-            }, self.container(id));
+            }, $container);
         }
     },
 
@@ -315,14 +404,16 @@ $.layout = {
         this.path.tab = false;
 
         path = path || this.path;
-        if (['apps', 'themes', 'plugins'].indexOf(path.list) >= 0) {
-            $('body').removeClass('i-apps i-themes i-plugins').addClass('i-' + path.list);
+        var $body = $('body');
+        $body.removeClass('i-apps i-themes i-plugins i-widgets i-featured');
+        if (['apps', 'themes', 'plugins', 'widgets', 'featured'].indexOf(path.list) >= 0) {
+            $body.addClass('i-' + path.list);
         }
-        $('#wa-app > div.content:visible').hide();
+        this.$app.find('> div.content:visible').hide();
         this.container(this.helper.getListId(path)).show();
         var filter = '';
         var query = '';
-        var i, lists = [];
+        var i, param, lists = [];
         if (path.query) {
             query = path.query;
             lists = path.query.split(',');
@@ -334,7 +425,7 @@ $.layout = {
         }
 
         if (path.filter) {
-            for (var param in path.filter) {
+            for (param in path.filter) {
                 if (path.filter.hasOwnProperty(param)) {
                     if (param == 'slug') {
                         query += '&' + param + '=' + path.filter[param];
@@ -345,40 +436,87 @@ $.layout = {
                 }
             }
         }
-        $('#wa-app > div.sidebar li.selected').removeClass('selected');
-        $('#wa-app > div.sidebar a[href^="\\.\\/\\#\\/' + path.list + '\\/"]').parent('li').addClass('selected');
+        this.$sidebar.show();
+        this.$sidebar.find('li.selected').removeClass('selected');
+        this.$sidebar.find('a[href^="\\.\\/\\#\\/' + path.list + '\\/"]').parent('li').addClass('selected selected375');
 
         var href = '\\#\\/' + path.list;
         var $list, $selected;
 
 
         $.layout.trace('$.layout.focusList', [filter, query]);
+        var container_id = this.helper.getListId(path);
+        this.window.updateTitle(container_id);
 
-        var $container = this.container(this.helper.getListId(path));
+        var $container = this.container(container_id);
+        this.$list = $container;
+
+        //show/hide by internal filter fields
+        $container.find('.js-inline-search:first').val('');
+        this.filterList($container, path.filter);
+
 
         var self = this;
         /* update app filters */
-        $container.find('.i-filters ul.js-query > li > ul > li.selected').removeClass('selected');
-        $container.find('.i-filters ul.js-query > li > ul > li a').each(function () {
+        $container.find('.js-filters ul.js-query > li > ul > li.selected').removeClass('selected');
+        $container.find('.js-filters ul.js-query > li > ul > li a').each(function () {
             self.helper.updateUrl($(this), [filter]);
         });
 
-        var $query = $container.find('.i-filters ul.js-query:first');
-        $selected = $container.find('.i-filters ul.js-query > li:first > a:first');
+        var $query = $container.find('.js-filters ul.js-query:first');
+        $selected = $container.find('.js-filters ul.js-query > li:first > a:first');
         $selected.find('> i.icon16, > img').remove();
-        var $icons = [];
         var name = [];
         var hint = '';
-        for (i = 0; i < lists.length; i++) {
-            $list = $query.find('a[data-href^="' + href + '%s\\/' + lists[i] + '"]:first');
-            if (!$list.length) {
-                $list = $query.find('a[data-href^="' + href + '%s&slug=' + lists[i] + '\\/"]:first');
+
+        /* update filters */
+        var $filters = $container.find('.js-filters ul.js-filter');
+
+        //update selected filter&sort
+        var internal_filter;
+        $filters.each(function () {
+            var $scope = $(this);
+            if (internal_filter = '' + $scope.data('filter')) {
+                var re = new RegExp('&?(' + internal_filter + ')=[^&\/%]*', 'g');
+                internal_filter = filter.match(re) || '';
+                filter = filter.replace(re, '');
+            } else {
+                internal_filter = filter;
             }
+            $scope.find('> li.selected').removeClass('selected');
+            $scope.find('> li a').each(function () {
+                self.helper.updateUrl($(this), [filter, query]);
+            });
+            $scope.find('> li a[data-href^="' + href + internal_filter + '"]:first').parent('li').addClass('selected');
+        });
+
+        for (i = 0; i < lists.length; i++) {
+            //update icon of category
+            //update selected list
+
+            $list = $query.find('a[data-href^="' + href + '%filter%\\/' + lists[i] + '"]:first');
+
+            if (!$list.length) {//themes case
+                $list = $query.find('a[data-href^="' + href + '%filter%&slug=' + lists[i] + '\\/"]:first');
+            }
+
+            if (filter && !$list.length) {
+                $list = $query.find('a[data-href^="' + href + filter + '%filter%\\/' + lists[i] + '"]:first');
+            }
+
+            if (!$list.length) {
+                $list = $query.find('a[href="' + href + '"]:first');
+            }
+
+
             if ($list.length) {
+                //point category && apps menu
                 $list.parent('li').addClass('selected');
                 hint = $list.find('span.hint').text().replace(/(^\s+|\s+$)/g, '') || hint;
+
                 name.push($list.text().replace(hint, '').replace(/(^\s+|\s+$)/g, ''));
                 $selected.prepend($list.find('i.icon16, img').clone());
+                $selected.attr('href', $list.attr('href'));
             }
 
         }
@@ -387,31 +525,107 @@ $.layout = {
         $selected.find('strong').text(name.join(', '));
         $selected.find('span.hint').text(hint ? ' ' + hint : '');
 
+
+        $container.trigger($.Event('wa_focus_list'));
+
         /* update list links */
         $container.find('a.js-item-link[data-href^="\\#"]').each(function () {
-            self.helper.updateUrl($(this), (path.list == 'themes' ) ? [ query, filter] : [ filter, query]);
-        });
-
-        /* update commercial filters */
-        var $commercial = $container.find('.i-filters ul.js-filter');
-        var internal_filter;
-        if (internal_filter = '' + $commercial.data('filter')) {
-            var re = new RegExp('&' + internal_filter + '=[^&]*');
-            internal_filter = filter.match(re) || '';
-            filter = filter.replace(re, '');
-        } else {
-            internal_filter = filter;
-        }
-        $commercial.find('> li.selected').removeClass('selected');
-        $commercial.find('> li a').each(function () {
             self.helper.updateUrl($(this), [filter, query]);
         });
-        var $filter = $commercial.find('> li a[data-href^="' + href + internal_filter + '"]:first');
-        $filter.parent('li').addClass('selected');
     },
 
-    loadListPlugins__: function (path) {
-        var $container = this.container();
+    filterList: function ($container, filter) {
+        //TODO show|hide data
+        //resort items
+        var param, i;
+        var sort = null;
+        var params = {};
+        var sort_field = 'sort';
+        for (i = 0; i < $.layout.options.inline_query.length; i++) {
+            param = $.layout.options.inline_query[i];
+            if (param == 'sort') {
+                sort = filter[param] || null;
+            } else {
+                params[param] = filter[param] || null;
+                if (params[param] == 'true') {
+                    params[param] = true;
+                } else if (params[param] == 'false') {
+                    params[param] = false;
+                }
+            }
+        }
+
+        if (sort) {
+            switch (sort) {
+                case 'new':
+                    sort_field = 'sort-new';
+                    break;
+                default:
+                    sort_field = 'sort';
+                    break;
+
+            }
+        }
+
+        $.layout.trace('$.layout.filterList', [sort_field, params]);
+        //show-hide
+        var $items_container = $container.find('ul.js-list-items');
+
+        $items_container.each(function () {
+            var $items_container_ = $(this);
+            $items_container_.find('> li').each(function (index, el) {
+                var data = {};
+                var param;
+                var $el = $(el);
+                var matched = true;
+                if (!filter['search'] && $el.data('hide')) {
+                    matched = false;
+                } else {
+                    for (i = 0; i < $.layout.options.inline_query.length; i++) {
+                        param = $.layout.options.inline_query[i];
+                        if ((param != 'sort') && (params[param] !== null)) {
+                            data[param] = $el.data('filter-' + param);
+                            if (data[param] != params[param]) {
+                                matched = false;
+                                break;
+                            }
+                        }
+
+                        if (matched && filter['search']) {
+                            data['search'] = '' + $el.data('search');
+                            matched = filter['search'].test(data['search']);
+                        }
+                    }
+                }
+
+                if (matched) {
+                    $el.show();
+                } else {
+                    $el.hide();
+                }
+            }).sort(function (a, b) {
+                var delta = parseInt($(b).data(sort_field)) - parseInt($(a).data(sort_field));
+                delta = Math.max(-1, Math.min(1, delta));
+                return delta;
+            }).appendTo($items_container_);
+        });
+
+        //TODO resort visible items
+
+    },
+
+    searchList: function (search, $input) {
+        var filter = this.path.filter;
+        try {
+            if (search) {
+                filter['search'] = new RegExp(search, 'i');
+                $.layout.trace('$.layout.searchList', search);
+            }
+            $input.removeClass('error').attr('title', '');
+            this.filterList(this.$list, filter);
+        } catch (ex) {
+            $input.addClass('error').attr('title', ex.message);
+        }
     },
 
     loadItem: function (path) {
@@ -425,17 +639,22 @@ $.layout = {
             //todo edition&vendor&filter workaround
             //add chunks to url and id
         }
+
         $.layout.trace('$.layout.loadItem', id);
 
-        var $container = $('#wa-app > div#' + id);
+        var $container = this.$app.find('> div#' + id);
 
-        if (!$container.length && ($container.html() !='null')) {
+        if (!$container.length && ($container.html() != 'null') && ($container.html() != '')) {
             var href = path.item.replace(/([ #;&,.+*~\':"!^$[\]()=>|\/])/g, '\\$1');
             var item_selector = '#wa-app > div.content:first a[href*="\\/' + href + '\\/"]:first';
             var $item = $(item_selector).parents('li');
-            $('#wa-app > div.content:last').after('<div class="content left200px" id="' + id + '" style="display:none;">' + $item.html() + (this.options.animation ? '<i class="icon16 loading"></i>' : '')
+            //put item name as content before it loaded
+            var html = $item.length ? $item.html() : (!this.options.animation ? '<i class="icon16 loading"></i>' : '');
+            $.layout.trace('$.layout.loadItem item.html()', [$item.html(), $item]);
+
+            this.$app.find('> div.content:last').after('<div class="content left200px" id="' + id + '" style="display:none;">' + html + (this.options.animation ? '<i class="icon16 loading"></i>' : '')
                 + '</div>');
-            $container = $('#wa-app > div#' + id);
+            $container = this.$app.find('> div#' + id);
             $container.find('a').contents().unwrap();
             $.layout.trace('$.layout.loadList', url);
 
@@ -476,7 +695,7 @@ $.layout = {
             }
         }
         var item = path.item;
-        if (path.list == 'plugins') {
+        if ((path.list == 'plugins') && (!path.item.match(/^wa-plugins\//))) {
             item = item.replace(/\//, '/' + path.list + '/');
         }
         id = '#tab-' + (item + '-' + (path.tab || 'info')).replace(/([ #;&,.+*~\':"!^$[\]()=>|\/])/g, '\\$1');
@@ -494,17 +713,17 @@ $.layout = {
         this.loadTab(path);
     },
     blurItem: function (path) {
-        $('#wa-app > div.content').hide();
-        var $sidebar = $('#wa-app > div.sidebar');
-        var $content = $('#wa-app > div.content:first');
+        var self = this;
+        this.$app.find('> div.content').hide();
+        var $content = this.$app.find('> div.content:first');
 
-        $sidebar.show();
+        this.$sidebar.show();
         if (this.options.animation) {
             $content.css('margin-left', '0px');
         }
         $content.show();
         if (this.options.animation) {
-            $sidebar.animate({
+            self.$sidebar.animate({
                 'width': '200px'
             }, this.options.duration).queue(function () {
                 $(this).dequeue();
@@ -514,7 +733,7 @@ $.layout = {
                 'margin-left': '200px'
             }, this.options.duration);
         } else {
-            $sidebar.css({
+            self.$sidebar.css({
                 'width': '200px'
             });
             $content.css({
@@ -531,18 +750,22 @@ $.layout = {
         this.path.item = null;
     },
     focusItem: function (path, $container) {
+        var self = this;
         $.layout.trace('$.layout.focusItem', path);
-        $('#wa-app > div.content:visible').hide();
+        this.$app.find('> div.content:visible').hide();
+
+        var container_id = this.helper.getItemId(path);
+        this.window.updateTitle(container_id);
 
         if (this.options.animation) {
-            $('#wa-app > div.sidebar').show().animate({
+            self.$sidebar.show().animate({
                 'width': '0px'
             }, this.options.duration).queue(function () {
                 $(this).hide();
                 $(this).dequeue();
             });
         } else {
-            $('#wa-app > div.sidebar').hide();
+            self.$sidebar.hide();
         }
         if (this.options.animation) {
             $container.show().animate({
@@ -556,10 +779,14 @@ $.layout = {
             });
         }
 
-        var $body = $('html');
+        var $body = $('body');
+        $body.removeClass('i-apps i-themes i-plugins i-widgets i-featured');
+        if (['apps', 'themes', 'plugins', 'widgets', 'featured'].indexOf(path.list) >= 0) {
+            $body.addClass('i-' + path.list);
+        }
+
         $body.addClass(this.premium.getClass());
 
-        var self = this;
 
         if (this.path.filter) {
             var filter = '';
@@ -571,7 +798,7 @@ $.layout = {
                 }
             }
             $container.find('a.js-item-link[data-href^="\\#"]').each(function () {
-                self.helper.updateUrl($(this), (self.path.list == 'themes' ) ? [ self.path.query, filter] : [ filter, self.path.query]);
+                self.helper.updateUrl($(this), (self.path.list == 'themes' ) ? [self.path.query, filter] : [filter, self.path.query]);
             });
         }
 
@@ -602,12 +829,11 @@ $.layout = {
     /**
      * Handle js section interactions
      *
-     * @param {JQuery} $el
+     * @param {jQuery} $el
      * @return {Boolean}
      */
     click: function ($el) {
         var args = $el.attr('href').replace(/.*#\//, '').replace(/\/$/, '').split('/');
-        var params = [];
         var method = $.layout.getMethod(args, this);
 
         if (method.name) {
@@ -628,34 +854,39 @@ $.layout = {
             var self = this;
             var url = '?module=' + path.list;
             $.layout.trace('$.layout.load', url);
-            $('#wa-app > div.sidebar li.selected').removeClass('selected');
+            this.$sidebar.find('li.selected').removeClass('selected');
             $.layout.loadContent(url, function () {
                 self.path.list = path.list;
                 var href = path.list.replace(/([ #;&,.+*~\':"!^$[\]()=>|\/])/g, '\\$1');
-                $('#wa-app > div.sidebar a[href="\\#\\/' + href + '\\/"]').parent('li').addClass('selected');
+                self.$sidebar.find('a[href="\\#\\/' + href + '\\/"]').parent('li').addClass('selected');
                 self.dispatch(path);
             }, this.container(this.helper.getListId(path)));
         }
     },
 
-    loadContent: function (url, callback, container) {
+    loadContent: function (url, callback, $container) {
         var r = Math.random();
         this.random = r;
         var self = this;
-        $.layout.trace('$.layout.loadContent', [url, container]);
+        $.layout.trace('$.layout.loadContent', [url, $container]);
         $.get(url, function (result) {
-            if (!container && (self.random != r)) {
+            if (!$container && (self.random != r)) {
                 // too late: user clicked something else.
                 return;
             }
-            container = container || self.container();
+            $container = $container || self.container();
             if (result) {
-                container.html(result);
+                $container.html(result);
                 $('html, body').animate({
                     scrollTop: 0
                 }, 200);
+                $container.trigger($.Event('wa_load_list'));
                 if ((self.random == r) && (typeof(callback) == 'function')) {
                     try {
+                        $container.find('.js-inline-search:first').val('').on('change keyup', function () {
+                            var $input = $(this);
+                            self.searchList($input.val() || null, $input);
+                        });
                         callback();
                     } catch (e) {
                         $.layout.error('$.layout.loadContent callback error: ' + e.message, e);
@@ -675,7 +906,7 @@ $.layout = {
      * @param {Array} args
      * @param {object} scope
      * @param {String} name
-     * @return {'name':{String},'params':[]}
+     * @return {{name:{String},params:{Array}}}
      */
     getMethod: function (args, scope, name) {
         var chunk, callable;
@@ -702,7 +933,7 @@ $.layout = {
     /**
      * Debug trace helper
      *
-     * @param String message
+     * @param {String} message
      * @param {} data
      */
     trace: function (message, data) {
@@ -717,8 +948,8 @@ $.layout = {
     /**
      * Handler error messages
      *
-     * @param String message
-     * @param {} data
+     * @param {String} message
+     * @param {Object} data
      */
     error: function (message, data) {
         if (console) {
@@ -745,26 +976,46 @@ $.layout = {
         updateUrl: function ($el, filter) {
             var href = '' + $el.data('href');
             if (href) {
-                var internal_filter;
+                var internal_filter = '' + $el.data('filter');
                 var re;
-                if (internal_filter = '' + $el.data('filter')) {
-                    re = new RegExp('&' + internal_filter + '=[^&]*');
+                if (internal_filter.length) {
+                    re = new RegExp('&(' + internal_filter + ')=[^&\/%]*', 'g');
                 } else {
                     re = new RegExp('');
                 }
+
+                var map = [
+                    new RegExp('%filter%'),
+                    new RegExp('%query%'),
+                    new RegExp('%sort%')
+                ];
+
                 for (var i = 0; i < filter.length; i++) {
-                    href = href.replace(/%s/, filter[i].replace(re, ''));
+                    if (filter[i] != undefined) {
+                        href = href.replace(map[i], filter[i].replace(re, ''));
+                    }
                 }
-                $el.attr('href', href.replace(/%s/g, '').replace(/[&\/]+\//g, '/').replace(/([&\/])\1+/g, '$1'));
+                $el.attr('href', href.replace(/%\w+%/g, '').replace(/[&\/]+\//g, '/').replace(/([&\/])\1+/g, '$1'));
             }
         },
         getItemId: function (path) {
             return 'ajax-item-' + this.replace(path.list) + '-' + this.replace(path.item);
         },
         getListId: function (path) {
-            return 'ajax-list-' + this.replace(path.list)
+            var filter = '';
+            if (path.filter && (filter = decodeURIComponent($.param({'filter': path.filter})))) {
+                var regexp;
+                for (var i = 0; i < $.layout.options.inline_query.length; i++) {
+                    regexp = new RegExp('&?\\bfilter\\[' + $.layout.options.inline_query[i] + '\\]=[^&\/]+');
+                    filter = filter.replace(regexp, '');
+                }
+            }
+
+
+            var id = 'ajax-list-' + this.replace(path.list)
                 + '-' + this.replace(path.query || '')
-                + this.replace('' + $.param(path.filter));
+                + this.replace('' + filter);
+            return id;
         },
         replace: function (string) {
             return ('' + (string || '')).replace(/\//g, '-').replace(/,/g, '_').replace(/[^\w_\-]+/g, '');
@@ -789,8 +1040,8 @@ $.layout = {
             return params;
         },
         /**
-         * @param String string
-         * @return String
+         * @param {String} string
+         * @return {String}
          */
         ucfirst: function (string) {
             return string ? (string.substr(0, 1).toUpperCase() + string.substr(1)) : '';
@@ -798,7 +1049,7 @@ $.layout = {
         ajaxErrorHandler: function (xhr) {
             if ((xhr.status === 403) || (xhr.status === 404)) {
                 var text = $(xhr.responseText);
-                console.log(text);
+                $.layout.error(text, xhr.status);
                 if (text.find('.dialog-content').length) {
                     text = $('<div class="block double-padded"></div>').append(text.find('.dialog-content *'));
 
@@ -820,7 +1071,7 @@ $.layout = {
                 $.ajax(url, {
                     'data': $form.serialize(),
                     'type': 'POST',
-                    'success': function (data, textStatus, jqXHR) {
+                    'success': function (data) {
                         $.layout.blurList();
                         $.layout.container().html(data);
                         $('html, body').animate({
@@ -829,7 +1080,7 @@ $.layout = {
                         $.layout.focusList();
                     },
                     'error': function (jqXHR, textStatus, errorThrown) {
-                        $.layout.error('Error at $.settings.featuresFeatureValueTypeEdit', errorThrown);
+                        $.layout.error('Error at $.layout.submit', errorThrown);
                     }
                 });
             } catch (e) {
@@ -841,3 +1092,320 @@ $.layout = {
 };
 /* }); */
 
+
+// variable for event touch data
+var UserTouch = (function () {
+
+    var min_touch_length = 5,
+        touch_is_vertical,
+        finger_place_x_start,
+        finger_place_y_start,
+        finger_place_x_end,
+        finger_place_y_end,
+        touch_delta_x,
+        touch_delta_y,
+        time_start,
+        time_end,
+        element;
+
+    var on_touch_start = function (event) {
+        finger_place_x_start = event.touches[0].pageX;
+        finger_place_y_start = event.touches[0].pageY;
+        finger_place_x_end = null;
+        finger_place_y_end = null;
+        touch_delta_x = null;
+        touch_delta_y = null;
+        touch_is_vertical = false,
+            time_start = ( new Date() ).getTime(),
+            time_end = false;
+
+        UserTouch = {
+            offsetStart: {
+                top: finger_place_y_start,
+                left: finger_place_x_start
+            },
+            offsetEnd: {
+                top: false,
+                left: false
+            },
+            offsetDelta: {
+                x: false,
+                y: false
+            },
+            orientation: {
+                x: false,
+                y: false
+            },
+            touchTime: false
+        };
+
+        element.addEventListener("touchmove", on_touch_move, false);
+        element.addEventListener("touchend", on_touch_end, false);
+    };
+
+    var on_touch_move = function (event) {
+        time_end = (new Date()).getTime();
+        finger_place_x_end = event.touches[0].pageX;
+        finger_place_y_end = event.touches[0].pageY;
+        touch_delta_x = finger_place_x_end - finger_place_x_start;
+        touch_delta_y = finger_place_y_end - finger_place_y_start;
+
+        var is_horizontal = ( Math.abs(touch_delta_x) > Math.abs(touch_delta_y) && Math.abs(touch_delta_x) > min_touch_length );
+        if (is_horizontal) {
+            event.preventDefault();
+        }
+
+        UserTouch.offsetEnd = {
+            top: finger_place_y_end,
+            left: finger_place_x_end
+        };
+
+        UserTouch.offsetDelta = {
+            x: touch_delta_x,
+            y: touch_delta_y
+        };
+
+        if (Math.abs(touch_delta_y) > min_touch_length) {
+            if (touch_delta_y < 0) {
+                UserTouch.orientation.y = "top";
+            } else {
+                UserTouch.orientation.y = "bottom";
+            }
+        }
+
+        if (Math.abs(touch_delta_x) > min_touch_length) {
+            if (touch_delta_x < 0) {
+                UserTouch.orientation.x = "left";
+            } else {
+                UserTouch.orientation.x = "right";
+            }
+        }
+
+        UserTouch.touchTime = (time_end - time_start);
+    };
+
+    var on_touch_end = function () {
+        // отключаем обработчики
+        element.removeEventListener("touchmove", on_touch_move);
+        element.removeEventListener("touchend", on_touch_end);
+    };
+
+    var bindEvents = function () {
+        element = document.body;
+        element.addEventListener("touchstart", on_touch_start, false);
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
+        bindEvents();
+    });
+
+    return {
+        offsetStart: {
+            top: false,
+            left: false
+        },
+        offsetEnd: {
+            top: false,
+            left: false
+        },
+        offsetDelta: {
+            x: false,
+            y: false
+        },
+        orientation: {
+            x: false,
+            y: false
+        },
+        touchTime: false
+    };
+
+})();
+
+var SectionSlider = (function ($) {
+
+    var storage = {
+        hiddenClass: "is-hidden"
+    };
+
+    SectionSlider = function (options) {
+        var that = this;
+
+        // DOM
+        that.$wrapper = options.$wrapper;
+        that.$slider = that.$wrapper.find(".i-list-wrapper");
+        that.$slides = that.$slider.find(".i-item-wrapper");
+        that.$controls = that.$wrapper.find(".i-controls-wrapper");
+
+        // VARS
+        that.slide_width = that.$slides.first().outerWidth(true);
+        that.slide_count = that.$slides.length;
+        that.slider_width = that.$slider.outerWidth();
+        that.slider_max_width = that.slide_count * that.slide_width;
+        that.slide_move = that.getSlideMove();
+
+        // DYNAMIC VARS
+        that.slide_left = 0;
+        that.offset = 0;
+        that.timeout = 0;
+        that.is_mobile = false;
+
+        // INIT
+        that.initSlider();
+    };
+
+    SectionSlider.prototype.initSlider = function () {
+        var that = this;
+
+        that.initControls();
+
+        that.bindEvents();
+    };
+
+    SectionSlider.prototype.bindEvents = function () {
+        var that = this,
+            $wrapper = that.$wrapper,
+            slider = that.$slider.get(0);
+
+        $wrapper.on("click", ".show-before-item", function () {
+            that.moveSlider("left");
+            return false;
+        });
+
+        $wrapper.on("click", ".show-next-item", function () {
+            that.moveSlider("right");
+            return false;
+        });
+
+        // For resize
+        $(window).resize(function () {
+            if (that.$wrapper.length && !that.is_mobile) {
+                clearTimeout(that.timeout);
+
+                that.timeout = setTimeout(function () {
+                    that.reInitializing();
+                }, 2000);
+            }
+        });
+
+        window.addEventListener("orientationchange", function () {
+            that.reInitializing();
+        });
+
+        slider.addEventListener("touchstart", function () {
+            if (!that.is_mobile) {
+                that.is_mobile = true;
+            }
+        }, false);
+
+        slider.addEventListener("touchend", function () {
+            that.onTouchEnd();
+        }, false);
+
+    };
+
+    SectionSlider.prototype.onTouchEnd = function () {
+        var that = this,
+            min_width = 50,
+            $beforeLink = that.$wrapper.find(".show-before-item"),
+            $nextLink = that.$wrapper.find(".show-next-item");
+
+        if (Math.abs(UserTouch.offsetDelta['x']) > min_width) {
+
+            if (UserTouch.orientation.x == "right") {
+                $beforeLink.trigger("click");
+            }
+
+            if (UserTouch.orientation.x == "left") {
+                $nextLink.trigger("click");
+            }
+        }
+    };
+
+    SectionSlider.prototype.moveSlider = function (type) {
+        var that = this,
+            slide_move = that.slide_move,
+            offset;
+
+        // Left offset
+        if (type == "left") {
+            if (that.slide_left >= slide_move) {
+                that.slide_left -= slide_move;
+            } else {
+                that.slide_left = 0;
+            }
+        }
+
+        // Right offset
+        if (type == "right") {
+
+            // If the number of slides more shift
+            if (that.slide_count > slide_move) {
+
+                // If end of right
+                if (that.slide_left < that.slide_count - slide_move) {
+                    that.slide_left += slide_move;
+                } else {
+                    that.slide_left = that.slide_count - slide_move;
+                }
+
+            }
+        }
+
+        offset = that.slide_left * that.slide_width;
+
+        // Fix for right corner
+        if (that.slider_width > ( that.slider_max_width - offset )) {
+            offset = that.slider_max_width - that.slider_width;
+        }
+
+        // Fix for right corner
+        if (that.slide_left > 0 && type == "left" && offset == that.offset) {
+            that.moveSlider(type);
+            return false;
+        }
+
+        that.$slider.css({
+            left: -(offset)
+        });
+
+        that.offset = offset;
+    };
+
+    SectionSlider.prototype.reInitializing = function () {
+        var that = this;
+
+        that.slide_width = that.$slides.first().outerWidth(true);
+        that.slider_width = that.$slider.outerWidth();
+        that.slider_max_width = that.slide_count * that.slide_width;
+        that.slide_move = that.getSlideMove();
+        that.slide_left = 0;
+        that.offset = 0;
+
+        that.$slider.css({left: 0});
+
+        that.initControls();
+    };
+
+    SectionSlider.prototype.initControls = function () {
+        var that = this;
+
+        if (that.slide_count <= 1 || that.slider_width > that.slider_max_width) {
+            that.$controls.addClass(storage.hiddenClass);
+        } else {
+            that.$controls.removeClass(storage.hiddenClass);
+        }
+    };
+
+    // Calculate how many slides move
+    SectionSlider.prototype.getSlideMove = function () {
+        var that = this,
+            move;
+
+        move = Math.round(that.slider_width / that.slide_width);
+
+        return (move > 1) ? move : 1;
+    };
+
+    return SectionSlider;
+
+})(jQuery);

@@ -1,4 +1,5 @@
 <?php
+
 abstract class waSystemPlugin
 {
 
@@ -236,7 +237,7 @@ abstract class waSystemPlugin
     {
         return $this->getSettings($name);
     }
-    
+
     public function __isset($name)
     {
         return $this->getSettings($name) !== null;
@@ -347,6 +348,7 @@ abstract class waSystemPlugin
     <div class="value">%s%s</div>
 </div>
 ',
+            'control_separator'   => '</div><div class="value">',
         );
         $options = ifempty($params['options'], array());
         unset($params['options']);
@@ -371,19 +373,21 @@ abstract class waSystemPlugin
     private function config()
     {
         if ($this->config === null) {
-            $path = $this->path.'/lib/config/settings.php';
-            if (file_exists($path)) {
-                $this->config = include($path);
+            if ($this->path) {
+                $path = $this->path.'/lib/config/settings.php';
+                if (file_exists($path)) {
+                    $this->config = include($path);
 
-                foreach ($this->config as & $config) {
-                    if (isset($config['title'])) {
-                        $config['title'] = $this->_w($config['title']);
+                    foreach ($this->config as & $config) {
+                        if (isset($config['title'])) {
+                            $config['title'] = $this->_w($config['title']);
+                        }
+                        if (isset($config['description'])) {
+                            $config['description'] = $this->_w($config['description']);
+                        }
                     }
-                    if (isset($config['description'])) {
-                        $config['description'] = $this->_w($config['description']);
-                    }
+                    unset($config);
                 }
-                unset($config);
             }
             if (!is_array($this->config)) {
                 $this->config = array();
@@ -402,7 +406,7 @@ abstract class waSystemPlugin
         $settings_config = $this->config();
         foreach ($settings_config as $name => $row) {
             if (!isset($settings[$name])) {
-                switch (ifset($row['control_type'])) {
+                switch (preg_replace('@\s.*$@', '', ifset($row['control_type']))) {
                     case waHtmlControl::CHECKBOX:
                         $settings[$name] = false;
                         break;

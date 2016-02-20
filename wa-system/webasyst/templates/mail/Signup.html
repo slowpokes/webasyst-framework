@@ -4,8 +4,7 @@
 [s`Email`]: {$email}<br /><br />
 
 {if !empty($email_confirmation_hash)}
-    [s`Confirm your email by clicking this link`]: <a
-        href="{$wa_app_url}?confirm={$email_confirmation_hash}">{$wa_app_url}?confirm={$email_confirmation_hash}</a>
+[s`Confirm your email by clicking this link`]: <a href="{$wa->signupUrl(true)}?confirm={$email_confirmation_hash}">{$wa->signupUrl(true)}?confirm={$email_confirmation_hash}</a>
 {/if}<br /><br />
 
 --

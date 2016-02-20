@@ -12,7 +12,7 @@ msgstr ""
 "%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.6.10\n"
+"X-Generator: Poedit 1.8.6\n"
 "Language: ru_RU\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: .\n"
@@ -456,7 +456,7 @@ msgstr "Плагины"
 
 #: /wa-apps/installer/templates/actions/backend/Backend.html:41
 msgid "Themes"
-msgstr "Темы"
+msgstr "Темы дизайна"
 
 #: /wa-apps/installer/templates/actions/plugins/Plugins.html:69
 msgid "App plugin can not be installed due to unresolved conflicts:"
@@ -1259,3 +1259,193 @@ msgstr ""
 #: /wa-apps/installer/templates/actions/settings/Settings.html:68
 msgid "Sender"
 msgstr "Отправитель"
+
+#: /wa-apps/installer/templates/actions/widgets/Widgets.html:37
+#: /wa-apps/installer/templates/actions/widgets/Widgets.html:234
+#: /wa-apps/installer/templates/layouts/Backend.html:76
+msgid "Widgets"
+msgstr "Виджеты"
+
+#: /wa-apps/installer/templates/actions/widgets/Widgets.html:55
+msgid "No widget enabled apps are installed."
+msgstr "Не установлено ни одного приложения с виджетами."
+
+#: /wa-apps/installer/templates/actions/widgets/Widgets.html:228
+msgid "No widgets were found."
+msgstr "Виджеты не найдены."
+
+#: /wa-apps/installer/templates/actions/widgets/WidgetsInfo.html:16
+#: /wa-apps/installer/templates/actions/widgets/WidgetsInfo.html:304
+msgid "All widgets"
+msgstr "Все виджеты"
+
+#: /wa-apps/installer/templates/actions/widgets/WidgetsInfo.html:55
+msgid ""
+"Installation and usage of %s widget on <strong>%s</strong> is not licensed. "
+"Updates are disabled. Buy a new license or link your existing %s widget "
+"license to this Webasyst installation."
+msgstr ""
+"Установка и использование виджета «%s» на домене <strong>%s</strong> не "
+"лицензирована. Возможность установки обновлений отключена. Получите лицензию "
+"для продолжения использования виджета."
+
+#: /wa-apps/installer/templates/actions/widgets/WidgetsInfo.html:293
+msgid "Delete this widget"
+msgstr "Удалить виджет"
+
+#: /wa-apps/installer/lib/actions/widgets/installerWidgets.action.php:33
+msgid "Webasyst framework"
+msgstr "Фреймворк Webasyst"
+
+#: /wa-apps/installer/lib/actions/widgets/installerWidgetsInfo.action.php:50
+msgid "Widget not found"
+msgstr "Виджет не найден"
+
+#: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:141
+msgid "Application widget %s has been deleted"
+msgid_plural "Applications widgets %s have been deleted"
+msgstr[0] "Виджет «%s» удален"
+msgstr[1] "Виджеты «%s» удалены"
+msgstr[2] "Виджеты «%s» удалены"
+
+#: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:47
+msgid "Unable to delete application's widgets (developer version is on)"
+msgstr "Виджет не удален: в директории есть папка с названием .svn или .git"
+
+#: /wa-apps/installer/templates/actions/update/Update.row.html:33
+msgid "Widget \"<strong>%s</strong>\""
+msgstr "Виджет «<strong>%s</strong>»"
+
+#: /wa-apps/installer/templates/actions/update/Update.row.html:110
+#: /wa-apps/installer/templates/actions/widgets/WidgetsInfo.html:98
+msgid "This widget will be updated automatically when you update %s app."
+msgstr ""
+"Виджет будет обновлен автоматически при установке обновления приложения «%s»."
+
+#: /wa-apps/installer/templates/actions/settings/Settings.html:132
+msgid "Localization"
+msgstr "Локализация"
+
+#: /wa-apps/installer/templates/actions/settings/Settings.html:135
+msgid "Gettext (recommended)"
+msgstr "Gettext (рекомендуется)"
+
+#: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:113
+msgid "Can not delete system application's widgets \"%s\""
+msgstr "Ошибка удаления виджетов системного приложения «%s»"
+
+#: /wa-apps/installer/lib/classes/installerExtrasRemoveAction.class.php:120
+msgid "Can not delete inbuilt application's widgets \"%s\""
+msgstr "Ошибка удаления виджетов системного приложения «%s»"
+
+#: /wa-apps/installer/templates/actions/update/UpdateManager.html:109
+#: /wa-apps/installer/templates/actions/update/UpdateManager.html:122
+msgid "Gathering information about available updates..."
+msgstr "Сбор информации о доступных обновлениях…"
+
+#: /wa-apps/installer/templates/actions/apps/Apps.html:16
+#: /wa-apps/installer/templates/layouts/Backend.html:54
+msgid "Recommended"
+msgstr "Рекомендуем"
+
+#: /wa-apps/installer/templates/actions/apps/Apps.html:16
+msgid "Best new apps"
+msgstr "Лучшие новые приложения"
+
+#: /wa-apps/installer/templates/actions/apps/Apps.html:16
+msgid "Top Free & Paid"
+msgstr "Лидеры продаж и скачиваний"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.html:11
+msgid "Actions"
+msgstr "Действия"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.html:48
+#: /wa-apps/installer/lib/actions/assets/installerAssets.action.php:75
+msgid "Assets"
+msgstr "Активы"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:22
+msgid "Plugin <a href=\"%s\">%s</a>"
+msgstr "Плагин «<a href=\"%s\">%s</a>»"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:24
+msgid "Theme <a href=\"%s\">%s</a>"
+msgstr "Тема дизайна «<a href=\"%s\">%s</a>»"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:26
+msgid "Widget <a href=\"%s\">%s</a>"
+msgstr "Виджет «<a href=\"%s\">%s</a>»"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:55
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:59
+msgid "Paused"
+msgstr "Выключен"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:56
+msgid "Resume"
+msgstr "Включить"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:63
+msgid "Active"
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:64
+msgid "Pause"
+msgstr "Выключить"
+
+#: /wa-apps/installer/templates/actions/assets/Assets.row.html:69
+msgid "System requirements not met:"
+msgstr "Системные требования не выполнены:"
+
+#: /wa-apps/installer/templates/actions/featured/Featured.html:41
+msgid "Recommended apps"
+msgstr "Рекомендуемые приложения"
+
+#: /wa-apps/installer/templates/actions/featured/Featured.html:53
+msgid "Recommended themes"
+msgstr "Рекомендуемые темы дизайна"
+
+#: /wa-apps/installer/templates/actions/featured/Featured.html:68
+msgid "Recommended plugins"
+msgstr "Рекомендуемые плагины"
+
+#: /wa-apps/installer/templates/actions/featured/Featured.html:84
+msgid "Recommended widgets"
+msgstr "Рекомендуемые виджеты"
+
+#: /wa-apps/installer/templates/actions/featured/Featured.html:101
+msgid "Featured"
+msgstr "Рекомендуем"
+
+#: /wa-apps/installer/templates/actions/plugins/Plugins.html:38
+msgid "Filter by app and type"
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/plugins/Plugins.html:51
+msgid "Filter by category"
+msgstr "Категории"
+
+#: /wa-apps/installer/templates/actions/update/Update.html:44
+msgid "Webasyst Framework version <strong>%s</strong>"
+msgstr "Версия Webasyst — <strong>%s</strong>"
+
+#: /wa-apps/installer/templates/layouts/Backend.html:69
+msgid "Plugins for apps"
+msgstr "Плагины"
+
+#: /wa-apps/installer/templates/layouts/Backend.html:90
+msgid "Manage apps"
+msgstr "Установлено"
+
+#: /wa-apps/installer/templates/actions/apps/Apps.include.html:36
+#: /wa-apps/installer/templates/actions/apps/AppsInfo.html:178
+msgid "Your account status enables you to install %s for free!"
+msgstr "Статус вашего аккаунта позволяет установить «%s» бесплатно!"
+
+#: /wa-apps/installer/templates/actions/featured/Featured.html:39
+#: /wa-apps/installer/templates/actions/featured/Featured.html:59
+#: /wa-apps/installer/templates/actions/featured/Featured.html:83
+#: /wa-apps/installer/templates/actions/featured/Featured.html:107
+msgid "See all"
+msgstr "Смотреть все"

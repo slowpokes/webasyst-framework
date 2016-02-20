@@ -1,0 +1,163 @@
+{include file="../../includes/message.html" inline}
+<div class="block">
+{if !empty($vendor_name)}<h1>{$vendor_name|string_format:'[`Apps by %s`]'|escape}</h1><br>{/if}
+{if !empty($promos)}
+
+        <section class="i-promos-wrapper">
+            <div class="i-promos-slider" id="i-promos-slider">
+                {foreach $promos as $promo}
+                    {$promo_url=$promo.link}
+                    {$promo_url=$promo_url|regex_replace:'@^.*\.webasyst\.\w{2,3}/store/app/([^/]+)/$@':'#/apps/$1/'}
+                    {$promo_url=$promo_url|regex_replace:'@^.*\.webasyst\.\w{2,3}/store/themes/([^/]+)/$@':'#/themes/$1/'}
+                    {$promo_url=$promo_url|regex_replace:'@^.*\.webasyst\.\w{2,3}/store/plugins/([^/]+)/([^/]+)/$@':'#/plugins/$1/$2/'}
+                    <div class="i-promos-slide" style="background-image: url('{$promo.image}');">
+                        {if !empty($promo.title)}<h3 class="i-slide-header" style="color: {$promo.color};">{$promo.title}</h3>{/if}
+                        {if !empty($promo.body)}<p class="i-slide-text" style="color: {$promo.color};">{$promo.body}</p>{/if}
+                        <a class="i-slide-link" href="{$promo_url|escape}" {if strpos($promo_url,'#')!==0} target="_blank"{/if}></a>
+                    </div>
+                {/foreach}
+            </div>
+
+            {if ( count($promos) > 1 )}
+                <script>( function($) {
+                    $(window).one("wa_focus_list", function() {
+                        $("#i-promos-slider").bxSlider({
+                            mode: "fade",
+                            auto : true,
+                            pause : 7000,
+                            autoHover : true,
+                            pager: true
+                        });
+                    });
+                })(jQuery);</script>
+            {/if}
+        </section>
+
+</div>
+{/if}
+
+<section class="i-section-wrapper block double-padded i-apps" style="padding-top: 10px;">
+    <header class="i-header-wrapper">
+        <h2 class="i-header heading">[`Recommended apps`]</h2>
+        <div class="i-controls-wrapper">
+            <a href="#/apps/" class="i-controls-viewall">[`See all`]</a>
+            <a class="i-controls-link show-before-item" href="javascript:void(0);"></a>
+            <a class="i-controls-link show-next-item" href="javascript:void(0);"></a>
+        </div>
+    </header>
+    <div class="i-section-block">
+        <ul class="i-list-wrapper thumbs i-mini">
+            {foreach $featured_apps as $_app_id => $app}
+                <li class="i-item-wrapper">
+                    {include file="../apps/Apps.include.html" is_mini=true hide_product_badge=true inline}
+                </li>
+            {/foreach}
+        </ul>
+    </div>
+</section>
+{$themes_meet=false}
+{capture name='themes'}
+<section class="i-section-wrapper block double-padded i-themes" style="background: transparent;">
+    <header class="i-header-wrapper">
+        <h2 class="i-header heading">[`Recommended themes`]</h2>
+        <div class="i-controls-wrapper">
+            <a href="#/themes/" class="i-controls-viewall">[`See all`]</a>
+            <a class="i-controls-link show-before-item" href="javascript:void(0);"></a>
+            <a class="i-controls-link show-next-item" href="javascript:void(0);"></a>
+        </div>
+    </header>
+    <div class="i-section-block" id="featured-themes-list">
+        <ul class="i-list-wrapper thumbs js-list-items">
+            {foreach $apps as $key => $app}
+                {if !empty($app['themes'])}
+                    {$themes_meet=true}
+                    {foreach $app['themes'] as $theme_id => $theme}
+                        <li class="i-item-wrapper {if $theme.installed}i-installed{/if}" data-sort="-{$theme.sort|default:1000}">
+                            {include file="../themes/Themes.include.html" hide_product_badge=true inline}
+                        </li>
+                    {/foreach}
+                {/if}
+            {/foreach}
+        </ul>
+    </div>
+</section>
+{/capture}
+{if $themes_meet}{$smarty.capture.themes}{/if}
+
+{$plugins_meet=false}
+{capture name='plugins'}
+<section class="i-section-wrapper block double-padded i-plugins">
+    <header class="i-header-wrapper">
+        <h2 class="i-header heading">[`Recommended plugins`]</h2>
+        <div class="i-controls-wrapper">
+            <a href="#/plugins/{$plugins_app}/" class="i-controls-viewall">[`See all`]</a>
+            <a class="i-controls-link show-before-item" href="javascript:void(0);"></a>
+            <a class="i-controls-link show-next-item" href="javascript:void(0);"></a>
+        </div>
+    </header>
+    <div class="i-section-block">
+        <ul class="i-list-wrapper thumbs js-list-items">
+            {foreach $apps as $key => $app}
+                {if !empty($app['plugins'])}
+                    {$plugins_meet=true}
+                    {foreach $app['plugins'] as $plugin_id => $plugin}
+                        <li class="i-item-wrapper" data-sort="-{$plugin.sort|default:1000}">
+                            {include file="../plugins/Plugins.include.html" hide_product_badge=true inline}
+                        </li>
+                    {/foreach}
+                {/if}
+            {/foreach}
+        </ul>
+    </div>
+</section>
+{/capture}
+
+{if $plugins_meet}{$smarty.capture.plugins}{/if}
+
+<section class="i-section-wrapper block double-padded i-widgets">
+    <header class="i-header-wrapper">
+        <h2 class="i-header heading">[`Recommended widgets`]</h2>
+        <div class="i-controls-wrapper">
+            <a href="#/widgets/" class="i-controls-viewall">[`See all`]</a>
+            <a class="i-controls-link show-before-item" href="javascript:void(0);"></a>
+            <a class="i-controls-link show-next-item" href="javascript:void(0);"></a>
+        </div>
+    </header>
+    <div class="i-section-block">
+        <ul class="i-list-wrapper thumbs js-list-items">
+            {foreach $apps as $key => $app}
+                {if !empty($app['widgets'])}
+                    {foreach $app['widgets'] as $widget_id => $widget}
+                        <li class="i-item-wrapper {if !empty($widget.installed)}i-installed{/if}" data-sort="-{$widget.sort|default:1000}">
+                            {include file="../widgets/Widgets.include.html" hide_product_badge=true inline}
+                        </li>
+                    {/foreach}
+                {/if}
+            {/foreach}
+        </ul>
+    </div>
+</section>
+
+</div>
+
+<script>
+( function($, SectionSlider) {
+
+    var initSectionSlider = function() {
+        var $section = $(".i-section-wrapper");
+
+        if ($section.length) {
+            $section.each( function() {
+                new SectionSlider({ $wrapper: $(this) });
+            });
+        }
+    };
+
+    $(window).one("wa_focus_list", function() {
+        initSectionSlider();
+    });
+
+    $.layout.window.setTitle('{"[`Featured`]"|cat:" — ":{$wa->accountName(false)}|escape:'javascript'}');
+
+})(jQuery, SectionSlider);
+</script>

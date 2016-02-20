@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of Webasyst framework.
  *
@@ -15,9 +16,18 @@ header('Content-Type: text/html; charset=UTF-8;');
 header('Pragma: no-cache');
 header('Connection: close');
 
+if (version_compare('5.2.5', PHP_VERSION, '>')) {
+    print sprintf("PHP version 5.2.5 or greater required, but current is %s", PHP_VERSION);
+}
+
 @ini_set("magic_quotes_runtime", 0);
 if (version_compare('5.4', PHP_VERSION, '>') && function_exists('set_magic_quotes_runtime') && get_magic_quotes_runtime()) {
     @set_magic_quotes_runtime(false);
+}
+
+if (!empty($_REQUEST['mod_rewrite'])) {
+    echo "mod_rewrite:success";
+    exit;
 }
 
 $init_path = dirname(__FILE__).'/lib/init.php';
@@ -113,20 +123,27 @@ $steps = array();
 $error = '';
 $warning = '';
 $checked = true;
-$steps[] = array( //0 - Welcome
+
+//0 - Welcome
+$steps[] = array(
     'title' => '',
     'next'  => $t->_('Continue'),
 );
-$steps[] = array( //1 - System requirements
+
+//1 - System requirements
+$steps[] = array(
     'title' => $t->_('System requirements'),
     'next'  => $t->_('Continue'),
 );
-$steps[] = array( //2 - Extract files
+
+//2 - Extract files
+$steps[] = array(
     'title' => $t->_('Files'),
     'next'  => $t->_('Continue'),
 );
 
-$steps[] = array( //3 - Setup Database properties
+//3 - Setup Database properties
+$steps[] = array(
     'title' => $t->_('Settings'),
     'next'  => $t->_('Connect'),
 );
@@ -177,15 +194,15 @@ HTML;
         $content = <<<HTML
 <!-- welcome text -->
 <div class="i-welcome">
-	<h1 class="i-url"><span>http://</span>{$host}</h1>
-		<p>{$t->_('Webasyst Installer will deploy archive with Webasyst system files and apps in this folder.')}<br >
-		</p>
+    <h1 class="i-url"><span>http://</span>{$host}</h1>
+        <p>{$t->_('Webasyst Installer will deploy archive with Webasyst system files and apps in this folder.')}<br >
+        </p>
 
-		{$extra}
-		<input type="submit" value="{$t->_('Install Webasyst')}" class="button green large" id="wa-installer-submit">
-		<br>
-		<br>
-		{$select_locale}
+        {$extra}
+        <input type="submit" value="{$t->_('Install Webasyst')}" class="button green large" id="wa-installer-submit">
+        <br>
+        <br>
+        {$select_locale}
 </div>
 HTML;
         break;
@@ -231,9 +248,9 @@ HTML;
                 } catch (Exception $ex) {
                     $passed = false;
                     $requirements_output .= <<<HTML
-	<li>
-		<i class="icon16 no"></i><strong class="large">{$ex->getMessage()}</strong>
-	</li>
+    <li>
+        <i class="icon16 no"></i><strong class="large">{$ex->getMessage()}</strong>
+    </li>
 HTML;
                 }
             }
@@ -249,32 +266,32 @@ HTML;
 
                     $success = false;
                     $requirements_output .= <<<HTML
-	<li>
-		<i class="icon16 no"></i><strong class="large">{$requirement['name']}</strong>
-		<span class="hint i-error">{$requirement['warning']}<!-- placeholder --></span>
-		<br>
-		<span class="hint">{$requirement['description']}<!-- placeholder --></span>
-	</li>
+    <li>
+        <i class="icon16 no"></i><strong class="large">{$requirement['name']}</strong>
+        <span class="hint i-error">{$requirement['warning']}<!-- placeholder --></span>
+        <br>
+        <span class="hint">{$requirement['description']}<!-- placeholder --></span>
+    </li>
 HTML;
 
                 } else {
                     if (!$requirement['warning']) {
 
                         $requirements_output .= <<<HTML
-	<li>
-		<i class="icon16 yes"></i><strong class="large">{$requirement['name']} <span class="hint">{$requirement['note']}<!-- placeholder --></span></strong>
-		<br>
-		<span class="hint">{$requirement['description']}<!-- placeholder --></span>
-	</li>
+    <li>
+        <i class="icon16 yes"></i><strong class="large">{$requirement['name']} <span class="hint">{$requirement['note']}<!-- placeholder --></span></strong>
+        <br>
+        <span class="hint">{$requirement['description']}<!-- placeholder --></span>
+    </li>
 HTML;
                     } else {
                         $requirements_output .= <<<HTML
-	<li>
-		<i class="icon16 no-bw"></i><strong class="large">{$requirement['name']}</strong>
-		<span class="hint">{$requirement['warning']}<!-- placeholder --></span>
-		<br>
-		<span class="hint">{$requirement['description']}<!-- placeholder --></span>
-	</li>
+    <li>
+        <i class="icon16 no-bw"></i><strong class="large">{$requirement['name']}</strong>
+        <span class="hint">{$requirement['warning']}<!-- placeholder --></span>
+        <br>
+        <span class="hint">{$requirement['description']}<!-- placeholder --></span>
+    </li>
 HTML;
                     }
                 }
@@ -329,7 +346,7 @@ HTML;
                 if (file_exists($local_path) && is_dir($local_path)) {
                     $cwd = getcwd();
                     chdir($local_path);
-                    $pattern = '{*.tar.gz,wa-apps/*.tar.gz,wa-apps/*/plugins/*.tar.gz,wa-apps/*/themes/*.tar.gz}';
+                    $pattern = '{*.tar.gz,wa-apps/*.tar.gz,wa-widgets/*.tar.gz,wa-apps/*/plugins/*.tar.gz,wa-apps/*/themes/*.tar.gz}';
                     foreach (glob($pattern, GLOB_BRACE) as $path) {
                         if (preg_match('@^([\\w%0-9\\-!]+)\\.tar\\.gz$@', basename($path), $matches)) {
                             $decoded = dirname($path).'/';
@@ -343,8 +360,8 @@ HTML;
                                 'target' => $decoded,
                                 'slug'   => $decoded,
                             );
-                            if (preg_match('@wa-apps/([\\w\\d\\-]+)$@', $decoded, $matches)) {
-                                $apps[] = $matches[1];
+                            if (preg_match('@wa-(apps|widgets)/([\\w\\d\\-]+)$@', $decoded, $matches)) {
+                                $apps[] = $matches[2];
                             } elseif (preg_match('@wa-apps/([\\w\\d\\-]+)/plugins/([\\w\\d\\-]+)$@', $decoded, $matches)) {
                                 if (!isset($plugins[$matches[1]])) {
                                     $plugins[$matches[1]] = array();
@@ -451,7 +468,7 @@ AddDefaultCharset utf-8
 
 <ifModule mod_headers.c>
     <FilesMatch "\.(jpg|jpeg|png|gif|js|css)$">
-	Header set Cache-Control "max-age=3153600, public"
+    Header set Cache-Control "max-age=3153600, public"
     </FilesMatch>
 </ifModule>
 
@@ -477,58 +494,111 @@ HTACCESS;
             }
             try {
                 //check Connection for database;
-                if (!extension_loaded('mysql')) {
-                    throw new Exception($t->_('PHP extension mysql required'));
-                }
-                if ($link = @mysql_connect($db_options['host'], $db_options['user'], $db_options['password'])) {
-                    if (@mysql_select_db($db_options['database'], $link)) {
-                        //allow store settings
-                        if (!file_exists($init_path)) {
-                            throw new Exception("File <b>wa-installer/lib/init.php</b> not found");
-                        }
-
-                        require_once($init_path);
-                        if (!class_exists('waInstallerApps')) {
-                            throw new Exception('Class <b>waInstallerApps</b> not found');
-                        }
-                        if (mysql_query('SELECT 1 FROM `wa_app_settings` WHERE 0')) {
-                            throw new Exception($t->_('Webasyst cannot be installed into "%s" database because this database already contains Webasyst tables. Please specify connection credentials for another MySQL database.', $db_options['database']));
-                        } elseif ($result = mysql_query('SHOW TABLES')) {
-                            if ($count = mysql_num_rows($result)) {
-                                $warning = $t->_('The database already contains %d tables.', $count);
+                if (extension_loaded('mysqli')) {
+                    $db_options['type'] = 'mysqli';
+                    if ($link = @mysqli_connect($db_options['host'], $db_options['user'], $db_options['password'])) {
+                        if (@mysqli_select_db($link, $db_options['database'])) {
+                            //allow store settings
+                            if (!file_exists($init_path)) {
+                                throw new Exception("File <b>wa-installer/lib/init.php</b> not found");
                             }
-                        }
 
-                        $installer_apps = new waInstallerApps();
-                        if (extension_loaded('mysqli')) {
-                            $db_options['type'] = 'mysqli';
+                            require_once($init_path);
+                            if (!class_exists('waInstallerApps')) {
+                                throw new Exception('Class <b>waInstallerApps</b> not found');
+                            }
+                            if (mysqli_query($link, 'SELECT 1 FROM `wa_app_settings` WHERE 0')) {
+                                throw new Exception($t->_('Webasyst cannot be installed into "%s" database because this database already contains Webasyst tables. Please specify connection credentials for another MySQL database.',
+                                    $db_options['database']));
+                            } elseif ($result = mysqli_query($link, 'SHOW TABLES')) {
+                                if ($count = mysqli_num_rows($result)) {
+                                    $warning = $t->_('The database already contains %d tables.', $count);
+                                }
+                            }
+
+                            $installer_apps = new waInstallerApps();
+                            if (strpos($db_options['host'], ':')) {
+                                $db_options['port'] = '';
+                                list($db_options['host'], $db_options['port']) = explode(':', $db_options['host'], 2);
+                            }
+                            $installer_apps->updateDbConfig($db_options);
+                            mysqli_close($link);
+
+                            $installer_apps->setGenericOptions($_POST['config']);
+
+                            $checked = true;
                         } else {
-                            $db_options['type'] = 'mysql';
+                            $error_text = mysqli_error($link);
+                            $error_no = mysqli_errno($link);
+                            throw new Exception($t->_('Failed to connect to the "%s" database. (%s)', $db_options['database'], "#{$error_no}: {$error_text}"));
                         }
-                        if (strpos($db_options['host'], ':')) {
-                            $db_options['port'] = '';
-                            list($db_options['host'], $db_options['port']) = explode(':', $db_options['host'], 2);
-                        }
-                        $installer_apps->updateDbConfig($db_options);
-                        mysql_close($link);
 
-                        $installer_apps->setGenericOptions($_POST['config']);
-
-                        $checked = true;
                     } else {
-                        $error_text = mysql_error($link);
-                        $error_no = mysql_errno($link);
-                        throw new Exception($t->_('Failed to connect to the "%s" database. (%s)', $db_options['database'], "#{$error_no}: {$error_text}"));
+                        $error_text = htmlentities(mysqli_error(null), ENT_QUOTES, 'utf-8');
+                        $error_no = mysqli_errno(null);
+                        throw new Exception($t->_('Failed to connect to "%s" MySQL database server. (%s)', $db_options['host'], "#{$error_no}: {$error_text}"));
                     }
-
                 } else {
-                    $error_text = htmlentities(mysql_error(), ENT_QUOTES, 'utf-8');
-                    $error_no = mysql_errno();
-                    throw new Exception($t->_('Failed to connect to "%s" MySQL database server. (%s)', $db_options['host'], "#{$error_no}: {$error_text}"));
+                    if (!extension_loaded('mysql')) {
+                        throw new Exception($t->_('PHP extension mysql required'));
+                    }
+                    $db_options['type'] = 'mysql';
+                    if ($link = @mysql_connect($db_options['host'], $db_options['user'], $db_options['password'])) {
+                        if (@mysql_select_db($db_options['database'], $link)) {
+                            //allow store settings
+                            if (!file_exists($init_path)) {
+                                throw new Exception("File <b>wa-installer/lib/init.php</b> not found");
+                            }
+
+                            require_once($init_path);
+                            if (!class_exists('waInstallerApps')) {
+                                throw new Exception('Class <b>waInstallerApps</b> not found');
+                            }
+                            if (mysql_query('SELECT 1 FROM `wa_app_settings` WHERE 0', $link)) {
+                                throw new Exception($t->_('Webasyst cannot be installed into "%s" database because this database already contains Webasyst tables. Please specify connection credentials for another MySQL database.',
+                                    $db_options['database']));
+                            } elseif ($result = mysql_query('SHOW TABLES', $link)) {
+                                if ($count = mysql_num_rows($result)) {
+                                    $warning = $t->_('The database already contains %d tables.', $count);
+                                }
+                            }
+
+                            $installer_apps = new waInstallerApps();
+                            if (strpos($db_options['host'], ':')) {
+                                $db_options['port'] = '';
+                                list($db_options['host'], $db_options['port']) = explode(':', $db_options['host'], 2);
+                            }
+                            $installer_apps->updateDbConfig($db_options);
+                            mysql_close($link);
+
+                            $installer_apps->setGenericOptions($_POST['config']);
+
+                            $checked = true;
+                        } else {
+                            $error_text = mysql_error($link);
+                            $error_no = mysql_errno($link);
+                            throw new Exception($t->_('Failed to connect to the "%s" database. (%s)', $db_options['database'], "#{$error_no}: {$error_text}"));
+                        }
+
+                    } else {
+                        $error_text = htmlentities(mysql_error(), ENT_QUOTES, 'utf-8');
+                        $error_no = mysql_errno();
+                        throw new Exception($t->_('Failed to connect to "%s" MySQL database server. (%s)', $db_options['host'], "#{$error_no}: {$error_text}"));
+                    }
                 }
             } catch (Exception $e) {
                 if (!empty($link) && is_resource($link)) {
-                    mysql_close($link);
+                    if (extension_loaded('mysqli')) {
+                        /**
+                         * @var mysqli $link
+                         */
+                        mysqli_close($link);
+                    } elseif (extension_loaded('mysql')) {
+                        /**
+                         * @var resource $link
+                         */
+                        mysql_close($link);
+                    }
                 }
                 $error = "<p class=\"i-error\">".$e->getMessage()."</p>";
             }
@@ -546,33 +616,33 @@ HTACCESS;
 {$error}
 
 <div class="fields form">
-	<div class="field-group">
-		<div class="field">
-			<div class="name">{$t->_('Web Server')}:</div>
-			<div class="value">
-				<input name="db[host]" type="text" class="large" value="{$db_options['host']}" >
-			</div>
-		</div>
-		<div class="field">
-			<div class="name">{$t->_('User')}:</div>
-			<div class="value">
-				<input name="db[user]" type="text" class="large" value="{$db_options['user']}">
-			</div>
-		</div>
-		<div class="field">
-			<div class="name">{$t->_('Password')}:</div>
-			<div class="value">
-				<input name="db[password]" type="password" class="large" value="{$db_options['password']}">
-			</div>
-		</div>
-		<div class="field">
-			<div class="name">{$t->_('Database Name')}:</div>
-			<div class="value">
-				<input name="db[database]" type="text" class="large" value="{$db_options['database']}" >
-			</div>
-		</div>
-	</div>
-	<input type="hidden" name="config[mod_rewrite]" value="{$mod_rewrite}" id="input_mod_rewrite">
+    <div class="field-group">
+        <div class="field">
+            <div class="name">{$t->_('Host')}:</div>
+            <div class="value">
+                <input name="db[host]" type="text" class="large" value="{$db_options['host']}" >
+            </div>
+        </div>
+        <div class="field">
+            <div class="name">{$t->_('User')}:</div>
+            <div class="value">
+                <input name="db[user]" type="text" class="large" value="{$db_options['user']}">
+            </div>
+        </div>
+        <div class="field">
+            <div class="name">{$t->_('Password')}:</div>
+            <div class="value">
+                <input name="db[password]" type="password" class="large" value="{$db_options['password']}">
+            </div>
+        </div>
+        <div class="field">
+            <div class="name">{$t->_('Database Name')}:</div>
+            <div class="value">
+                <input name="db[database]" type="text" class="large" value="{$db_options['database']}" >
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="config[mod_rewrite]" value="{$mod_rewrite}" id="input_mod_rewrite">
 </div>
 
 <p class="clear-left i-hint">{$t->_('If you do not know what should be entered here, please contact your hosting provider technical support.')}</p>
@@ -637,15 +707,15 @@ PHP;
             $content = <<<HTML
 
 <div class="i-welcome">
-	<h1>{$t->_('Installed!')}</h1>
-	<p>{$t->_('Webasyst is installed and ready.')}</p>
+    <h1>{$t->_('Installed!')}</h1>
+    <p>{$t->_('Webasyst is installed and ready.')}</p>
 
-	<p><a id="redirect_url" href="//{$host}{$login_path}?lang={$lang}" class="large"><strong>{$url}://{$host}<span class="highlighted underline">{$login_path}</span></strong></a> <i class="icon10 yes"></i></p>
-	<p class="clear-left i-hint">{$t->_('Remember this address. This is the address for logging into your Webasyst backend.')}</p>
+    <p><a id="redirect_url" href="//{$host}{$login_path}?lang={$lang}" class="large"><strong>{$url}://{$host}<span class="highlighted underline">{$login_path}</span></strong></a> <i class="icon10 yes"></i></p>
+    <p class="clear-left i-hint">{$t->_('Remember this address. This is the address for logging into your Webasyst backend.')}</p>
 
-	<br><br><br>
-	<p id="redirect_message" style="display:none;">{$t->_('Finalizing installation...')} <i class="icon16 loading"></i></p>
-	<p>{$warning}</p>
+    <br><br><br>
+    <p id="redirect_message" style="display:none;">{$t->_('Finalizing installation...')} <i class="icon16 loading"></i></p>
+    <p>{$warning}</p>
 
 </div>
 HTML;
@@ -680,11 +750,11 @@ HTML;
     }
     $color = (($next_step > $step && !$error) || (in_array($step, array(3)) && !$error)) ? 'green' : 'grey';
     $progress .= <<<HTML
-		</div><!--
-		-->
-		<input type="submit" value="{$next}" class="button {$color}" id="wa-installer-submit" >
-		<a href="{$t->_('install_quide_url')}" target="_blank" class="wa-help-link"><span>{$t->_('Installation Guide')}</span> <i class="icon10 new-window"></i></a>
-		</div>
+        </div><!--
+        -->
+        <input type="submit" value="{$next}" class="button {$color}" id="wa-installer-submit" >
+        <a href="{$t->_('install_quide_url')}" target="_blank" class="wa-help-link"><span>{$t->_('Installation Guide')}</span> <i class="icon10 new-window"></i></a>
+        </div>
 </div>
 HTML;
 }
@@ -714,6 +784,7 @@ if (file_exists($js_path)) {
 <script type="text/javascript">
 /* inline js from wa-installer/js/wa-installer.js*/
 {$inline_js}
+wai.options.lang='{$lang}';
 </script>
 JS;
 
@@ -730,31 +801,31 @@ $index = <<<HTML
 </head>
 <body>
 
-	<div id="wa-installer">
+    <div id="wa-installer">
 
-		<div class="dialog" id="wa-install-dialog">
-			<div class="dialog-background"></div>
-			<div class="dialog-window">
-			<form action="install.php" method="POST" id="install_form">
-				<div class="dialog-content" id="dialog-content">
-				<input type="hidden" name="step" value="{$next_step}">
-				<input type="hidden" name="lang" value="{$lang}">
-				<input type="hidden" name="complete" value="0" id="install_form_complete">
-					<div class="dialog-content-indent" id="content-wrapper">
-
-
-					{$content}
-					</div>
-				</div>
-				{$progress}
-
-			</form>
-			</div>
+        <div class="dialog" id="wa-install-dialog">
+            <div class="dialog-background"></div>
+            <div class="dialog-window">
+            <form action="install.php" method="POST" id="install_form">
+                <div class="dialog-content" id="dialog-content">
+                <input type="hidden" name="step" value="{$next_step}">
+                <input type="hidden" name="lang" value="{$lang}">
+                <input type="hidden" name="complete" value="0" id="install_form_complete">
+                    <div class="dialog-content-indent" id="content-wrapper">
 
 
-		</div> <!-- .dialog -->
+                    {$content}
+                    </div>
+                </div>
+                {$progress}
 
-	</div> <!-- #wa-login -->
+            </form>
+            </div>
+
+
+        </div> <!-- .dialog -->
+
+    </div> <!-- #wa-login -->
 </body>
 </html>
 HTML;

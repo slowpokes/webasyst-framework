@@ -4,7 +4,7 @@
         <div class="i-breadcrumbs">
             <a href="#/themes/">[`All themes`]</a>
             {if strlen($query)}
-                <a href="#/themes{$query}/" data-href="#/themes%s%s/" class="js-item-link">[`List`]</a>
+                <a href="#/themes{$query}/" data-href="#/themes%query%%filter%/" class="js-item-link">[`List`]</a>
             {/if}
         </div>
         <h1>[`Application not found`]</h1>
@@ -42,19 +42,19 @@
                             {/if}
                             <input type="hidden" name="domain" value="{$domain}">
                             <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
-                            
-                            
+
+
                                 <input type="submit" class="button green" value="[`Link license`]">
                                 <p class="red"><i class="icon16 no"></i>{sprintf("[`Installation and usage of %s theme on <strong>%s</strong> is not licensed. Updates are disabled. Buy a new license or link your existing %s theme license to this Webasyst installation.`]",$theme.name|escape,installerHelper::getDomain()|escape, $theme.name|escape)}</p>
-                            
+
                         </form>
                     {/if}
                 {else}
-                
+
                     {* LICENSED INSTALLATION: EITHER FREE OR PAID *}
-                    
+
                     {if $theme.action == waInstallerApps::ACTION_UPDATE}
-                    
+
                         {* UPDATES ARE AVAILABLE *}
                         <form action="?module=update&action=manager" method="post">
                             <input type="hidden" name="app_id[{$theme.slug}]" value="{$theme.vendor}{if !empty($theme.edition)}:{$theme.edition}{/if}">
@@ -77,9 +77,9 @@
                             {/if}
 
                         </form>
-                        
+
                     {elseif $theme.commercial}
-                    
+
                         {if !empty($theme.license_expire)}
                             {* COMMERCIAL LICENSE WITH AN EXPIRE DATE *}
                             <p><em class="i-installed-label"><i class="icon16 yes"></i>{sprintf("[`This is a licensed installation of %s on %s. License is valid through <strong>%s</strong>.`]",$theme.name|escape, installerHelper::getDomain()|escape, $theme.license_expire)}</em></p>
@@ -91,9 +91,9 @@
                             <a class="button green" href="{* $theme.buymore_url|escape *}https://www.webasyst.com/my/#/neworder/">[`Buy more licenses`]</a>
                             <p>{sprintf("[`Additional licenses are required if you are using %s on more than one domain name (<a href='%s' target='_blank'>one license per domain</a>).`]",$theme.name|escape, '[`http://www.webasyst.com/help/1200/paid-app-licensing/`]')}</p>
                         {/if}
-                        
+
                     {else}
-                    
+
                         {* FREE APP *}
                         {if !empty($theme.reviews.url)}
                             <p>
@@ -102,7 +102,7 @@
                             </p>
                         {/if}
                         <p><em class="i-installed-label"><i class="icon16 yes"></i>{sprintf("[`You have the latest version of %s installed: <strong>%s</strong>`]",$theme.name|escape,$theme.installed.version)}</em></p>
-                        
+
                     {/if}
                 {/if}
             </div>
@@ -166,7 +166,7 @@
                             {else}
                                 <div class="value">
                                     {if !empty($theme.compare_price)}<strike class="gray">{$theme.compare_price}</strike>&nbsp; {/if}
-                                    <strong{if !empty($theme.compare_price)} class="highlighted"{/if}>{$theme.price}</strong>
+                                    <strong{if !empty($theme.compare_price)} class="discounted large"{/if}>{$theme.price}</strong>
                                 </div>
                                 {if !empty($theme.lease_price)}
                                     <div class="value">
@@ -195,8 +195,8 @@
                     [`License`]
                 </div>
                 <div class="value">
-                
-                
+
+
                     {if !empty($theme.license_text)}
                         [`Commercial`]
                         <a href="#/show/license/" class="js-action">[`View`]</a>
@@ -293,7 +293,7 @@
 
         <div class="i-breadcrumbs">
             <a href="#/themes/">[`All themes`]</a>
-            {if !empty($theme.vendor)} &raquo; <a href="#/themes&vendor={$theme.vendor}/" data-href="#/themes%s%s&vendor={$theme.vendor}/" data-filter="vendor" class="js-item-link">{$theme.vendor_name|escape}</a>{/if}
+            {if !empty($theme.vendor)} &raquo; <a href="#/themes&vendor={$theme.vendor}/" data-href="#/themes%query%%filter%&vendor={$theme.vendor}/" data-filter="vendor" class="js-item-link">{$theme.vendor_name|escape}</a>{/if}
         </div>
 
         <article class="i-summary">

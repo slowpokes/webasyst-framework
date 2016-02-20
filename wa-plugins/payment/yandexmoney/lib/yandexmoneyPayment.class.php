@@ -84,7 +84,7 @@ class yandexmoneyPayment extends waPayment implements waIPayment
                     'scid'           => $this->scid,
                     'ShopID'         => $this->ShopID,
                     'CustomerNumber' => $order_data['customer_contact_id'],
-                    'customerNumber' => $order_data['customer_contact_id'],
+                    //'customerNumber' => $order_data['customer_contact_id'],
                     'orderNumber'    => $this->app_id.'_'.$this->merchant_id.'_'.$order_data['order_id'],
                     'Sum'            => number_format($order_data['amount'], 2, '.', ''),
                 );
@@ -171,8 +171,8 @@ class yandexmoneyPayment extends waPayment implements waIPayment
         if (!$this->ShopID) {
             throw new waPaymentException('empty merchant data', $code);
         }
-        if (waRequest::get('result') || $request['action'] == 'PaymentFail') {
-            $type = $request['action'] == 'PaymentFail' ? waAppPayment::URL_FAIL : waAppPayment::URL_SUCCESS;
+        if (waRequest::get('result') || (ifset($request['action']) == 'PaymentFail')) {
+            $type = (ifset($request['action']) == 'PaymentFail') ? waAppPayment::URL_FAIL : waAppPayment::URL_SUCCESS;
             return array(
                 'redirect' => $this->getAdapter()->getBackUrl($type, $transaction_data)
             );
@@ -355,11 +355,11 @@ class yandexmoneyPayment extends waPayment implements waIPayment
                 'customer_id' => ifempty($transaction_raw_data['customerNumber'], ifset($transaction_raw_data['CustomerNumber'])),
                 'result'      => 1,
                 'order_id'    => $this->order_id,
-                'view_data'   => $view_data
+                'view_data'   => $view_data,
             )
         );
 
-        switch ($transaction_raw_data['action']) {
+        switch (ifset($transaction_raw_data['action'])) {
             case 'checkOrder': //Проверка заказа
                 $this->version = '3.0';
                 $transaction_data['type'] = self::OPERATION_CHECK;

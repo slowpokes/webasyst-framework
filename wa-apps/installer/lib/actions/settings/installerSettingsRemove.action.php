@@ -27,7 +27,7 @@ class installerSettingsRemoveAction extends waViewAction
                         $images_path = wa()->getDataPath(null, true, 'webasyst');
                         if ($images = waFiles::listdir($images_path)) {
                             foreach ($images as $image) {
-                                if (is_file($images_path.'/'.$image) && !preg_match('@\.(jpe?g|png|gif|bmp)$@', $image)) {
+                                if (is_file($images_path.'/'.$image) && preg_match('@\.(jpe?g|png|gif|bmp)$@', $image)) {
 
 
                                     waFiles::delete($images_path."/".$image);
@@ -46,7 +46,7 @@ class installerSettingsRemoveAction extends waViewAction
             }
             $params = array(
                 'module' => 'settings',
-                'msg'    => installerMessage::getInstance()->raiseMessage(implode(', ', $message)),
+                'msg'    => installerMessage::getInstance()->raiseMessage(implode(" \n", $message)),
             );
             $this->redirect($params);
         } catch (waException $ex) {

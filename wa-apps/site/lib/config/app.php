@@ -8,9 +8,10 @@ return array(
         24 => 'img/site24.png',
         16 => 'img/site16.png'
     ),
+    'sash_color' => '#49a2e0',
     'frontend' => true,
-    'version'=>'2.2.3',
-    'critical'=>'2.2.2',
+    'version'=>'2.2.6',
+    'critical'=>'2.2.6',
     'vendor' => 'webasyst',
     'system' => true,
     'rights' => true,

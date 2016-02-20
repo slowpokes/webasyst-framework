@@ -16,10 +16,6 @@ class installerAppsAction extends waViewAction
 {
     public function execute()
     {
-        if (!waRequest::get('_')) {
-            $this->setLayout(new installerBackendLayout());
-        }
-
         $options = array(
             'local'  => false, //retrieve only server info
             'filter' => (array)waRequest::get('filter'),
@@ -27,6 +23,9 @@ class installerAppsAction extends waViewAction
         try {
             $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
             $this->view->assign('apps', $apps = installerHelper::getInstaller()->getApps($options));
+
+
+
             $vendor_name = null;
             if (!empty($options['filter']['vendor']) && empty($vendor_name)) {
                 foreach ($apps as $app) {
@@ -36,11 +35,15 @@ class installerAppsAction extends waViewAction
                     }
                 }
             }
+
+            $callback = create_function('$a, $b', 'return $a[\'publish_datetime\'] < $b[\'publish_datetime\'];');
+            uasort($apps, $callback);
+
+            $this->view->assign('_new_apps', array_slice($apps, 0, 6, true));
             $this->view->assign('vendor_name', $vendor_name);
         } catch (Exception $ex) {
-            $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
-            $this->view->assign('messages', $messages);
+            installerHelper::handleException($ex, $messages);
         }
+        $this->view->assign('messages', $messages);
     }
 }
-//EOF

@@ -31,6 +31,7 @@ class installerBackendLayout extends waLayout
             'default_query',
             array(
                 'plugins' => $plugins,
+                // 'widgets' => 'webasyst',
             )
         );
     }

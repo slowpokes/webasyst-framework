@@ -40,6 +40,13 @@ return array(
         'description'  => 'Командный ключ.',
         'control_type' => waHtmlControl::INPUT,
     ),
+	'lifetime'       => array(
+        'value'        => 1,
+        'title'        => 'Срок действия счета (суток)',
+        'description'  => 'Укажите срок оплаты счета в днях.',
+        'class'=>'small',
+        'control_type' => 'input',
+    ),
 	 'test_mode'         => array(
         'value'        => '',
         'title'        => 'Тестовый режим',
