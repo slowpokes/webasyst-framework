@@ -70,6 +70,7 @@ class waTheme implements ArrayAccess
     const PATH = 'theme.xml';
 
     protected $app;
+    protected $app_fake;
     protected $id;
     protected $info;
     protected $extra_info;
@@ -1722,16 +1723,17 @@ HTACCESS;
                         foreach ($theme_types as $type => $source) {
                             $id = isset($rule[$source]) ? $rule[$source] : 'default';
                             $app = $rule['app'];
+                            $app_real = wa()->getAppName($app);
 
-                            if (!isset($themes[$app])) {
-                                $themes[$app] = array();
+                            if (!isset($themes[$app_real])) {
+                                $themes[$app_real] = array();
                             }
 
-                            if (!isset($themes[$app][$id])) {
-                                $themes[$app][$id] = array();
+                            if (!isset($themes[$app_real][$id])) {
+                                $themes[$app_real][$id] = array();
                             }
 
-                            $themes[$app][$id][] = array(
+                            $themes[$app_real][$id][] = array(
                                 'domain'  => $domain,
                                 'url'     => $rule['url'],
                                 'type'    => $type,
