@@ -455,7 +455,16 @@ class waSystem
     public function dispatch()
     {
         try {
-            if (preg_match('/^sitemap-?([a-z0-9_]+)?(-([0-9]+))?.xml$/i', $this->config->getRequestUrl(true), $m)) {
+            $is_dashboard = false;
+            if ($this->getEnv() == 'backend') {
+                $url = explode("/", $this->getConfig()->getRequestUrl(true, true));
+                $is_dashboard = ifset($url[1]) == 'dashboard';
+            }
+
+            if ($is_dashboard) {
+                $webasyst_system = self::getInstance('webasyst', null, true);
+                $webasyst_system->getFrontController()->execute(null, 'dashboard', 'tv');
+            } elseif (preg_match('/^sitemap-?([a-z0-9_]+)?(-([0-9]+))?.xml$/i', $this->config->getRequestUrl(true), $m)) {
                 $app_id = isset($m[1]) ? $m[1] : 'webasyst';
                 if ($this->appExists($app_id)) {
                     self::getInstance($app_id);
@@ -1227,6 +1236,51 @@ class waSystem
             return new $class($plugin_info);
         } else {
             throw new waException('Plugin '.$plugin_id.' not found');
+        }
+    }
+
+    /**
+     * @param $widget_id
+     * @return waWidget
+     * @throws waException
+     */
+    public function getWidget($widget_id)
+    {
+        $widget_model = new waWidgetModel();
+        $widget = $widget_model->getById($widget_id);
+        if ($widget) {
+            if ($this->getConfig()->getApplication() != $widget['app_id']) {
+                $path = self::getInstance($widget['app_id'])->getConfig()->getWidgetPath($widget['widget']);
+            } else {
+                $path = $this->getConfig()->getWidgetPath($widget['widget']);
+            }
+            $widget_path = $path . '/lib/config/widget.php';
+            if (file_exists($widget_path)) {
+                if ($widget['app_id'] == 'webasyst') {
+                    $class_filename = $path . '/lib/' . $widget['widget'] . '.widget.php';
+                    if (file_exists($class_filename)) {
+                        require_once($class_filename);
+                    } else {
+                        throw new waException('Widget '.$widget['widget'].' not found', 404);
+                    }
+                    $class = $widget['widget'].'Widget';
+                } else {
+                    $class = $widget['app_id'] . ucfirst($widget['widget']) . 'Widget';
+                }
+                if (!class_exists($class)) {
+                    throw new waException('Widget class '.$class.' '.$widget['widget'].' not found', 404);
+                }
+                $widget_config = include($widget_path);
+                $widget = $widget + $widget_config;
+                if (isset($widget['img'])) {
+                    $widget['img'] = 'wa-apps/'.$widget['app_id'].'/widgets/'.$widget['widget'].'/'.$widget['img'];
+                }
+                return new $class($widget);
+            } else {
+                throw new waException('Widget '.$widget['widget'].' not found', 404);
+            }
+        } else {
+            throw new waException('Widget '.$widget_id.' not found', 404);
         }
     }
 

@@ -19,10 +19,11 @@
  * @property string $description
  * @property string $about
  * @property string $version
+ * @property string $vendor
  * @property int $edition Incremental counter of theme changes
+ * @property string $parent_theme_id Parent theme ID
  * @property-read string $id
  * @property-read string $slug
- * @property-read string $vendor
  * @property-read string $author
  * @property-read string $app_id
  * @property-read string $cover
@@ -33,9 +34,9 @@
  * @property-read string $original
  * @property-read string $type
  * @property-read string $url Theme directory URL
- * @property-read string $parent_theme_id Parent theme ID
  * @property-read string $source_theme_id Source theme ID for duplicated one
  * @property-read waTheme $parent_theme Parent theme instance or false
+ * @property-read waTheme[] $related_themes
  * @property-read array $used theme settlement URLs
  * @property-read bool $system
  * @property-read string[] $thumbs
@@ -69,7 +70,6 @@ class waTheme implements ArrayAccess
     const PATH = 'theme.xml';
 
     protected $app;
-    protected $app_fake;
     protected $id;
     protected $info;
     protected $extra_info;
@@ -204,8 +204,13 @@ class waTheme implements ArrayAccess
                         'edition'         => 0,
                         'source_theme_id' => '',
                     );
-                    if (!$xml = $this->getXML()) {
-                        trigger_error("Invalid theme description {$path}", E_USER_WARNING);
+                    try {
+                        if (!$xml = $this->getXML()) {
+                            trigger_error("Invalid theme description {$path}", E_USER_WARNING);
+                            break;
+                        }
+                    } catch (waException $ex) {
+                        trigger_error("Invalid theme description {$path}: ".$ex->getMessage(), E_USER_WARNING);
                         break;
                     }
                     /**
@@ -451,22 +456,31 @@ class waTheme implements ArrayAccess
      */
     private function getXML($as_dom = false)
     {
-
         if ($as_dom && !class_exists('DOMDocument')) {
             throw new waException('PHP extension DOM required');
+        } elseif (!function_exists('simplexml_load_file')) {
+            throw new waException('PHP extension SimpleXML required');
         }
         $path = $this->path.'/'.self::PATH;
         if (file_exists($path) && filesize($path)) {
+            libxml_use_internal_errors(true);
+            libxml_clear_errors();
             if ($as_dom) {
                 $xml = new DOMDocument(1.0, 'UTF-8');
                 $xml->preserveWhiteSpace = false;
                 $xml->formatOutput = true;
-                $xml->load($path);
+                if (!$xml->load($path, LIBXML_NOCDATA)) {
+                    $this->throwXmlError($path);
+                }
                 $xml->preserveWhiteSpace = false;
                 $xml->formatOutput = true;
             } else {
                 $xml = @simplexml_load_file($path, null, LIBXML_NOCDATA);
+                if (!$xml) {
+                    $this->throwXmlError($path);
+                }
             }
+
         } else {
             $data = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -482,7 +496,7 @@ XML;
                 $xml = new DOMDocument(1.0, 'UTF-8');
                 $xml->preserveWhiteSpace = false;
                 $xml->formatOutput = true;
-                $xml->loadXML($data);
+                $xml->loadXML($data, LIBXML_NOCDATA);
                 $xml->preserveWhiteSpace = false;
                 $xml->formatOutput = true;
             } else {
@@ -490,6 +504,47 @@ XML;
             }
         }
         return $xml;
+    }
+
+    /**
+     * @param $path
+     * @throws waException
+     */
+    private function throwXmlError($path)
+    {
+        $xml_errors = libxml_get_errors();
+        /**
+         * @var LibXMLError[] $xml_errors
+         */
+
+        $log = 'waTheme.log';
+        $relative_path = ltrim(str_replace(wa()->getConfig()->getRootPath(), '', $path), '\\/');
+        $error = sprintf("Error occurred while read theme XML file %s, For details see log at %s", $relative_path, $log);
+
+        $log_error = array(
+            sprintf("Error occurred while read theme XML file %s.", $path)
+        );
+        foreach ($xml_errors as $er) {
+            $level = 'unknown';
+            switch ($er->level) {
+                case LIBXML_ERR_FATAL:
+                    $level = 'Fatal error';
+                    break;
+                case LIBXML_ERR_ERROR:
+                    $level = 'Error';
+                    break;
+                case LIBXML_ERR_WARNING:
+                    $level = 'Warning';
+                    break;
+                case LIBXML_ERR_NONE:
+                    $level = 'Notice';
+                    break;
+            }
+            $log_error[] = "{$level} #{$er->code} at [{$er->line}:{$er->column}]: {$er->message}";
+        }
+        waLog::log(implode("\n\t", $log_error), $log);
+        libxml_clear_errors();
+        throw new waException($error);
     }
 
     /**
@@ -958,7 +1013,6 @@ XML;
         foreach ($files as $f_id => $f) {
             if (!empty($f['modified'])) {
                 $modified[] = $f_id;
-                break;
             }
         }
 
@@ -981,12 +1035,8 @@ XML;
 
         foreach ($list_files as $f) {
             // ignore files
-            if ($f !== 'build.php') {
-                foreach ((array)$skip_pattern as $pattern) {
-                    if (preg_match($pattern, $f)) {
-                        continue 2;
-                    }
-                }
+            if ($f !== 'build.php' && preg_match($skip_pattern, $f)) {
+                continue;
             }
             // ignore image settings and modified
             if ($f == 'theme.xml' || in_array($f, $img_files) || in_array($f, $modified)) {
@@ -1555,7 +1605,7 @@ HTACCESS;
     }
 
 
-    public function getSettings($values_only = false)
+    public function getSettings($values_only = false, $locale = null)
     {
         $this->init();
         if ($values_only === 'full') {
@@ -1565,6 +1615,9 @@ HTACCESS;
             $this->settings = $this->info['settings'];
             foreach ($this->settings as $var => &$s) {
                 $s['name'] = isset($s['name']) ? self::prepareField($s['name']) : $var;
+                if (isset($s['description'])) {
+                    $s['description'] = self::prepareField($s['description']);
+                }
                 if (isset($s['options'])) {
                     foreach ($s['options'] as &$o) {
                         if ($s['control_type'] == 'radio') {
@@ -1583,7 +1636,7 @@ HTACCESS;
                     unset($o);
                 }
                 if (isset($s['value']) && is_array($s['value'])) {
-                    $s['value'] = $s['value'][self::getLocale($s['value'])];
+                    $s['value'] = $s['value'][self::getLocale($s['value'], $locale)];
                 }
             }
             unset($s);
@@ -1614,9 +1667,11 @@ HTACCESS;
      * @param array $data
      * @return string
      */
-    private static function getLocale($data = array())
+    private static function getLocale($data = array(), $locale = null)
     {
-        $locale = wa()->getLocale();
+        if (!$locale) {
+            $locale = wa()->getLocale();
+        }
         if ($data) {
             if (!isset($data[$locale])) {
                 $locale = 'en_US';
@@ -1667,17 +1722,16 @@ HTACCESS;
                         foreach ($theme_types as $type => $source) {
                             $id = isset($rule[$source]) ? $rule[$source] : 'default';
                             $app = $rule['app'];
-                            $app_real = wa()->getAppName($app);
 
-                            if (!isset($themes[$app_real])) {
-                                $themes[$app_real] = array();
+                            if (!isset($themes[$app])) {
+                                $themes[$app] = array();
                             }
 
-                            if (!isset($themes[$app_real][$id])) {
-                                $themes[$app_real][$id] = array();
+                            if (!isset($themes[$app][$id])) {
+                                $themes[$app][$id] = array();
                             }
 
-                            $themes[$app_real][$id][] = array(
+                            $themes[$app][$id][] = array(
                                 'domain'  => $domain,
                                 'url'     => $rule['url'],
                                 'type'    => $type,
@@ -1705,6 +1759,41 @@ HTACCESS;
             }
         }
         return $this->parent_theme;
+    }
+
+    /**
+     * @return waTheme[]
+     * @throws waException
+     */
+    private function getRelatedThemes()
+    {
+        $themes = array(
+            sprintf('%s:%s', $this->app_id, $this->id) => $this,
+        );
+        if ($this->parent_theme_id) {
+            $themes[$this->parent_theme_id] = $this->getParentTheme();
+        }
+
+        $apps = wa()->getApps();
+        foreach ($apps as $app_id => $info) {
+            if (!empty($info['frontend']) && !empty($info['themes'])) {
+                $theme_id = sprintf('%s:%s', $app_id, $this->id);
+                if (!isset($themes[$theme_id])) {
+                    try {
+                        $theme = new waTheme($this->id, $app_id);
+                        if ($theme->parent_theme_id && isset($themes[$theme->parent_theme_id])) {
+                            $themes[$theme_id] = $theme;
+                        }
+                        unset($theme);
+                    } catch (waException $ex) {
+                        //ignore error
+                    }
+                }
+            }
+        }
+
+        return $themes;
+
     }
 
     /**
@@ -1780,36 +1869,138 @@ HTACCESS;
         $this->flush();
     }
 
-    /**
-     *
-     * @throws waException
-     * @return waTheme
-     */
-    public function duplicate()
+    private function getAvailableId($apps = array())
     {
         $numerator = 0;
-        $available = null;
+        $exists = null;
+        if (empty($apps)) {
+            $apps = array($this->app);
+        }
         do {
             $id = $this->id.++$numerator;
             if ($numerator > 1000) {
                 break;
             }
-        } while ($available = self::exists($id, $this->app, true));
 
-        if ($available) {
+            foreach ($apps as $app_id) {
+                if ($exists = self::exists($id, $app_id, true)) {
+                    break;
+                }
+
+            }
+        } while ($exists);
+
+        if ($exists) {
             throw new waException(_w("Duplicate theme failed"));
         }
-        $names = $this->getName(true);
-        foreach ($names as &$name) {
-            $name .= ' '.$numerator;
+        return $numerator;
+    }
+
+    /**
+     *
+     * @throws waException
+     * @param bool $related duplicate all related themes
+     * @param mixed [string] $options
+     * @param string [string] $options['id']
+     * @param string [string] $options['name']
+     * @return waTheme
+     */
+    public function duplicate($related = false, $options = array())
+    {
+        if (!empty($options['id'])) {
+            self::verify($options['id']);
         }
-        unset($name);
-        $params = array(
-            'name'            => $names,
-            'system'          => false,
-            'source_theme_id' => $this->id,
-        );
-        return $this->copy($this->id.$numerator, $params);
+        if ($related) {
+            $apps = array();
+            $parent_theme = null;
+            foreach ($this->related_themes as $related_theme) {
+                $apps[] = $related_theme->app_id;
+                if (!$parent_theme && $related_theme->parent_theme_id) {
+                    $parent_theme = $related_theme->parent_theme;
+                }
+                unset($related_theme);
+            }
+            if (!empty($options['id'])) {
+                $exists = false;
+                foreach ($apps as $app_id) {
+                    if ($exists = self::exists($options['id'], $app_id, true)) {
+                        break;
+                    }
+
+                }
+                if ($exists) {
+                    throw new waException(_w("Duplicate theme failed"));
+                }
+            }
+
+            $numerator = $this->getAvailableId($apps);
+            if ($parent_theme) {
+                if (!empty($options['id'])) {
+                    $parent_theme_id = $parent_theme->app_id.':'.$options['id'];
+                } else {
+                    $parent_theme_id = $parent_theme->app_id.':'.$this->id.$numerator;
+                }
+
+            } else {
+                $parent_theme_id = null;
+            }
+            $duplicate = null;
+            foreach ($this->related_themes as $related_theme) {
+                if (!empty($options['name'])) {
+                    $names = trim($options['name']);
+                } else {
+                    $names = $related_theme->getName(true);
+                    foreach ($names as &$name) {
+                        $name .= ' '.$numerator;
+                    }
+                    unset($name);
+                }
+                $params = array(
+                    'name'            => $names,
+                    'system'          => false,
+                    'source_theme_id' => $related_theme->id,
+                );
+                if ($parent_theme_id && $related_theme->parent_theme_id) {
+                    $params['parent_theme_id'] = $parent_theme_id;
+                }
+                if (!empty($options['id'])) {
+                    $id = $options['id'];
+                } else {
+                    $id = $this->id.$numerator;
+                }
+
+                $instance = $related_theme->copy($id, $params);
+                if ($related_theme->app_id == $this->app_id) {
+                    $duplicate = $instance;
+                }
+                unset($related_theme);
+                unset($instance);
+            }
+            return $duplicate;
+        } else {
+            $numerator = $this->getAvailableId();
+
+            if (!empty($options['id'])) {
+                $id = $options['id'];
+            } else {
+                $id = $this->id.$numerator;
+            }
+            if (!empty($options['name'])) {
+                $names = trim($options['name']);
+            } else {
+                $names = $this->getName(true);
+                foreach ($names as &$name) {
+                    $name .= ' '.$numerator;
+                }
+                unset($name);
+            }
+            $params = array(
+                'name'            => $names,
+                'system'          => false,
+                'source_theme_id' => $this->id,
+            );
+            return $this->copy($id, $params);
+        }
     }
 
     /**
@@ -1822,6 +2013,7 @@ HTACCESS;
      */
     public static function extract($source_path)
     {
+        /** @var string[] $white_list */
         static $white_list = array(
             'js',
             'css',
@@ -1841,6 +2033,7 @@ HTACCESS;
             'eot',
             'otf',
             'woff',
+            'woff2',
             '',
         );
 
@@ -1935,7 +2128,7 @@ HTACCESS;
                 foreach ($files as $file) {
                     if ($extract_pattern && !preg_match("@^{$extract_pattern}(/|$)@", $file['filename'])) {
                         self::throwThemeException('UNEXPECTED_FILE_PATH', "{$file['filename']}. Expect files in [{$extract_path}] directory");
-                    } elseif (preg_match('@\\.(php\d*|pl)@', $file['filename'], $matches)) {
+                    } elseif (preg_match('@\\.(php\d*|pl)$@', $file['filename'], $matches)) {
                         if (preg_match('@(^|/)build\\.php$@', $file['filename'])) {
                             $file['content'] = $tar_object->extractInString($file['filename']);
                             if (!preg_match('@^<\\?php[\\s\\n]+return[\\s\\n]+\\d+;[\\s\\n]*$@', $file['content'])) {
@@ -2034,7 +2227,7 @@ HTACCESS;
         if (file_exists($this->path) && class_exists('Archive_Tar', true)) {
             waFiles::create($target_file);
             $tar_object = new Archive_Tar($target_file, true);
-            $tar_object->setIgnoreRegexp('@(\.(php\d?|svn|git|fw_|files\.md5$))@');
+            $tar_object->setIgnoreRegexp('@(\.(php\d?|_|DS_Store|\.db|svn|git|fw_|files\.md5$))@');
             $path = getcwd();
             chdir(dirname($this->path));
             if (!$tar_object->create('./'.basename($this->path))) {

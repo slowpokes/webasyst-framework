@@ -2,7 +2,7 @@
 
 /**
  *
- * @author WebAsyst Team
+ * @author Webasyst
  * @name SagePay
  * @description SagePay payment module
  * @property-read string $test_mode

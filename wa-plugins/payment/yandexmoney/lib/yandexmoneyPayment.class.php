@@ -171,8 +171,8 @@ class yandexmoneyPayment extends waPayment implements waIPayment
         if (!$this->ShopID) {
             throw new waPaymentException('empty merchant data', $code);
         }
-        if (waRequest::get('result') || $request['action'] == 'PaymentFail') {
-            $type = $request['action'] == 'PaymentFail' ? waAppPayment::URL_FAIL : waAppPayment::URL_SUCCESS;
+        if (waRequest::get('result') || (ifset($request['action']) == 'PaymentFail')) {
+            $type = (ifset($request['action']) == 'PaymentFail') ? waAppPayment::URL_FAIL : waAppPayment::URL_SUCCESS;
             return array(
                 'redirect' => $this->getAdapter()->getBackUrl($type, $transaction_data)
             );
@@ -355,11 +355,19 @@ class yandexmoneyPayment extends waPayment implements waIPayment
                 'customer_id' => ifempty($transaction_raw_data['customerNumber'], ifset($transaction_raw_data['CustomerNumber'])),
                 'result'      => 1,
                 'order_id'    => $this->order_id,
+<<<<<<< HEAD
                 'view_data'   => $view_data
             )
         );
 
         switch ($transaction_raw_data['action']) {
+=======
+                'view_data'   => $view_data,
+            )
+        );
+
+        switch (ifset($transaction_raw_data['action'])) {
+>>>>>>> upstream/master
             case 'checkOrder': //Проверка заказа
                 $this->version = '3.0';
                 $transaction_data['type'] = self::OPERATION_CHECK;

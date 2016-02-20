@@ -83,7 +83,10 @@ class waAutoload
                 return $result;
             }
         } elseif (substr($class, 0, 4) === 'waDb') {
-            return $this->base_path.'/wa-system/database/'.$class.'.class.php';
+            $file = $this->base_path.'/wa-system/database/'.$class.'.class.php';
+            if (is_readable($file)) {
+                return $file;
+            }
         } elseif (substr($class, 0, 2) == 'wa') {
             if (strpos($class, '.') !== false) return null;
             $dir = preg_replace("/^wai?([A-Z][a-z]+).*?$/", "$1", $class);
@@ -182,7 +185,7 @@ class waAutoload
         'waViewAction'             => 'controller/waViewAction.class.php',
         'waViewActions'            => 'controller/waViewActions.class.php',
         'waViewController'         => 'controller/waViewController.class.php',
-        'waWidget'                 => 'controller/waWidget.class.php',
+        'waWidget'                 => 'widget/waWidget.class.php',
 
         'waCurrency'               => 'currency/waCurrency.class.php',
 
@@ -205,6 +208,7 @@ class waAutoload
         'waDbResultUpdate'         => 'database/waDbResultUpdate.class.php',
         'waDbStatement'            => 'database/waDbStatement.class.php',
         'waModel'                  => 'database/waModel.class.php',
+        'waModelExpr'               => 'database/waModelExpr.class.php',
         'waNestedSetModel'         => 'database/waNestedSetModel.class.php',
 
         'waSMS'                    => 'sms/waSMS.class.php',
@@ -264,8 +268,6 @@ class waAutoload
         'waViewHelper'             => 'view/waViewHelper.class.php',
         'waAppViewHelper'          => 'view/waAppViewHelper.class.php',
 
-        'waWidgets'                => 'widget/waWidgets.class.php',
-
         'waWorkflow'               => 'workflow/waWorkflow.class.php',
         'waWorkflowAction'         => 'workflow/waWorkflowAction.class.php',
         'waWorkflowEntity'         => 'workflow/waWorkflowEntity.class.php',
@@ -302,5 +304,6 @@ class waAutoload
         'waPageActions'            => 'page/actions/waPage.actions.php',
 
         'waDesignActions'          => 'design/actions/waDesign.actions.php',
+        'waPluginsActions'         => 'plugin/actions/waPlugins.actions.php',
     );
 }
