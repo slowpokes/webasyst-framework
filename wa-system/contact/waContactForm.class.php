@@ -382,25 +382,11 @@ class waContactForm
                 continue;
             }
 
-            if ($fid === 'photo') {
-                $fake_user = new waContact();
-                $result .= '<div class="' . $class_field . ' ' . ($class_field.'-'.$f->getId()) . '"><div class="' . $class_name . '">' .
-                    _ws('Photo') . '</div><div class="' . $class_value . '">';
-                if (wa()->getUser()->get($fid)) {
-                    $result .= "\n" . '<img src="' . wa()->getUser()->getPhoto() . '">';
-                }
-                $result .= "\n" . '<img src="' . $fake_user->getPhoto() . '">';
-                $result .= "\n" . '<p><input type="file" name="' . $fid . '_file"></p>';
-                $result .= $this->html($fid, true);
-                $result .= "\n</div></div>";
-                continue;
-            }
-
             if ($f instanceof waContactHiddenField) {
                 $result .= $this->html($fid, true);
                 continue;
             }
-            
+
             $field_class = $class_field.'-'.$f->getId();
             if (strpos($fid, '.') !== false) {
                 $field_class .= ' '.$class_field.'-'.str_replace('.', '-', $fid);

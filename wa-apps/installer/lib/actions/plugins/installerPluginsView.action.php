@@ -37,5 +37,9 @@ class installerPluginsViewAction extends installerItemsAction
         }
         $this->view->assign('top', !!preg_match('@^[^/]+$@', waRequest::get('slug')) && !waRequest::get('filter'));
         $this->view->assign('return_url', $return_url);
+        $this->view->assign('identity_hash', installerHelper::getHash());
+        $this->view->assign('promo_id', installerHelper::getPromoId());
+        $this->view->assign('domain', installerHelper::getDomain());
+        $this->view->assign('options', (array)waRequest::get('options', array()));
     }
 }

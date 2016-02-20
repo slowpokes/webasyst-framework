@@ -24,7 +24,7 @@ class installerUpdateManagerAction extends waViewAction
     private function init()
     {
         $url = parse_url($r = waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
-        if (preg_match('/(^|&)module=(update|apps|plugins)($|&)/', $url, $matches)) {
+        if (preg_match('/(^|&)module=(update|apps|plugins|widgets)($|&)/', $url, $matches)) {
             $this->module = $matches[2];
         }
         if (installerHelper::isDeveloper()) {
@@ -97,7 +97,7 @@ class installerUpdateManagerAction extends waViewAction
                         }
                     }
 
-                    foreach (array('themes', 'plugins') as $type) {
+                    foreach (array('themes', 'plugins', 'widgets') as $type) {
                         if (!empty($info[$type]) && is_array($info[$type])) {
                             foreach ($info[$type] as $extra_id => $extras_info) {
                                 if (!empty($extras_info['download_url']) && in_array($extras_info['action'], $execute_actions)) {
@@ -130,6 +130,10 @@ class installerUpdateManagerAction extends waViewAction
                                         if (strpos($app_id, '/')) {
                                             //system plugins
                                             $target = $app_id.'/'.$extra_id;
+                                        } elseif (($app_id == 'webasyst') && ($type == 'widgets')) {
+                                            $target = 'wa-widgets/'.$extra_id;
+                                        } elseif (($app_id == 'wa-widgets')) {
+                                            $target = 'wa-widgets/'.$extra_id;
                                         } else {
                                             $target = 'wa-apps/'.$app_id.'/'.$type.'/'.$extra_id;
                                         }
@@ -144,6 +148,7 @@ class installerUpdateManagerAction extends waViewAction
                 }
 
                 if (!$queue_apps) {
+                    $updater->flush();
                     throw new waException(_w('Please select items for update'));
                 }
 
@@ -158,7 +163,13 @@ class installerUpdateManagerAction extends waViewAction
                 $this->view->assign('install', !empty($install) ? 'install' : '');
                 $this->view->assign('title', _w('Updates'));
                 $this->view->assign('thread_id', $state['thread_id']);
-                $this->view->assign('return_url', waRequest::post('return_url'));
+
+                $return_url = waRequest::post('return_url', null, waRequest::TYPE_STRING_TRIM);
+                if (empty($return_url) && waRequest::post('additional_updates', 0, waRequest::TYPE_INT)) {
+                    $this->view->assign('additional_updates', true);
+                    $return_url = '?module=update&auto_submit=1';
+                }
+                $this->view->assign('return_url', $return_url);
                 $cache = new waSerializeCache($this->getApp().'.'.$state['thread_id']);
                 $cache->set($this->urls);
             } else {

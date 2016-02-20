@@ -1,0 +1,120 @@
+<tr class="{if in_array($item_type,['app','plugin']) && empty($item.enabled) && empty($app.virtual)}grey{/if}">
+    <td class="i-update-icon">
+        {* ICON *}
+        {if $item_type eq 'app'}
+            <img src="{$wa_url}{$item.icons.48|default:$item.img|default:''|ltrim:'/'}" alt="">
+        {else}
+            &nbsp;
+        {/if}
+
+    </td>
+    <td class="i-update-name">
+        {* PRODUCT NAME *}
+        {if $item_type eq 'plugin' ||  $item_type eq 'theme' || $item_type eq 'widget' }
+            {* theme or plugin *}
+            {if !empty($item.icons) && false}
+                <img src="{$wa_url}{$item.icons.16}" alt="">
+            {else}
+                <i class="icon16 {if $item_type eq 'plugin'}plugins{elseif $item_type eq 'widget'}widgets{else}design{/if}"></i>
+            {/if}
+
+            {if $item_type eq 'plugin'}
+                {sprintf('[`Plugin <a href="%s">%s</a>`]', "./#/plugins/{$item.app|default:''}/{$item.id|escape}/",$item.name|default:$item_id|escape)}
+            {elseif $item_type eq 'theme' }
+                {sprintf('[`Theme <a href="%s">%s</a>`]', "./#/themes/{$item.id|escape}/", $item.name|default:$item_id|escape)}
+            {elseif $item_type eq 'widget' }
+                {sprintf('[`Widget <a href="%s">%s</a>`]', "./#/widgets/{$item.id|escape}/", $item.name|default:$item_id|escape)}
+            {else}
+                {$item.name|default:$item_id|escape}
+            {/if}
+        {else}
+            {* apps and system plugins *}
+            {if $item_type eq 'systemplugin'}
+                <strong>{sprintf('[`Plugin "<strong>%s</strong>"`]',{$item.name|default:$item_id|escape})}</strong>
+            {elseif empty($item.virtual)}
+                <a href="./#/apps/{$item.id|escape}/"><strong class="large">{$item.name|default:$item_id|escape}</strong></a>
+            {else}
+                <a href="./#/plugins/{$item.slug|escape}/"><strong class="large">{$item.name|default:$item_id|escape}</strong></a>
+            {/if}
+        {/if}
+        {if !empty($item.vendor_name) && empty($item.virtual)}
+            <span class="hint">{$item.vendor_name|escape}</span>
+        {/if}
+    </td>
+
+    <td class="i-update-data">
+        {if !empty($item.installed.version)}
+            <span class="{if $item_type =='app'} bold{/if}">{$item.installed.version|escape}</span>
+        {/if}
+        {if ($item_type !='theme') && empty($item.virtual)}
+            {if $item_type !='widget' && ($item_type !='plugin' || empty($app.virtual))}
+                {if empty($item.enabled)}
+                    ([`Paused`])
+                {/if}
+            {/if}
+            {if !$item.applicable}
+                <i class="icon10 exclamation"></i>
+                [`System requirements not met:`]
+            {/if}
+            {include file="../../includes/requirements.html" inline}
+        {/if}
+    </td>
+
+    <td>
+        {if
+        empty($item.virtual)
+        &&
+        (
+            !in_array($item_type,['plugin','widget'])
+            ||
+            !empty($app.enabled)
+            ||
+            !empty($app.virtual)
+            ||
+            ($item_type=='app')
+        )}
+        <ul class="menu-h with-icons float-right">
+            {if in_array($item_type,['plugin','app'])}
+                {if ($item_type !='widget') && empty($app.virtual) && empty($item.system)}
+                    {if empty($item.enabled)}
+                        {if $item.applicable}
+                            <li><a href="#/assets/"
+                                   data-url="?module={$item_type}s&action=enable"
+                                   data-data="app_id={$app.id}{if $item_type=='plugin'}&plugin_id={$item.id|default:'wtf'}{/if}"
+                                   style="color: #03c; display: block{*xxx zebra class override it *}" class="js-switch-item"><i class="icon16 play"></i>[`Resume`]</a></li>
+                        {else}
+                            {* requiremnts not sutisfied *}
+                        {/if}
+                    {else}
+                        <li><a href="#/assets/"
+                               data-url="?module={$item_type}s&action=disable"
+                               data-data="app_id={$app.id}{if $item_type=='plugin'}&plugin_id={$item.id|default:'wtf'}{/if}"
+                               class="gray js-switch-item" style="display: block{*xxx zebra class override it *}"><i class="icon16 pause"></i>[`Pause`]</a></li>
+                    {/if}
+                {/if}
+
+            {/if}
+            {if
+            empty($item.system)
+            &&
+            (
+                !in_array($item_type,['app','plugin'])
+                ||
+                ( $item_type =='plugin' && !empty($app.virtual))
+                ||
+                !empty($item.enabled)
+            )
+            }
+            <li><a href="#/assets/" class="js-remove-item" style="color: #03c; display: block{*xxx zebra class override it *}" data-confirm="[`This will delete application source code and data without the ability to recover. Are you sure?`]"><i class="icon16 delete"></i>[`Delete`]</a>
+                {if $item_type=='app'}{$field = 'app_id'}{else}{$field='extras_id'}{/if}
+                <form action="?module={$item_type}s&action=remove" method="post">
+                    {$wa->csrf()}
+                    <input type="hidden" name="{$field}[{$item.slug}]" value="{$item.installed.vendor|default:'webasyst'|escape}"/>
+                </form>
+                {/if}
+            </li>
+            {/if}
+        </ul>
+
+    </td>
+</tr>

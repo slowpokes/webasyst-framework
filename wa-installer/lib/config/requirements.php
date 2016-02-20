@@ -6,32 +6,44 @@
  *
  */
 return array(
-    'server'                 => array(
-    ),
-    'php'                    => array(
+    'server'                        => array(),
+    'php'                           => array(
         'strict'  => true,
         'version' => '>5.2',
     ),
-    'php.curl'               => array(
+    'php.curl'                      => array(
         'description' => 'Get updates information from update servers',
         'strict'      => false,
     ),
-    'phpini.allow_url_fopen' => array(
+    'php.json'                      => array(
+        'description' => 'JavaScript data format support',
+        'strict'      => true,
+    ),
+    'phpini.allow_url_fopen'        => array(
         'description' => 'Get updates information from update servers',
         'strict'      => false,
         'value'       => 1,
     ),
-    'phpini.mbstring.func_overload'=>array(
-        'description'=>'Smarty properly work',
-        'strict'=>true,
-        'value'=>'<2',
-    ),
-    'php.mbstring'           => array(
+    'php.mbstring'                  => array(
         'strict' => true,
         'value'  => 1,
     ),
-    'rights'                 => array(
-        'subject'     => array('.',
+    'phpini.mbstring.func_overload' => array(
+        'description' => 'Smarty properly work',
+        'strict'      => true,
+        'value'       => '<2',
+    ),
+    'php.dom'                       => array(
+        'strict' => true,
+        'value'  => 1,
+    ),
+    'php.simplexml'                 => array(
+        'strict' => true,
+        'value'  => 1,
+    ),
+    'rights'                        => array(
+        'subject'     => array(
+            '.',
             'wa-installer',
             'install.php',
             'index.php',
@@ -45,12 +57,12 @@ return array(
         'description' => 'Check folder rights for install&amp;update',
         'strict'      => true,
     ),
-    'server.mod_rewrite'     => array(
+    'server.mod_rewrite'            => array(
         'description' => 'Use friendly URLs',
         'strict'      => false,
         'config'      => 'mod_rewrite',
     ),
-    'md5'                    => array(
+    'md5'                           => array(
         'subject'     => '*.tar.gz|*.php',
         'description' => 'Check archives and files checksum',
         'strict'      => false,
@@ -58,5 +70,3 @@ return array(
         'allow_skip'  => true,
     ),
 );
-
-//EOF

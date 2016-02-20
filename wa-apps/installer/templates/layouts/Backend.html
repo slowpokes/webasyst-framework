@@ -4,17 +4,19 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>{$title|default:$wa->appName()} — {$wa->accountName()}</title>
-    
+
     {$wa->css()}
     <link href="{$wa_app_static_url}css/installer.css?v={$wa->version()}" rel="stylesheet" type="text/css">
     <link href='//fonts.googleapis.com/css?family=PT+Sans+Caption:400,700' rel='stylesheet' type='text/css'>
+    {* BxSlider *}
+    {if empty($no_ajax)}
+    <link rel="stylesheet" href="{$wa_app_static_url}js/plugins/bxslider/jquery.bxslider.css">
+    {/if}
 
     <script src="{$wa_url}wa-content/js/jquery/jquery-1.7.1.min.js" type="text/javascript"></script>
     {wa_js file="js/installer-jquery.min.js"}
-    
         {$wa_url}wa-content/js/jquery-wa/wa.core.js
         {$wa_url}wa-content/js/jquery-wa/wa.dialog.js
-    
         {$wa_url}wa-content/js/jquery-plugins/jquery.history.js
         {$wa_url}wa-content/js/jquery-plugins/jquery.store.js
         {$wa_url}wa-content/js/jquery-ui/jquery.ui.core.min.js
@@ -22,18 +24,22 @@
         {$wa_url}wa-content/js/jquery-ui/jquery.ui.mouse.min.js
         {$wa_url}wa-content/js/jquery-ui/jquery.ui.sortable.min.js
         {$wa_url}wa-content/js/jquery-ui/jquery.ui.position.min.js
+        {$wa_url}wa-content/js/jquery-ui/jquery.ui.position.min.js
     {/wa_js}
+
+
+
     {if empty($no_ajax)}
-    <script src="{$wa_app_static_url}js/layout.js?v={$wa->version()}" type="text/javascript"></script>
+        <script src="{$wa_app_static_url}js/plugins/bxslider/jquery.bxslider.min.js"></script>
+        <script src="{$wa_app_static_url}js/layout.js?v={$wa->version()}" type="text/javascript"></script>
     {/if}
     {$wa->js()}
     {block name='head-js'}{/block}
     {if empty($no_ajax)}
     <script type="text/javascript">
         $.layout.init({
-            default_query:{
-                plugins:'{$default_query.plugins|default:''}'
-            }
+            debug: {waSystemConfig::isDebug()|var_export:true},
+            default_query:{$default_query|json_encode}
         });
     </script>
     {/if}
@@ -51,31 +57,33 @@
                   <div class="i-sidebar">
                     <div class="block">
                       <ul class="menu-v with-icons">
-{*
-                        <li{if $module eq 'backend'} class="selected"{/if}>
-                            <a href="./#/:page=default/" class="bold">
-                                <i class="icon16 star"></i>[`Editor’s choice`]
-                            </a>
-                        </li>
-*}
-                        <li>
-                            <a href="./#/apps/">
-                                <i class="icon16 apps"></i>[`Applications`]
-                            </a>
-                        </li>
-                        <li>
-                            <a href="./#/plugins/{$default_query.plugins}/">
-                                <i class="icon16 plugins"></i>[`Plugins`]
-                            </a>
-                        </li>
-                        <li>
-                            <a href="./#/themes/">
-                                <i class="icon16 palette"></i>[`Themes`]
-                            </a>
-                        </li>
+                          <li>
+                              <a href="./#/featured/">
+                                  <i class="icon16 star"></i>[`Recommended`]
+                              </a>
+                          </li>
+                          <li class="top-padded">
+                              <a href="./#/apps/">
+                                  <i class="icon16 apps"></i>[`Apps`]
+                              </a>
+                          </li>
+                          <li>
+                              <a href="./#/themes/">
+                                  <i class="icon16 palette"></i>[`Themes`]
+                              </a>
+                          </li>
+                          <li>
+                              <a href="./#/plugins/{$default_query.plugins}/">
+                                  <i class="icon16 plugins"></i>[`Plugins for apps`]
+                              </a>
+                          </li>
+                          <li>
+                              <a href="./#/widgets/">
+                                  <i class="icon16 widgets"></i>[`Widgets`]
+                              </a>
+                          </li>
                       </ul>
                     </div>
-
 
                     {block name='sidebar'}
 
@@ -85,6 +93,11 @@
 
                     <div class="block">
                       <ul class="menu-v with-icons">
+                        <li>
+                          <a href="./#/assets/">
+                              <i class="icon16 checkboxes"></i>[`Manage apps`]
+                          </a>
+                        </li>
                         <li{if $module eq 'update'} class="selected"{/if}>
                             {if isset($update_counter) && $update_counter}<span class="count indicator red">{$update_counter}</span>{/if}
                             <a href="?module=update">
@@ -114,11 +127,17 @@
                     {elseif $message.result == 'fail'}
                     <i class="icon16 no"></i>
                     {/if}
-                    {$message.text|escape}
+                    {$message.text|escape|nl2br}
                 </div>
                 {/foreach}
                 {/if}
-                
+                {if empty($no_ajax)}
+                <div class="block triple-padded">
+                    <i class="icon16 loading"></i>
+                </div>
+                {/if}
+
+
                 {block name='content'}
                     {$content}
                 {/block}

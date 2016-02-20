@@ -1,14 +1,4 @@
-{if !empty($messages)}
-    {foreach $messages as $message}
-        <div class="block double-padded i-message-{$message.result}">
-            {if $message.result == 'success'}<i class="icon16 yes"></i>
-            {elseif $message.result == 'fail'}
-            <i class="icon16 no"></i>
-            {/if}
-            {$message.text|escape}
-        </div>
-    {/foreach}
-{/if}
+{include file="../../includes/message.html" inline}
 
 {if !empty($top)}<h1>[`Popular plugins`]</h1>{/if}
 <p>
@@ -36,7 +26,7 @@
     {capture assign="_plugin"}
     <li{if !empty($plugin.installed)} class="i-installed"{/if}>
         {$app = $apps[$key]}
-        <a href="{$installer}#/plugins/{$app['slug']}/{$plugin_id}/" data-href="{$installer}#/plugins%s/{$app['slug']}/{$plugin_id}/" class="js-item-link">
+        <a href="{$installer}#/plugins/{$app['slug']|default:'undefined'}/{$plugin_id}/" data-href="{$installer}#/plugins%filter%/{$app['slug']|default:'undefined'}/{$plugin_id}/" class="js-item-link">
             <!-- cover -->
             <img src="{$plugin.icon}">
 
@@ -63,21 +53,48 @@
                             {/if}
                         </strong>
                     {/if}
-                    {if !empty($plugin.purchased) && false}
-                        <form action="{$installer}?module=update&action=manager" method="post" class="js-installer js-confirm" data-confirm-text="{sprintf('[`Install "%s" plugin?`]',$plugin.name)|escape}" style="display: inline-block;">
+                    {if !empty($plugin.purchased) && true}
+                        <form
+                                action="{$installer}?module=update&action=manager"
+                                method="post"
+                                class="js-installer {if empty($options.no_confirm)}js-confirm{/if}"
+                            {if empty($options.no_confirm)}
+                                data-confirm-text="{sprintf('[`Install "%s" plugin?`]',$plugin.name)|escape}"
+                            {/if}
+                                style="display: inline-block;"
+                                >
                             <input type="hidden" name="return_url" value="{$return_url|replace:'%plugin_id%':$plugin_id|escape}">
                             <input type="hidden" name="install" value="1">
-                            <input type="hidden" name="app_id[{$plugin.slug}]" value="{$plugin.vendor}{if !empty($plugin.edition)}:{$plugin.edition}{/if}">
+                            <input type="hidden" name="app_id[{$plugin.slug|default:'undefined'}]" value="{$plugin.vendor}{if !empty($plugin.edition)}:{$plugin.edition}{/if}">
                             <input type="submit" value="[`Install`]"{if empty($plugin.applicable)&&false} disabled="disabled"{/if}>
+                        </form>
+                    {/if}
+                    {* && !empty($plugin.purchase_link) *}
+                    {if empty($plugin.purchased) && !empty($plugin.purchase_url) && false}
+                        <form action="{$plugin.purchase_url|default:''}" method="post" class="js-installer" style="display: inline-block;">
+                            <input type="hidden" name="app_id[]" value="{$plugin.slug|default:'undefined'}{if !empty($plugin.edition)}:{$plugin.edition}{/if}">
+                            <input type="hidden" name="hash" value="{$identity_hash}">
+                            <input type="hidden" name="domain" value="{$domain}">
+                            {if !empty($promo_id)}
+                                <input type="hidden" name="promo_id" value="{$promo_id|escape}">
+                            {/if}
+                            <input type="submit" value="[`Buy`]"{if empty($plugin.applicable)&&false} disabled="disabled"{/if}>
                         </form>
                     {/if}
                 {/if}
             {else}
                 <strong class="black">[`Free`]</strong>
-                <form action="{$installer}?module=update&action=manager" method="post" class="js-installer js-confirm" data-confirm-text="{sprintf('[`Install "%s" plugin?`]',$plugin.name)|escape}" style="display: inline-block;">
+                <form
+                        action="{$installer}?module=update&action=manager"
+                        method="post" class="js-installer {if empty($options.no_confirm)}js-confirm{/if}"
+                    {if empty($options.no_confirm)}
+                        data-confirm-text="{sprintf('[`Install "%s" plugin?`]',$plugin.name)|escape}"
+                    {/if}
+                        style="display: inline-block;"
+                        >
                     <input type="hidden" name="return_url" value="{$return_url|replace:'%plugin_id%':$plugin_id|escape}">
                     <input type="hidden" name="install" value="1">
-                    <input type="hidden" name="app_id[{$plugin.slug}]" value="{$plugin.vendor}{if !empty($plugin.edition)}:{$plugin.edition}{/if}">
+                    <input type="hidden" name="app_id[{$plugin.slug|default:'undefined'}]" value="{$plugin.vendor}{if !empty($plugin.edition)}:{$plugin.edition}{/if}">
                     <input type="submit" value="[`Install`]"{if empty($plugin.applicable)&&false} disabled="disabled"{/if}>
                 </form>
             {/if}

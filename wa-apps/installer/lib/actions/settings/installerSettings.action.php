@@ -20,7 +20,6 @@ class installerSettingsAction extends waViewAction
         $settings = array(
             'name'                         => 'Webasyst',
             'url'                          => wa()->getRootUrl(true),
-            //'auth_type'                    => 'login',
             'auth_form_background'         => 'stock:bokeh_vivid.jpg',
             'auth_form_background_stretch' => 1,
             'locale'                       => 'ru_RU',
@@ -95,7 +94,37 @@ class installerSettingsAction extends waViewAction
                 }
 
                 $model->ping();
+                $tmp = waRequest::post('locale_adapter');
+                if ($tmp) {
 
+                    $file_path = $this->getConfig()->getPath('config', 'factories');
+
+                    if ($tmp == 'gettext') {
+                        $locale_adapter = $tmp;
+                        if (file_exists($file_path)) {
+                            $factories = include($file_path);
+                            if (isset($factories['locale'])) {
+                                unset($factories['locale']);
+                                if ($factories) {
+                                    waUtils::varExportToFile($factories, $file_path);
+                                } else {
+                                    waFiles::delete($file_path);
+                                }
+                            }
+                        }
+                    } elseif ($tmp == 'php') {
+                        $locale_adapter = $tmp;
+                        if (file_exists($file_path)) {
+                            $factories = include($file_path);
+                        } else {
+                            $factories = array();
+                        }
+                        if (empty($factories['locale']) || $factories['locale'] != 'waLocalePHPAdapter') {
+                            $factories['locale'] = 'waLocalePHPAdapter';
+                            waUtils::varExportToFile($factories, $file_path);
+                        }
+                    }
+                }
             }
 
             if ($changed || $config_changed) {
@@ -182,7 +211,7 @@ class installerSettingsAction extends waViewAction
             if ($message) {
                 $params = array();
                 $params['module'] = 'settings';
-                $params['msg'] = installerMessage::getInstance()->raiseMessage(implode(', ', $message));
+                $params['msg'] = installerMessage::getInstance()->raiseMessage(implode(" \n", $message));
                 if ($t = waRequest::get('_')) {
                     $params['_'] = $t;
                 }
@@ -225,6 +254,15 @@ class installerSettingsAction extends waViewAction
         $locales = waSystem::getInstance()->getConfig()->getLocales('name');
         $this->view->assign('locales', $locales);
         $this->view->assign('title', _w('Settings'));
+
+        if (empty($locale_adapter)) {
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' || !function_exists('gettext')) {
+                $locale_adapter = false;
+            } else {
+                $locale_adapter = get_class(waLocale::$adapter) == 'waLocalePHPAdapter' ? 'php' : 'gettext';
+            }
+        }
+        $this->view->assign('locale_adapter', $locale_adapter);
     }
 
     private function getImages($path)
@@ -238,4 +276,3 @@ class installerSettingsAction extends waViewAction
         return array_values($files);
     }
 }
-//EOF

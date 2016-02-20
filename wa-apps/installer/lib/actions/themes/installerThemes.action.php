@@ -16,4 +16,3 @@ class installerThemesAction extends installerItemsAction
 {
     protected $module = 'themes';
 }
-//EOF

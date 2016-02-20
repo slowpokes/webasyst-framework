@@ -331,14 +331,6 @@ $(document).ajaxError(function(e, xhr, settings, exception) {
 $.ajaxSetup({'cache': false});
 
 $(document).ajaxSend(function (event, xhr, settings) {
-
-	//ZV CODE START Фикс для dadata, ибо переопределяет заголовок с json для всех ajax запросов
-	if (settings.dataType === "json") {
-		return;
-	}
-	//ZV CODE START
-
-
 	if (settings.type == 'POST') {
 		var matches = document.cookie.match(new RegExp("(?:^|; )_csrf=([^;]*)"));
 		var csrf = matches ? decodeURIComponent(matches[1]) : '';

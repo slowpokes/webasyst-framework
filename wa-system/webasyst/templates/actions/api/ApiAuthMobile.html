@@ -34,13 +34,13 @@
                 {/foreach}
             </ul> 
             <form method="post" action="">
+                    {$wa->csrf()}
                     <div class="wa-api-allow">
                         <input type="submit" name="approve" value="[s`Allow`]" id="wa-login-submit">
                     </div>
                     <div class="wa-api-deny">
                         <input type="submit" name="deny" value="[s`Deny`]" id="wa-login-submit">
                     </div>
-        
             </form>
         {/if}
 

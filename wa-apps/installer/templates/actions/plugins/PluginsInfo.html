@@ -23,9 +23,9 @@
             <!-- already installed -->
             <div class="align-center">
                 {if $plugin.commercial && empty($plugin.purchased)}
-                
+
                     {* PAID PLUGIN, LICENSE IS NOT VALID *}
-                    
+
                     {if !empty($plugin.license_expire)}
                         {* EXPIRED LICENSE *}
                         <a class="button green" href="{$plugin.renew_url|escape}">[`Renew license`]</a>
@@ -39,7 +39,7 @@
                                 <input type="hidden" name="promo_id" value="{$promo_id|escape}">
                             {/if}
                             <input type="hidden" name="domain" value="{$domain}">
-                            <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">    
+                            <input type="hidden" name="installer_url" value="{$wa->currentUrl(true,true)}">
                             <input type="submit" class="button green" value="[`Link license`]">
                             <p class="red"><i class="icon16 no"></i>{sprintf("[`Installation and usage of %s plugin on <strong>%s</strong> is not licensed. Updates are disabled. Buy a new license or link your existing %s plugin license to this Webasyst installation.`]",$plugin.name|escape,installerHelper::getDomain()|escape,$plugin.name|escape)}</p>
                         </form>
@@ -84,24 +84,24 @@
                         {* PAID PLUGIN *}
 
                         {if !empty($plugin.license_expire)}
-                        
+
                             {* COMMERCIAL LICENSE WITH AN EXPIRATION DATE *}
                             <p><em class="i-installed-label"><i class="icon16 yes"></i>{sprintf("[`This is a licensed installation of %s on %s. License is valid through <strong>%s</strong>.`]",$plugin.name|escape, installerHelper::getDomain()|escape, $plugin.license_expire)}</em></p>
                             <a class="button green" href="{$plugin.renew_url|escape}" style="display: inline-block;">[`Extend license`]</a>
                             <br><br>
-                            
+
                         {else}
-                        
+
                             {* VALID LICENSE *}
                             <p><em class="i-installed-label"><i class="icon16 yes"></i>{sprintf("[`This is a valid licensed installation of %s on <strong>%s</strong>.`]",$plugin.name|escape, installerHelper::getDomain()|escape)}</em></p>
-                            
+
                              <a class="button green" href="{* $plugin.buymore_url|escape *}https://www.webasyst.com/my/#/neworder/">[`Buy more licenses`]</a>
-                            
+
                             <p>{sprintf("[`Additional licenses are required if you are using %s on more than one domain name (<a href='%s' target='_blank'>one license per domain</a>).`]",$plugin.name|escape, '[`http://www.webasyst.com/help/1200/paid-app-licensing/`]')}</p>
                         {/if}
-                        
+
                     {else}
-                    
+
                         {* FREE PLUGIN *}
                         {if !empty($plugin.reviews.url)}
                             <p>
@@ -110,7 +110,7 @@
                             </p>
                         {/if}
                         <p><em class="i-installed-label"><i class="icon16 yes"></i>{sprintf("[`You have the latest version of %s installed: <strong>%s</strong>`]",$plugin.name|escape,$plugin.installed.version)}</em></p>
-                        
+
                     {/if}
                 {/if}
             </div>
@@ -169,7 +169,7 @@
                             {else}
                                 <div class="value">
                                     {if !empty($plugin.compare_price)}<strike class="gray">{$plugin.compare_price}</strike>&nbsp; {/if}
-                                    <strong{if !empty($plugin.compare_price)} class="highlighted"{/if}>{$plugin.price}</strong>
+                                    <strong{if !empty($plugin.compare_price)} class="discounted large"{/if}>{$plugin.price}</strong>
                                 </div>
                                 {if !empty($plugin.lease_price)}
                                     <div class="value">
@@ -198,7 +198,7 @@
                     [`License`]
                 </div>
                 <div class="value">
-                
+
                     {if !empty($plugin.license_text)}
                         [`Commercial`]
                         <a href="#/show/license/" class="js-action">[`View`]</a>
@@ -290,8 +290,8 @@
     <div class="content">
 
         <div class="i-breadcrumbs">
-            <a href="#/plugins/{$plugin.app}/">[`All plugins`]</a>
-            {if !empty($plugin.vendor)} &raquo; <a href="#/plugins&vendor={$plugin.vendor}/" data-href="#/plugins%s&vendor={$plugin.vendor}/%s/" data-filter="vendor" class="js-item-link">{$plugin.vendor_name|escape}</a>{/if}
+            <a href="#/plugins/{$plugin.app}/" data-href="#/plugins%filter%/{$plugin.app}/" class="js-item-link">[`All plugins`]</a>
+            {if !empty($plugin.vendor)} &raquo; <a href="#/plugins&vendor={$plugin.vendor}/" data-href="#/plugins%filter%&vendor={$plugin.vendor}/%query%/" data-filter="vendor" class="js-item-link">{$plugin.vendor_name|escape}</a>{/if}
         </div>
 
         <article class="i-summary">

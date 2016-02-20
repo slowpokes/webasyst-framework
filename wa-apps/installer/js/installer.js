@@ -125,11 +125,16 @@ String.prototype.translate = function () {
             $(window).resize(function () {
                 self.onResize();
             });
+
+            //if count autosubmit && app_id
+            if (this.options.auto_submit ) {
+                console.log('It go to update!',$(':input[name^="app_id\["]').length);
+            }
         },
 
         helper: {
             plural: function (n) {
-                return  ((n % 10 == 1 && n % 100 != 11) ? 0 : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2));
+                return ((n % 10 == 1 && n % 100 != 11) ? 0 : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2));
             },
             /**
              * prepare templates
@@ -173,6 +178,9 @@ String.prototype.translate = function () {
                         subject = 'systemplugins';
                         /* it's apps */
                     }
+                }else if (target.match(/^wa-widgets/)) {
+                    subject = 'system_widgets';
+                    /* it's widget */
                 }
                 return subject;
             },

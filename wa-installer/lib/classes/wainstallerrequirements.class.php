@@ -40,7 +40,6 @@ class waInstallerRequirements
 
     private function __clone()
     {
-        ;
     }
 
     /**
@@ -77,7 +76,7 @@ class waInstallerRequirements
         }
     }
 
-    private function app_version($app_id)
+    private function appVersion($app_id)
     {
         $app_id = preg_replace('@\\/@', '', strtolower($app_id));
         $path = $this->root.'wa-apps/'.$app_id.'/lib/config/app.php';
@@ -88,7 +87,8 @@ class waInstallerRequirements
             if (is_array($data)) {
                 $version = isset($data['version']) ? $data['version'] : 0;
                 if (file_exists($build_path)) {
-                    if ($build = include($build_path)) {
+                    $build = include($build_path);
+                    if ($build) {
                         $version .= ".{$build}";
                     }
                 }
@@ -195,7 +195,12 @@ class waInstallerRequirements
                 if (isset($requirement['version'])) {
                     $relation = $this->getRelation($requirement['version']);
                     if (!version_compare($version, $requirement['version'], $relation)) {
-                        $format = !empty($requirement['strict']) ? _w('extension %s has %s version but should be %s %s') : _w('extension %s has %s version but recomended is %s %s');
+                        if (!empty($requirement['strict'])) {
+                            $format = _w('extension %s has %s version but should be %s %s');
+                        } else {
+                            $format = _w('extension %s has %s version but recommended is %s %s');
+                        }
+
                         $requirement['warning'] = sprintf($format, $subject, $version, $relation, $requirement['version']);
                     } else {
                         if ($version) {
@@ -238,14 +243,15 @@ class waInstallerRequirements
         self::setDefaultDescription($requirement, array('Version of %s', htmlentities(ucfirst($subject), ENT_QUOTES, 'utf-8')), '');
         $requirement['note'] = false;
         $requirement['warning'] = false;
-        $version = $this->app_version($subject);
+        $version = $this->appVersion($subject);
         if ($version !== false) {
             if (isset($requirement['version'])) {
                 $relation = $this->getRelation($requirement['version']);
                 if (!version_compare($version, $requirement['version'], $relation)) {
-                    $format = !empty($requirement['strict']) ? _w('%s has %s version but should be %s %s') : _w('%s has %s version but recomended is %s %s');
+                    $format = !empty($requirement['strict']) ? _w('%s has %s version but should be %s %s') : _w('%s has %s version but recommended is %s %s');
                     $relation = _w($relation);
-                    $requirement['warning'] = sprintf($format, _w(ucfirst($subject)), $version, $relation, $requirement['version']);
+                    $name = $subject == 'installer' ? _w('Webasyst Framework') : _w(ucfirst($subject));
+                    $requirement['warning'] = sprintf($format, $name, $version, $relation, $requirement['version']);
                 } else {
                     if ($version) {
                         $requirement['note'] = $version;
@@ -270,19 +276,22 @@ class waInstallerRequirements
         }
         $bad_folders = array();
         $good_folders = array();
+        $root_path = sprintf('<span style="color:#ccc;">%s</span>', rtrim($this->root, '\\/'));
         self::setDefaultDescription($requirement, 'Files access rights');
         //TODO make it recursive
         foreach ($folders as $folder) {
             $path = $this->root.$folder;
+            $folder_name = $root_path.preg_replace('@^\.?/?@', '/', $folder);
+
             if (file_exists($path)) {
                 //XXX skip symbolic link
                 if (is_writeable($path) || is_link($path)) {
-                    $good_folders[] = $folder;
+                    $good_folders[] = $folder_name;
                 } else {
                     if (!empty($requirement['strict'])) {
                         $requirement['passed'] = false;
                     }
-                    $bad_folders[] = $folder;
+                    $bad_folders[] = $folder_name;
                 }
             } else {
 
@@ -368,7 +377,7 @@ class waInstallerRequirements
             $command_pattern = '@({'.implode('|', $commandcharacters).')@';
             $pattern = preg_replace($cleanup_pattern, '\\\\$1', $pattern);
             $pattern = preg_replace($command_pattern, '.$1', $pattern);
-            $hash_pattern = "@^([\da-f]{32})\s+\*({$pattern})$@m";
+            $hash_pattern = "@^([\\da-f]{32})\\s+\\*({$pattern})$@m";
             if (file_exists($md5_path)) {
                 $hashes = file_get_contents($md5_path);
                 if (preg_match_all($hash_pattern, $hashes, $file_matches)) {

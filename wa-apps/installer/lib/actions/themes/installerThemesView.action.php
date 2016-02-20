@@ -114,7 +114,7 @@ class installerThemesViewAction extends waViewAction
                 $return_url .= '#'.$return_hash;
             }
         }
+        $this->view->assign('identity_hash', installerHelper::getHash());
         $this->view->assign('return_url', $return_url);
     }
 }
-//EOF

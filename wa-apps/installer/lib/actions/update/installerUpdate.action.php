@@ -31,6 +31,9 @@ class installerUpdateAction extends waViewAction
             if (isset($items['installer'])) {
                 $items['installer']['name'] = _w('Webasyst Framework');
             };
+            if (isset($items['webasyst'])) {
+                $items['webasyst']['name'] = _w('Webasyst Framework');
+            };
 
         } catch (Exception $ex) {
             $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
@@ -51,10 +54,11 @@ class installerUpdateAction extends waViewAction
         $this->view->assign('error', false);
         $this->view->assign('update_counter', $counter['total']);
         $this->view->assign('update_counter_applicable', $counter['applicable']);
+        $this->view->assign('update_counter_payware', $counter['payware']);
         $this->view->assign('items', $items);
         $this->view->assign('domain', installerHelper::getDomain());
+        $this->view->assign('version', wa()->getVersion('installer'));
 
         $this->view->assign('title', _w('Updates'));
     }
 }
-//EOF

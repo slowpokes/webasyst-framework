@@ -20,7 +20,13 @@ class installerPluginsAction extends installerItemsAction
     protected function getExtrasOptions()
     {
         $options = parent::getExtrasOptions();
-        $options['local'] = true;
+        $filter = waRequest::get('filter');
+        if (is_array($filter) && !empty($filter['tag'])) {
+            $options['local'] = false;
+        } else {
+            $options['local'] = true;
+        }
+
         return $options;
     }
 
@@ -60,5 +66,11 @@ class installerPluginsAction extends installerItemsAction
                 }
             }
         }
+    }
+
+    protected function getTags()
+    {
+        $tags = installerHelper::getInstaller()->getServerData('plugin_tags');
+        return empty($tags) ? array() : $tags;
     }
 }
