@@ -27,6 +27,7 @@ class smscruSMS extends waSMSAdapter
 		$result =  $this->_read_url('http://smsc.ru/sys/send.php?login='.urlencode($this->getOption('login')).
 										'&psw='.urlencode(strlen($psw_smsc) == 32 ? $psw_smsc : md5($psw_smsc)).
 										'&phones='.urlencode($to).'&mes='.urlencode($text).
+										($from == '*' || !$from ? '' : '&sender='.urlencode($from)).
 										'&cost=3&fmt=1&charset=utf-8');
 
 		$this->log($to, $text, $result);

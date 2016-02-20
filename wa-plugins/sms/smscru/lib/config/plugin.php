@@ -5,5 +5,5 @@ return array(
 	'description' => 'Отправка SMS-уведомлений через сервис smsc.ru',
 	'icon' => 'img/smscru.png',
 	'vendor' => 982754,
-	'version' => '1.1',
+	'version' => '1.2',
 );

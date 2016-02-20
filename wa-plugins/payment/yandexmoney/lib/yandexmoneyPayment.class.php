@@ -84,7 +84,7 @@ class yandexmoneyPayment extends waPayment implements waIPayment
                     'scid'           => $this->scid,
                     'ShopID'         => $this->ShopID,
                     'CustomerNumber' => $order_data['customer_contact_id'],
-                    'customerNumber' => $order_data['customer_contact_id'],
+                    //'customerNumber' => $order_data['customer_contact_id'],
                     'orderNumber'    => $this->app_id.'_'.$this->merchant_id.'_'.$order_data['order_id'],
                     'Sum'            => number_format($order_data['amount'], 2, '.', ''),
                 );
@@ -355,19 +355,11 @@ class yandexmoneyPayment extends waPayment implements waIPayment
                 'customer_id' => ifempty($transaction_raw_data['customerNumber'], ifset($transaction_raw_data['CustomerNumber'])),
                 'result'      => 1,
                 'order_id'    => $this->order_id,
-<<<<<<< HEAD
-                'view_data'   => $view_data
-            )
-        );
-
-        switch ($transaction_raw_data['action']) {
-=======
                 'view_data'   => $view_data,
             )
         );
 
         switch (ifset($transaction_raw_data['action'])) {
->>>>>>> upstream/master
             case 'checkOrder': //Проверка заказа
                 $this->version = '3.0';
                 $transaction_data['type'] = self::OPERATION_CHECK;

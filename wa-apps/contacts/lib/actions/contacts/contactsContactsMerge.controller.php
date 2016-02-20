@@ -129,14 +129,6 @@ class contactsContactsMergeController extends waJsonController
                 }
             }
 
-            // birthday parts
-            if (!empty($data_fields['birthday'])) {
-                foreach(array('birth_day', 'birth_month', 'birth_year') as $f) {
-                    if (empty($master_data[$f]) && !empty($info[$f])) {
-                        $master[$f] = $master_data[$f] = $info[$f];
-                    }
-                }
-            }
         }
 
         // Remove duplicates

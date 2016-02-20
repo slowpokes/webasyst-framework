@@ -49,7 +49,7 @@ class cash24Payment extends waPayment implements waIPayment
         $surl        = $this->getAdapter()->getBackUrl(waAppPayment::URL_SUCCESS, array(
             'order_id' => $order_data['order_id']
         ));
-        $time        = time() + 24 * 60 * 60;
+        $time        = time() + (int)$this->lifetime * 24 * 60 * 60;
         $exptime     = gmdate('Y-m-d', $time) . 'T' . gmdate('H:i:s', $time);
         $sign        = md5('create-invoice-' . $amount . '-' . $order->currency . '-' . $email . '-Order ' . $order->id_str . '-' . $order->id . '-' . $surl . '-' . $furl . '-' . $result_url . '-' . $payment_system . '--' . $this->command_key);
         $objResponse = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><cash24/>');

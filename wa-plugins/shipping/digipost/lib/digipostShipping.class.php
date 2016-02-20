@@ -53,48 +53,68 @@ class digipostShipping extends waShipping
 					//print_r($Response);
 
 					if (!empty($Response->parcel) && !empty($this->deliveries['parcel'])) {
-						$parcel_eta_to = $Response->parcel->eta+5;
+						if ($this->no_est_delivery) {
+						$parcel_eta_to = $Response->parcel->eta;
+						$parcel_eta = waDateTime::format('humandate', strtotime('+'.(int)$Response->parcel->eta.' days')).' — '.waDateTime::format('humandate', strtotime('+'.$parcel_eta_to.' days'));
+						} else {
+							$parcel_eta = '';
+						}
 						$services['parcel'] = array(
 							'name'         => $Response->parcel->type,
 							'description' => $Response->info->route,
 							'id'           => 'parcel',
-							'est_delivery' => waDateTime::format('humandate', strtotime('+'.(int)$Response->parcel->eta.' days')).' — '.waDateTime::format('humandate', strtotime('+'.$parcel_eta_to.' days')),
+							'est_delivery' => $parcel_eta,
 							'rate'         => $Response->parcel->cost + $allowance,
 							'currency'     => 'RUB',
 						);
 					}
 
 					if (!empty($Response->bookpost_1class) && !empty($this->deliveries['bookpost_1class'])) {
-						$bookpost_1class_eta_to = $Response->bookpost_1class->eta+3;
+						if ($this->no_est_delivery) {
+							$bookpost_1class_eta_to = $Response->bookpost_1class->eta+3;
+							$bookpost_1class_eta = waDateTime::format('humandate', strtotime('+'.(int)$Response->bookpost_1class->eta.' days')).' — '.waDateTime::format('humandate', strtotime('+'.$bookpost_1class_eta_to.'days'));
+						} else {
+							$bookpost_1class_eta = '';
+						}
 						$services['bookpost_1class'] = array(
 							'name'         => $Response->bookpost_1class->type,
 							'description' => $Response->info->route,
 							'id'           => 'bookpost_1class',
-							'est_delivery' => waDateTime::format('humandate', strtotime('+'.(int)$Response->bookpost_1class->eta.' days')).' — '.waDateTime::format('humandate', strtotime('+'.$bookpost_1class_eta_to.'days')),
+							'est_delivery' => $bookpost_1class_eta,
 							'rate'         => $Response->bookpost_1class->cost_nds + $allowance,
 							'currency'     => 'RUB',
 						);
 					}
 
 					if (!empty($Response->valued_bookpost) && !empty($this->deliveries['valued_bookpost'])) {
-						$valued_bookpost_eta_to = $Response->valued_bookpost->eta+4;
+						if ($this->no_est_delivery) {
+							$valued_bookpost_eta_to = $Response->valued_bookpost->eta+4;
+							$valued_bookpost_eta = waDateTime::format('humandate', strtotime('+'.(int)$Response->parcel->eta.' days')).' — '.waDateTime::format('humandate', strtotime('+'.$valued_bookpost_eta_to.'days'));
+						} else {
+							$valued_bookpost_eta = '';
+						}
 						$services['valued_bookpost'] = array(
 							'name'         => $Response->valued_bookpost->type,
 							'description' => $Response->info->route,
 							'id'           => 'valued_bookpost',
-							'est_delivery' => waDateTime::format('humandate', strtotime('+'.(int)$Response->parcel->eta.' days')).' — '.waDateTime::format('humandate', strtotime('+'.$valued_bookpost_eta_to.'days')),
+							'est_delivery' => $valued_bookpost_eta,
 							'rate'         => $Response->valued_bookpost->cost_nds + $allowance,
 							'currency'     => 'RUB',
 						);
 					}
 
 					if (!empty($Response->bookpost) && !empty($this->deliveries['bookpost'])) {
-						$bookpost_eta_to = $Response->bookpost->eta+4;
+						if ($this->no_est_delivery) {
+							$bookpost_eta_to = $Response->bookpost->eta+4;
+							$bookpost_eta = waDateTime::format('humandate', strtotime('+'.(int)$Response->parcel->eta.' days')).' — '.waDateTime::format('humandate', strtotime('+'.$bookpost_eta_to.'days'));
+						} else {
+							$bookpost_eta = '';
+						}
 						$services['bookpost'] = array(
 							'name'         => $Response->bookpost->type,
 							'description' => $Response->info->route,
 							'id'           => 'bookpost',
-							'est_delivery' => waDateTime::format('humandate', strtotime('+'.(int)$Response->parcel->eta.' days')).' — '.waDateTime::format('humandate', strtotime('+'.$bookpost_eta_to.'days')),
+							'est_delivery' => $bookpost_eta,
 							'rate'         => $Response->bookpost->cost_reg_bookpost_cost_nds + $allowance,
 							'currency'     => 'RUB',
 						);
@@ -423,7 +443,13 @@ class digipostShipping extends waShipping
 		if ($tracking_id != null) {
 			$Response = $this->getFromDigiApi("https://api.digi-post.ru/tracking?mode=track&", $data, '');
 		}
-
+		
+		if($Response->error == 200) {
+			$track = $Response->message;
+			
+			return $track;
+		}
+		
 		if($Response->error == 0) {
 			$track = '<table class="light" width="100%"><tbody>';
 			$track .= '<tr><th>Дата</th><th>Тип</th><th>Атрибут</th><th>Место</th></tr>';
@@ -446,17 +472,22 @@ class digipostShipping extends waShipping
 			$order_id = waRequest::get('id', '', 'int');
 			$order = $som->getOrder($order_id, true, true);
 			
-			$contact = new waContact($order['contact']['id']);
+			if(!empty($contact->get('email'))) {
+				//echo 'У контакта "'.$contact->get('name').'" не указан email, поэтому email не будут ему отсылаться.';
+			}
+			if(!empty($contact->get('phone'))) {
+				//echo 'У контакта "'.$contact->get('name').'" не указан телефон, поэтому SMS не будут ему отсылаться.';
+			}
 			
-			$order_data = array('postcode'=>$tracking_id, 'tracking_name'=>'Заказ #'.$order['id'], 'order_id'=>$order['id'], 'client_name'=>$contact->get('name'),'client_phone'=>$contact->get('phone'),'client_email'=>$contact->get('email'));
+			$order_data = array('postcode'=>$tracking_id, 'tracking_name'=>'Заказ #'.$order['id'], 'order_id'=>$order['id'], 'client_name'=>$order['contact']['name'],'client_phone'=>$order['contact']['phone'],'client_email'=>$order['contact']['email'], 'send_email' => 1, 'send_sms' => 1);
+			
+			
 			$upload_track = $this->getFromDigiApi("https://api.digi-post.ru/tracking?mode=addtrack&", $order_data, 'post');
 			
 			if ($upload_track->error == '13') {
 				$track .= '<br><br><storng>Упппс!</strong> Мы попытались добавить идентификатор '.$tracking_id.' в систему api.digi-post.ru автоматически, но сделать это не получилось, так как <strong>ваша лицензия неактивна</strong>. <a target="_blank" href="https://api.digi-post.ru/invoice">Оплатите</a> использование сервиса api.digi-post.ru, чтобы добавлять неограниченное количество идентификаторов.';
 			}
 		}
-		
-		
 		
 		return $track;
 	}
@@ -481,7 +512,6 @@ class digipostShipping extends waShipping
 
 	public function getFromDigiApi($url, $data, $type) {
 
-		$timeout = 7;
 		if (!empty($data)) {
 			$str = http_build_query($data);
 		} else {
@@ -499,12 +529,19 @@ class digipostShipping extends waShipping
 				$curl_error = 'curl init error: '.curl_errno($ch);
 			}
 			if (!$curl_error) {
-
+				
+				$userAgent = 'Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0';
+				
 				@curl_setopt($ch, CURLOPT_URL, $url);
 				@curl_setopt($ch, CURLOPT_USERPWD, trim($this->digipost_username) . ":" . trim($this->digipost_api_key));
-				@curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+				//@curl_setopt($ch, CURLOPT_FAILONERROR, true);
+				//@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+				//@curl_setopt($ch, CURLOPT_AUTOREFERER, true);
 				@curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				@curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+				//@curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
 				@curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+				@curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
 
 
 				if ($type == 'post') {

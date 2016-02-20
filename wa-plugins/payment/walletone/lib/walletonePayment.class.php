@@ -160,23 +160,105 @@ class walletonePayment extends waPayment implements waIPayment
         return array(
             'WalletOneRUB'     => 'Единый кошелек RUB',
             'WalletOneUAH'     => 'Единый кошелек UAH',
+            'WalletOneUSD'     => 'Единый кошелек USD',
+            'WalletOneEUR'     => 'Единый кошелек EUR',
             'WalletOneZAR'     => 'Единый кошелек ZAR',
-            'UkashEUR'         => 'Ukash',
-            'MoneyMailRUB'     => 'MoneyMail',
+            'WalletOneBYR'     => 'Единый кошелек BYR',
+            'WalletOneGEL'     => 'Единый кошелек GEL',
+            'WalletOneKZT'     => 'Единый кошелек KZT',
+            'WalletOnePLN'     => 'Единый кошелек PLN',
+            'WalletOneTJS'     => 'Единый кошелек TJS',
+            'YandexMoneyRUB'   => 'Яндекс.Деньги',
+            'UniMoneyRUB'      => 'Юнистрим Деньги',
+            'MailRUMoneyRUB'   => 'Деньги@Mail.ru',
+            'WebMoneyRUB'      => 'WebMoney WMR',
+            'WebMoneyBYR'      => 'WebMoney WMB',
+            'QiwiWalletRUB'    => 'QIWI Кошелек',
+            'QiwiWalletRUB'    => 'QIWI Кошелек',
             'RbkMoneyRUB'      => 'RBK Money',
-            'ZPaymentRUB'      => 'Z-Payment',
-            'WebCredsRUB'      => 'WebCreds',
+            'BPayMDL'          => 'B-Pay',
+            'CashUUSD'         => 'CashU',
             'EasyPayBYR'       => 'EasyPay',
+            'LiqPayMoney'      => 'LiqPay Money',
+            'LiqPayMoneyRUB'   => 'LiqPayMoneyRUB',
+            'LiqPayMoneyUAH'   => 'LiqPayMoneyUAH',
+            'GoogleWalletUSD'  => 'Google Wallet',
+            'OkpayRUB'         => 'OKPAY RUB',
+            'OkpayUSD'         => 'OKPAY USD',
+            'BeelineRUB'       => 'Мобильный платеж «Билайн» (Россия)',
+            'Tele2RUB'         => 'Tele2',
+            'MtsRUB'           => 'Мобильный платеж «МТС» (Россия)',
+            'MegafonRUB'       => 'Мобильный платеж «Мегафон» (Россия)',
+            'KievStarUAH'      => 'КиевСтар.Мобильные деньги (Украина)',
+            'CashTerminal'     => 'Платежные терминалы',
             'CashTerminalRUB'  => 'Платежные терминалы России',
             'CashTerminalUAH'  => 'Платежные терминалы Украины',
-            'MobileRetailsRUB' => 'Салоны сотовой связи: Евросеть, Связной, МТС ...',
+            'CashTerminalBYR'  => 'Платежные терминалы Беларуси',
+            'CashTerminalGEL'  => 'Платежные терминалы Грузии',
+            'CashTerminalKZT'  => 'Платежные терминалы Казахстана',
+            'CashTerminalMDL'  => 'Платежные терминалы Молдовы',
+            'CashTerminalTJS'  => 'Платежные терминалы Таджикистана',
+            'CashTerminalZAR'  => 'Платежные терминалы ЮАР',
+            'AtmRUB'           => 'Прием наличных (RUB)',
+            'AtmUAH'           => 'Прием наличных (UAH)',
+            'StandardAtmZAR'   => 'Standard Bank (ZAR)',
+            'MobileRetails'    => 'Салоны связи',
+            'MobileRetailsRUB' => 'Салоны связи RUB',
+            'EurosetRUB'       => 'Салоны связи «Евросеть»',
+            'SvyaznoyRUB'      => 'Салоны связи «Связной»',
+            'DixisRUB'         => 'Салоны связи «Диксис»',
+            'CifrogradRUB'     => 'Салоны связи «Цифроград»',
+            'CellularWorldRUB' => 'Салоны связи «Сотовый мир»',
+            'BankOffice'       => 'Отделения банков',
             'SberbankRUB'      => 'Отделения Сбербанка России',
-            'PrivatbankUAH'    => 'Банки Украины: Приватбанк, Правэкс-Банк, УкрСиббанк',
+            'SberbankKZT'      => 'Отделения Сбербанка в Казахстане',
+            'PrivatbankUAH'    => 'Отделения Приватбанка в Украине',
+            'PravexBankUAH'    => 'Отделения Правэкс-Банка в Украине',
+            'UkrsibBankUAH'    => 'Отделения УкрСиббанка в Украине',
+            'KazkomBankKZT'    => 'Отделения Казкоммерцбанка Казахстане',
+            'LibertyBankGEL'   => 'Отделения Liberty Bank в Грузии',
+            'StandardBankZAR'  => 'Отделения Standard Bank в ЮАР',
             'RussianPostRUB'   => 'Отделения Почты России',
+            'MoneyTransfer'    => 'Денежные переводы',
+            'LiderRUB'         => 'Денежные переводы «ЛИДЕР»',
             'ContactRUB'       => 'Денежные переводы «CONTACT»',
-            'UnistreamRUB'     => 'Денежные переводы «Unistream»',
+            'UnistreamRUB'     => 'Денежные переводы Unistream (RUB)',
+            'UnistreamUSD'     => 'Денежные переводы Unistream (USD)',
+            'AnelikRUB'        => 'Денежные переводы Anelik',
+            'RedCashRUB'       => 'RedExpress RUB',
+            'RedCashRegionRUB' => 'RedExpress (Регионы) RUB',
+            'OnlineBank'       => 'Интернет-банки',
+            'AlfaclickRUB'     => 'Интернет-банк «Альфа-Клик» («Альфа-Банк»)',
+            'Privat24UAH'      => 'Интернет-банк «Приват24»',
+            'PsbRetailRUB'     => 'Интернет-банк «PSB-Retail» («Промсвязьбанк»)',
+            'QBankRUB'         => 'Интернет-банк «Связной Банк»',
+            'SberOnlineRUB'    => 'Сбербанк ОнЛ@йн',
+            'FakturaruRUB'     => 'Faktura.ru',
+            'RsbRUB'           => 'Интернет-банк Банка «Русский Стандарт»',
+            'EripBYR'          => 'Единое Расчетное Информационное Пространство (ЕРИП)',
+            'SetcomSidZAR'     => 'SetcomSid ZAR (ЮАР)',
+            'StandardBankEftZ' => 'Standard Bank EFT (ЮАР)',
+            'BankTransfer'     => 'Банковский перевод',
             'BankTransferRUB'  => 'Банковский перевод в рублях',
             'BankTransferUAH'  => 'Банковский перевод в гривнах',
+            'BankTransferCNY'  => 'Банковский перевод в китайских юанях',
+            'BankTransferEUR'  => 'Банковский перевод в евро',
+            'BankTransferGEL'  => 'Банковский перевод в лари',
+            'BankTransferKZT'  => 'Банковский перевод в тенге',
+            'BankTransferMDL'  => 'Банковский перевод в леях',
+            'BankTransferPLN'  => 'Банковский перевод в польских злотах',
+            'BankTransferUSD'  => 'Банковский перевод в долларах',
+            'SmartiviGEL'      => 'Карты Smartivi',
+            'VISA'             => 'VISA',
+            'CreditCardBYR'    => 'VISA BYR',
+            'CreditCardRUB'    => 'VISA RUB',
+            'CreditCardUAH'    => 'VISA UAH',
+            'CreditCardUSD'    => 'VISA USD',
+            'CreditCardEUR'    => 'VISA EUR',
+            'UkashEUR'         => 'Ukash',
+            'MoneyMailRUB'     => 'MoneyMail',
+            'ZPaymentRUB'      => 'Z-Payment',
+            'WebCredsRUB'      => 'WebCreds',
             'LiqPayRUB'        => 'Банковские карты VISA, MasterCard (LiqPay) RUB',
             'LiqPayUSD'        => 'Банковские карты VISA, MasterCard (LiqPay) USD',
             'LiqPayEUR'        => 'Банковские карты VISA, MasterCard (LiqPay) EUR',
@@ -215,6 +297,9 @@ class walletonePayment extends waPayment implements waIPayment
     * @throws waPaymentException
     * @return array - ассоциативный массив необязательных параметров результата обработки вызова:
     *     'redirect' => URL для перенаправления пользователя
+    *     'template' => путь к файлу шаблона, который необходимо использовать для формирования веб-страницы, отображающей результат обработки вызова платежной системы;
+    *                   укажите false, чтобы использовать прямой вывод текста
+    *                   если не указано, используется системный шаблон, отображающий строку 'OK'
     */
     protected function callbackHandler($request)
     {
@@ -268,17 +353,24 @@ class walletonePayment extends waPayment implements waIPayment
             // Информацию  о результате обработки дополнительно пишем в лог плагина
             if (!empty($result_app['result'])) {
                 self::log($this->id, array('result' => 'success'));
+                $message = 'WMI_RESULT=OK';
             } else {
                 $message = !empty($result_app['error']) ? $result_app['error'] : 'wa transaction error';
                 self::log($this->id, array('error' => $message));
+                $message = 'WMI_RESULT=RETRY&WMI_DESCRIPTION='.$message;
                 header("HTTP/1.0 403 Forbidden");
+            }            
+            echo $message;
 
-                echo $message;
-                exit;
-            }
-        }
+            return array(
+                'template' => false,
+            );
 
-        return $result;
+        } else {
+
+            return $result;
+
+		}
     }
 
     /**
