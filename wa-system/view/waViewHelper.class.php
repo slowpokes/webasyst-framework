@@ -694,7 +694,7 @@ HTML;
                 $field_name = ucfirst($field_id);
             }
         }
-        return '<div class="wa-form login_form">'. // VADIM CODE
+        $html = '<div class="wa-form">'.
             ($form ? '<form action="'.($form === 2 ? $this->loginUrl() : '').'" method="post">' : '').'
                 <div class="wa-field wa-field-'.$field_id.'">
                     <div class="wa-name">'.$field_name.'</div>

@@ -58,7 +58,8 @@
     {include file="header.html"}
     <div class="main-container">
         <script>
-            $(".container").css('min-height', $(window).height());
+            $(".main-container").css('min-height', $(window).height());
+            $('body').addClass('with-bg');
         </script>
         {include file="$wa_active_theme_path/top_menu.html"}
         <div class="main_content">
