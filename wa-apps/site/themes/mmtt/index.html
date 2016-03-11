@@ -29,6 +29,11 @@
     {$wa->js()}
     {$wa->headJs()}
 
+    {* @event frontend_head.%plugin_id% *}
+    {if isset($frontend_head)}
+        {foreach $frontend_head as $_}{$_}{/foreach}
+    {/if}
+
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.nouislider.js"></script>
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.maskedinput.js"></script>{* ввод номера телефона по маске *}
