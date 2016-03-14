@@ -11,6 +11,7 @@
  * @copyright 2011 Webasyst LLC
  * @package installer
  */
+
 //
 
 abstract class installerExtrasRemoveAction extends waViewAction
@@ -28,7 +29,7 @@ abstract class installerExtrasRemoveAction extends waViewAction
     private function init()
     {
         $url = parse_url($r = waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
-        if (preg_match('/(^|&)module=(themes|plugins)($|&)/', $url, $matches)) {
+        if (preg_match('/(^|&)module=(themes|plugins|widgets)($|&)/', $url, $matches)) {
             $this->extras_type = $matches[2];
         } elseif (preg_match('/^installer(\w+)RemoveAction$/', get_class($this), $matches)) {
             $this->extras_type = strtolower($matches[1]);
@@ -41,6 +42,9 @@ abstract class installerExtrasRemoveAction extends waViewAction
                     break;
                 case 'plugins':
                     $msg = _w("Unable to delete application's plugins (developer version is on)");
+                    break;
+                case 'widgets':
+                    $msg = _w("Unable to delete application's widgets (developer version is on)");
                     break;
                 default:
                     $msg = '???';
@@ -75,8 +79,13 @@ abstract class installerExtrasRemoveAction extends waViewAction
             );
 
 
-            if ($this->extras_type == 'plugins') {
-                $options['system'] = true;
+            switch ($this->extras_type) {
+                case 'plugins':
+                    $options['system'] = true;
+                    break;
+                case 'widgets':
+                    $options['widgets'] = true;
+                    break;
             }
 
             $this->installer = installerHelper::getInstaller();
@@ -86,34 +95,50 @@ abstract class installerExtrasRemoveAction extends waViewAction
 
 
             foreach ($extras_ids as $slug => $info) {
+                $slug = preg_replace('@^wa-widgets/@', 'webasyst/widgets/', $slug);
                 $slug_chunks = explode('/', $slug);
+
                 if ($slug_chunks[0] == 'wa-plugins') {
                     $app_id = $slug_chunks[0].'/'.$slug_chunks[1];
                 } else {
                     $app_id = reset($slug_chunks);
                 }
-                if (isset($app_list[$app_id]) || ($slug_chunks == 'wa-plugins')) {
+                if (isset($app_list[$app_id])) {
                     $app = $app_list[$app_id];
-                    if (($installed = $this->installer->getItemInfo($slug, $options)) && ($info['vendor'] == $installed['vendor'])) {
-                        if (!empty($installed['installed']['system'])) {
-                            /*
-                             _w("Can not delete system application's themes \"%s\"");
-                             _w("Can not delete system application's plugins \"%s\"");
-                             */
+                    $installed = $this->installer->getItemInfo($slug, $options);
+                    if ($installed) {
+                        if ($info['vendor'] == $installed['vendor']) {
+                            if (!empty($installed['installed']['system'])) {
+                                /*
+                                 _w("Can not delete system application's themes \"%s\"");
+                                 _w("Can not delete system application's plugins \"%s\"");
+                                _w("Can not delete system application's widgets \"%s\"");
+                                 */
 
-                            $message = "Can not delete system application's {$this->extras_type} \"%s\"";
-                            throw new waException(sprintf(_w($message), _wd($slug, isset($info['name'])?$info['name']:'???')));
+                                $message = "Can not delete system application's {$this->extras_type} \"%s\"";
+                                throw new waException(sprintf(_w($message), _wd($slug, isset($info['name']) ? $info['name'] : '???')));
+                            } elseif (!empty($installed['inbuilt'])) {
+                                /*
+                                _w("Can not delete inbuilt application's widgets \"%s\"");
+                                 */
+                                $message = "Can not delete inbuilt application's {$this->extras_type} \"%s\"";
+                                throw new waException(sprintf(_w($message), _wd($slug, isset($info['name']) ? $info['name'] : '???')));
+                            }
+                            $queue[] = array(
+                                'app_slug' => $app_id,
+                                'ext_id'   => $installed['id'],
+                                'name'     => sprintf("%s (%s)", _wd($slug, $installed['installed']['name']), _wd($app_id, $app['name'])),
+                            );
+                            unset($extras_ids[$slug]);
+                        } else {
+                            throw new waException(sprintf('Invalid item vendor: expected %s but get %s', $installed['vendor'], $info['vendor']));
                         }
-                        $queue[] = array(
-                            'app_slug' => $app_id,
-                            'ext_id'   => $installed['id'],
-                            'name'     => sprintf("%s (%s)", _wd($slug, $installed['installed']['name']), _wd($app_id, $app['name'])),
-                        );
-                        unset($extras_ids[$slug]);
+
+                    } else {
+                        //TODO force delete item
                     }
                 }
             }
-
             $deleted_extras = array();
             foreach ($queue as $q) {
                 if ($this->removeExtras($q['app_slug'], $q['ext_id'])) {
@@ -128,6 +153,7 @@ abstract class installerExtrasRemoveAction extends waViewAction
             /*
              _w('Application plugin %s has been deleted', 'Applications plugins %s have been deleted');
              _w('Application theme %s has been deleted', 'Applications themes %s have been deleted');
+            _w('Application widget %s has been deleted', 'Applications widgets %s have been deleted');
              */
             $message_singular = sprintf('Application %s %%s has been deleted', preg_replace('/s$/', '', $this->extras_type));
             $message_plural = sprintf('Applications %a %%s have been deleted', $this->extras_type);

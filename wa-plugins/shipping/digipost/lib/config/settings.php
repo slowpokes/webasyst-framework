@@ -20,14 +20,18 @@ return array(
         'description'  => 'При расчете доставки каждое отправление оценивается в стоимость всего заказа.',
         'control_type' => waHtmlControl::CHECKBOX,
     ),
-	
 	'upload'  => array(
         'value'        => '1',
         'title'        => 'Передавать данные на сервер api.Digi-Post.ru',
         'description'  => 'Необходимо для уведомления клиентов.',
         'control_type' => waHtmlControl::CHECKBOX,
     ),
-    
+    'no_est_delivery'  => array(
+        'value'        => '0',
+        'title'        => 'Показывать приблизительное расчетное время доставки',
+        'description'  => '',
+        'control_type' => waHtmlControl::CHECKBOX,
+    ),
 	'deliveries' => array(
 		'value' => array('parcel', 'valued_bookpost', 'bookpost_1class', 'bookpost', 'ems'),
 		'title' => 'Доступные способы доставки',

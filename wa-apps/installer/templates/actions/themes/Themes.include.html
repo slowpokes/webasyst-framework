@@ -1,0 +1,53 @@
+<a href="#/themes/{$theme_id}/" data-href="#/themes%query%%filter%/{$theme_id}/" class="js-item-link">
+    <!-- cover -->
+    <div class="i-paper">
+        <div class="i-lifted-corners">
+            <img src="{$theme.icon}">
+        </div>
+        {if empty($hide_product_badge)}
+        {if !empty($theme.publish_datetime) && strtotime($theme.publish_datetime) > $smarty.now - 86400*14}
+            <!-- NEW -->
+            <div class="i-badge new"><span>New</span></div>
+        {elseif !empty($theme.tags)}
+            {if in_array('featured', $theme.tags)}
+                <!-- FEATURED -->
+                <div class="i-badge featured"><i class="thumb-up"></i></div>
+            {elseif in_array('updated', $theme.tags)}
+                <!-- UPDATED -->
+                <div class="i-badge updated two-lines"><span>[`New version!`]</span></div>
+            {/if}
+        {/if}
+        {/if}
+    </div>
+
+    <!-- name & author -->
+    <h5>{$theme.name|default:$theme_id|escape}</h5>
+
+    <!-- theme price and status -->
+    {if !$theme.installed}
+        {if $theme.commercial}
+            {if ifset($theme.lease_price) == 'free'}
+                {* free to install on this particular installation (cloud) *}
+                <span class="black">[`Free`]</span>
+            {else}
+                <div class="i-pricing">
+                {if !empty($theme.compare_price)}
+                    <strike class="gray">{$theme.compare_price}</strike>&nbsp;
+                    <strong class="discounted">{$theme.price}</strong>
+                {else}
+                    <span class="gray">
+                        {$theme.price}
+                        {if !empty($theme.lease_price)}
+                            [`or`] {sprintf('[`%s/mo`]',$theme.lease_price)}
+                        {/if}
+                    </span>
+                {/if}
+                </div>
+            {/if}
+        {else}
+            <span class="gray">[`Free`]</span>
+        {/if}
+    {else}
+        <em class="i-installed-label"><i class="icon10 yes"></i> [`Installed`]</em>
+    {/if}
+</a>

@@ -12,6 +12,7 @@
  * @package wa-system
  * @subpackage request
  */
+
 class waRequest
 {
     const TYPE_INT = 'int';
@@ -22,7 +23,14 @@ class waRequest
 
     protected static $params = array();
 
-    public function __construct () {}
+    /**
+     * @var bool Is request from mobile device?
+     */
+    protected static $mobile;
+
+    public function __construct()
+    {
+    }
 
     protected static function cast($val, $type = null)
     {
@@ -51,7 +59,7 @@ class waRequest
                 break;
             case self::TYPE_ARRAY:
                 if (!is_array($val)) {
-                    $val = (array) $val;
+                    $val = (array)$val;
                 }
                 break;
         }
@@ -217,33 +225,41 @@ class waRequest
                 return false;
             }
         }
+
+        if (self::$mobile !== null) {
+            return self::$mobile;
+        }
         $user_agent = self::server('HTTP_USER_AGENT');
 
         $desktop_platforms = array(
-            'ipad' => 'ipad',
-            'galaxy-tab' => 'android.*?GT\-P'
+            'ipad'       => 'ipad',
+            'galaxy-tab' => 'android.*?GT\-P',
         );
         foreach ($desktop_platforms as $pattern) {
             if (preg_match('/'.$pattern.'/i', $user_agent)) {
+                self::$mobile = false;
                 return false;
             }
         }
 
         $mobile_platforms = array(
-            "android"       => "android",
-            "blackberry"    => "blackberry",
-            "iphone"        => "(iphone|ipod)",
-            "opera"         => "opera (mini|mobi)",
-            "palm"          => "(avantgo|blazer|elaine|hiptop|palm|plucker|xiino)",
-            "windows"       => "windows\sce;\s(iemobile|ppc|smartphone)",
-            "generic"       => "(kindle|mobile|mmp|midp|o2|pda|pocket|psp|symbian|smartphone|treo|up.browser|up.link|vodafone|wap)"
+            "google-mobile" => "googlebot\-mobile",
+            "android"    => "android",
+            "blackberry" => "(blackberry|rim tablet os)",
+            "iphone"     => "(iphone|ipod)",
+            "opera"      => "opera (mini|mobi|mobile)",
+            "palm"       => "(palmos|avantgo|blazer|elaine|hiptop|palm|plucker|xiino)",
+            "windows"    => "windows\sce;\s(iemobile|ppc|smartphone)",
+            "generic"    => "(kindle|mobile|mmp|midp|o2|pda|pocket|psp|symbian|smartphone|treo|up.browser|up.link|vodafone|wap)"
         );
         foreach ($mobile_platforms as $id => $pattern) {
             if (preg_match('/'.$pattern.'/i', $user_agent)) {
+                self::$mobile = $id;
                 return $id;
             }
         }
 
+        self::$mobile = false;
         return false;
     }
 
@@ -347,7 +363,7 @@ class waRequest
         if ($get_as_int) {
             $ip = ip2long($ip);
             if ($ip > 2147483647) {
-              $ip -= 4294967296;
+                $ip -= 4294967296;
             }
         }
         return $ip;
@@ -430,7 +446,7 @@ class waRequest
      */
     public static function getTheme()
     {
-        $app_id =  wa()->getConfig()->getApplication();
+        $app_id = wa()->getConfig()->getApplication();
         $key = wa()->getRouting()->getDomain().'/theme';
         if (($theme_hash = self::get('theme_hash')) && ($theme = self::get('set_force_theme')) !== null) {
             $app_settings_model = new waAppSettingsModel();
@@ -481,9 +497,14 @@ class waRequest
             return true;
         }
         if (!empty($_SERVER['HTTP_HTTPS']) && (strtolower($_SERVER['HTTP_HTTPS']) == 'on' || $_SERVER['HTTP_HTTPS'] == '1')) {
-            return true;
+            if (($_SERVER['HTTP_HTTPS'] != '1') && (strpos(waRequest::getUserAgent(), 'Chrome/44.0') === false)) {
+                return true;
+            }
         }
         if (!empty($_SERVER['HTTP_SSL']) && $_SERVER['HTTP_SSL'] == 1) {
+            return true;
+        }
+        if (!empty($_SERVER['HTTP_X_SSL']) && (strtolower($_SERVER['HTTP_X_SSL']) == 'yes' || $_SERVER['HTTP_X_SSL'] == '1')) {
             return true;
         }
         if(!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {

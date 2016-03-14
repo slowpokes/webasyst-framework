@@ -2,32 +2,151 @@
 
 class webasystBackendActions extends waViewActions
 {
-
     public function defaultMobileAction()
     {
         $apps = $this->getUser()->getApps();
         $this->view->assign('apps', $apps);
-        $backend_url = $this->getConfig()->getBackendUrl(true);
-        $this->view->assign('backend_url', $backend_url);
+        $this->view->assign('backend_url', $this->getConfig()->getBackendUrl(true));
     }
 
     public function defaultAction()
     {
-        try {
-            $this->setLayout(new webasystBackendLayout());
-            $this->view->assign("username", wa()->getUser()->getName());
-            $template_file = wa()->getDataPath('templates/BackendDefault.html', false, 'webasyst');
-            if (file_exists($template_file)) {
-                $this->template = 'file:'.$template_file;
+        $this->action = 'dashboard';
+        $this->setLayout(new webasystBackendLayout());
+        $this->view->assign("username", wa()->getUser()->getName());
+        $this->dashboardAction();
+    }
+
+    public function dashboardMobileAction()
+    {
+        $this->dashboardAction();
+    }
+
+    public function dashboardAction()
+    {
+        $widget_model = new waWidgetModel();
+        $locale = wa()->getUser()->getLocale();
+
+        // Create dashboard widgets on first login
+        if (!wa()->getUser()->getSettings('webasyst', 'dashboard')) {
+            $apps = wa()->getApps(true);
+            $widgets = array();
+            foreach ($apps as $app_id => $app) {
+                if (($app_id == 'webasyst') || $this->getUser()->getRights($app_id, 'backend')) {
+                    foreach (wa($app_id)->getConfig()->getWidgets() as $w_id => $w) {
+                        if (!empty($w['rights'])) {
+                            if (!waWidget::checkRights($w['rights'])) {
+                                continue;
+                            }
+                        }
+                        if (!empty($w['locale']) && ($w['locale'] != $locale)) {
+                            continue;
+                        }
+                        $widgets[] = $w;
+                    }
+                }
             }
-        } catch (waException $e) { 
-            // user not exists
-            if ($e->getCode() == 404) {
-                wa()->getUser()->logout();
-                wa()->dispatch();
-                exit;
+            $block = 0;
+            $contact_id = wa()->getUser()->getId();
+            foreach ($widgets as $w) {
+                $max_size = $w['sizes'][0];
+                foreach ($w['sizes'] as $s) {
+                    if ($s[0] + $s[1] > $max_size[0] + $max_size[1]) {
+                        $max_size = $s;
+                    }
+                }
+
+                $row = array(
+                    'app_id' => $w['app_id'],
+                    'widget' => $w['widget'],
+                    'name' => $w['name'],
+                    'block' => $block++,
+                    'sort' => 0,
+                    'size' => $max_size[0] . 'x' . $max_size[1],
+                    'contact_id' => $contact_id,
+                    'create_datetime' => date('Y-m-d H:i:s')
+                );
+                $widget_model->insert($row);
+            }
+            wa()->getUser()->setSettings('webasyst', 'dashboard', 1);
+        }
+
+        // fetch widgets
+        $rows = $widget_model->getByContact($this->getUserId());
+        $widgets = array();
+        foreach ($rows as $row) {
+            if (($row['app_id'] == 'webasyst') || $this->getUser()->getRights($row['app_id'], 'backend')) {
+                $app_widgets = wa($row['app_id'])->getConfig()->getWidgets();
+                if (isset($app_widgets[$row['widget']])) {
+                    $row['size'] = explode('x', $row['size']);
+                    $row = $row + $app_widgets[$row['widget']];
+                    if (!empty($row['rights'])) {
+                        if (!waWidget::checkRights($row['rights'])) {
+                            continue;
+                        }
+                    }
+                    $row['href'] = wa()->getAppUrl($row['app_id'])."?widget={$row['widget']}&id={$row['id']}";
+                    foreach ($row['sizes'] as $s) {
+                        if ($s == array(1, 1)) {
+                            $row['has_sizes']['small'] = true;
+                        } elseif ($s == array(2, 1)) {
+                            $row['has_sizes']['medium'] = true;
+                        } elseif ($s == array(2, 2)) {
+                            $row['has_sizes']['big'] = true;
+                        }
+                    }
+                    $widgets[$row['block']][] = $row;
+                }
             }
         }
+
+        // announcement
+        $user = wa()->getUser();
+        $announcement_model = new waAnnouncementModel();
+        $apps = $user->getApps();
+        $data = $announcement_model->getByApps($user->getId(), array_keys($apps), $user['create_datetime']);
+        $announcements = array();
+        $announcements_apps = array();
+        foreach ($data as $row) {
+            // show no more than 1 message per application
+            if (!empty($announcements_apps[$row['app_id']])) {
+                continue;
+            }
+            $announcements_apps[$row['app_id']] = true;
+            $announcements[] = $row;
+        }
+
+        // activity stream
+        $activity_action = new webasystDashboardActivityAction();
+        $user_filters = wa()->getUser()->getSettings('webasyst', 'dashboard_activity');
+        if ($user_filters) {
+            $user_filters = explode(',', $user_filters);
+        } else {
+            $user_filters = array();
+        }
+        $activity = $activity_action->getLogs(array(), $count);
+        $activity_load_more = $count == 50;
+
+        $is_admin = wa()->getUser()->isAdmin('webasyst');
+        $public_dashboards = array();
+        if ($is_admin) {
+            $dashboard_model = new waDashboardModel();
+            $public_dashboards = $dashboard_model->order('name')->fetchAll('id');
+        }
+
+        $this->view->assign(array(
+            'widgets' => $widgets,
+            'notifications' => $announcements,
+            'public_dashboards' => $public_dashboards,
+            'apps' => wa()->getUser()->getApps(),
+
+            'user_filters' => $user_filters,
+            'activity_load_more' => $activity_load_more,
+            'activity' => $activity,
+            'is_admin' => $is_admin,
+
+            'show_tutorial' => !wa()->getUser()->getSettings('webasyst', 'widget_tutorial_closed'),
+        ));
     }
 
     public function logoutAction()

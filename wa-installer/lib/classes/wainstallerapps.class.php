@@ -22,11 +22,14 @@ class waInstallerApps
     private static $cache_ttl;
     private $license;
     private $identity_hash;
+    private $beta;
     private $promo_id;
     private static $force;
 
     private $extras_list = array();
     private static $sort = array();
+
+    private $server_data = array();
 
     const CONFIG_GENERIC = 'wa-config/config.php';
     const CONFIG_DB = 'wa-config/db.php';
@@ -54,6 +57,7 @@ class waInstallerApps
     const LIST_SYSTEM = 'system';
 
     const ACTION_UPDATE = 'update';
+    const ACTION_INBUILT = 'inbuilt';
     const ACTION_CRITICAL_UPDATE = 'critical';
     const ACTION_REPAIR = 'repair';
     const ACTION_INSTALL = 'install';
@@ -113,8 +117,11 @@ class waInstallerApps
         } elseif (defined('PHP_OS')) {
             $signature['os'] = constant('PHP_OS');
         }
+
         return $raw ? $signature : base64_encode(json_encode($signature));
     }
+
+    private static $app_domains = array();
 
     private static function getDomains($apps, $raw = false)
     {
@@ -137,6 +144,13 @@ class waInstallerApps
                                     if (!in_array($domain, $d)) {
                                         $d[] = $domain;
                                     }
+                                    if (!isset(self::$app_domains[$app_id])) {
+                                        self::$app_domains[$app_id] = array();
+                                    }
+                                    if (!in_array($domain, self::$app_domains[$app_id])) {
+                                        self::$app_domains[$app_id][] = $domain;
+                                    }
+
                                     $id = array_search($domain, $d);
                                     if (!isset($s[$app_id])) {
                                         $s[$app_id] = array();
@@ -181,7 +195,9 @@ class waInstallerApps
     {
         if (!isset(self::$root_path)) {
             @ini_set("magic_quotes_runtime", 0);
+            /** @noinspection PhpDeprecationInspection */
             if (version_compare('5.4', PHP_VERSION, '>') && function_exists('set_magic_quotes_runtime') && get_magic_quotes_runtime()) {
+                /** @noinspection PhpDeprecationInspection */
                 @set_magic_quotes_runtime(false);
             }
             @ini_set('register_globals', 'off');
@@ -207,6 +223,10 @@ class waInstallerApps
         $this->license = $license;
         /* identity hash */
         $this->identity_hash = self::getGenericConfig('identity_hash');
+        $this->beta = self::getGenericConfig('beta');
+        if (in_array($this->beta, array(true, '1', 1), true)) {
+            $this->beta = 'beta';
+        }
         $this->promo_id = self::getGenericConfig('promo_id');
         if (!$this->identity_hash) {
             $this->updateGenericConfig();
@@ -224,6 +244,7 @@ class waInstallerApps
                     $this->installed_extras[$app_id] = array();
                     $this->installed_extras[$app_id]['plugins'] = self::getConfig(sprintf(self::CONFIG_APP_PLUGINS, $app_id));
                     $this->installed_extras[$app_id]['themes'] = self::getFolders(sprintf(self::ITEM_EXTRAS_PATH, $app_id, 'themes'));
+                    $this->installed_extras[$app_id]['widgets'] = self::getFolders(sprintf(self::ITEM_EXTRAS_PATH, $app_id, 'widgets'));
                     $build_path = self::$root_path.sprintf(self::ITEM_BUILD, $app_id);
                     if (file_exists($build_path)) {
                         $enabled = max(1, include($build_path));
@@ -244,9 +265,13 @@ class waInstallerApps
             'info'    => 'plugin',
             'subpath' => 'lib/config/',
         );
-        $this->extras_list['themes'] = array(
+        $this->extras_list['widgets'] = array(
             'info'    => 'theme',
             'subpath' => '',
+        );
+        $this->extras_list['widgets'] = array(
+            'info'    => 'widget',
+            'subpath' => 'lib/config/',
         );
     }
 
@@ -299,8 +324,9 @@ class waInstallerApps
             self::ACTION_CRITICAL_UPDATE,
             self::ACTION_UPDATE,
             self::ACTION_INSTALL,
+            true,
         );
-        $update = $action && in_array($action, $actions);
+        $update = $action && in_array($action, $actions, true);
         foreach ($requirements as $subject => & $requirement) {
             $requirement['passed'] = false;
             $requirement['note'] = null;
@@ -444,15 +470,14 @@ class waInstallerApps
         $items = array();
         $path = self::formatPath($path);
         $folders = self::getFolders($path);
-        $z = array();
         foreach ($folders as $slug => $exist) {
             if ($slug) {
                 if (isset($options['items']) && !isset($options['items'][$slug])) {
                     #skip not applicable items
                     continue;
                 }
-                $z[] = $path;
-                if ($item = $this->info($path, $slug, $filter)) {
+                $item = $this->info($path, $slug, $filter);
+                if ($item) {
                     if (isset($options['items'])) {
                         $item['enabled'] = !empty($options['items'][$slug]);
                     }
@@ -493,13 +518,16 @@ class waInstallerApps
         $path = self::formatPath($path);
         if (preg_match('@^wa-apps/[^/]+(/.+|$)@', $path)) {
             #it apps or apps extras
-            if (preg_match('@^wa-apps/([^/]+)/(themes|plugins)/([^/]+)$@', $path, $matches)) {
+            if (preg_match('@^wa-apps/([^/]+)/(themes|plugins|widgets)/([^/]+)$@', $path, $matches)) {
                 switch ($matches[2]) {
                     case 'themes':
                         $path .= '/theme.xml';
                         break;
                     case 'plugins':
                         $path .= '/lib/config/plugin.php';
+                        break;
+                    case 'widgets':
+                        $path .= '/lib/config/widget.php';
                         break;
                 }
             } elseif (preg_match('@^wa-apps/([^/]+)/?$@', $path, $matches)) {
@@ -509,9 +537,11 @@ class waInstallerApps
             }
         } elseif (preg_match('@^wa-plugins/[^/]+/[^/]+@', $path)) {
             #system plugins
-
             $path = preg_replace('@^wa-plugins/([^/]+)/plugins/(.+)$@', 'wa-plugins/$1/$2', $path);
             $path .= '/lib/config/plugin.php';
+        } elseif (preg_match('@^(wa-widgets|webasyst/widgets)/([^/]+)/?$@', $path, $matches)) {
+
+            $path = 'wa-widgets/'.$matches[2].'/lib/config/widget.php';
         } else {
             $path = false;
         }
@@ -578,10 +608,14 @@ class waInstallerApps
     private function extend(&$item, $options = array())
     {
         if ($item) {
-            self::fixItemCurrent($item);
+            if (!empty($options['requirements']) && !isset($item['requirements'])) {
+                $item['requirements'] = self::getRequirements(sprintf(self::ITEM_REQUIREMENTS, $item['slug']), $item['slug']);
+            }
+            self::fixItemCurrent($item, null, array(), empty($options['local']));
             $item['applicable'] = true;
+
             if (!empty($item['requirements']) && !empty($options['requirements'])) {
-                $item['applicable'] = $this->checkRequirements($item['requirements']);
+                $item['applicable'] = $this->checkRequirements($item['requirements'], false, ifset($options['action']));
             }
             if (!empty($options['action'])) {
                 $item['action'] = self::applicableAction($item);
@@ -599,6 +633,7 @@ class waInstallerApps
             $extra_types = array(
                 'plugins' => array(),
                 'themes'  => array(),
+                'widgets' => array(),
             );
             $items = $this->getApps($options);
             foreach ($items as $app) {
@@ -609,6 +644,8 @@ class waInstallerApps
                 if (!empty($app['installed']['themes'])) {
                     $extra_types['themes'][] = $app['id'];
                 }
+
+                $extra_types['widgets'][] = $app['id'];
             }
             $options['status'] = true;
             foreach ($extra_types as $type => $extras_apps) {
@@ -639,14 +676,18 @@ class waInstallerApps
 
         }
         $versions = array();
-        $apps = $this->getItems();
+        $options = array(
+            'widgets' => true,
+        );
+        $apps = $this->getItems($options);
         $apps += $this->getSystemItems(true);
+
         foreach ($apps as $slug => $app) {
             if (!empty($app['installed']) && (strpos($slug, 'wa-plugins/') !== 0)) {
                 $versions[$slug] = $app['installed']['version'];
             }
 
-            foreach (array('plugins', 'themes') as $type) {
+            foreach (array('plugins', 'themes', 'widgets') as $type) {
                 if (!empty($app[$type])) {
                     foreach ($app[$type] as $item) {
                         $versions[$item['slug']] = $item['installed']['version'];
@@ -698,10 +739,11 @@ class waInstallerApps
             $url = 'updates/?'.implode('&', $query);
             $updates = $this->query($url, $vendor, false);
             $items = $this->getItems();
+
             $items += $this->getSystemItems(true);
             //XXX check current edition:versions
             foreach ($updates as $app_id => &$item) {
-                foreach (array('plugins', 'themes') as $type) {
+                foreach (array('plugins', 'themes', 'widgets') as $type) {
                     if (!empty($item[$type])) {
                         foreach ($item[$type] as $extras_id => &$extras_item) {
                             if (!empty($items[$app_id][$type][$extras_id])) {
@@ -730,16 +772,31 @@ class waInstallerApps
                         if (isset($items[$app_id]['themes'])) {
                             unset($items[$app_id]['themes']);
                         }
+                        if (isset($items[$app_id]['widgets'])) {
+                            unset($items[$app_id]['widgets']);
+                        }
                         $item = array_merge($items[$app_id], $item);
                     }
                     $item['vendor'] = $vendor;
                     $item['slug'] = $slug = $app_id;
                     $item['action'] = self::applicableAction($item);
                     $item['applicable'] = self::checkRequirements($item['requirements'], false, $item['action']);
+                    $item['domains'] = isset(self::$app_domains[$app_id]) ? self::$app_domains[$app_id] : array();
                     $this->buildUrl($item['download_url']);
                 } elseif (!empty($items[$app_id])) {
                     if (empty($item['name'])) {
-                        $item['name'] = $items[$app_id]['installed']['name'];
+                        if (!empty($items[$app_id]['installed']) && is_array($items[$app_id]['installed'])) {
+                            $item['name'] = ifset($items[$app_id]['installed']['name'], ifset($items[$app_id]['name'], $app_id));
+                        } else {
+                            $item['name'] = ifset($items[$app_id]['name'], $app_id);
+                        }
+                    }
+
+                    if (empty($item['icons']) && !empty($items[$app_id]['installed'])) {
+                        if (is_array($items[$app_id]['installed'])) {
+                            $item['icon'] = ifset($items[$app_id]['installed']['icon'], ifset($items[$app_id]['installed']['icons'], array()));
+                            $item['icons'] = $item['icon'];
+                        }
                     }
                     $item['action'] = self::ACTION_NONE;
                 }
@@ -763,6 +820,7 @@ class waInstallerApps
                 'name'      => _w('SMS'),
                 'installed' => true,
                 'vendor'    => 'webasyst',
+                'virtual'   => true,
             ),
             'wa-plugins/payment'  => array(
                 'slug'      => 'wa-plugins/payment',
@@ -773,6 +831,7 @@ class waInstallerApps
                 'name'      => _w('Payment'),
                 'installed' => true,
                 'vendor'    => 'webasyst',
+                'virtual'   => true,
             ),
             'wa-plugins/shipping' => array(
                 'slug'      => 'wa-plugins/shipping',
@@ -783,6 +842,7 @@ class waInstallerApps
                 'name'      => _w('Shipping'),
                 'installed' => true,
                 'vendor'    => 'webasyst',
+                'virtual'   => true,
             ),
         );
         foreach ($items as $id => &$item) {
@@ -810,11 +870,20 @@ class waInstallerApps
         return $items;
     }
 
+    public function getServerData($name = null)
+    {
+        if ($name) {
+            return isset($this->server_data[$name]) ? $this->server_data[$name] : null;
+        } else {
+            return $this->server_data;
+        }
+    }
+
     /**
      *
      * @param array $options
      *
-     * @param array [string]string $options['status'] item status at config (enabled|disabled or deleted); default are enabled
+     * @param array [string]string $options['status'] item status at config (enabled|disabled|true - items from config|false - all available); default are enabled
      * @param array [string]boolean $options['requirements'] check apps requirements; default are false
      * @param array [string]boolean $options['installed'] get local apps only if true; get remote apps if false; merge if not set
      *
@@ -830,32 +899,46 @@ class waInstallerApps
         $options += array(
             'status' => self::STATUS_ENABLED,
         );
-
-
         $enum_options = array();
-        if (!empty($options['status'])) {
+        if (isset($options['status'])) {
             $installed_apps = self::getConfig(self::CONFIG_APPS);
-            switch ($options['status']) {
-                case self::STATUS_ENABLED:
-                    $installed_apps = array_filter($installed_apps, 'intval');
-                    $enum_options['items'] = $installed_apps;
-                    break;
-                case self::STATUS_DISABLED:
-                    $installed_apps = array_diff_assoc($installed_apps, array_filter($installed_apps, 'intval'));
-                    $enum_options['items'] = $installed_apps;
-                    break;
-                case true:
-                    $enum_options['items'] = $installed_apps;
-                    break;
+            if ($options['status'] === true) {
+                $enum_options['items'] = $installed_apps;
+            } elseif ($options['status'] === false) {
+                $installed_apps = array_merge(array_fill_keys(array_keys(self::getFolders('wa-apps')), false), $installed_apps);
+                $enum_options['items'] = $installed_apps;
+            } else {
+                switch ($options['status']) {
+                    case self::STATUS_ENABLED:
+                        $installed_apps = array_filter($installed_apps, 'intval');
+                        $enum_options['items'] = $installed_apps;
+                        break;
+                    case self::STATUS_DISABLED:
+                        $installed_apps = array_diff_assoc($installed_apps, array_filter($installed_apps, 'intval'));
+                        $enum_options['items'] = $installed_apps;
+                        break;
+                }
             }
         }
 
         $enum_filter = array();
         if (!empty($filter['extras'])) {
-            $enum_filter[$filter['extras']] = true;
+            if (!is_array($filter['extras'])) {
+                $enum_filter[$filter['extras']] = true;
+            }
         }
         if (!isset($options['installed']) || !empty($options['installed'])) {
-            $apps = $this->enumerate('wa-apps', $enum_options, $enum_filter);
+            if (!empty($filter['extras']) && is_array($filter['extras'])) {
+                $apps = array();
+                foreach ($filter['extras'] as $extras_type) {
+                    $enum_filter[$extras_type] = true;
+                    $apps += $this->enumerate('wa-apps', $enum_options, $enum_filter);
+                    unset($enum_filter[$extras_type]);
+                }
+            } else {
+                $apps = $this->enumerate('wa-apps', $enum_options, $enum_filter);
+            }
+
             $installed = $apps;
         } else {
             $apps = array();
@@ -864,6 +947,18 @@ class waInstallerApps
         if (!empty($options['system'])) {
             $apps += $this->getSystemItems();
         }
+
+        if (!empty($options['widgets'])) {
+            $apps += array(
+                'webasyst' => array(
+                    'name'    => 'Webasyst framework',
+                    'id'      => 'webasyst',
+                    'slug'    => 'webasyst',
+                    'enabled' => true,
+                ),
+            );
+        }
+
 
         /* get available apps */
         if (empty($options['installed'])) {
@@ -888,23 +983,31 @@ class waInstallerApps
                 }
                 $list = $this->query($url, $vendor);
                 foreach ($list as $app_id => $app) {
-                    if (empty($list_filter) || self::filter($app, $list_filter)) {
+                    if (strpos($app_id, '::') === 0) {
+                        $this->server_data[substr($app_id, 2)] = $app;
+                    } else {
+                        if (empty($list_filter) || self::filter($app, $list_filter)) {
 
-                        if (!empty($installed[$app_id])) {
-                            $apps[$app_id] = array_merge($installed[$app_id], $app);
-                        } else {
-                            $app += array(
-                                'id'        => $app_id,
-                                'slug'      => $app_id,
-                                'vendor'    => $vendor,
-                                'installed' => null,
-                            );
-                            $apps[$app_id] = $app;
+                            if (!empty($installed[$app_id])) {
+                                $apps[$app_id] = array_merge($installed[$app_id], $app);
+                            } else {
+                                $app += array(
+                                    'id'        => $app_id,
+                                    'slug'      => $app_id,
+                                    'vendor'    => $vendor,
+                                    'installed' => null,
+                                );
+                                $apps[$app_id] = $app;
+                            }
+                        } elseif (!empty($installed[$app_id])) {
+                            unset($apps[$app_id]);
                         }
-                    } elseif (!empty($installed[$app_id])) {
-                        unset($apps[$app_id]);
                     }
                 }
+            }
+        } else {
+            if (isset($options['local'])) {
+                trigger_error(sprintf('Parameter $option[%s] has no effect at %s', 'local', __METHOD__), E_USER_NOTICE);
             }
         }
 
@@ -929,7 +1032,7 @@ class waInstallerApps
      */
     public function getExtras($app, $type, $options = array())
     {
-        if (!in_array($type, array('plugins', 'themes'))) {
+        if (!in_array($type, array('plugins', 'themes', 'widgets'))) {
             throw new Exception('Invalid extras type');
         }
         /*get local extras*/
@@ -938,23 +1041,28 @@ class waInstallerApps
         );
 
         $enum_options = array();
-        if (!empty($options['status'])) {
+        if (isset($options['status'])) {
             if ($type == 'plugins') {
                 foreach ((array)$app as $app_id) {
                     if (strpos($app_id, 'wa-plugins/') === false) {
                         $installed = self::getConfig(sprintf(self::CONFIG_APP_PLUGINS, $app_id));
-                        switch ($options['status']) {
-                            case self::STATUS_ENABLED:
-                                $installed = array_filter($installed, 'intval');
-                                $enum_options[$app_id] = array('items' => $installed);
-                                break;
-                            case self::STATUS_DISABLED:
-                                $installed = array_diff_assoc($installed, array_filter($installed, 'intval'));
-                                $enum_options[$app_id] = array('items' => $installed);
-                                break;
-                            case true:
-                                $enum_options[$app_id] = array('items' => $installed);
-                                break;
+                        if ($options['status'] === true) {
+                            $enum_options[$app_id] = array('items' => $installed);
+                        } elseif ($options['status'] === false) {
+                            $path = $this->getExtrasPath($app_id, $type);
+                            $installed = array_merge(array_fill_keys(array_keys(self::getFolders($path)), false), $installed);
+                            $enum_options[$app_id] = array('items' => $installed);
+                        } else {
+                            switch ($options['status']) {
+                                case self::STATUS_ENABLED:
+                                    $installed = array_filter($installed, 'intval');
+                                    $enum_options[$app_id] = array('items' => $installed);
+                                    break;
+                                case self::STATUS_DISABLED:
+                                    $installed = array_diff_assoc($installed, array_filter($installed, 'intval'));
+                                    $enum_options[$app_id] = array('items' => $installed);
+                                    break;
+                            }
                         }
                     }
                 }
@@ -964,20 +1072,26 @@ class waInstallerApps
         if (!isset($options['installed']) || !empty($options['installed'])) {
             $extras = array();
             foreach ((array)$app as $app_id) {
-                if (preg_match('@^wa-plugins/@', $app_id)) {
-                    $path = $app_id;
-                } else {
-                    $path = 'wa-apps/'.$app_id.'/'.$type;
-                }
-                $enum_filter = array();
-                if (!empty($options['filter'])) {
-                    if (!empty($options['filter']['vendor'])) {
-                        $enum_filter['vendor'] = $options['filter']['vendor'];
+                $path = $this->getExtrasPath($app_id, $type);
+                if ($path) {
+                    $enum_filter = array();
+                    if (!empty($options['filter'])) {
+                        if (!empty($options['filter']['vendor'])) {
+                            $enum_filter['vendor'] = $options['filter']['vendor'];
+                        }
                     }
+
+                    $items = $this->enumerate($path, isset($enum_options[$app_id]) ? $enum_options[$app_id] : array(), $enum_filter);
+
+                    foreach ($items as &$extras_item) {
+                        self::extend($extras_item);
+                        unset($extras_item);
+                    }
+                    $extras[$app_id] = array(
+                        $type => $items,
+                    );
+                    unset($items);
                 }
-                $extras[$app_id] = array(
-                    $type => $this->enumerate($path, ifset($enum_options[$app_id], array()), $enum_filter),
-                );
             }
             $installed = $extras;
         } else {
@@ -1008,46 +1122,49 @@ class waInstallerApps
 
                 $count = count(self::$sort);
                 foreach ($list as $app_id => $available_extras) {
-                    if (!isset($extras[$app_id])) {
-                        if (!isset($options['apps']) || !empty($options['apps'])) {
-                            $enum_filter = array($type => true);
-                            $extras[$app_id] = $this->info('wa-apps', $app_id, $enum_filter);
-                        } else {
-                            $extras[$app_id] = array($type => array());
-                        }
-                    }
-                    foreach ($available_extras[$type] as $extras_id => $extras_item) {
-                        if (!isset(self::$sort[$extras_id])) {
-                            self::$sort[$extras_id] = ++$count;
-                        }
-                        if (!empty($installed[$app_id][$type][$extras_id])) {
-                            $_installed = $installed[$app_id][$type][$extras_id];
-                            if (!empty($extras_item['inherited'])) {
-
-                                foreach ($extras_item['inherited'] as $inherited_app_id => $inherited) {
-
-                                    $inherited_extras_id = preg_replace('@(^|^.+/)([^/]+)$@', '$2', $inherited['slug']);
-                                    if (empty($installed[$inherited_app_id][$type][$inherited_extras_id])) {
-                                        $_installed = array(
-                                            'id'        => $extras_id,
-                                            'slug'      => $app_id.'/'.$type.'/'.$extras_id,
-                                            'vendor'    => $vendor,
-                                            'installed' => null,
-                                        );
-                                        break;
-                                    }
-                                }
-
+                    if (strpos($app_id, '::') === 0) {
+                        $this->server_data[substr($app_id, 2)] = $available_extras;
+                    } else {
+                        if (!isset($extras[$app_id])) {
+                            if (!isset($options['apps']) || !empty($options['apps'])) {
+                                $enum_filter = array($type => true);
+                                $extras[$app_id] = $this->info('wa-apps', $app_id, $enum_filter);
+                            } else {
+                                $extras[$app_id] = array($type => array());
                             }
-                            $extras[$app_id][$type][$extras_id] = array_merge($_installed, $extras_item);
-                        } else {
-                            $extras_item += array(
-                                'id'        => $extras_id,
-                                'slug'      => $app_id.'/'.$type.'/'.$extras_id,
-                                'vendor'    => $vendor,
-                                'installed' => null,
-                            );
-                            $extras[$app_id][$type][$extras_id] = $extras_item;
+                        }
+                        foreach ($available_extras[$type] as $extras_id => $extras_item) {
+                            if (!isset(self::$sort[$extras_id])) {
+                                self::$sort[$extras_id] = ++$count;
+                            }
+                            if (!empty($installed[$app_id][$type][$extras_id])) {
+                                $_installed = $installed[$app_id][$type][$extras_id];
+                                if (!empty($extras_item['inherited'])) {
+                                    foreach ($extras_item['inherited'] as $inherited_app_id => $inherited) {
+
+                                        $inherited_extras_id = preg_replace('@(^|^.+/)([^/]+)$@', '$2', $inherited['slug']);
+                                        if (empty($installed[$inherited_app_id][$type][$inherited_extras_id])) {
+                                            $_installed = array(
+                                                'id'        => $extras_id,
+                                                'slug'      => $app_id.'/'.$type.'/'.$extras_id,
+                                                'vendor'    => $vendor,
+                                                'installed' => null,
+                                            );
+                                            break;
+                                        }
+                                    }
+
+                                }
+                                $extras[$app_id][$type][$extras_id] = array_merge($_installed, $extras_item);
+                            } else {
+                                $extras_item += array(
+                                    'id'        => $extras_id,
+                                    'slug'      => $app_id.'/'.$type.'/'.$extras_id,
+                                    'vendor'    => $vendor,
+                                    'installed' => null,
+                                );
+                                $extras[$app_id][$type][$extras_id] = $extras_item;
+                            }
                         }
                     }
                 }
@@ -1085,7 +1202,6 @@ class waInstallerApps
     {
         $info = null;
         $id = preg_replace('@/.*$@', '', $slug);
-
         if (empty($options['local'])) {
             switch ($id) {
                 case 'wa-plugins':
@@ -1117,12 +1233,22 @@ class waInstallerApps
             );
 
             $installed_apps = self::getConfig(self::CONFIG_APPS);
-            if (!empty($installed_apps[$id]) || ($id == 'wa-plugins') || ($id == '*')) {
+            if (!empty($installed_apps[$id]) || ($id == 'wa-plugins') || ($id == 'webasyst') || ($id == '*')) {
                 $filter = array();
                 if (!empty($options['vendor'])) {
                     $filter['vendor'] = $options['vendor'];
                 }
-                $key = ($id == 'wa-plugins') ? '' : 'wa-apps';
+                switch ($id) {
+                    case 'webasyst':
+                        $key = '';
+                        break;
+                    case 'wa-plugins':
+                        $key = '';
+                        break;
+                    default:
+                        $key = 'wa-apps';
+                        break;
+                }
                 $info = array_merge($info, $this->info($key, $info['slug'], $filter));
                 if (!$exists && empty($info['installed'])) {
                     $info = array();
@@ -1136,7 +1262,6 @@ class waInstallerApps
                     }
                 }
             }
-
             $this->extend($info, $options);
         }
         return $info;
@@ -1154,9 +1279,8 @@ class waInstallerApps
         if (!$id) {
             $id = (isset($item['id']) && $item['id']) ? $item['id'] : $item['slug'];
         }
-
         if (isset($item['installed']) && !empty($item['installed']) !== false) {
-            $l = & $item['installed'];
+            $l = &$item['installed'];
             $sizes = array(48, 24, 16);
             if (!empty($l['icon']) && !is_array($l['icon'])) {
                 $l['icon'] = array(48 => $l['icon']);
@@ -1190,6 +1314,13 @@ class waInstallerApps
             if (empty($item['icons'])) {
                 $item['icons'] = $l['icon'];
             }
+            if (!isset($item['icon'])) {
+                if (!empty($item['icons'])) {
+                    $icon_id = max(array_keys($item['icons']));
+                    $item['icon'] = $item['icons'][$icon_id];
+                }
+            }
+
         }
 
     }
@@ -1204,7 +1335,7 @@ class waInstallerApps
             }
         } else {
             $is_url = preg_match('@^https?://@', $path);
-            if (($this->license || $this->identity_hash) && $is_url && $this->originalUrl($path)) {
+            if (($this->license || $this->identity_hash || $this->beta) && $is_url && $this->originalUrl($path)) {
                 $query = parse_url($path, PHP_URL_QUERY);
                 if ($this->license) {
                     $query = $query.($query ? '&' : '').'license='.$this->license;
@@ -1215,13 +1346,28 @@ class waInstallerApps
                 if ($this->promo_id) {
                     $query = $query.($query ? '&' : '').'promo_id='.$this->promo_id;
                 }
-                if ($domain = $this->getDomain()) {
+                $domain = $this->getDomain();
+                if ($domain) {
                     $query = $query.($query ? '&' : '').'domain='.urlencode(base64_encode($domain));
                 }
-                if (preg_match('@/download/@', $path)) {
+                if (preg_match('@/(download|archive)/@', $path)) {
                     $query = $query.($query ? '&' : '').'signature='.urlencode(self::getServerSignature());
+
+                    if ($this->beta && preg_match('@/archive/@', $path)) {
+                        $path = preg_replace('@/(archive)/@', "/\$1/{$this->beta}/", $path, 1);
+                    }
                 }
+
+                if (preg_match('@/versions/\?@', $path)) {
+                    if ($this->beta) {
+                        $path = preg_replace('@/versions/\?@', "/versions/{$this->beta}/?", $path, 1);
+                    }
+                }
+
                 if (preg_match('@/updates/\?@', $path)) {
+                    if ($this->beta) {
+                        $path = preg_replace('@/updates/\?@', "/updates/{$this->beta}/?", $path, 1);
+                    }
                     parse_str($path, $raw);
                     if (!empty($raw['v']) && ($raw['v'] = array_filter($raw['v']))) {
                         $stack = debug_backtrace();
@@ -1277,8 +1423,9 @@ class waInstallerApps
      * @param array $item
      * @param string $id
      * @param array $fields
+     * @param bool $no_translate
      */
-    private static function fixItemCurrent(&$item, $id = null, $fields = array())
+    private static function fixItemCurrent(&$item, $id = null, $fields = array(), $no_translate = false)
     {
         if (!$id) {
             $id = empty($item['id']) ? ($item['slug']) : $item['id'];
@@ -1317,9 +1464,19 @@ class waInstallerApps
         }
         $ml_fileds = array('name', 'description');
         foreach ($ml_fileds as $field) {
-            //TODO use _wd/etc
-            if (isset($item[$field]) && is_array($item[$field])) {
-                $item[$field] = isset($item[$field][self::$locale]) ? $item[$field][self::$locale] : current($item[$field]);
+            if (isset($item[$field])) {
+                if (is_array($item[$field])) {
+                    $item[$field] = isset($item[$field][self::$locale]) ? $item[$field][self::$locale] : current($item[$field]);
+                } elseif (!empty($item[$field]) && function_exists('_wd') && !$no_translate) {
+                    $item[$field] = _wd($id, $item[$field]);
+                }
+            }
+        }
+        if (empty($item['app'])) {
+            if (preg_match('@^(.+)/(plugins|widgets)/@', $item['slug'], $matches)) {
+                $item['app'] = $matches[1];
+            } elseif (preg_match('@^wa-widgets/@', $item['slug'], $matches)) {
+                $item['app'] = 'webasyst';
             }
         }
 
@@ -1334,12 +1491,21 @@ class waInstallerApps
         if (!preg_match('@^wa-plugins/@', $item['slug'])) {
             self::fixItemIcon($item);
         }
+        if (isset($item['installed']['version']) && ($item['installed']['version'] === '0.0.0.0')) {
+            if (isset($item['version']) && preg_match('@^1\.0\.\d+$@', $item['version'])) {
+                $item['installed']['version'] = $item['version'];
+            }
+        }
     }
 
     private static function fixItemVersion(&$item, $id = null, $extras_info = null)
     {
         if ((!isset($item['installed']['version']) || !$item['installed']['version']) && !empty($item['installed'])) {
-            $item['installed']['version'] = '0.0.0';
+            if (isset($item['version'])) {
+                $item['installed']['version'] = $item['version'];
+            } else {
+                $item['installed']['version'] = '0.0.0';
+            }
         }
 
         if (is_null($id) && isset($item['slug'])) {
@@ -1398,12 +1564,15 @@ class waInstallerApps
         $priority = null;
         switch ($action) {
             case self::ACTION_INSTALL:
-                $priority = 5;
+                $priority = 6;
                 break;
             case self::ACTION_CRITICAL_UPDATE:
-                $priority = 4;
+                $priority = 5;
                 break;
             case self::ACTION_UPDATE:
+                $priority = 4;
+                break;
+            case self::ACTION_INBUILT:
                 $priority = 3;
                 break;
             case self::ACTION_REPAIR:
@@ -1606,15 +1775,17 @@ class waInstallerApps
         $current_routing = self::getConfig(self::CONFIG_ROUTING);
         if (!$routing) {
             foreach ($current_routing as $domain => & $routes) {
-                foreach ($routes as $route_id => $route) {
-                    if (is_array($route)) { //route is array
-                        if (isset($route['app']) && ($route['app'] == $app_id)) {
-                            unset($routes[$route_id]);
-                        }
-                    } else { //route is string
-                        $route = array_shift(array_filter(explode('/', $route), 'strlen'));
-                        if ($route == $app_id) {
-                            unset($routes[$route_id]);
+                if (is_array($routes)) {
+                    foreach ($routes as $route_id => $route) {
+                        if (is_array($route)) { //route is array
+                            if (isset($route['app']) && ($route['app'] == $app_id)) {
+                                unset($routes[$route_id]);
+                            }
+                        } else { //route is string
+                            $route = array_shift(array_filter(explode('/', $route), 'strlen'));
+                            if ($route == $app_id) {
+                                unset($routes[$route_id]);
+                            }
                         }
                     }
                 }
@@ -1742,7 +1913,6 @@ class waInstallerApps
      * @param $domain string domain ID fo
      * @param bool|string $edition string application edition
      * @throws Exception
-     * @internal param string $app_id application slug
      * @return void
      */
     public function installWebAsystItem($slug, $domain = null, $edition = true)
@@ -1755,6 +1925,9 @@ class waInstallerApps
                     break;
                 case 'themes':
                     $this->setRoutingConfig($slugs[0], $slugs[2]);
+                    break;
+                case 'widgets':
+                    //do nothing
                     break;
                 default:
                     throw new Exception("Invalid subject for method ".__METHOD__);
@@ -1849,7 +2022,7 @@ class waInstallerApps
         } elseif (!is_writable(self::$root_path.$target_path)) {
             throw new Exception("Directory {$target_path} unwritable");
         }
-        if (preg_match('`^/?(wa-data/protected|wa-log|wa-cache|wa-config)/?`', $target_path, $matches)) {
+        if (preg_match('@^/?(wa-data/protected|wa-log|wa-cache|wa-config)(/|$)@', $target_path, $matches)) {
             $htaccess_path = $matches[1].'/.htaccess';
             if (!file_exists(self::$root_path.$htaccess_path)) {
                 if ($fp = @fopen(self::$root_path.$htaccess_path, 'w')) {
@@ -1878,10 +2051,14 @@ class waInstallerApps
                 } elseif (isset($item['edition']) && ($item['edition'] != $item['installed']['edition'])) {
                     $action = self::ACTION_INSTALL;
                 } elseif (version_compare($item['version'], $item['installed']['version'], '>')) {
-                    if (isset($item['critical']) && version_compare($item['critical'], $item['installed']['version'], '>')) {
-                        $action = self::ACTION_CRITICAL_UPDATE;
+                    if (!empty($item['inbuilt'])) {
+                        $action = self::ACTION_INBUILT;
                     } else {
-                        $action = self::ACTION_UPDATE;
+                        if (isset($item['critical']) && version_compare($item['critical'], $item['installed']['version'], '>')) {
+                            $action = self::ACTION_CRITICAL_UPDATE;
+                        } else {
+                            $action = self::ACTION_UPDATE;
+                        }
                     }
                 } else {
                     $action = self::ACTION_REPAIR;
@@ -1918,6 +2095,11 @@ class waInstallerApps
             /**
              * @todo temporal hack with replace
              */
+            if (strpos($query, '?') !== false) {
+                $query .= '&server_data=1';
+            } else {
+                $query .= '?server_data=1';
+            }
             $url = preg_replace('@apps/list/$@', '2.0/', $sources[$vendor]).$query;
             if ($this->buildUrl($url)) {
                 if (!$file) {
@@ -1969,5 +2151,20 @@ class waInstallerApps
             }
         }
     }
+
+    private function getExtrasPath($app_id, $type = 'plugins')
+    {
+        if (preg_match('@^wa-plugins/@', $app_id)) {
+            if ($type !== 'plugins') {
+                $path = null;
+            } else {
+                $path = $app_id;
+            }
+        } elseif (('webasyst' == $app_id) && ($type == 'widgets')) {
+            $path = 'wa-widgets/';
+        } else {
+            $path = 'wa-apps/'.$app_id.'/'.$type;
+        }
+        return $path;
+    }
 }
-//EOF

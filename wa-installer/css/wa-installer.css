@@ -1,8 +1,8 @@
 @CHARSET "UTF-8";
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; font-size: 100%; 
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; font-size: 100%;
 	vertical-align: baseline; }
 
-article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; }
+article, aside, details, figcaption, figure, footer, header, menu, nav, section { display: block; }
 body { line-height: 1; }
 
 blockquote, q { quotes: none; }
@@ -212,7 +212,7 @@ ul.menu-v li a.inline { display:inline; margin:0; padding:0; min-width:0; }
 .dialog.height400px .dialog-window { height: 400px; min-height: 400px; }
 .dialog.height500px .dialog-window { height: 500px; min-height: 500px; }
 .dialog-buttons { position: absolute; bottom: 0; height: 55px; z-index: 101; width: 100% }
-.dialog-content { height: 100%; width: 100%; overflow: auto; position: absolute; top: 0; bottom: 70px; overflow: auto; }
+.dialog-content { height: 100%; width: 100%; overflow: auto; position: absolute; top: 0; bottom: 70px; }
 .dialog-content-indent { padding: 20px 20px 10px; }
 .dialog-buttons-gradient { background: #fff; padding: 10px 10px 0; margin-right: 17px; -moz-box-shadow: 0 -5px 5px #fff; -webkit-box-shadow: 0 -5px 5px #fff; box-shadow: 0 -5px 5px #fff; }
 

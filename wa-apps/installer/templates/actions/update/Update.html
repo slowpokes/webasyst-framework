@@ -14,6 +14,7 @@
         {/foreach}
     {/if}
     <form action="?module=update&amp;action=manager" method="POST">
+        <input type="hidden" name="additional_updates" value="{if $update_counter_payware || ($update_counter_applicable<$update_counter) }1{else}0{/if}">
         <table class="zebra i-updates">
             <thead>
             {if $update_counter_applicable}
@@ -37,14 +38,19 @@
             {if !$update_counter }
                 <tr>
                     <td colspan="4" class="align-center" style="background: #fff;">
-                        <div class="block triple-padded">[`All apps are up to date.`]</div>
+                        <div class="block triple-padded">
+                            [`All apps are up to date.`]
+                            <br><br>
+                            {$version|string_format:"[`Webasyst Framework version <strong>%s</strong>`]"}
+                        </div>
                     </td>
                 </tr>
             {else}
 
                 <!-- list of available updates -->
                 {foreach $items as $app_id => $app}
-                    {if isset($app.applicable)}
+
+                    {if isset($app.applicable) ||  !empty($app.plugins) || !empty($app.themes) || !empty($app.widgets)}
                         {include file="../update/Update.row.html" item=$app item_id=$app_id item_type='app' inline}
                     {/if}
 
@@ -57,6 +63,12 @@
                     {if !empty($app.themes)}
                         {foreach $app.themes as $item_id => $theme}
                             {include file="../update/Update.row.html" item=$theme item_id=$item_id item_type='theme' inline}
+                        {/foreach}
+                    {/if}
+
+                    {if !empty($app.widgets)}
+                        {foreach $app.widgets as $item_id => $widget}
+                            {include file="../update/Update.row.html" item=$widget item_id=$item_id item_type='widget' app=$app inline}
                         {/foreach}
                     {/if}
 
@@ -79,11 +91,16 @@
             if (item_id && item_id[1]) {
                 if (item_id[1] == 'all') {
                     $('input:hidden:disabled[name^=app_id]').removeAttr('disabled');
+                    $('input:hidden[name="additional_updates"]').removeAttr('disabled');
                 } else {
                     $('#checkbox_' + item_id[1].replace(/(\/)/g, '\\/')).removeAttr('disabled');
+                    $('input:hidden[name="additional_updates"]').attr('disabled','disabled');
                 }
             }
         });
+
+
+        //auto_submit: {waRequst::post('additional_updates')},
         $('a.js-changelog-more').click(function () {
             $(this).parents('.js-changelog').find(':hidden').show();
             $(this).hide();

@@ -27,8 +27,6 @@ $(document).ready( function() {
         },'{$thread_id|escape:'js'}');
     });
 
-
-
     translate['prepare'] = '[`Preparing`]';
     translate['copy'] = '[`Creating backup`]';
     translate['download'] = '[`Downloading new version`]';
@@ -100,12 +98,28 @@ $(document).ready( function() {
         <p>[`An error occurred during installation`]</p>
         <p><i class="icon10 no"></i> <em class="error"><strong>{{html current_state.error}}</strong></em>
         {{else}}
+        {/literal}{if !empty($return_url)}
+        {if empty($additional_updates)}
         <p><i class="icon10 yes"></i> <em class="success"><strong>[`Finalizing the installation and redirecting back to the app...`]</strong></em><i class="icon16 loading"></i></p>
+
+        {else}
+
+        <p><i class="icon10 yes"></i> <em class="success"><strong>[`Gathering information about available updates...`]</strong></em><i class="icon16 loading"></i></p>
+        {/if}
+        {else}{literal}
+        <p><i class="icon10 yes"></i> <em class="success"><strong>[`Applications were successfully installed`]</strong></em></p>
+        {/literal}{/if}{literal}
         {{/if}}
         {{/if}}
         {/literal}{if !empty($return_url)}{literal}
         {{if result && result.success}}
-            <p><i class="icon10 yes"></i> <em class="success"><strong>[`Finalizing the installation and redirecting back to the app...`]</strong></em><i class="icon16 loading"></i></p>
+            {/literal}
+            {if empty($additional_updates)}
+            <p><i class="icon10 yes"></i> <em class="success"><strong>[`Installation completed`]</strong></em></p>
+            {else}
+            <p><i class="icon10 yes"></i> <em class="success"><strong>[`Gathering information about available updates...`]</strong></em><i class="icon16 loading"></i></p>
+            {/if}
+            {literal}
         {{/if}}
         {/literal}{/if}{literal}
     </div>

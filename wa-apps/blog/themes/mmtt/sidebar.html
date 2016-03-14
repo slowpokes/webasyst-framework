@@ -13,18 +13,21 @@
             {/if}
             {$month_year[$p.datetime|date_format:'Y'][$p.datetime|date_format:'m'][] = $p}
         {/foreach}
-        <ul>
+        <ul class="news">
             {foreach $month_year as $key=>$month}
-                <li class="closed depth_0">
+                <li class="closed depth_0 has-children">
                     <a href="#" class="sidebar_link">{$key}</a>
                     <ul>
                         {foreach $month as $m}
-                            <li class="closed depth_1">
+                            <li class="closed depth_1 has-children">
                                 <a href="#" class="sidebar_link">{$month_rus[$m[0].datetime|date_format:'n']}</a>
                                 <ul>
                                     {foreach $m as $p}
                                         <li class="depth_2 {if isset($post)&&($post.id==$p.id)}current{/if}">
-                                            <a href="{$p.link}">{$p.title}</a>
+                                            <a id="post-link-{$p.id}" href="{$p.link}">
+                                                <div class="news-date">{$p.datetime|date_format:'d.m.Y'}</div>
+                                                {$p.title}
+                                            </a>
                                         </li>
                                     {/foreach}
                                 </ul>

@@ -111,7 +111,8 @@ class installerHelper
             $message = array('text' => $text, 'result' => 'fail');
             if (strpos($text, "\n")) {
                 $texts = array_filter(array_map('trim', explode("\n", $message['text'])), 'strlen');
-                while ($message['text'] = array_shift($texts)) {
+                while ($texts) {
+                    $message['text'] = array_shift($texts);
                     $messages[] = $message;
                 }
             } else {
@@ -155,11 +156,15 @@ class installerHelper
             $errors = (array)json_decode($app_settings_model->get('installer', 'errors', '[]'));
             $items = self::getInstaller()->getUpdates($vendor);
             $changed = false;
-            foreach ($items as $id => $item) {
+            foreach ($items as $id => &$item) {
                 if (isset($item['version'])) {
                     ++self::$counter['total'];
                     if (!empty($item['applicable'])) {
                         ++self::$counter['applicable'];
+                    }
+
+                    if (!empty($item['commercial']) && empty($item['purchased'])) {
+                        ++self::$counter['payware'];
                     }
                 }
 
@@ -184,16 +189,24 @@ class installerHelper
                     $changed = true;
                 }
 
-                foreach (array('themes', 'plugins') as $extras) {
+                foreach (array('themes', 'plugins', 'widgets') as $extras) {
                     if (isset($item[$extras])) {
                         self::$counter['total'] += count($item[$extras]);
-                        foreach ($item[$extras] as $extras_item) {
-                            if (!empty($extras_item['applicable'])) {
+                        foreach ($item[$extras] as $extras_id => $extras_item) {
+                            if (!empty($extras_item['inbuilt'])) {
+                                if (empty($item['applicable'])) {
+                                    --self::$counter['total'];
+                                    unset($item[$extras][$extras_id]);
+                                } elseif (!empty($extras_item['applicable'])) {
+                                    ++self::$counter['applicable'];
+                                }
+                            } elseif (!empty($extras_item['applicable'])) {
                                 ++self::$counter['applicable'];
                             }
                         }
                     }
                 }
+                unset($item);
             }
             if ($changed) {
                 $app_settings_model->ping();
@@ -306,7 +319,7 @@ class installerHelper
     {
         $module = 'apps';
         $url = parse_url(waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
-        if (preg_match('/(^|&)module=(update|apps|plugins)($|&)/', $url, $matches)) {
+        if (preg_match('/(^|&)module=(update|apps|plugins|widgets)($|&)/', $url, $matches)) {
             $module = $matches[2];
         }
         return $module;
@@ -317,13 +330,19 @@ class installerHelper
      * @param array $messages
      * @throws Exception
      */
-    private static function handleException($ex, &$messages)
+    public static function handleException($ex, &$messages)
     {
+        $message = $ex->getMessage();
+        waLog::log($message, 'installer.log');
+        if (preg_match('@\b\[?(https?://[^\s]+)\]?\b@', $message, $matches)) {
+            $message = str_replace($matches[1], parse_url($matches[1], PHP_URL_HOST), $message);
+        }
+
         if ($messages === null) {
             throw $ex;
         } else {
             $messages[] = array(
-                'text'   => $ex->getMessage(),
+                'text'   => $message,
                 'result' => 'fail',
             );
         }

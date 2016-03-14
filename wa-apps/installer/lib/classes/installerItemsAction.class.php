@@ -24,7 +24,20 @@ abstract class installerItemsAction extends waViewAction
 
     protected function extendApplications(&$applications)
     {
+        $apps = wa()->getApps();
+        foreach ($applications as $app_id => &$app) {
+            if (isset($apps[$app_id])) {
+                $app['name'] = $apps[$app_id]['name'];
+            } else {
+                $app['name'] = _wd($app_id, $app['name']);
+            }
+            unset($app);
+        }
+    }
 
+    protected function getTags()
+    {
+        return array();
     }
 
     public function execute()
@@ -38,7 +51,9 @@ abstract class installerItemsAction extends waViewAction
         $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
         $filter = array();
         if ($this->module) {
-            $filter['extras'] = $this->module;
+            if ($this->module != 'widgets') {
+                $filter['extras'] = $this->module;
+            }
         }
 
 
@@ -63,9 +78,13 @@ abstract class installerItemsAction extends waViewAction
                     unset($options['filter']['slug']);
                 }
 
-                $search['slug'] = array_filter(array_map('trim', explode(',', $slug)), 'strlen');
+                if ($slug === 'all') {
+                    $search['slug'] = array_keys($applications);
+                } else {
+                    $search['slug'] = array_filter(array_map('trim', explode(',', $slug)), 'strlen');
+                }
 
-                if ($this->module == 'themes') {
+                if (in_array($this->module, array('themes', 'widgets'))) {
                     if (empty($search['slug'])) {
                         $search['slug'] = array_keys($applications);
                     }
@@ -77,67 +96,107 @@ abstract class installerItemsAction extends waViewAction
                     }
                 }
 
-                if ((!$this->redirect || !empty($search['slug'])) && (($keys = installerHelper::search($applications, $search, true)) !== null)) {
+                if ((!$this->redirect || !empty($search['slug']))
+                    &&
+                    (($keys = installerHelper::search($applications, $search, true)) !== null)
+                ) {
                     $slug = array();
                     foreach ($keys as $id => $key) {
                         $slug[$id] = $applications[$key]['slug'];
                     }
-
-                    $extras = installerHelper::getInstaller()->getExtras($slug, $this->module, $options);
                     $vendor_name = null;
-                    foreach ($extras as $app_id => $app_item) {
-                        if (!empty($app_item[$this->module])) {
-                            foreach ($app_item[$this->module] as $extras_id => $extras_item) {
-                                if (!empty($extras_item['vendor_name']) && !empty($options['filter']['vendor']) && empty($vendor_name)) {
-                                    $vendor_name = $extras_item['vendor_name'];
-                                }
+                    foreach ((array)$this->module as $module) {
 
-                                if (in_array($app_id, $keys) !== false) {
-                                    $app = &$applications[$app_id];
-                                    if (!isset($app[$this->module])) {
-                                        $app[$this->module] = array();
+                        $extras = installerHelper::getInstaller()->getExtras($slug, $module, $options);
+
+                        foreach ($extras as $app_id => $app_item) {
+
+                            if (!empty($app_item[$module])) {
+                                foreach ($app_item[$module] as $extras_id => $extras_item) {
+                                    if (!empty($extras_item['vendor_name']) && !empty($options['filter']['vendor']) && empty($vendor_name)) {
+                                        $vendor_name = $extras_item['vendor_name'];
                                     }
-                                    $app[$this->module][$extras_id] = $extras_item;
-                                    unset($app);
 
-                                } elseif (!empty($extras_item['inherited'])) {
-                                    foreach (array_keys($extras_item['inherited']) as $app_id) {
-                                        if (in_array($app_id, $keys) !== false) {
-                                            $app = &$applications[$app_id];
-                                            if (!isset($app[$this->module])) {
-                                                $app[$this->module] = array();
-                                            }
-                                            $app[$this->module][$extras_id] = $extras_item;
-                                            unset($app);
+                                    if (in_array($app_id, $keys) !== false) {
+                                        $app = &$applications[$app_id];
+                                        if (!isset($app[$module])) {
+                                            $app[$module] = array();
                                         }
+                                        $app[$module][$extras_id] = $extras_item;
+                                        unset($app);
+
+                                    } elseif (!empty($extras_item['inherited'])) {
+                                        foreach (array_keys($extras_item['inherited']) as $app_id) {
+                                            if (in_array($app_id, $keys) !== false) {
+                                                $app = &$applications[$app_id];
+                                                if (!isset($app[$module])) {
+                                                    $app[$module] = array();
+                                                }
+                                                $app[$module][$extras_id] = $extras_item;
+                                                unset($app);
+                                            }
+                                        }
+                                    } elseif ($app_id == 'webasyst') {
+                                        $alias_id = 'installer';
+                                        $app = &$applications[$alias_id];
+
+                                        if (!isset($app[$module])) {
+                                            $app[$module] = array();
+                                            $app['slug'] = 'webasyst';
+                                        }
+                                        $app[$module][$extras_id] = $extras_item;
+                                        unset($app);
                                     }
                                 }
                             }
                         }
+
                     }
+
                     foreach ($keys as $id => $key) {
-                        if (empty($applications[$key][$this->module])) {
+                        $empty = true;
+                        foreach ((array)$this->module as $module) {
+                            if (!empty($applications[$key][$module])) {
+                                $empty = false;
+
+                            }
+                        }
+                        if ($empty) {
                             unset($slug[$id]);
                         }
                     }
 
+
                     $this->view->assign('vendor_name', $vendor_name);
                 } else {
                     reset($applications);
-                    if ($app = current($applications)) {
-                        $this->redirect(array('module' => $this->module, 'slug' => $app['slug'], 'vendor' => $app['vendor']));
+                    $app = current($applications);
+                    if ($app) {
+                        $redirect = array(
+                            'module' => $this->module,
+                            'slug'   => $app['slug'],
+                            'vendor' => $app['vendor'],
+                        );
+                        $this->redirect($redirect);
                     }
 
                 }
+
 
                 $this->view->assign('slug', $search['slug']);
                 //$this->view->assign('vendor', $search['vendor']);
                 $this->view->assign('extras', $extras);
             }
 
+            $this->view->assign('tags', $this->getTags());
             $this->view->assign('apps', $applications);
         } catch (Exception $ex) {
-            $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
+            $message = $ex->getMessage();
+            waLog::log($message, 'installer.log');
+            if (preg_match('@\b(https?://[^\s]+)\b@', $message, $matches)) {
+                $message = str_replace($matches[1], parse_url($matches[1], PHP_URL_HOST), $message);
+            }
+            $messages[] = array('text' => $message, 'result' => 'fail');
         }
 
         installerHelper::checkUpdates($messages);

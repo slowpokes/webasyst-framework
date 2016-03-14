@@ -14,6 +14,9 @@
  */
 class waModel
 {
+    const INSERT_ON_DUPLICATE_KEY_UPDATE = 1;
+    const INSERT_IGNORE = 2;
+
     /**
      * Database Adapter
      * @var waDbAdapter
@@ -492,6 +495,9 @@ class waModel
      */
     protected function castValue($type, $value, $is_null = false)
     {
+        if ($value instanceof waModelExpr) {
+            return (string)$value;
+        }
         switch ($type) {
             case 'bigint':
             case 'tinyint':

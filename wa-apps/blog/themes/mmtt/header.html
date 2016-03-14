@@ -1,23 +1,27 @@
 <!--header-->
+{if $wa->shop}
+{$cart_total = $wa->shop->cart->total()}
+{$cart_count = $wa->shop->cart->count()}
+{$cart_items = $wa->shop->cart->items()}
+{/if}
 <div class="header">
     <div class="top_line">
-        <div class="site_name"><span id='site_name1'>Первый Московский Магазин</span> Таможенных Товаров</div>
         <div class="user_links">
-            <a href="/saved/">Отложено</a> |
-            {if $wa->isAuthEnabled()}
-                {if $wa->user()->isAuth()}
-                    <a href="{$wa->getUrl('/frontend/my')}">{$wa->user('name')}</a> |
-                    <a href="?logout">[s`Log out`]</a>
-                {else}
-                    <a href="{$wa->loginUrl()}">Личный кабинет</a> |
-                    <a href="{$wa->signupUrl()}">[s`Sign up`]</a>
-                {/if}
+            {*
+            <a href="/saved/">Отложено {$wa->shop->saved()}</a> |
+            *}
+            {if $wa->user()->isAuth()}
+                <a href="{$wa->getUrl('/frontend/my')}">{$wa->user('name')}</a> |
+                <a href="?logout">[s`Log out`]</a>
+            {else}
+                <a href="{$wa->loginUrl()}">Личный кабинет</a> |
+                <a href="{$wa->signupUrl()}">[s`Sign up`]</a>
             {/if}
         </div>
     </div>
     <div class="header_main">
         <div class="logo_block">
-            <div class="logo"><a href="/"><img alt="Интернет магазин таможенных товаров 1mmtt.ru" src="/wa-apps/shop/themes/mmtt/img/logo.png"></a></div>
+            <div class="logo"><a href="/"><img alt="Интернет магазин таможенных товаров 1mmtt.ru" src="/wa-apps/shop/themes/mmtt/img/logo_new.png"></a></div>
         </div>
         <div class="header_center">
             <div class="phone_big">8 (800) 100-03-90 &nbsp;&nbsp;&nbsp; +7 (495) 662-30-60</div>
@@ -32,7 +36,22 @@
                     <div class="cart_maininfo">
                         <div class="cart_main"><a class="cart_button" href='{$wa->getUrl('/frontend/cart')}'>Корзина:</a></div>
                         <div class="cart_info cart-total">
-
+                            <div class='cart_notempty'>
+                                <span class='cart_count'>{$cart_c}</span> | <span class='cart_total'>{$cart_t}</span>
+                                <div class="cart_link"><a href="/cart/" class="cart_button">Оформить заказ</a></div>
+                            </div>
+                            <div class='cart_empty'>нет товаров</div>
+                            {if $cart_count>0}
+                            {literal}
+                                <style>.cart_empty{display: none}</style>
+                            {/literal}
+                                <script>cart_empty = false;cart_total = '{$cart_t}';</script>
+                            {else}
+                            {literal}
+                                <style>.cart_notempty{display: none}</style>
+                                <script>cart_empty = true;</script>
+                            {/literal}
+                            {/if}
                         </div>
                     </div>
                 </div>
@@ -41,8 +60,4 @@
         <div class="cb"></div>
     </div>
 </div>
-<script>
-    var cart_items = [];
-    var cart_items_full = [];
-</script>
 <!--header end-->

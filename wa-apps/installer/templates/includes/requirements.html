@@ -4,7 +4,7 @@ Requirements list
 *}
 {if !empty($item.requirements)}
     {capture name='warning'}
-        {assign var=warning_meets value=''}
+        {assign var=warning_meets value=false}
         {if !isset($class)}{assign var=class value="small red"}{/if}
         {if !isset($icon)}{assign var=icon value=false}{/if}
         <ul class="menu-v">

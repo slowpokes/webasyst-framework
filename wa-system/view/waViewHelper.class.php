@@ -140,7 +140,7 @@ class waViewHelper
                 try {
                     $action = new $class_name();
                     wa()->getView()->assign('my_nav_selected', $app_id == $old_app ? $my_nav_selected : '');
-                    $result[$app_id] = $action->display();
+                    $result[$app_id] = $action->display(false);
                 } catch (Exception $e) {
                     unset($result[$app_id]);
                 }
@@ -184,16 +184,23 @@ class waViewHelper
         return null;
     }
 
-    public function headJs()
+    public function head()
     {
         $domain = wa()->getRouting()->getDomain(null, true);
         $domain_config_path = $this->getConfig()->getConfigPath('domains/'.$domain.'.php', true, 'site');
+        $html = '';
+        $og = wa()->getResponse()->getMeta('og');
+        if ($og) {
+            foreach ($og as $k => $v) {
+                $html .= '<meta property="'.htmlspecialchars($k).'" content="'.htmlspecialchars($v).'" />'.PHP_EOL;
+            }
+        }
+
         if (file_exists($domain_config_path)) {
             /**
              * @var $domain_config array
              */
             $domain_config = include($domain_config_path);
-            $html = '';
             if (!empty($domain_config['head_js'])) {
                 $html .= $domain_config['head_js'];
             }
@@ -232,9 +239,13 @@ HTML;
 HTML;
                 }
             }
-            return $html;
         }
-        return '';
+        return $html;
+    }
+
+    public function headJs()
+    {
+        return $this->head();
     }
 
 
@@ -306,7 +317,7 @@ HTML;
 
     public function css()
     {
-        if (wa()->getEnv() == 'backend') {
+        if (wa()->getEnv() == 'backend' || wa()->getEnv() == 'api') {
             $css = '<link href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.3.css?v'.$this->version(true).'" rel="stylesheet" type="text/css" >
 <!--[if IE 9]><link type="text/css" href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.0.ie9.css" rel="stylesheet"><![endif]-->
 <!--[if IE 8]><link type="text/css" href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.0.ie8.css" rel="stylesheet"><![endif]-->
@@ -683,7 +694,7 @@ HTML;
                 $field_name = ucfirst($field_id);
             }
         }
-        return '<div class="wa-form login_form">'. // VADIM CODE
+        $html = '<div class="wa-form">'.
             ($form ? '<form action="'.($form === 2 ? $this->loginUrl() : '').'" method="post">' : '').'
                 <div class="wa-field wa-field-'.$field_id.'">
                     <div class="wa-name">'.$field_name.'</div>
@@ -697,14 +708,21 @@ HTML;
                         <input'.($error ? ' class="wa-error"' : '').' type="password" name="password"'.($placeholders ? ' placeholder="'._ws('Password').'"' : '').'>'.
                         ($error ? '<em class="wa-error-msg">'.$error.'</em>' : '').'
                     </div>
+                </div>';
+
+        $auth_config = wa()->getAuthConfig();
+        if (!empty($auth_config['rememberme'])) {
+            $html .= '<div class="wa-field wa-field-remember-me">
+                <div class="wa-value">
+                    <label><input name="remember" type="checkbox" '.(waRequest::post('remember') ? 'checked="checked"' : '').' value="1"> '._ws('Remember me').'</label>
                 </div>
-                <div class="wa-field">
+            </div>';
+        }
+
+        $html .= '<div class="wa-field">
                     <div class="wa-value wa-submit">
                         <input type="hidden" name="wa_auth_login" value="1">
-                        <input type="submit" class="button" value="'._ws('Sign In').'">
-                    </div>
-                </div>
-                <div class="wa-field">
+                        <input type="submit" value="'._ws('Sign In').'">
                         &nbsp;
                         <a href="'.$this->getUrl('/forgotpassword').'">'._ws('Forgot password?').'</a>
                         &nbsp;
@@ -713,6 +731,7 @@ HTML;
                 </div>'.(waRequest::param('secure') ? $this->csrf() : '').
             ($form ? '</form>' : '').'
         </div>';
+        return $html;
     }
 
     public function forgotPasswordForm($error = '', $placeholders = false)
@@ -861,7 +880,7 @@ HTML;
         }
         $signup_submit_name = !empty($config['params']['button_caption']) ? htmlspecialchars($config['params']['button_caption']) : _ws('Sign Up');
         $html .= '<div class="wa-field"><div class="wa-value wa-submit">
-            <input type="submit" class="button" value="'.$signup_submit_name.'"> '.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
+            <input type="submit" value="'.$signup_submit_name.'"> '.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
         </div></div>';
         if (waRequest::param('secure')) {
             $html .= $this->csrf();
@@ -1111,7 +1130,7 @@ HTML;
         if($region_id>0){
         }
         else{
-            $region_id = 77; 
+            $region_id = 77;
         }
         $region = $geoip->getRegionName($region_id);
         return "<span id='region_name' class='region_name region_handler' data-id='$region_id'>$region</span>";

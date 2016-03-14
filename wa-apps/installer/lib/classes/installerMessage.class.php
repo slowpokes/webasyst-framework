@@ -62,6 +62,9 @@ class installerMessage
             unset($this->messages[$id]);
         }
         $this->storage->write(__CLASS__, $this->messages);
+        if ($this->messages && wa()->getConfig()->isDebug()) {
+            waLog::log(var_export($this->messages, true), 'installer/messages.log');
+        }
     }
 
     /**

@@ -20,4 +20,3 @@ class installerUpdateDownloadlogController extends waController
         waFiles::readFile($installer->getLogPath(), 'update.txt');
     }
 }
-//EOF

@@ -21,13 +21,13 @@
                 <!-- already installed -->
                 <div class="align-center">
                     {if $app.commercial && empty($app.purchased)}
-                        {* PAID APP, LICENSE IS NOT VALID *}                        
+                        {* PAID APP, LICENSE IS NOT VALID *}
                         {if !empty($app.license_expire)}
-                        
+
                             {* EXPIRED LICENSE: renew ... *}
                             <p class="red"><i class="icon16 no"></i>{sprintf("[`License for using %s on <strong>%s</strong> has expired on %s`]",$app.name|escape,installerHelper::getDomain()|escape,waDatetime::format('humandate',$app.license_expire))}</p>
                             <a class="button green" href="{$app.renew_url|escape}">[`Renew license`]</a>
-                            
+
                             {* ...or buy a permanent license *}
                             <form action="{$app.purchase_url|escape}" method="post" id="buy-instead-of-renew-license-form">
                                 <p>
@@ -42,7 +42,7 @@
                                 </p>
                                 <p>{sprintf("[`Permanent license saves you money on your monthly bills (your monthly payment will be reduced by %s).`]", $app.lease_price)}</p>
                             </form>
-                            
+
                         {else}
                             {* NEVER LICENSED *}
                             <form action="{$app.purchase_url|escape}" method="post">
@@ -98,13 +98,13 @@
                                     </p>
                                     <p>{sprintf("[`Permanent license saves you money on your monthly bills (your monthly payment will be reduced by %s).`]", $app.lease_price)}</p>
                                 </form>
-                                
+
                             {else}
                                 {* VALID LICENSE *}
                                 <p><em class="i-installed-label"><i class="icon16 yes"></i>{sprintf("[`This is a valid licensed installation of %s on <strong>%s</strong>.`]",$app.name|escape, installerHelper::getDomain()|escape)}</em></p>
 
                                 <a class="button green" href="{* $app.buymore_url|escape *}https://www.webasyst.com/buy/store/{$app.slug}{if $wa->locale() == 'ru_RU'}?locale=ru_RU{/if}">[`Buy more licenses`]</a>
-                                
+
                                 <p>{sprintf("[`Additional licenses are required if you are using %s on more than one domain name (<a href='%s' target='_blank'>one license per domain</a>).`]",$app.name|escape, '[`http://www.webasyst.com/help/1200/paid-app-licensing/`]')}</p>
                             {/if}
                         {else}
@@ -172,12 +172,14 @@
                             {if ifset($app.lease_price) == 'free'}
                                 {* free to install on this particular installation (cloud) *}
                                 <div class="value">
+                                    {if $app.price}<strike>{$app.price}</strike>{/if}
                                     <strong>[`Free`]</strong>
                                 </div>
+                                {if $app.price}<div class="value italic"><p class="small">{sprintf('[`Your account status enables you to install %s for free!`]', $app.name|escape)}</p></div>{/if}
                             {else}
                                 <div class="value">
                                     {if !empty($app.compare_price)}<strike class="gray">{$app.compare_price}</strike>&nbsp; {/if}
-                                    <strong{if !empty($app.compare_price)} class="highlighted"{/if}>{$app.price}</strong>
+                                    <strong{if !empty($app.compare_price)} class="discounted large"{/if}>{$app.price}</strong>
                                 </div>
                                 {if !empty($app.lease_price)}
                                     <div class="value">
@@ -366,7 +368,7 @@
             {/if}
 
         </article>
-        
+
         <section class="i-page i-description" id="tab-{$app.slug|escape}-info">
             <p>{$app.description}</p>
         </section>
@@ -378,11 +380,11 @@
         {/foreach}
         {/if}
         {if !empty($app.changelog)}
-            <section class="i-page" id="tab-{$app.slug|escape}-changelog" style="display:none;">
+            <section class="i-page i-changelog" id="tab-{$app.slug|escape}-changelog" style="display:none;">
                 {foreach $app.changelog as $changelog}
                     <h5>{$changelog.version}{if !empty($changelog.datetime)} <span class="hint">{$changelog.datetime|wa_date:'humandate'|escape}</span>{/if}</h5>
                     {if version_compare($changelog.version,$app.installed.version,'>')}{/if}
-                    <div class="i-changelog">{$changelog.content|nl2br}</div>
+                    <div>{if $changelog.content|strstr:'<' && $changelog.content|strstr:'>'}{$changelog.content}{else}{$changelog.content|nl2br}{/if}</div>
                 {/foreach}
             </section>
         {/if}

@@ -1,6 +1,6 @@
 <div class="shadowed">
     <div class="i-white-core-content">
-    
+
         {if !empty($messages)}
             {foreach $messages as $message}
                 <div class="block double-padded i-message-{$message.result}">
@@ -8,11 +8,11 @@
                     {elseif $message.result == 'fail'}
                     <i class="icon16 no"></i>
                     {/if}
-                    {$message.text|escape}
+                    {$message.text|escape|nl2br}
                 </div>
             {/foreach}
-        {/if}    
-    
+        {/if}
+
         <div class="block double-padded">
 
           <div class="fields form">
@@ -34,7 +34,6 @@
                     </div>
                     <div class="value">
                         <input type="text" name="url" value="{$settings.url|escape}" id="config-url"><br>
-                        <span class="hint">[`Your website, blog or company URL (will be displayed as a link below the company name in the top left corner).`]</span>
                     </div>
                 </div>
 
@@ -125,6 +124,20 @@
                     {/if}
                 </div>
               </div>
+
+            {if !empty($locale_adapter)}
+              <div class="field-group">
+                  <div class="field">
+                      <div class="name">[`Localization`]</div>
+                      <div class="value no-shift">
+                          <select name="locale_adapter">
+                              <option {if $locale_adapter == 'gettext'}selected{/if} value="gettext">[`Gettext (recommended)`]</option>
+                              <option {if $locale_adapter == 'php'}selected{/if} value="php">PHP</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+            {/if}
 
               <div class="field-group">
                 <div class="field">

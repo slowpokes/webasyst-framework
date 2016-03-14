@@ -11,7 +11,7 @@ class siteHelper
     {
         if (!self::$domains) {
             $domain_model = new siteDomainModel();
-            $q = $domain_model->select('*');
+            $q = $domain_model->select('*')->order('id');
             if (!wa()->getUser()->isAdmin('site')) {
                 $domain_ids = wa()->getUser()->getRights('site', 'domain.%', false);
                 if ($domain_ids) {
@@ -60,7 +60,8 @@ class siteHelper
                 $result[$id] = array(
                     'name' => $d['name'],
                     'title' => $result[$id],
-                    'style' => $d['style']
+                    'style' => $d['style'],
+                    'is_alias' => wa()->getRouting()->isAlias($d['name'])
                 );
             }
         }
@@ -110,6 +111,14 @@ class siteHelper
     {
         self::getDomains();
         return self::$domains[self::getDomainId()][$key];
+    }
+
+    public static function getDomainInfo()
+    {
+        self::getDomains();
+        $domain_info = self::$domains[self::getDomainId()];
+        $domain_info['id'] = self::getDomainId();
+        return $domain_info;
     }
     
     public static function getApp($info = true)

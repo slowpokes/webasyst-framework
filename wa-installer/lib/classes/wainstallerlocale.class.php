@@ -16,9 +16,9 @@ class waInstallerLocale
 {
     private static $strings = array();
     private $locale;
-    function __construct($default = null)
-    {
 
+    public function __construct($default = null)
+    {
         $this->locale = $default ? $default : $this->detect();
         $path = dirname(__FILE__).'/../../locale/'.$this->locale.'.php';
         if (preg_match('/^[a-z]{2}_[A-Z]{2}$/', $this->locale) && file_exists($path)) {
@@ -29,7 +29,6 @@ class waInstallerLocale
                 self::$strings[$this->locale] = array();
             }
         }
-
     }
 
     public function getLocale()
@@ -63,7 +62,7 @@ class waInstallerLocale
                 $lang .= '_'.$matches[2][$i];
             }
             if (!empty($matches[3][$i])) {
-                $q = (float) $matches[3][$i];
+                $q = (float)$matches[3][$i];
             } else {
                 $q = 1.0;
             }
@@ -107,14 +106,15 @@ class waInstallerLocale
         return $available;
     }
 
-    function _()
+    public function _()
     {
         $args = func_get_args();
         $string = current($args);
         $string = isset(self::$strings[$this->locale][$string]) ? self::$strings[$this->locale][$string] : $string;
         if (count($args)) {
             $args[0] = $string;
-            if ($formatted = @call_user_func_array('sprintf', $args)) {
+            $formatted = @call_user_func_array('sprintf', $args);
+            if ($formatted) {
                 $string = $formatted;
             } else {
                 $string = implode(', ', $args);

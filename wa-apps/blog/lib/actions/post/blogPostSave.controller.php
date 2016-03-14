@@ -27,7 +27,6 @@ class blogPostSaveController extends waJsonController
     {
         $this->post_model = new blogPostModel();
 
-
         $post = $this->getPreparedPost();
         $this->makeOperation($post);
     }
@@ -57,11 +56,7 @@ class blogPostSaveController extends waJsonController
             'meta_description'   => waRequest::post('meta_description', null, waRequest::TYPE_STRING_TRIM),
             'album_id'           => waRequest::post('album_id', null, waRequest::TYPE_INT),
             'album_link_type'    => waRequest::post('album_link_type', null, waRequest::TYPE_STRING_TRIM),
-            //'main_image'         => waRequest::post('main_image') // ZV CODE
         );
-        if (waRequest::post('main_image')) {
-            $post['main_image'] = waRequest::post('main_image');
-        }
 
         if ($post['album_id'] && blogPhotosBridge::isAvailable()) {
             wa('photos');
@@ -220,13 +215,17 @@ class blogPostSaveController extends waJsonController
                 }
                 $this->post_model->updateItem($post['id'], $post);
                 if ($prev_post['status'] != blogPostModel::STATUS_PUBLISHED && $post['status'] == blogPostModel::STATUS_PUBLISHED) {
-                    $this->log('post_publish', 1);
+                    $this->logAction('post_publish', $post['id']);
+                } else if ($prev_post['status'] == blogPostModel::STATUS_PUBLISHED && $post['status'] != blogPostModel::STATUS_PUBLISHED) {
+                    $this->logAction('post_unpublish', $post['id']);
                 } else {
-                    $this->log('post_edit', 1);
+                    $this->logAction('post_edit', $post['id']);
                 }
             } else {
                 $post['id'] = $this->post_model->updateItem(null, $post);
-                $this->log('post_publish', 1);
+                if ($post['status'] == blogPostModel::STATUS_PUBLISHED) {
+                    $this->logAction('post_publish', $post['id']);
+                }
             }
 
             $this->saveParams($post['id']);
@@ -276,7 +275,7 @@ class blogPostSaveController extends waJsonController
     private function delete($post)
     {
         $post_model = new blogPostModel();
-        $post = $post_model->getFieldsById($post['id'], array('id', 'blog_id', 'contact_id'));
+        $post = $post_model->getFieldsById($post['id'], array('id', 'blog_id', 'contact_id', 'status'));
         if ($post) {
             if (!$this->getUser()->isAdmin($this->getApp())) {
                 // author of post
@@ -287,6 +286,9 @@ class blogPostSaveController extends waJsonController
                 }
             }
             $post_model->deleteById($post['id']);
+            if ($post['status'] == blogPostModel::STATUS_PUBLISHED) {
+                $this->logAction('post_delete', $post['id']);
+            }
             $this->response['redirect'] = '?blog='.$post['blog_id'];
         } else {
             $this->response['redirect'] = '?';

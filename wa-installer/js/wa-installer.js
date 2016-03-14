@@ -14,6 +14,7 @@
             'mod_rewrite_id': 'input_mod_rewrite',
             'redirect_url_id': 'redirect_url',
             'redirect_message_id': 'redirect_message',
+            'lang': null,
             'end': true
         },
         form: null,
@@ -72,6 +73,9 @@
                 if (wai.xmlReq) {
                     wai.xmlReq.onreadystatechange = wai.onGetState;
                     var url = "install.php?action=getstate&source=ajax&req_time=" + wai.date.getTime();
+                    if (wai.options.lang) {
+                        url += '&lang=' + wai.options.lang;
+                    }
                     wai.xmlReq.open("GET", url, true);
                     wai.xmlReq.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
                     wai.xmlReq.send(null);
@@ -82,12 +86,12 @@
         },
         checkModRewrite: function () {
             var input = document.getElementById(wai.options.mod_rewrite_id);
-            if (input && parseInt(input.value)) {
+            if (input && (parseInt(input.value) || true)) {
                 try {
                     wai.xmlReqRewrite = wai.createRequestObject();
                     if (wai.xmlReqRewrite) {
                         wai.xmlReqRewrite.onreadystatechange = wai.oncheckModRewrite;
-                        var url = "webasyst/";
+                        var url = "./non/exists/url/?mod_rewrite=1";
                         wai.xmlReqRewrite.open("GET", url, true);
                         wai.xmlReqRewrite.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
                         wai.xmlReqRewrite.send(null);
@@ -100,11 +104,13 @@
         oncheckModRewrite: function () {
             try {
                 if (wai.xmlReqRewrite.readyState == 4) {// 4 = "loaded"
+                    var input = document.getElementById(wai.options.mod_rewrite_id);
                     // 404 = mod rewrite not available
                     // 500 = mod rewrite not work properly
                     if ((wai.xmlReqRewrite.status == 404) || (wai.xmlReqRewrite.status == 500)) {
-                        var input = document.getElementById(wai.options.mod_rewrite_id);
                         input.value = '0';
+                    } else if ((wai.xmlReqRewrite.status == 200) && (wai.xmlReqRewrite.responseText.match(/mod_rewrite:success/))) {
+                        input.value = '1';
                     }
                     wai.xmlReqRewrite = null;
                 }
@@ -193,7 +199,7 @@
                     var url = "install.php";
                     var query = [];
                     query[query.length] = 'step=' + '2';
-                    query[query.length] = 'lang=' + 'ru_RU';
+                    query[query.length] = 'lang=' + wai.options.lang;
                     query[query.length] = 'timestamp=' + wai.date.getTime();
                     url = url + '?' + query.join('&');
                     wai.xmlReqExtract.open("GET", url, true);

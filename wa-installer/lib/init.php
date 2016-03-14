@@ -60,4 +60,3 @@ if (!function_exists('_wd')) {
         return $t->_($string);
     }
 }
-//EOF

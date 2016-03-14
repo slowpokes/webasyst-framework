@@ -11,7 +11,7 @@ class webasystApiTokenController extends waController
 
     public function execute()
     {
-        if (!$this->checkRequest()) {
+        if (!$this->checkRequest()) {;
             return;
         }
 

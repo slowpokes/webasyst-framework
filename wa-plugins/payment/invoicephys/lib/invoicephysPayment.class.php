@@ -11,6 +11,7 @@
  * @property-read string $kpp
  * @property-read string $second_name
  * @property-read string $bank_name
+ * @property-read string $emailprintform
  */
 class invoicephysPayment extends waPayment implements waIPayment, waIPaymentCapture
 {
@@ -40,8 +41,9 @@ class invoicephysPayment extends waPayment implements waIPayment, waIPaymentCapt
     {
         $forms = array();
         $forms[$this->id] = array(
-            'name'        => 'Квитанция',
-            'description' => 'Квитанция на оплату в банке (РФ)',
+            'name'           => 'Квитанция',
+            'description'    => 'Квитанция на оплату в банке (РФ)',
+            'emailprintform' => $this->emailprintform,
         );
         return $forms;
     }
@@ -59,8 +61,9 @@ class invoicephysPayment extends waPayment implements waIPayment, waIPaymentCapt
     {
         if ($id == $this->id) {
             $view = wa()->getView();
-            $view->assign('settings', $this->getSettings(), true);
+
             $view->assign('order', $order);
+            $view->assign('settings', $this->getSettings(), true);
 
             return $view->fetch($this->path.'/templates/form.html');
         } else {

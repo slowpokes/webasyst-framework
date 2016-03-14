@@ -6,13 +6,22 @@
     <meta name="Keywords" content="{$wa->meta('keywords')|escape}" />
     <meta name="Description" content="{$wa->meta('description')|escape}" />
 
+    <link href="/wa-apps/shop/themes/mmtt/css/bootstrap.min.css" rel="stylesheet">
     <link href="/wa-apps/shop/themes/mmtt/css/default.css" rel="stylesheet" type="text/css">
     <link href="/wa-apps/shop/themes/mmtt/css/uri.css" rel="stylesheet" type="text/css">
     {include file="$wa_active_theme_path/app_head.html"}
 
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
-    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.8.2.min.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-migrate-1.2.1.min.js"></script>
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.tools.min.js"></script>
 
     <script type="text/javascript" src="{$wa_app_static_url}js/banner.js"></script>
@@ -20,6 +29,12 @@
     {$wa->js()}
     {$wa->headJs()}
 
+    {* @event frontend_head.%plugin_id% *}
+    {if isset($frontend_head)}
+        {foreach $frontend_head as $_}{$_}{/foreach}
+    {/if}
+
+    <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.nouislider.js"></script>
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.maskedinput.js"></script>{* ввод номера телефона по маске *}
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/mailcheck.js"></script>{* проверка email на опечатку *}
@@ -27,6 +42,7 @@
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery-ui-1.8.11.custom.min.js"></script> {* календарик *}
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.autocomplete.min.js"></script> {* подсказка для городов *}
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/scrolltop.js"></script> {* кнопка наверх *}
+    <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/modal.js"></script>
 
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/default.js"></script> {* общие скрипты для сайта *}
     <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/cart.js"></script> {* общие скрипты для корзины *}
@@ -45,9 +61,10 @@
 <div class="wrapper">
 <div class="wrapper2">
     {include file="header.html"}
-    <div class="container">
+    <div class="main-container">
         <script>
-            $(".container").css('min-height', $(window).height());
+            $(".main-container").css('min-height', $(window).height());
+            $('body').addClass('with-bg');
         </script>
         {include file="$wa_active_theme_path/top_menu.html"}
         <div class="main_content">
