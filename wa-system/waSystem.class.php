@@ -609,6 +609,8 @@ class waSystem
     {
         $params = array();
         $app = $argv[1];
+        $app_fake = $app;//VADIM CODE
+        $app = wa()->replaceNameToReal($app);//VADIM CODE
         $class = $app.ucfirst($argv[2])."Cli";
         $argv = array_slice($argv, 3);
         while ($arg = array_shift($argv)) {
@@ -630,6 +632,7 @@ class waSystem
             //throw new waException("App ".$app." not found", 404);
         }
         // Load app
+        self::setApp($app, $app_fake); //VADIM CODE
         waSystem::getInstance($app, null, true);
         if (class_exists($class)) {
             /**
