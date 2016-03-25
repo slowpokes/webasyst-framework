@@ -627,7 +627,7 @@ class waSystem
         waSystem::getInstance('webasyst');
 
         if (!wa()->appExists($app)) {
-            throw new waException("App ".$app." not found", 404);
+            //throw new waException("App ".$app." not found", 404);
         }
         // Load app
         waSystem::getInstance($app, null, true);
