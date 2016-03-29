@@ -466,8 +466,25 @@ class waSystem
                 $webasyst_system->getFrontController()->execute(null, 'dashboard', 'tv');
             } elseif (preg_match('/^sitemap-?([a-z0-9_]+)?(-([0-9]+))?.xml$/i', $this->config->getRequestUrl(true), $m)) {
                 $app_id = isset($m[1]) ? $m[1] : 'webasyst';
-                if ($this->appExists($app_id)) {
-                    self::getInstance($app_id);
+
+                //VADIM CODE START
+                $app_fake = $app_id;
+                if($app_id=='shop') {
+                    $system = waSystem::getInstance();
+                    $apps = $system->getApps();
+                    $routes = $this->getRouting()->getRoutes(wa()->getRouting()->getDomain(null, true));
+                    foreach ($routes as $r) {
+                        if (isset($r['app']) && empty($r['private']) && isset($apps[$r['app']])) {
+                            if(substr($r['app'], 0, 5)=='shop_'){
+                                $app_fake = $r['app'];
+                            }
+                        }
+                    }
+                }
+                //VADIM CODE END
+
+                if ($this->appExists($app_fake)) {//VADIM CODE
+                    self::getInstance($app_fake);//VADIM CODE
                     $class = $app_id.'SitemapConfig';
                     if (class_exists($class)) {
                         /**

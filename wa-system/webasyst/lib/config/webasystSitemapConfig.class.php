@@ -17,6 +17,8 @@ class webasystSitemapConfig extends waSitemapConfig
         }
 
         foreach ($domain_apps as $app_id => $app) {
+            wa()->setAppTemp($app_id);//VADIM CODE
+            $app_id = wa()->replaceNameToReal($app_id);//VADIM CODE
             $path = $system->getAppPath('lib/config/'.$app_id.'SitemapConfig.class.php', $app_id);
             if (file_exists($path)) {
                 include_once($path);
