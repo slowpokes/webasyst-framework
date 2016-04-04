@@ -11,7 +11,6 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
     <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.8.2.min.js"></script>
-    <script type="text/javascript" src="/wa-apps/shop/themes/aromateca/js/jquery.tools.min.js"></script>
 
     {$wa->js()}
     {$wa->headJs()}
@@ -20,7 +19,6 @@
     {* @event frontend_head.%plugin_id% *}
     {foreach $frontend_head as $_}{$_}{/foreach}
 
-    <script type="text/javascript" src="/wa-apps/shop/themes/aromateca/js/main.js"></script> {* общие скрипты для сайта *}
     {include file="$wa_active_theme_path/js.html"}
     <script>
         $(document).ready(function () {
