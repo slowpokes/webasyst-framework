@@ -311,6 +311,17 @@ class russianpost2Shipping extends waShipping
                         if ($rate['ground'] < 370) {
                             $rate['ground'] = 370;
                         }
+                        $order_price = $this->getTotalPrice();
+                        if ($order_price >= $this->free_shipping) {
+                            if ($this->free_shipping_amount > 0) {
+                                $rate['ground'] = $rate['ground'] - $this->free_shipping_amount;
+                                if ($rate['ground'] < 0) {
+                                    $rate['ground'] = 0;
+                                }
+                            } else {
+                                $rate['ground'] = 0;
+                            }
+                        }
                         $services['ground'] = array(
                             'name' => 'Наземный транспорт',
                             'id' => 'ground',
@@ -650,7 +661,8 @@ class russianpost2Shipping extends waShipping
      */
     public function tracking($tracking_id = null)
     {
-        return 'Отслеживание отправления: <a href="http://www.russianpost.ru/Tracking20/" target="_blank">http://www.russianpost.ru/Tracking20/</a>';
+        return $this->myTracking($tracking_id);
+        return 'Отслеживание отправления: <a href="https://www.pochta.ru/tracking" target="_blank">https://www.pochta.ru/tracking</a>';
     }
 
     /**
@@ -829,5 +841,25 @@ class russianpost2Shipping extends waShipping
                 break;
         }
         return !$srcIm ? false : $srcIm;
+    }
+
+    private function myTracking($barcode)
+    {
+        $model = new waModel();
+        $data = $model->query("SELECT * FROM shipment_codecheck WHERE barcode = '$barcode' ORDER BY operation_date, datetime, id")->fetchAll();
+        $result = "";
+        if (count($data) > 0) {
+            $result = "<table class='tracking_table table'>";
+            foreach ($data as $line) {
+                $result .= "<tr>";
+                $result .= "<td>" . date('d.m.Y H:i', strtotime($line['operation_date'])) . "</td>";
+                $result .= "<td>{$line['operation_place']}</td>";
+                $result .= "<td>{$line['operation_type']}</td>";
+                $result .= "<td>{$line['operation_text']}</td>";
+                $result .= "</tr>";
+            }
+            $result .= "</table>";
+        }
+        return $result;
     }
 }

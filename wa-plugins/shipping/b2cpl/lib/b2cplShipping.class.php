@@ -3,7 +3,7 @@
  * @author Serge Rodovnichenko <serge@syrnik.com>
  * @copyright (c) 2015, Serge Rodovnichenko
  * @license Webasyst
- * @version 1.1.0
+ * @version 1.1.1
  * @license http://www.webasyst.com/terms/#eula Webasyst
  * @package b2cpl
  */
@@ -155,10 +155,17 @@ class b2cplShipping extends waShipping
                 $html .= "<tr><td>$date_str</td><td>$status_str</td><td>$seat_str</td><td>$state_str</td></tr>";
             }
 
-            $html .= "</table";
+            $html .= "</table>";
         }
 
         return $html;
+    }
+
+    public function saveSettings($settings = array())
+    {
+        $this->checkRequiredExtensions();
+
+        return parent::saveSettings($settings);
     }
 
     /**
@@ -166,6 +173,7 @@ class b2cplShipping extends waShipping
      */
     protected function calculate()
     {
+        $this->checkRequiredExtensions();
         $weight = $this->getTotalWeight();
         $weight = intval($weight) > 0 ? intval($weight) : 1000;
 
@@ -218,8 +226,6 @@ class b2cplShipping extends waShipping
                 );
             }
         }
-
-//        var_dump($result, $deliveries);
 
         return $result;
     }
