@@ -16,7 +16,14 @@ class b2cShipping extends waShipping
                     $rate = $price;
                     $order_price = $this->getTotalPrice();
                     if($order_price>=$this->free_shipping){
-                        $rate = 0;
+                        if ($this->free_shipping_amount > 0) {
+                            $rate = $price - $this->free_shipping_amount;
+                            if ($rate < 0) {
+                                $rate = 0;
+                            }
+                        } else {
+                            $rate = 0;
+                        }
                     }
                     $cities = self::getCities();
                     if(isset($cities[$region_int])){
@@ -50,6 +57,7 @@ class b2cShipping extends waShipping
         foreach($cities as $c){
             $str .= "<div class='shipping_comment'>$c</div>";
         }
+        $str .= "</span>";
         return $str;
     }
 
@@ -146,8 +154,8 @@ class b2cShipping extends waShipping
     }
 
     private function myTracking($barcode){
-        $model = new shipmentCodeCheckModel();
-        $data = $model->where("barcode = '$barcode'")->order('operation_date, datetime, id')->fetchAll();
+        $model = new waModel();
+        $data = $model->query("SELECT * FROM shipment_codecheck WHERE barcode = '$barcode' ORDER BY operation_date, datetime, id")->fetchAll();
         $result = "";
         if(count($data)>0){
             $result = "<table class='tracking_table table'>";
