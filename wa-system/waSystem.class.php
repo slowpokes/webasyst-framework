@@ -650,7 +650,7 @@ class waSystem
         }
         // Load app
         self::setApp($app, $app_fake); //VADIM CODE
-        waSystem::getInstance($app, null, true);
+        waSystem::getInstance($app_fake, null, true);//VADIM CODE
         if (class_exists($class)) {
             /**
              * @var $cli waCliController
