@@ -5,13 +5,14 @@
     <title>{$wa->title()|escape}</title>
     <meta name="Keywords" content="{$wa->meta('keywords')|escape}" />
     <meta name="Description" content="{$wa->meta('description')|escape}" />
+    <meta name='yandex-verification' content='50ce4b30f8570592'/>
     <link href="/wa-apps/shop/themes/aromateca/css/aromateca.css" rel="stylesheet" type="text/css">
     {include file="$wa_active_theme_path/app_head.html"}
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
     <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.8.2.min.js"></script>
-    
+
     {$wa->js()}
     {$wa->headJs()}
 
