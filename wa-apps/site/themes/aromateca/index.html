@@ -6,6 +6,7 @@
     <meta name="Keywords" content="{$wa->meta('keywords')|escape}" />
     <meta name="Description" content="{$wa->meta('description')|escape}" />
     <meta name='yandex-verification' content='50ce4b30f8570592'/>
+    <meta name="google-site-verification" content="fZ16paJa0YnpLaTi6pTFoOBb6BOmEXEuJY9oMOcYA5U"/>
     <link href="/wa-apps/shop/themes/aromateca/css/aromateca.css" rel="stylesheet" type="text/css">
     <link href="/wa-apps/shop/themes/aromateca/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     {include file="$wa_active_theme_path/app_head.html"}
@@ -37,15 +38,15 @@
     <div class="main_content">
         {$content}
         <div class="cb"></div>
-        <div class="catalog-link">
+        <!--div class="catalog-link">
             <a href="/category/zhenshchinam/">Перейти в каталог</a>
-        </div>
+        </div-->
     </div>
     <script>$('.main_content').css('height', 'auto');</script>
     <div class="push"></div>
 </div>
 {include file="footer.html"}
 {include file="$wa_active_theme_path/noindex.html"}
-
+<a id="goTop" class="btn-floating btn-large waves-effect waves-light primary"><i class="fa fa-arrow-up no-padding"></i></a>
 </body>
 </html>

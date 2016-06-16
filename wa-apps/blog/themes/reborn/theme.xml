@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE theme PUBLIC "wa-app-theme" "http://www.webasyst.com/wa-content/xml/wa-app-theme.dtd" >
+<theme id="reborn" system="1" vendor="chelbeh" app="blog" parent_theme_id="shop:reborn" version="1.0.0">
+    <name locale="en_US">Reborn</name>
+    <name locale="ru_RU">Reborn</name>
+    <files>
+        <file path="index.html" parent="1"></file>
+        <file path="stream.html" parent="0"></file>
+    </files>
+</theme>

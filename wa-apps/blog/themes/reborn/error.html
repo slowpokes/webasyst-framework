@@ -1,0 +1,27 @@
+<div class="error-page center">
+    <h1>К сожалению, запрошенная вами страница не существует</h1>
+
+    <div>
+        Ошибка могла произойти по нескольким причинам:
+        <ul>
+            <li>Вы ввели неправильный адрес.</li>
+            <li>Страница, на которую вы хотели зайти, устарела и была удалена.</li>
+            <li>На сервере произошла ошибка, которую мы обязательно исправим.</li>
+        </ul>
+        <br>
+        По любым вопросам вы можете связаться с нами по телефону:<br>
+        <b>8(495) 221-5-381</b>
+
+        <br><br>
+        <a href="{$wa_app_url}category/elitnaya-parfyumeriya/" class="btn btn-primary btn-sm">Перейти в каталог</a>
+
+        <br><br>
+
+    </div>
+
+    <div class="error hide">
+        <pre>
+        {if $error_code}{$error_code}. {/if}{$error_message|default:"[`Error`]"}
+        </pre>
+    </div>
+</div>

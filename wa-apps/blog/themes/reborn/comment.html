@@ -1,0 +1,27 @@
+<ul>
+    <li id="comment-{$comment.id}">
+        <div class="review" itemprop="review" itemscope itemtype="http://schema.org/Review">
+            <div class="summary">
+                {if empty($comment.site)}
+                    <span class="username bold" itemprop="creator"><i class="fa fa-user"></i>{$comment.name}</span>
+                {else}
+                    <a href="{$comment.site}" class="username" itemprop="creator"><i class="fa fa-user"></i>{$comment.name}</a>
+                {/if}
+                <span class="date grey-text"
+                      title="{$comment.datetime|wa_datetime}">{$comment.datetime|wa_datetime:"humandatetime"}
+                </span>
+
+                {* @event prepare_comments_frontend.%plugin_id%.authorname_suffix *}
+                {if !empty($comment.plugins.authorname_suffix)}
+                    {foreach $comment.plugins.authorname_suffix as $plugin => $output}{$output}{/foreach}
+                {/if}
+                <div class="text" itemprop="commentText">{$comment.text|nl2br}</div>
+
+                {* @event prepare_comments_frontend.%plugin_id%.after *}
+                {if !empty($comment.plugins.after)}
+                    {foreach $comment.plugins.after as $plugin => $output}{$output}{/foreach}
+                {/if}
+            </div>
+        </div>
+    </li>
+</ul>
