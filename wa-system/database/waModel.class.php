@@ -73,7 +73,11 @@ class waModel
     {
         $this->writable = $writable;
         $this->type = $type ? $type : 'default';
-        $this->type = $this->getDBSheme(); // VADIM CODE
+        // VADIM CODE START
+        if(!is_array($type)) {
+            $this->type = $this->getDBSheme();
+        }
+        // VADIM CODE END
         $this->adapter = waDbConnector::getConnection($this->type, $this->writable);
         if ($this->table && !$this->fields) {
             $this->getMetadata();
