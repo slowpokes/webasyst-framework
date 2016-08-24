@@ -3,15 +3,16 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>{$wa->title()|escape}</title>
-    <meta name="Keywords" content="{$wa->meta('keywords')|escape}" />
-    <meta name="Description" content="{$wa->meta('description')|escape}" />
+    <meta name="Keywords" content="{$wa->meta('keywords')|escape}"/>
+    <meta name="Description" content="{$wa->meta('description')|escape}"/>
     <meta name='yandex-verification' content='50ce4b30f8570592'/>
     <meta name="google-site-verification" content="fZ16paJa0YnpLaTi6pTFoOBb6BOmEXEuJY9oMOcYA5U"/>
     <link href="/wa-apps/shop/themes/aromateca/css/aromateca.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
     <link href="/wa-apps/shop/themes/aromateca/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     {include file="$wa_active_theme_path/app_head.html"}
 
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
 
     <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.8.2.min.js"></script>
 
@@ -48,5 +49,12 @@
 {include file="footer.html"}
 {include file="$wa_active_theme_path/noindex.html"}
 <a id="goTop" class="btn-floating btn-large waves-effect waves-light primary"><i class="fa fa-arrow-up no-padding"></i></a>
+
+    <script>
+        $(document).ready(function(){
+            $('#shopping_cart').pushpin({ top: $('#shopping_cart').offset().top });
+        });
+    </script>
+
 </body>
 </html>
