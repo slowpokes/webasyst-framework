@@ -644,6 +644,8 @@ class waSystem
     {
         $params = array();
         $app = $argv[1];
+        $app_fake = $app;//VADIM CODE
+        $app = wa()->replaceNameToReal($app);//VADIM CODE
         $class = $app.ucfirst(ifset($argv[2], 'help'))."Cli";
         $argv = array_slice($argv, 3);
         while ($arg = array_shift($argv)) {
