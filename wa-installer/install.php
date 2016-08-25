@@ -18,6 +18,7 @@ header('Connection: close');
 
 if (version_compare('5.2.5', PHP_VERSION, '>')) {
     print sprintf("PHP version 5.2.5 or greater required, but current is %s", PHP_VERSION);
+    exit;
 }
 
 @ini_set("magic_quotes_runtime", 0);
@@ -521,6 +522,14 @@ HTACCESS;
                                 $db_options['port'] = '';
                                 list($db_options['host'], $db_options['port']) = explode(':', $db_options['host'], 2);
                             }
+
+                            if ($result = mysqli_query($link, 'SELECT VERSION()')) {
+                                $mysql_version = mysqli_fetch_row($result);
+                                if ($mysql_version && version_compare(reset($mysql_version), '5.7', '>=')) {
+                                    $db_options['sql_mode'] = 'NO_ENGINE_SUBSTITUTION';
+                                }
+                            }
+
                             $installer_apps->updateDbConfig($db_options);
                             mysqli_close($link);
 
@@ -568,6 +577,14 @@ HTACCESS;
                                 $db_options['port'] = '';
                                 list($db_options['host'], $db_options['port']) = explode(':', $db_options['host'], 2);
                             }
+
+                            if ($result = mysql_query('SELECT VERSION()', $link)) {
+                                $mysql_version = mysql_fetch_row($result);
+                                if ($mysql_version && version_compare(reset($mysql_version), '5.7', '>=')) {
+                                    $db_options['sql_mode'] = 'NO_ENGINE_SUBSTITUTION';
+                                }
+                            }
+
                             $installer_apps->updateDbConfig($db_options);
                             mysql_close($link);
 

@@ -145,11 +145,23 @@ class installerAppsRemoveAction extends waViewAction
 
         $paths[] = wa()->getAppCachePath(null, 'webasyst'); //wa-cache/apps/webasyst/
 
+        $retry_paths = array();
         foreach ($paths as $path) {
             try {
                 waFiles::delete($path, true);
             } catch (waException $ex) {
-
+                waLog::log($ex->getMessage(), 'installer/remove.apps.log');
+                $retry_paths[] = $path;
+            }
+        }
+        if ($retry_paths) {
+            sleep(5);
+            foreach ($retry_paths as $path) {
+                try {
+                    waFiles::delete($path, true);
+                } catch (waException $ex) {
+                    waLog::log($ex->getMessage(), 'installer/remove.apps.log');
+                }
             }
         }
         return $app_id;

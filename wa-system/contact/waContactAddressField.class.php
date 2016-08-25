@@ -76,7 +76,7 @@ class waContactAddressField extends waContactCompositeField
             'sensor'  => 'false'
         );
         $url = $url.'?'.http_build_query($params);
-        $timeout = 25;
+        $timeout = 9;
         if (function_exists('curl_init')) {
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -129,6 +129,8 @@ class waContactAddressField extends waContactCompositeField
                 } else if ($response['status'] == "OVER_QUERY_LIMIT") {
                     $sm->set($app_id, $name, time());
                 }
+            } else {
+                $sm->set($app_id, $name, time());
             }
         }
         return $value;
@@ -352,6 +354,25 @@ class waContactAddressSeveralLinesFormatter extends waContactAddressOneLineForma
 
         $data['value'] = implode("<br>\n", $data['value']);
         $data['value'] = $val;//VADIM CODE
+        return $data;
+    }
+}
+
+class waContactAddressDataFormatter extends waContactAddressOneLineFormatter
+{
+    public function format($data)
+    {
+        $parts = $this->getParts($data);
+        $data['value'] = array();
+        foreach($parts['parts'] + $data['data'] as $key => $value) {
+            if (strlen($value)) {
+                $data['value'][$key] = $value;
+            }
+        }
+        unset($data['value']['lat'], $data['value']['lng']);
+
+        $adr = waContactFields::get('address');
+        $data['for_map'] = $adr->format($data, 'forMap');
         return $data;
     }
 }

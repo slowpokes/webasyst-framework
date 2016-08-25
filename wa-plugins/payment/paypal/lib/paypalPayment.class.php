@@ -26,7 +26,7 @@ class paypalPayment extends waPayment implements waIPayment
      */
     public function allowedCurrency()
     {
-        return array_keys(array_filter(array_map('intval', $this->currency)));
+        return array_keys(array_filter($this->currency));
     }
 
     /**
@@ -306,8 +306,7 @@ class paypalPayment extends waPayment implements waIPayment
         );
 
         $transaction_data['type'] = 'N/A';
-        if (
-            in_array(ifset($request['txn_type']), $types)
+        if (in_array(ifset($request['txn_type']), $types)
             && (strtolower(ifset($request['payment_status'])) == 'completed')
         ) {
             $transaction_data['type'] = self::OPERATION_AUTH_CAPTURE;
@@ -353,14 +352,14 @@ class paypalPayment extends waPayment implements waIPayment
      */
     private function getEndpointUrl()
     {
-        return 'https://www.'.($this->sandbox ? 'sandbox.':'').'paypal.com/cgi-bin/webscr';
+        return 'https://www.'.($this->sandbox ? 'sandbox.' : '').'paypal.com/cgi-bin/webscr';
     }
 
     /**
      * Requests current transaction status from payment gateway.
      *
      * @throws waException
-     * @param $data Transaction data
+     * @param array $data Transaction data
      * @return string Response received from payment gateway
      */
     private function notifyValidate($data)

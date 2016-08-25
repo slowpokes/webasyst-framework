@@ -24,8 +24,8 @@ abstract class waActions extends waController
         if (method_exists($this, $method)) {
             $this->action = $action;
             $this->$method();
-        } else{
-            throw new waException(sprintf("Invalid action or missed method at %s for action %s",get_class($this), $action));
+        } else {
+            throw new waException(sprintf("Invalid action or missed method %s at %s for action %s", $method, get_class($this), $action));
         }
     }
 
@@ -33,7 +33,6 @@ abstract class waActions extends waController
     {
 
     }
-
 
     public function run($params = null)
     {
@@ -94,6 +93,9 @@ abstract class waActions extends waController
 
     public function displayJson($data, $errors = null)
     {
+        if (waRequest::isXMLHttpRequest()) {
+            $this->getResponse()->addHeader('Content-type', 'application/json');
+        }
         $this->getResponse()->sendHeaders();
         if (!$errors) {
             echo json_encode(array('status' => 'ok', 'data' => $data));

@@ -52,8 +52,26 @@ class installerPluginsRemoveAction extends installerExtrasRemoveAction
                 $paths[] = wa()->getAppCachePath(null, $type.'_'.$extras_id); //wa-cache/apps/$app_id/
             }
 
+            $retry_paths = array();
             foreach ($paths as $path) {
-                waFiles::delete($path, true);
+                try {
+                    waFiles::delete($path, true);
+                } catch (waException $ex) {
+                    waLog::log($ex->getMessage(), 'installer/remove.'.ifset($type).$this->extras_type.'.log');
+                    $retry_paths[] = $path;
+                }
+            }
+
+
+            if ($retry_paths) {
+                sleep(5);
+                foreach ($retry_paths as $path) {
+                    try {
+                        waFiles::delete($path, true);
+                    } catch (waException $ex) {
+                        waLog::log($ex->getMessage(), 'installer/remove.'.ifset($type).$this->extras_type.'.log');
+                    }
+                }
             }
 
             return true;

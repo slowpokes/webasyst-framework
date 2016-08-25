@@ -11,7 +11,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.6.4\n"
+"X-Generator: Poedit 1.5.5\n"
 "Language: en_US\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: .\n"
@@ -850,7 +850,7 @@ msgid "Overview"
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/themes/Themes.html:9
-msgid "Both"
+msgid "All"
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/themes/Themes.html:10
@@ -1179,7 +1179,9 @@ msgstr ""
 
 #: /wa-apps/installer/templates/actions/apps/AppsInfo.html:43
 #: /wa-apps/installer/templates/actions/apps/AppsInfo.html:99
-msgid "Permanent license saves you money on your monthly bills (your monthly payment will be reduced by %s)."
+msgid ""
+"Permanent license saves you money on your monthly bills (your monthly "
+"payment will be reduced by %s)."
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/themes/ThemesView.html:37
@@ -1191,15 +1193,21 @@ msgid "Get new themes from Webasyst Store"
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/update/Update.row.html:99
-msgid "To get the update, you need to have separate %s app license for every individual domain the app is used on: %s"
+msgid ""
+"To get the update, you need to have separate %s app license for every "
+"individual domain the app is used on: %s"
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/apps/AppsInfo.html:151
-msgid "%s will be downloaded from Webasyst Store and installed for free. Once installed, you will be able either to pay for the app on a monthly basis or to buy a permanent license."
+msgid ""
+"%s will be downloaded from Webasyst Store and installed for free. Once "
+"installed, you will be able either to pay for the app on a monthly basis or "
+"to buy a permanent license."
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/settings/Settings.html:62
-msgid "Main account administrative email where system notification will be sent."
+msgid ""
+"Main account administrative email where system notification will be sent."
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/settings/Settings.html:68
@@ -1226,7 +1234,10 @@ msgid "All widgets"
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/widgets/WidgetsInfo.html:55
-msgid "Installation and usage of %s widget on <strong>%s</strong> is not licensed. Updates are disabled. Buy a new license or link your existing %s widget license to this Webasyst installation."
+msgid ""
+"Installation and usage of %s widget on <strong>%s</strong> is not licensed. "
+"Updates are disabled. Buy a new license or link your existing %s widget "
+"license to this Webasyst installation."
 msgstr ""
 
 #: /wa-apps/installer/templates/actions/widgets/WidgetsInfo.html:293
@@ -1386,4 +1397,12 @@ msgstr ""
 #: /wa-apps/installer/templates/actions/featured/Featured.html:83
 #: /wa-apps/installer/templates/actions/featured/Featured.html:107
 msgid "See all"
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/plugins/Plugins.html:25
+msgid "Search"
+msgstr ""
+
+#: /wa-apps/installer/templates/actions/themes/ThemesInfo.html:237
+msgid "View theme demo"
 msgstr ""

@@ -9,7 +9,7 @@ return array(
     'server'                        => array(),
     'php'                           => array(
         'strict'  => true,
-        'version' => '>5.2',
+        'version' => '>=5.2.5',
     ),
     'php.curl'                      => array(
         'description' => 'Get updates information from update servers',

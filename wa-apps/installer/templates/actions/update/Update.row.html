@@ -109,6 +109,9 @@
                 <input type="button" onClick="javascript:window.location.href='{$wa_backend_url}installer/#/{$link}/';" value="[`Get license`]">
             {elseif !empty($item.inbuilt)}
                 <p class="hint">{sprintf("[`This widget will be updated automatically when you update %s app.`]",$app.name|default:$item.app|default:''|escape)}</p>
+                <input type="hidden" name="app_id[{$item.slug}]"
+                       value="{$item.vendor}{if isset($item.edition) && $item.edition}:{$item.edition}{/if}"
+                       id="checkbox_{$item.slug|replace:'/':'___'}" data-app="{$item.app|default:''|escape}">
             {else}
                 <!-- ok to update -->
                 <input type="hidden" name="app_id[{$item.slug}]"

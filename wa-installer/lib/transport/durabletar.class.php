@@ -37,7 +37,7 @@ class DurableTar extends Archive_Tar implements Serializable
 
         $this->tarSize = $tarSize;
         $this->resumeOffset = $resumeOffset;
-        return parent::Archive_Tar($p_tarname, $p_compress);
+        return parent::__construct($p_tarname, $p_compress);
     }
 
     public function serialize()

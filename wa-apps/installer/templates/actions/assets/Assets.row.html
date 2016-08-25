@@ -1,7 +1,7 @@
 <tr class="{if in_array($item_type,['app','plugin']) && empty($item.enabled) && empty($app.virtual)}grey{/if}">
     <td class="i-update-icon">
         {* ICON *}
-        {if $item_type eq 'app'}
+        {if ($item_type eq 'app') && (!empty($item.icons.48)||!empty($item.img))}
             <img src="{$wa_url}{$item.icons.48|default:$item.img|default:''|ltrim:'/'}" alt="">
         {else}
             &nbsp;
@@ -19,7 +19,11 @@
             {/if}
 
             {if $item_type eq 'plugin'}
+                {if strpos($item.slug,'wa-plugins/')===0}
+                    {sprintf('[`Plugin <a href="%s">%s</a>`]', "./#/plugins/{$item.slug|escape}/",$item.name|default:$item_id|escape)}
+                {else}
                 {sprintf('[`Plugin <a href="%s">%s</a>`]', "./#/plugins/{$item.app|default:''}/{$item.id|escape}/",$item.name|default:$item_id|escape)}
+                {/if}
             {elseif $item_type eq 'theme' }
                 {sprintf('[`Theme <a href="%s">%s</a>`]', "./#/themes/{$item.id|escape}/", $item.name|default:$item_id|escape)}
             {elseif $item_type eq 'widget' }

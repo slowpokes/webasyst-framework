@@ -127,8 +127,8 @@ String.prototype.translate = function () {
             });
 
             //if count autosubmit && app_id
-            if (this.options.auto_submit ) {
-                console.log('It go to update!',$(':input[name^="app_id\["]').length);
+            if (this.options.auto_submit) {
+                console.log('It go to update!', $(':input[name^="app_id\["]').length);
             }
         },
 
@@ -178,7 +178,7 @@ String.prototype.translate = function () {
                         subject = 'systemplugins';
                         /* it's apps */
                     }
-                }else if (target.match(/^wa-widgets/)) {
+                } else if (target.match(/^wa-widgets/)) {
                     subject = 'system_widgets';
                     /* it's widget */
                 }

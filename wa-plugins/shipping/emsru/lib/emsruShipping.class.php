@@ -2,8 +2,11 @@
 
 /**
  * @property-read string $region Регион
+ * @property-read bool $home_delivery
  * @property-read string $city Город
  * @property-read double $surcharge Надбавка (%)
+ * @property-read double $fixed_surcharge Надбавка
+ * @property-read double $difficult_charge Надбавка за каждый килограмм
  * @property-read string $company_name Получатель наложенного платежа (магазин)
  * @property-read string $address1 Адрес получателя наложенного платежа (магазина), строка 1
  * @property-read string $address2 Адрес получателя наложенного платежа (магазина), строка 2
@@ -28,6 +31,7 @@ class emsruShipping extends waShipping
             return 'Вес отправления не задан.';
         }
         $incomplete = false;
+        $home = false;
         switch ($country_iso3 = $this->getAddress('country')) {
             case 'rus':
                 $address = array_merge(array('country' => 'rus'), $this->getSettings());
@@ -36,6 +40,10 @@ class emsruShipping extends waShipping
                 if (empty($params['to'])) {
                     $address = $this->getAddress();
                     $incomplete = empty($address['city']) && empty($address['region']);
+                } elseif (!$this->home_delivery) {
+                    if ($params['to'] == $params['from']) {
+                        $home = true;
+                    }
                 }
                 break;
             default: /* International shipping*/
@@ -51,7 +59,9 @@ class emsruShipping extends waShipping
                 break;
         }
         $services = array();
-        if (!empty($params['to'])) {
+        if ($home) {
+            $services = false;
+        } elseif (!empty($params['to'])) {
             if (!empty($params['from']) || !empty($params['type'])) {
                 if ($result = $this->request('ems.calculate', $params)) {
 
@@ -69,6 +79,14 @@ class emsruShipping extends waShipping
                     if (doubleval($this->surcharge) > 0) {
                         $rate += $this->getTotalPrice() * doubleval($this->surcharge) / 100.0;
                     }
+                    if (doubleval($this->fixed_surcharge) > 0) {
+                        $rate += $this->fixed_surcharge;
+                    }
+
+                    if ($this->isDifficult()) {
+                        $rate += $this->difficult_charge * ceil($this->getTotalWeight());
+                    }
+
                     $services['main'] = array(
                         'rate'         => $rate,
                         'currency'     => 'RUB',
@@ -163,9 +181,11 @@ class emsruShipping extends waShipping
                 $model = new waRegionModel();
                 if ($region_name) {
                     $region_name = trim(preg_replace($pattern, '', mb_strtoupper($region_name)));
+                    $region_name = preg_replace('@\s*(—|-)\s*@', '-', $region_name);
                     $to = ifset($map['region'][$region_name]);
                 } elseif ($region && ($region = $model->get(ifset($address['country']), $region))) {
                     $region = trim(preg_replace($pattern, '', mb_strtoupper($region['name'])));
+                    $region = preg_replace('@\s*(—|-)\s*@', '-', $region);
                     $to = ifset($map['city'][$region], ifset($map['region'][$region]));
                 }
             }
@@ -412,6 +432,7 @@ class emsruShipping extends waShipping
      * @param waOrder $order Объект, содержащий информацию о заказе
      * @param array $params
      * @return string HTML-код формы
+     * @throws waException
      */
     private function displayPrintForm112(waOrder $order, $params = array())
     {
@@ -420,7 +441,8 @@ class emsruShipping extends waShipping
 
         $order['rub'] = intval(waRequest::request('rub', round(floor($order->total))));
         $order['cop'] = min(99, max(0, intval(waRequest::request('cop', round($order->total * 100 - $order['rub'] * 100)))));
-        switch ($side = waRequest::get('side', ($order ? '' : 'print'), waRequest::TYPE_STRING)) {
+        $side = waRequest::get('side', ($order ? (waRequest::get('mass_print') ? 'front' : '') : 'print'), waRequest::TYPE_STRING);
+        switch ($side) {
             case 'front':
                 $image_info = null;
                 if ($image = $this->read('f112ep_front.gif', $image_info)) {
@@ -610,5 +632,17 @@ class emsruShipping extends waShipping
             $view = wa()->getView();
         }
         return $view;
+    }
+
+    private function isDifficult()
+    {
+        $difficult = include($this->path.'/lib/config/data/difficult.php');
+        if (in_array($this->zip, $difficult)) {
+            return true;
+        } elseif (in_array(trim($this->getAddress('zip')), $difficult)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

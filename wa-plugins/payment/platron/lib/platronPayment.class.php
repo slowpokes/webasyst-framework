@@ -39,10 +39,6 @@ class platronPayment extends waPayment implements waIPayment, waIPaymentCancel, 
                 'data' => 'not allowed currency '.$order_data['currency_id'],
             );
         }
-		
-		// Валюта по старому ISO
-		if($order_data['currency_id'] == "RUB")
-			$order_data['currency_id'] = "RUR";
 
         $form_fields = array(
             'pg_merchant_id'	=> $this->merchant,
@@ -58,6 +54,7 @@ class platronPayment extends waPayment implements waIPayment, waIPaymentCancel, 
 			'pg_success_url'	=> $this->getAdapter()->getBackUrl(waAppPayment::URL_SUCCESS, array('order_id' => $order_data['order_id'])),
 			'pg_failure_url'	=> $this->getAdapter()->getBackUrl(waAppPayment::URL_DECLINE, array('order_id' => $order_data['order_id'])),
             'pg_salt'			=> rand(21,43433), // Параметры безопасности сообщения. Необходима генерация pg_salt и подписи сообщения.
+			'cms_payment_module'=> 'webasyst',
         );
 		
 		preg_match_all("/\d/", @$order->contact_phone, $arrPhone);

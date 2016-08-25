@@ -1614,6 +1614,9 @@ class waInstallerApps
             //hack for theme xml
             $path_xml = preg_replace('@\.php$@', '.xml', $_path);
             if (file_exists($path_xml)) {
+                if (!function_exists('simplexml_load_file')) {
+                    throw new Exception('PHP extension SimpleXML required');
+                }
                 if ($xml = @simplexml_load_file($path_xml)) {
 
                     foreach ($ml_fields as $field) {
@@ -1793,18 +1796,26 @@ class waInstallerApps
             }
         } else {
             if (is_null($domain)) {
-                $domain = $_SERVER['HTTP_HOST'];
-                if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME']) {
-                    $root_url = $_SERVER['SCRIPT_NAME'];
-                } elseif (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF']) {
-                    $root_url = $_SERVER['PHP_SELF'];
+                if (!empty($current_routing)) {
+                    $domains = array_keys($current_routing);
+                    foreach ($domains as $domain) {
+                        $this->updateRoutingConfig($app_id, $routing, $domain);
+                    }
+                    return $domains;
                 } else {
-                    $root_url = '/';
-                }
-                $root_url = preg_replace('!/[^/]*$!', '/', $root_url);
-                $root_url = trim($root_url, '/');
-                if ($root_url) {
-                    $domain .= '/'.$root_url;
+                    $domain = $_SERVER['HTTP_HOST'];
+                    if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME']) {
+                        $root_url = $_SERVER['SCRIPT_NAME'];
+                    } elseif (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF']) {
+                        $root_url = $_SERVER['PHP_SELF'];
+                    } else {
+                        $root_url = '/';
+                    }
+                    $root_url = preg_replace('!/[^/]*$!', '/', $root_url);
+                    $root_url = trim($root_url, '/');
+                    if ($root_url) {
+                        $domain .= '/'.$root_url;
+                    }
                 }
             }
 
@@ -1959,7 +1970,9 @@ class waInstallerApps
                 $routing = array_merge($routing, $config['routing_params']);
             }
             $domain = $this->updateRoutingConfig($app_id, $routing, $domain);
-            $this->addAppRobots($app_id, $routing, $domain);
+            foreach ((array)$domain as $_domain) {
+                $this->addAppRobots($app_id, $routing, $_domain);
+            }
         }
     }
 
@@ -2003,9 +2016,11 @@ class waInstallerApps
             }
             $robots_path = "wa-data/public/site/data/{$domain}/robots.txt";
             self::mkdir("wa-data/public/site/data/{$domain}");
-            if ($fp = fopen(self::$root_path.$robots_path, 'a')) {
+            if ($fp = @fopen(self::$root_path.$robots_path, 'a')) {
                 fwrite($fp, "\n".implode("", $robots));
                 fclose($fp);
+            } else {
+                //TODO log error
             }
         }
     }
