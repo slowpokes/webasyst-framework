@@ -315,7 +315,7 @@ HTML;
         return waRequest::get('module', $default);
     }
 
-    public function css()
+    public function css($strict = false)
     {
         if (wa()->getEnv() == 'backend' || wa()->getEnv() == 'api') {
             $css = '<link href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.3.css?v'.$this->version(true).'" rel="stylesheet" type="text/css" >
@@ -323,19 +323,19 @@ HTML;
 <!--[if IE 8]><link type="text/css" href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.0.ie8.css" rel="stylesheet"><![endif]-->
 <!--[if IE 7]><link type="text/css" href="'.wa()->getRootUrl().'wa-content/css/wa/wa-1.0.ie7.css" rel="stylesheet"><![endif]-->
 <link type="text/css" rel="stylesheet" href="'.wa()->getRootUrl().'wa-content/font/ruble/arial/fontface.css">'."\n";
-            
+
             if ( !waRequest::isMobile(false) )
                 $css .= '<meta name="viewport" content="width=device-width, initial-scale=1" />'."\n"; //for handling iPad and tablet computer default view properly
-            
+
         } else {
             $css = '';
         }
-        return $css.wa()->getResponse()->getCss(true);
+        return $css.wa()->getResponse()->getCss(true, $strict);
     }
 
-    public function js()
+    public function js($strict = false)
     {
-        return wa()->getResponse()->getJs(true);
+        return wa()->getResponse()->getJs(true, $strict);
     }
 
     /**
@@ -622,9 +622,12 @@ HTML;
             $errors['email'] = implode(', ', $email_validator->getErrors());
         }
         if (!$errors) {
-            $m = new waMailMessage($subject, nl2br($body));
+            $body = nl2br(htmlspecialchars($body));
+            $body = _ws('Name').': '.htmlspecialchars($this->post('name'))."<br>\n".
+                    _ws('Email').': '.htmlspecialchars($email)."<br><br>\n".$body;
+            $m = new waMailMessage($subject, $body);
             $m->setTo($to);
-            $m->setFrom(array($email => $this->post('name')));
+            $m->setReplyTo(array($email => $this->post('name')));
             if (!$m->send()) {
                 $errors['all'] = _ws('An error occurred while attempting to send your request. Please try again in a minute.');
             } else {
@@ -927,18 +930,18 @@ HTML;
         } elseif (!empty($params['placeholder'])) {
             $attrs .= ' placeholder="'.htmlspecialchars($params['placeholder']).'"';
         }
-		
-		if ($f instanceof waContactHiddenField) {
-			$html = $f->getHTML($params, $attrs);
-		} else {
-			$html = '<div class="wa-field wa-field-'.$f->getId().'">
-					<div class="wa-name">'.$name.'</div>
-					<div class="wa-value">'.$f->getHTML($params, $attrs);
-			if ($error) {
-				$html .= '<em class="wa-error-msg">'.$error.'</em>';
-			}
-			$html .= '</div></div>';
-		}
+
+        if ($f instanceof waContactHiddenField) {
+            $html = $f->getHTML($params, $attrs);
+        } else {
+            $html = '<div class="wa-field wa-field-'.$f->getId().'">
+                    <div class="wa-name">'.$name.'</div>
+                    <div class="wa-value">'.$f->getHTML($params, $attrs);
+            if ($error) {
+                $html .= '<em class="wa-error-msg">'.$error.'</em>';
+            }
+            $html .= '</div></div>';
+        }
         if ($is_multi) {
             $f->setParameter('multi', $is_multi);
         }
@@ -1061,7 +1064,7 @@ HTML;
                     curl_setopt($ch, CURLOPT_HEADER, 0);
                     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 25);
+                    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
                     $photo = curl_exec($ch);
                     curl_close($ch);
                 } else {

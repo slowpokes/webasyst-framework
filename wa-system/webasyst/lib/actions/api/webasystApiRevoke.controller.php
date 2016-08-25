@@ -4,7 +4,7 @@ class webasystApiRevokeController extends waController
 {
     public function execute()
     {
-        $token = waRequest::request('access_token');
+        $token = waRequest::request('access_token', '', 'string');
 
         $token_model = new waApiTokensModel();
         $token_model->deleteById($token);

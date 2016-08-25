@@ -161,7 +161,6 @@ class waAutoload
         'waVarExportCache'         => 'cache/waVarExportCache.class.php',
         'waiCache'                 => 'cache/waiCache.interface.php',
 
-        'waAnalyticsConfig'        => 'config/waAnalyticsConfig.class.php',
         'waAppConfig'              => 'config/waAppConfig.class.php',
         'waConfig'                 => 'config/waConfig.class.php',
         'waRightConfig'            => 'config/waRightConfig.class.php',
@@ -224,6 +223,7 @@ class waAutoload
         'waRightsException'        => 'exception/waRightsException.class.php',
 
         'waFiles'                  => 'file/waFiles.class.php',
+        'waNet'                    => 'file/waNet.class.php',
         'waTheme'                  => 'file/waTheme.class.php',
 
         'waLayout'                 => 'layout/waLayout.class.php',

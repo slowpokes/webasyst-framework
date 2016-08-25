@@ -2,8 +2,7 @@ wa-cache
 wa-data
 wa-log
 .fw_compatible
-.idea
-wa-log
-*.md5
-wa-config
-wa-apps/warehouse
+.files.md5
+build.php
+config.codekit
+/wa-system/webasyst/lib/updates/dev

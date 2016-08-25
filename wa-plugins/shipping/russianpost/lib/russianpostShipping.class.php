@@ -5,19 +5,47 @@
  *
  * @see http://www.russianpost.ru/rp/servise/ru/home/postuslug/bookpostandparcel/parcelltariff
  *
- * @property $region
- * @property $halfkilocost
- * @property $currency
- * @property $overhalfkilocost
- * @property $caution
- * @property $max_weight
- * @property $complex_calculation_weight
- * @property $commission
+ * @property-read $api_login
+ * @property-read $api_password
+ * @property-read $region
+ * @property-read $exclude_cities
+ * @property-read $halfkilocost
+ * @property-read $currency
+ * @property-read $overhalfkilocost
+ * @property-read $caution
+ * @property-read $max_weight
+ * @property-read $complex_calculation_weight
+ * @property-read $commission
+ * @property-read $extra_charge
+ *
+ * @property-read string $bookpost Отправлять бандероли
+ * @property-read float $bookpost_max_weight Максимальный вес бандероли
+ * @property-read string $bookpost_simple_cost Стоимость отправки бандероли весом 0,1 кг
+ * @property-read string $bookpost_weight_simple_cost Стоимость отправки каждых 0,02 кг
+ * @property-read string $bookpost_ordered_cost Стоимость отправки бандероли весом 0,1 кг
+ * @property-read string $bookpost_weight_ordered_cost Стоимость отправки каждых 0,02 кг
+ * @property-read string $bookpost_weight_declared_cost Стоимость отправки каждых 0.5 килограмм бандероли с объявленной ценностью
+ * @property-read string $bookpost_declared_commission Плата за сумму объявленной ценности бандероли (%)
+ * @property-read float $bookpost_air Надбавка за отправление «Авиа» для бандероли(руб.)
+ *
+ * @property-read $delivery_date_show
+ * @property-read $delivery_date_min
+ * @property-read $delivery_date_max
+ *
+ * @property-read $document
+ * @property-read $document_series
+ * @property-read $document_number
+ * @property-read $document_issued
+ * @property-read $document_issued_day
+ * @property-read $document_issued_month
+ * @property-read $document_issued_year
  *
  * @property string $company_name
+ * @property string $company_name2
  * @property string $address1
  * @property string $address2
  * @property string $zip
+ * @property string $phone
  * @property string $inn
  * @property string $bank_kor_number
  * @property string $bank_name
@@ -27,6 +55,7 @@
  */
 class russianpostShipping extends waShipping
 {
+    private $wsdl = 'https://tracking.russianpost.ru/rtm34?wsdl';
 
     /**
      * Регистрирует пользовательские элементы управления плагина для использования в интерфейсе настроек.
@@ -110,21 +139,17 @@ class russianpostShipping extends waShipping
             $control .= "<tr class=\"gridsheader\"><th colspan=\"3\">";
             $control .= htmlentities('Распределите регионы по тарифным поясам Почты России', ENT_QUOTES, 'utf-8');
             $control .= "</th>";
-            $control .= "<th>Только авиа</th>";
+            $control .= "<th>Ограничения доставки</th>";
             $control .= "</th></tr></thead><tbody>";
 
             $params['control_wrapper'] = '<tr><td>%s</td><td>&rarr;</td><td>%s</td><td>%s</td></tr>';
             $params['title_wrapper'] = '%s';
             $params['description_wrapper'] = '%s';
             $params['options'] = array();
-            $params['options'][0] = _wp('*** пояс не выбран ***');
+            $params['options'][0] = _wp('*** не доставлять ***');
             for ($region = 1; $region <= 5; $region++) {
                 $params['options'][$region] = sprintf(_wp('Пояс %d'), $region);
             }
-            $avia_params = $params;
-            $avia_params['control_wrapper'] = '%2$s';
-            $avia_params['description_wrapper'] = false;
-            $avia_params['title_wrapper'] = false;
 
             foreach ($regions as $region) {
                 $name = 'zone';
@@ -136,16 +161,26 @@ class russianpostShipping extends waShipping
                 $region_params = $params;
 
                 waHtmlControl::addNamespace($region_params, $id);
-                $avia_params = array(
+
+                //backward compatibility
+                $default = empty($params['value'][$id]['avia_only']) ? 'all' : 'avia';
+
+                $method_params = array(
                     'namespace'           => $region_params['namespace'],
                     'control_wrapper'     => '%2$s',
                     'description_wrapper' => false,
                     'title_wrapper'       => false,
-                    'value'               => $params['value'][$id]['avia_only'],
+                    'value'               => ifempty($params['value'][$id]['method'], $default),
+                    'options'             => array(
+                        'all'    => 'без ограничения',
+                        'avia'   => 'только Авиа',
+                        'ground' => 'Только наземный транспорт',
+                    )
                 );
-                $region_params['value'] = max(0, min(5, $params['value'][$id][$name]));
 
-                $region_params['description'] = waHtmlControl::getControl(waHtmlControl::CHECKBOX, 'avia_only', $avia_params);
+                $region_params['description'] = waHtmlControl::getControl(waHtmlControl::SELECT, 'method', $method_params);
+
+                $region_params['value'] = max(0, min(5, $params['value'][$id][$name]));
                 $region_params['title'] = $region['name'];
                 if ($region['code']) {
                     $region_params['title'] .= " ({$region['code']})";
@@ -233,18 +268,28 @@ class russianpostShipping extends waShipping
         $halfkilocost = $this->halfkilocost;
         $overhalfkilocost = $this->overhalfkilocost;
 
-        $rate['ground'] = $halfkilocost[$zone] + $overhalfkilocost[$zone] * ceil((($weight < 0.5 ? 0.5 : $weight) - 0.5) / 0.5);
+        $extra_weight = round(max(0.5, $weight) - 0.5, 3);
 
-        $rate['air'] = $rate['ground'] + $this->getSettings('air');
+        $rate['ground'] = $halfkilocost[$zone] + $overhalfkilocost[$zone] * ceil($extra_weight / 0.5);
+        $rate['avia'] = $rate['ground'] + $this->getSettings('air');
+
+        if ($weight <= min($this->bookpost_max_weight, 2)) {
+            $base_cost = $this->bookpost_weight_declared_cost;
+            $rate['bookpost_ground'] = $base_cost[$zone] * (1 + ceil($extra_weight / 0.5));
+            $rate['bookpost_ground'] += $price * ($this->bookpost_declared_commission / 100) + $this->extra_charge;
+            $rate['bookpost_air'] = $rate['bookpost_ground'] + $this->bookpost_air;
+        }
+
 
         if ($this->getSettings('caution') || ($weight > $this->complex_calculation_weight)) {
 
-            $rate['ground'] *= 1.3;
-            $rate['air'] *= 1.3;
+            $rate['ground'] *= 1.4;
+            $rate['avia'] *= 1.4;
         }
 
-        $rate['ground'] += $price * ($this->commission / 100);
-        $rate['air'] += $price * ($this->commission / 100);
+
+        $rate['ground'] += $price * ($this->commission / 100) + $this->extra_charge;
+        $rate['avia'] += $price * ($this->commission / 100) + $this->extra_charge;
         return $rate;
     }
 
@@ -294,34 +339,119 @@ class russianpostShipping extends waShipping
      */
     protected function calculate()
     {
+        $home_city = array_map('strtolower', array_filter(preg_split('@,\s*@', $this->exclude_cities), 'strlen'));
         $weight = $this->getTotalWeight();
         if ($weight > $this->max_weight) {
             $services = sprintf("Вес отправления (%0.2f) превышает максимально допустимый (%0.2f)", $weight, $this->max_weight);
         } else {
             $region_id = $this->getAddress('region');
             if ($region_id) {
-                if (!empty($this->region[$region_id]) && !empty($this->region[$region_id]['zone'])) {
+                if (!empty($this->region[$region_id])
+                    && !empty($this->region[$region_id]['zone'])
+                    && (empty($home_city) || !in_array(strtolower($this->getAddress('city')), $home_city, true))
+                ) {
                     $services = array();
 
-                    $delivery_date = waDateTime::format('humandate', strtotime('+1 week')).' — '.waDateTime::format('humandate', strtotime('+2 week'));
+                    $delivery_date = null;
+
+                    if ($this->delivery_date_show) {
+                        $delivery_date = array();
+                        if ($this->delivery_date_min) {
+                            $delivery_date[] = waDateTime::format('humandate', strtotime(sprintf('+%d days', $this->delivery_date_min)));
+                        }
+                        if ($this->delivery_date_max) {
+                            $delivery_date[] = waDateTime::format('humandate', strtotime(sprintf('+%d days', $this->delivery_date_max)));
+                        }
+                        if ($delivery_date) {
+                            $delivery_date = implode(' - ', $delivery_date);
+                        } else {
+                            $delivery_date = null;
+                        }
+                    }
 
                     $rate = $this->getZoneRates($weight, $this->getTotalPrice(), $this->region[$region_id]['zone']);
-                    if (empty($this->region[$region_id]['avia_only'])) {
+                    $region = $this->region[$region_id];
+                    $method = ifset($region['method'], empty($region['avia_only']) ? 'all' : 'avia');
+
+                    $avia = in_array($method, array('all', 'avia'), true);
+                    $ground = in_array($method, array('all', 'ground'), true);
+
+                    if ($ground) {
                         $services['ground'] = array(
-                            'name'         => 'Наземный транспорт',
+                            'name'         => 'Посылка, наземный транспорт',
                             'id'           => 'ground',
                             'est_delivery' => $delivery_date,
                             'rate'         => $rate['ground'],
                             'currency'     => 'RUB',
                         );
                     }
-                    $services['avia'] = array(
-                        'name'         => 'Авиа',
-                        'id'           => 'avia',
-                        'est_delivery' => $delivery_date,
-                        'rate'         => $rate['air'],
-                        'currency'     => 'RUB',
-                    );
+                    if ($avia) {
+                        $services['avia'] = array(
+                            'name'         => 'Посылка, Авиа',
+                            'id'           => 'avia',
+                            'est_delivery' => $delivery_date,
+                            'rate'         => $rate['avia'],
+                            'currency'     => 'RUB',
+                        );
+                    }
+
+                    if (($weight <= min($this->bookpost_max_weight, 2)) && ($this->getTotalPrice() < 10000)) {
+                        $extra_weight = round(max(0.1, $weight) - 0.1, 3);
+                        switch ($this->bookpost) {
+                            case 'simple':
+                                $simple_rate = $this->bookpost_simple_cost;
+                                $simple_rate += ceil($extra_weight / 0.02) * $this->bookpost_weight_simple_cost;
+
+                                $services['bookpost_simple'] = array(
+                                    'name'         => 'Бандероль простая',
+                                    'id'           => 'bookpost_simple',
+                                    'est_delivery' => $delivery_date,
+                                    'rate'         => $simple_rate,
+                                    'currency'     => 'RUB',
+                                );
+                                break;
+                            case 'ordered':
+                                $ordered_rate = $this->bookpost_ordered_cost;
+                                $ordered_rate += ceil($extra_weight / 0.02) * $this->bookpost_weight_ordered_cost;
+
+                                $services['bookpost_ordered'] = array(
+                                    'name'         => 'Бандероль заказная',
+                                    'id'           => 'bookpost_ordered',
+                                    'est_delivery' => $delivery_date,
+                                    'rate'         => $ordered_rate,
+                                    'currency'     => 'RUB',
+                                );
+
+                                break;
+                            case 'declared':
+                                if (!empty($rate['bookpost_ground'])) {
+                                    if ($avia) {
+                                        $services['bookpost_declared_avia'] = array(
+                                            'name'         => 'Бандероль с объявленной ценностью, Авиа',
+                                            'id'           => 'bookpost_declared_avia',
+                                            'est_delivery' => $delivery_date,
+                                            'rate'         => $rate['bookpost_air'],
+                                            'currency'     => 'RUB',
+                                        );
+                                    }
+
+                                    if ($ground) {
+                                        if (!empty($rate['bookpost_ground'])) {
+                                            $services['bookpost_declared_ground'] = array(
+                                                'name'         => 'Бандероль с объявленной ценностью',
+                                                'id'           => 'bookpost_declared_ground',
+                                                'est_delivery' => $delivery_date,
+                                                'rate'         => $rate['bookpost_ground'],
+                                                'currency'     => 'RUB',
+                                            );
+                                        }
+                                    }
+                                }
+                                break;
+
+                        }
+                    }
+
                 } else {
                     $services = false;
                 }
@@ -349,6 +479,14 @@ class russianpostShipping extends waShipping
     public function getPrintForms(waOrder $order = null)
     {
         return extension_loaded('gd') ? array(
+            7   => array(
+                'name'        => 'Форма №7-п',
+                'description' => 'Бланк адресного ярлыка к посылке',
+            ),
+            107 => array(
+                'name'        => 'Форма №107',
+                'description' => 'Бланк описи вложения',
+            ),
             112 => array(
                 'name'        => 'Форма №112ЭП',
                 'description' => 'Бланк приема переводов в адрес физических и юридических лиц',
@@ -402,7 +540,7 @@ class russianpostShipping extends waShipping
         $order['rub'] = intval(waRequest::request('rub', round(floor($order->total))));
         $order['cop'] = min(99, max(0, intval(waRequest::request('cop', round($order->total * 100 - $order['rub'] * 100)))));
 
-        switch ($side = waRequest::get('side', ($order ? '' : 'print'), waRequest::TYPE_STRING)) {
+        switch ($side = waRequest::get('side', ($order ? (waRequest::get('mass_print') ? 'print' : '') : 'print'), waRequest::TYPE_STRING)) {
             case 'front':
                 $image_info = null;
                 if ($image = $this->read('f113en_front.gif', $image_info)) {
@@ -417,14 +555,31 @@ class russianpostShipping extends waShipping
                     $this->printOnImage($image, sprintf('%02d', $order['cop']), 1995, 670);
                     $this->printOnImage($image, waRequest::request('order_amount', waCurrency::format($format, $order->total, $order->currency)), 856, 735, 30);
                     $this->printOnImage($image, $this->company_name, 915, 800);
+                    $this->printOnImage($image, $this->company_name2, 850, 857);
                     $this->printOnImage($image, $this->address1, 915, 910);
                     $this->printOnImage($image, $this->address2, 824, 975);
                     $this->printOnImagePersign($image, $this->zip, 1985, 1065, 34, 35);
                     $this->printOnImagePersign($image, $this->inn, 920, 1135, 34, 35);
                     $this->printOnImagePersign($image, $this->bank_kor_number, 1510, 1135, 34, 35);
-                    $this->printOnImage($image, $this->bank_name, 1160, 1194);
+                    $long = mb_strlen($this->bank_name) > 30;
+                    $this->printOnImage($image, $this->bank_name, 1160, $long ? 1210 : 1194, $long ? 20 : 35);
                     $this->printOnImagePersign($image, $this->bank_account_number, 1018, 1250, 34, 35);
                     $this->printOnImagePersign($image, $this->bik, 1885, 1250, 34, 35);
+
+                    #
+                    $this->printOnImage($image, $order->contact_lastname, 1000, 1660);
+                    $this->printOnImage($image, $order->contact_firstname.' '.$order->contact_secondname, 850, 1715);
+
+                    $size = 35;
+                    $sizes = array(35, 30, 30);
+                    $full_address = waRequest::request('shipping_address', $this->buildAddress($order->billing_address));
+                    $address = $this->adjustSizes($full_address, $sizes, $size);
+
+                    $this->printOnImage($image, $address[0], 1200, 1770, $size);
+                    $this->printOnImage($image, $address[1], 850, 1840, $size);
+                    $this->printOnImage($image, $address[2], 850, 1910, $size);
+
+                    $this->printOnImagePersign($image, $order->billing_address['zip'], 1990, 1900, 34, 35);
 
                     header("Content-type: image/gif");
                     imagegif($image);
@@ -443,7 +598,13 @@ class russianpostShipping extends waShipping
                 if (!$strict && !$order) {
                     $this->view()->assign('action', 'preview');
                 }
-                $this->view()->assign('editable', waRequest::post() ? false : true);
+                $this->view()->assign(
+                    array(
+                        'src_front' => http_build_query(array_merge($request, array('side' => 'front'))),
+                        'src_back'  => http_build_query(array_merge($request, array('side' => 'back'))),
+                    )
+                );
+                $this->view()->assign('editable', false);
                 break;
             default:
                 $this->view()->assign(
@@ -464,6 +625,140 @@ class russianpostShipping extends waShipping
     }
 
     /**
+     * Вспомогательный метод для печати формы с идентификатором 113.
+     *
+     * @param waOrder $order Объект, содержащий информацию о заказе
+     * @param array $params
+     * @return string HTML-код формы
+     */
+    private function displayPrintForm7(waOrder $order, $params = array())
+    {
+        $strict = true;
+        $side = waRequest::get('side', ($order ? '' : 'print'), waRequest::TYPE_STRING);
+        switch ($side) {
+            case 'front':
+                $image_info = null;
+                if ($image = $this->read('f7p.gif', $image_info)) {
+                    $params = $order->params;
+
+                    $rate_id = ifset($params['shipping_rate_id']);
+                    if (strpos($rate_id, 'bookpost') === false) {
+                        $this->printOnImage($image, 'X', 1390, 160, 80);
+                    } else {
+                        $this->printOnImage($image, 'X', 1390, 320, 80);
+                    }
+
+                    if (waRequest::get('inventory')) {
+                        $this->printOnImage($image, 'X', 2310, 310, 35);
+                    }
+
+                    switch (waRequest::get('notify_type', 'simple')) {
+                        case 'paid':
+                            $this->printOnImage($image, 'X', 2310, 460, 35);
+                            break;
+                        default:
+                            $this->printOnImage($image, 'X', 2310, 385, 35);
+                            break;
+                    }
+
+                    #Отправитель
+                    $size = 60;
+                    $name = waRequest::get('sender_name', $this->company_name.' '.$this->company_name2);
+                    $names = $this->adjustSizes($name, array(45), $size);
+                    $this->printOnImage($image, $names[0], 450, 1050 + (35 - $size), $size);
+
+                    $size = 60;
+
+                    $full_address = waRequest::get('sender_address', $this->address1.' '.$this->address2);
+                    $address = $this->adjustSizes($full_address, array(47, 47, 47), $size);
+                    $this->printOnImage($image, $address[0], 330, 1440 + (35 - $size), $size);
+                    $this->printOnImage($image, $address[1], 330, 1560 + (35 - $size), $size);
+                    $this->printOnImage($image, $address[2], 330, 1680 + (35 - $size), $size);
+
+                    #SMS notice
+                    $phone = preg_replace('@\D+@', '', $this->phone);
+                    if (waRequest::get('arrival_notice') && preg_match('@^(7|8)(\d{3})(\d{7})$@', $phone, $matches)) {
+                        $this->printOnImagePersign($image, $matches[2], 480, 1810, 103, 80);
+                        $this->printOnImagePersign($image, $matches[3], 810, 1810, 103, 80);
+
+                        $this->printOnImage($image, 'X', 385, 1930, 35);
+                    }
+
+
+                    $this->printOnImagePersign($image, waRequest::get('sender_zip', $this->zip), 1650, 1810, 103, 80);
+
+                    #Получатель
+                    $name = waRequest::get('shipping_name', $order->shipping_address['zip']);
+                    $size = 60;
+                    $names = $this->adjustSizes($name, array(42), $size);
+                    $this->printOnImage($image, $names[0], 2450, 1680 + (35 - $size), $size);
+
+                    $full_address = waRequest::get('shipping_address', $this->buildAddress($order->shipping_address));
+
+                    $size = 60;
+                    $sizes = array(57, 57, 57);
+
+                    $address = $this->adjustSizes($full_address, $sizes, $size);
+                    $this->printOnImage($image, $address[0], 2300, 2040 + (35 - $size), $size);
+                    $this->printOnImage($image, $address[1], 2300, 2160 + (35 - $size), $size);
+                    $this->printOnImage($image, $address[2], 2300, 2280 + (35 - $size), $size);
+
+                    #SMS notice
+                    if (waRequest::get('shipping_sms') && ($phone = $order->getContactField('phone'))) {
+                        if (preg_match('@^(\+?7|8)(\d{3})(\d{7})$@', $phone, $matches)) {
+                            $this->printOnImagePersign($image, $matches[2], 2445, 2435, 103, 80);
+                            $this->printOnImagePersign($image, $matches[3], 2775, 2435, 103, 80);
+
+                            $this->printOnImage($image, 'X', 2355, 2555, 35);
+                        }
+                    }
+
+                    $zip = waRequest::get('shipping_zip', $order->shipping_address['zip']);
+                    $this->printOnImagePersign($image, $zip, 3615, 2435, 103, 80);
+                    $order_price_d = self::floatval(waRequest::get('order_price_d', floor($order->total)));
+                    if ($order_price_d && waRequest::get('order_price_checked')) {
+                        $this->printOnImage($image, 'X', 2310, 160, 35);
+                        $order_price = waRequest::get('order_price', waCurrency::format('%.W', floor($order->total), $order->currency));
+
+                        $size = 60;
+                        $prices = $this->adjustSizes(sprintf('%s (%s) руб.', $order_price_d, $order_price), array(47), $size);
+                        $this->printOnImage($image, reset($prices), 2300, 1000 + (35 - $size), $size);
+                    }
+
+                    #
+                    $order_amount_d = self::floatval(waRequest::get('order_amount_d', $order->total));
+                    if ($order_amount_d && waRequest::get('order_amount_checked')) {
+                        $this->printOnImage($image, 'X', 2310, 235, 35);
+                        $order_amount = waRequest::get('order_amount', waCurrency::format('%.W', $order->total, $order->currency));
+
+                        $order_amount_f = ($order_amount_d - floor($order_amount_d)) * 100;
+                        $size = 60;
+                        $prices = $this->adjustSizes(sprintf('%s (%s) руб. %02d коп.', $order_amount_d, $order_amount, $order_amount_f), array(47), $size);
+                        $this->printOnImage($image, reset($prices), 2300, 1250 + (35 - $size), $size);
+                    }
+
+                    header("Content-type: image/gif");
+                    imagegif($image);
+                    exit;
+                }
+                break;
+            default:
+                if (!$strict && !$order) {
+                    $this->view()->assign('action', 'preview');
+                }
+                $request = waRequest::request();
+                $this->view()->assign('src', http_build_query(array_merge($request, array('side' => 'front'))));
+                $this->view()->assign('order', $order);
+                $this->view()->assign('shipping_address', $this->buildAddress($order->shipping_address));
+                $this->view()->assign('editable', waRequest::post() || waRequest::get('mass_print') ? false : true);
+                $this->view()->assign('settings', $this->getSettings());
+                break;
+        }
+
+        return $this->view()->fetch($this->path.'/templates/form7.html');
+    }
+
+    /**
      * Вспомогательный метод для печати формы с идентификатором 112.
      *
      * @param waOrder $order Объект, содержащий информацию о заказе
@@ -478,11 +773,15 @@ class russianpostShipping extends waShipping
         $order['rub'] = intval(waRequest::request('rub', round(floor($order->total))));
         $order['cop'] = min(99, max(0, intval(waRequest::request('cop', round($order->total * 100 - $order['rub'] * 100)))));
 
-        switch ($side = waRequest::get('side', ($order ? '' : 'print'), waRequest::TYPE_STRING)) {
+        switch ($side = waRequest::get('side', ($order ? (waRequest::get('mass_print') ? 'print' : '') : 'print'), waRequest::TYPE_STRING)) {
             case 'front':
                 $image_info = null;
                 if ($image = $this->read('f112ep_front.gif', $image_info)) {
                     $format = '%.W{n0} %.2{f0}';
+
+                    if (waRequest::request('payment')) {
+                        $this->printOnImage($image, 'X', 90, 750, 80);
+                    }
 
                     $this->printOnImage($image, sprintf('%d', $order['rub']), 110, 680);
                     $this->printOnImage($image, sprintf('%02d', $order['cop']), 430, 680);
@@ -499,6 +798,18 @@ class russianpostShipping extends waShipping
                     $this->printOnImagePersign($image, $this->bank_account_number, 310, 1470, 55.5, 45);
                     $this->printOnImagePersign($image, $this->bik, 1815, 1470, 55.5, 45);
 
+
+                    $this->printOnImage($image, waRequest::request('billing_name', $order->contact_name), 310, 1550);
+                    $full_address = waRequest::request('billing_address', $this->buildAddress($order->billing_address));
+
+                    $size = 35;
+                    $sizes = array(60, 65);
+                    $address = $this->adjustSizes($full_address, $sizes, $size);
+                    $this->printOnImagePersign($image, $order->billing_address['zip'], 1965, 1690, 58.3, 50);
+
+                    $this->printOnImage($image, $address[0], 520, 1635 + 35 - $size, $size);
+                    $this->printOnImage($image, $address[1], 70, 1720 + 35 - $size, $size);
+
                     header("Content-type: image/gif");
                     imagegif($image);
                     exit;
@@ -508,7 +819,13 @@ class russianpostShipping extends waShipping
                 if (!$strict && !$order) {
                     $this->view()->assign('action', 'preview');
                 }
-                $this->view()->assign('editable', waRequest::post() ? false : true);
+                $this->view()->assign('editable', false);
+                $this->view()->assign(
+                    array(
+                        'src_front' => http_build_query(array_merge($request, array('side' => 'front'))),
+                        'src_back'  => http_build_query(array_merge($request, array('side' => 'back'))),
+                    )
+                );
                 break;
             default:
                 $this->view()->assign(
@@ -521,6 +838,7 @@ class russianpostShipping extends waShipping
                     $this->view()->assign('action', 'preview');
                 }
                 $this->view()->assign('order', $order);
+                $this->view()->assign('billing_address', $this->buildAddress($order->billing_address));
                 $this->view()->assign('editable', waRequest::post() ? false : true);
                 break;
         }
@@ -540,28 +858,61 @@ class russianpostShipping extends waShipping
         return $view;
     }
 
+    private function buildAddress($address)
+    {
+        $address_chunks = array(
+            $address['street'],
+            $address['city'],
+            $address['region_name'],
+            ($address['country'] != 'rus') ? $address['country_name'] : '',
+        );
+
+        return implode(', ', array_filter(array_map('trim', $address_chunks), 'strlen'));
+    }
+
     /**
      * Разбиение адреса получателя на подстроки длиной от 25 до 40 символов для удобного отображения на печатной форме.
      *
-     * @param waOrder $order Объект, содержащий информацию о заказе
+     * @param string $address Массив, содержащий информацию об адресе
+     * @param int[] $sizes
      * @return array
      */
-    private function splitAddress(waOrder $order)
+    private function splitAddress($address, $sizes = array())
     {
-        $address_chunks = array(
-            $order->shipping_address['street'],
-            $order->shipping_address['city'],
-            $order->shipping_address['region_name'],
-            ($order->shipping_address['country'] != 'rus') ? $order->shipping_address['country_name'] : '',
-        );
-        $address_chunks = array_filter($address_chunks, 'strlen');
-        $address = array(implode(', ', $address_chunks), '');
-        if (preg_match('/^(.{25,40})[,\s]+(.+)$/u', $address[0], $matches)) {
+        $address_chunks = array_filter(preg_split('@\s+@', trim($address)), 'strlen');
 
-            array_shift($matches);
-            $matches[0] = rtrim($matches[0], ', ');
-            $address = $matches;
+        $address = array_fill_keys(array_keys($sizes), '');
+
+        foreach ($address as $n => &$item) {
+            $next = reset($address_chunks);
+            $next_size = mb_strlen($next);
+            while ($next_size && (mb_strlen($item) + $next_size + 1) <= $sizes[$n]) {
+                $item .= ' '.array_shift($address_chunks);
+                $next = reset($address_chunks);
+                $next_size = mb_strlen($next);
+            }
+            unset($item);
         }
+
+        return $address_chunks ? false : $address;
+    }
+
+    private function adjustSizes($full_address, $sizes, &$size)
+    {
+        if (empty($size)) {
+            $size = 35;
+        }
+        do {
+            $address = $this->splitAddress($full_address, $sizes);
+            if ($address === false) {
+                $k = $size > 10 ? 1.1 : 2;
+                foreach ($sizes as &$_size) {
+                    $_size = round($_size * $k);
+                }
+                unset($_size);
+                $size = max(1, round($size / $k));
+            }
+        } while ($address === false);
         return $address;
     }
 
@@ -576,45 +927,87 @@ class russianpostShipping extends waShipping
     {
         $strict = true;
         $request = waRequest::request();
-        switch ($side = waRequest::get('side', ($order ? '' : 'print'), waRequest::TYPE_STRING)) {
+        switch ($side = waRequest::get('side', ($order ? (waRequest::get('mass_print') ? 'print' : '') : 'print'), waRequest::TYPE_STRING)) {
             case 'front':
                 $image_info = null;
-                if ($image = $this->read('f116_front.gif', $image_info)) {
-                    $address = $this->splitAddress($order);
-                    $this->printOnImage($image, waRequest::request('order_amount', $order->total), 294, 845, 24);
-                    $this->printOnImage($image, waRequest::request('order_price', $order->total), 294, 747, 24);
-                    //customer
-                    $this->printOnImage($image, waRequest::request('shipping_name', $order->contact_name), 390, 915);
-                    $this->printOnImage($image, waRequest::request('shipping_address_1', $address[0]), 390, 975);
-                    $this->printOnImage($image, waRequest::request('shipping_address_2', $address[1]), 300, 1040);
-                    $this->printOnImagePersign($image, waRequest::request('shipping_zip', $order->shipping_address['zip']), 860, 1105, 55, 35);
+                if ($image = $this->read('f116.gif', $image_info)) {
+                    #customer info
+                    $shipping_name = waRequest::request('shipping_name', $order->contact_name);
+                    $shipping_address = waRequest::request('shipping_address', $this->buildAddress($order->shipping_address));
+                    $shipping_zip = waRequest::request('shipping_zip', $order->shipping_address['zip']);
 
-                    //company
-                    $this->printOnImage($image, $this->company_name, 420, 1170);
-                    $this->printOnImage($image, $this->address1, 400, 1237);
-                    $this->printOnImage($image, $this->address2, 300, 1304);
-                    $this->printOnImagePersign($image, $this->zip, 1230, 1304, 55, 35);
+                    $price = self::floatval(waRequest::request('order_price_d', $order->total));
+                    $amount = self::floatval(waRequest::request('order_amount_d', $order->total));
 
-                    //additional
-                    $this->printOnImage($image, waRequest::request('order_price_d', waCurrency::format('%2', $order->total, $order->currency)), 590, 2003);
-                    $this->printOnImage($image, waRequest::request('order_amount_d', waCurrency::format('%2', $order->total, $order->currency)), 1280, 2003);
+                    $full_format = '%0i (%.W) руб. %.2 коп.';
 
-                    $this->printOnImage($image, waRequest::request('shipping_name', $order->contact_name), 390, 2085);
+                    if (!empty($price)) {
+                        $blocks = array(
+                            array(294, 940, 55,),
+                        );
+                        $this->printOnImageBlock($image, waCurrency::format($full_format, $price, $order->currency), $blocks, 45);
+                    }
+                    if (!empty($amount)) {
+                        $blocks = array(
+                            array(294, 1140, 55,),
+                        );
+                        $this->printOnImageBlock($image, waCurrency::format($full_format, $amount, $order->currency), $blocks, 45);
+                    }
 
-                    $this->printOnImage($image, waRequest::request('shipping_address_1', $address[0]), 390, 2170);
-                    $this->printOnImage($image, waRequest::request('shipping_address_2', $address[1]), 300, 2260);
+                    #customer
+                    $this->printOnImage($image, $shipping_name, 600, 1350, 45);
+                    $blocks = array(
+                        array(600, 1610, 70,),
+                        array(300, 1720, 60,),
+                    );
+                    $this->printOnImageBlock($image, $shipping_address, $blocks, 50);
+                    $this->printOnImagePersign($image, $shipping_zip, 2330, 1680, 122, 80);
 
-                    $this->printOnImagePersign($image, waRequest::request('shipping_zip', $order->shipping_address['zip']), 1230, 2260, 55, 35);
+                    #company
+                    $this->printOnImage($image, $this->company_name, 620, 1830, 45);
+                    $blocks = array(
+                        array(600, 1970, 70,),
+                        array(300, 2100, 55,),
+                    );
+                    $this->printOnImageBlock($image, $this->address1.' '.$this->address2, $blocks, 50);
+                    $this->printOnImagePersign($image, $this->zip, 2330, 2050, 122, 80);
 
-                    header("Content-type: image/gif");
-                    imagegif($image);
-                    exit;
-                }
-                break;
-            case 'back':
-                $image_info = null;
+                    #additional
+                    if (!empty($price)) {
+                        $this->printOnImage($image, waCurrency::format('%2', $price, $order->currency), 800, 3670, 50);
+                    }
+                    if (!empty($amount)) {
+                        $this->printOnImage($image, waCurrency::format('%2', $amount, $order->currency), 2200, 3670, 50);
+                    }
 
-                if ($image = $this->read('f116_back.gif', $image_info)) {
+                    $this->printOnImage($image, $shipping_name, 620, 3850, 45);
+
+
+                    $blocks = array(
+                        array(620, 3950, 70,),
+                        array(320, 4100, 55,),
+                    );
+                    $this->printOnImageBlock($image, $shipping_address, $blocks, 50);
+
+                    $this->printOnImagePersign($image, $shipping_zip, 2280, 4050, 122, 80);
+
+                    #document
+                    $this->printOnImage($image, waRequest::request('document', $this->document), 800, 2390, 60);
+                    $this->printOnImage($image, waRequest::request('document_series', $this->document_series), 1550, 2390, 60);
+                    $this->printOnImage($image, waRequest::request('document_number', $this->document_number), 1950, 2390, 60);
+
+                    $dd_mm = waRequest::request('document_issued_day', $this->document_issued_day);
+                    $dd_mm .= '.';
+                    $dd_mm .= waRequest::request('document_issued_month', $this->document_issued_month);
+                    $this->printOnImage($image, $dd_mm, 2530, 2390, 60);
+                    $this->printOnImage($image, waRequest::request('document_issued_year', $this->document_issued_year), 2840, 2390, 60);
+
+                    $document_issued = waRequest::request('document_issued', $this->document_issued);
+                    $blocks = array(
+                        array(300, 2520, 80,),
+                    );
+                    $this->printOnImageBlock($image, $document_issued, $blocks, 50);
+
                     header("Content-type: image/gif");
                     imagegif($image);
                     exit;
@@ -626,23 +1019,140 @@ class russianpostShipping extends waShipping
                 }
                 $this->view()->assign('editable', false);
                 $this->view()->assign('order', $order);
+                $this->view()->assign('src_front', http_build_query(array_merge($request, array('side' => 'front'))));
                 break;
             default:
-                $this->view()->assign(
-                    array(
-                        'src_front' => http_build_query(array_merge($request, array('side' => 'front'))),
-                        'src_back'  => http_build_query(array_merge($request, array('side' => 'back'))),
-                    )
-                );
+                $this->view()->assign('src_front', http_build_query(array_merge($request, array('side' => 'front'))));
+
                 if (!$strict && !$order) {
                     $this->view()->assign('action', 'preview');
                 }
                 $this->view()->assign('editable', waRequest::post() ? false : true);
                 $this->view()->assign('order', $order);
-                $this->view()->assign('address', $this->splitAddress($order));
+                $this->view()->assign('address', $this->buildAddress($order->shipping_address));
+                $this->view()->assign('settings', $this->getSettings());
                 break;
         }
         return $this->view()->fetch($this->path.'/templates/form116.html');
+    }
+
+    /**
+     * Вспомогательный метод для печати формы с идентификатором 116.
+     *
+     * @param waOrder $order Объект, содержащий информацию о заказе
+     * @param array $params
+     * @return string HTML-код формы
+     */
+    private function displayPrintForm107(waOrder $order, $params = array())
+    {
+        $strict = true;
+        $request = waRequest::request();
+        $side = waRequest::get('side', ($order ? (waRequest::get('mass_print') ? 'print' : '') : 'print'), waRequest::TYPE_STRING);
+        switch ($side) {
+            case 'front':
+                $offsets = array(0, 3480);
+                $image_info = null;
+                $page = waRequest::get('page', 0, waRequest::TYPE_INT);
+                if ($image = $this->read('f107.gif', $image_info)) {
+                    #company
+                    $items = $order->items;
+                    $post_items = waRequest::request('item', array());
+                    foreach ($offsets as $offset) {
+                        $blocks = array(
+                            array(270 + $offset, 3030, 55,),
+                            array(270 + $offset, 3135, 55,),
+                        );
+                        $this->printOnImageBlock($image, $this->company_name, $blocks, 50);
+
+                        $total = 0;
+
+                        for ($i = 0; $i < 14; $i++) {
+                            if (isset($items[$i + $page * 14])) {
+                                $item = $items[$i + $page * 14];
+                                $edited_item = ifset($post_items[$i + $page * 14], array());
+
+                                $y = 1010 + round(120.5 * $i);
+                                $this->printOnImage($image, $page * 14 + $i + 1, 290 + $offset, $y, 50);
+                                $item['quantity'] = intval(ifset($edited_item['quantity'], $item['quantity']));
+                                $item['price'] = $item['price'] * $item['quantity'];
+                                $item['price'] = self::floatval(ifset($edited_item['price'], $item['price']));
+                                if (!empty($item['price'])) {
+                                    $total += $item['price'];
+                                    $price = waCurrency::format('%2', $item['price'], $order->currency);
+
+                                    $this->printOnImage($image, $price, 2360 + $offset, $y, 50);
+                                }
+
+                                $this->printOnImage($image, $item['quantity'], 2010 + $offset, $y, 50);
+
+                                $blocks = array(
+                                    array(500 + $offset, $y, 42,),
+                                );
+
+                                $this->printOnImageBlock($image, ifset($edited_item['name'], $item['name']), $blocks, 50);
+
+                            } else {
+                                break;
+                            }
+                        }
+
+                        $total = 0;
+
+                        if ($i + $page * 14 >= count($items)) {
+                            foreach ($items as $id => $item) {
+                                $edited_item = ifset($post_items[$id], array());
+
+                                $item['quantity'] = intval(ifset($edited_item['quantity'], $item['quantity']));
+                                $item['price'] = $item['price'] * $item['quantity'];
+                                $item['price'] = self::floatval(ifset($edited_item['price'], $item['price']));
+                                if (!empty($item['price'])) {
+                                    $total += $item['price'];
+
+                                }
+                            }
+                            $this->printOnImage($image, $order->getTotalQuantity(), 2010 + $offset, 2720, 50);
+                            $total = waCurrency::format('%2', $total, $order->currency);
+                            $this->printOnImage($image, $total, 2360 + $offset, 2720, 50);
+                        }
+                    }
+
+                    header("Content-type: image/gif");
+                    imagegif($image);
+                    exit;
+                }
+                break;
+            case 'print':
+                $pages = array();
+                $count = ceil(count($order->items) / 14);
+                for ($page = 0; $page < $count; $page++) {
+                    $pages[] = http_build_query(array_merge($request, array('side' => 'front', 'page' => $page)));
+                }
+                $this->view()->assign('pages', $pages);
+
+                if (!$strict && !$order) {
+                    $this->view()->assign('action', 'preview');
+                }
+                $this->view()->assign('editable', false);
+                $this->view()->assign('order', $order);
+                break;
+            default:
+                $pages = array();
+                $count = ceil(count($order->items) / 14);
+                for ($page = 0; $page < $count; $page++) {
+                    $pages[] = http_build_query(array_merge($request, array('side' => 'front', 'page' => $page)));
+                }
+                $this->view()->assign('pages', $pages);
+
+                if (!$strict && !$order) {
+                    $this->view()->assign('action', 'preview');
+                }
+                $this->view()->assign('editable', waRequest::post() ? false : true);
+                $this->view()->assign('order', $order);
+                $this->view()->assign('address', $this->buildAddress($order->shipping_address));
+                $this->view()->assign('settings', $this->getSettings());
+                break;
+        }
+        return $this->view()->fetch($this->path.'/templates/form107.html');
     }
 
     /**
@@ -655,11 +1165,384 @@ class russianpostShipping extends waShipping
      */
     public function tracking($tracking_id = null)
     {
-        $template = 'Отслеживание отправления: <a href="https://pochta.ru/tracking" target="_blank">https://pochta.ru/tracking</a>';
-        if($tracking_id){
-            $template .= sprintf(' <b>%s</b>',htmlentities($tracking_id,ENT_NOQUOTES,'utf-8'));
+        $template = 'Отслеживание отправления вручную: <a href="https://pochta.ru/tracking#%1$s" target="_blank">https://pochta.ru/tracking#%1$s</a>';
+        if ($tracking_id) {
+            $template = sprintf($template/*.' <b>%1$s</b>'*/, htmlentities($tracking_id, ENT_NOQUOTES, 'utf-8'));
+            if (class_exists('SoapClient') && $this->api_login && $this->api_password) {
+                $timeout = ini_get('default_socket_timeout');
+                @ini_set('default_socket_timeout', 15);
+                try {
+                    $status = $this->trackingStatus($tracking_id);
+                    if (!empty($status['message'])) {
+                        $template = $status['message'];
+                    }
+                    if (!empty($status['error'])) {
+                        $template .= $status['error'];
+                    }
+                } catch (SoapFault $ex) {
+                    $message = array(
+                        'tracking_id' => $tracking_id,
+                        'code'        => $ex->getCode(),
+                        'error'       => $ex->getMessage(),
+                    );
+                    waLog::log(var_export($message, true), 'wa-plugins/shipping/russianpost/soap.error.log');
+                    $template .= "Произаошла ошибка при обращении к API Почты России";
+                } catch (Exception $ex) {
+                    $template .= $ex->getMessage();
+                }
+                @ini_set('default_socket_timeout', $timeout);
+            }
+        } else {
+            $template = sprintf($template, '');
         }
         return $template;
+    }
+
+    private function getTrackingData($tracking_id)
+    {
+        $valid = false;
+        if (preg_match('@^\d{14}$@', $tracking_id)) {
+            $valid = true;
+        } elseif (preg_match('@^\w{2}\d{9}\w{2}$@', $tracking_id)) {
+            $valid = true;
+        }
+
+        if (!$valid) {
+            throw new waException('Неверный формат идентификатора отправления');
+        }
+
+        $options = array(
+            'soap_version' => SOAP_1_2,
+        );
+
+
+        $params = array(
+            'OperationHistoryRequest' => array(
+                'Barcode'     => $tracking_id,
+                'MessageType' => '0',
+                'Language'    => 'RUS',
+            ),
+            'AuthorizationHeader'     => array(
+                'login'    => $this->api_login,
+                'password' => $this->api_password,
+            ),
+        );
+
+        $wrappers = stream_get_wrappers();
+
+        $protocol = parse_url($this->wsdl, PHP_URL_SCHEME);
+        if (!in_array($protocol, $wrappers, true)) {
+            $this->wsdl = preg_replace('@^https://@', 'http://', $this->wsdl);
+            $protocol = parse_url($this->wsdl, PHP_URL_SCHEME);
+        }
+
+        if (!in_array($protocol, $wrappers, true)) {
+            $error = 'В системе не найдено адаптеров для '.$protocol;
+        } else {
+            $client = new SoapClient($this->wsdl, $options);
+            $param = new SoapParam($params, 'OperationHistoryRequest');
+            $result = $client->getOperationHistory($param);
+            if (empty($result)) {
+                $error = $client->getError();
+            } elseif (!empty($result->AuthorizationFault)) {
+                $error = (string)$result->AuthorizationFault;
+            } elseif (!empty($result->OperationHistoryFault)) {
+                $error = (string)$result->OperationHistoryFault;
+            } elseif (!empty($result->LanguageFault)) {
+                $error = (string)$result->LanguageFault;
+            } else {
+                $timestamp = time();
+                if (!empty($result->OperationHistoryData->historyRecord)) {
+                    $rows = array();
+
+                    foreach ($result->OperationHistoryData->historyRecord as $record) {
+                        $row = array(
+                            'operation' => (string)ifempty($record->OperationParameters->OperType->Name),
+                            'date'      => (string)ifempty($record->OperationParameters->OperDate),
+                            'post_zip'  => (string)ifempty($record->AddressParameters->OperationAddress->Index),
+                            'post_name' => (string)ifempty($record->AddressParameters->OperationAddress->Description),
+                            'type'      => (string)ifempty($record->OperationParameters->OperAttr->Name),
+                            'weight'    => (int)ifempty($record->ItemParameters->Mass),
+                            'payment'   => (int)ifempty($record->FinanceParameters->Payment),
+                            'value'     => (int)ifempty($record->FinanceParameters->Value),
+                            'zip'       => (string)ifempty($record->AddressParameters->DestinationAddress->Index),
+                            'address'   => (string)ifempty($record->AddressParameters->DestinationAddress->Description),
+                            'recipient' => (string)ifempty($record->UserParameters->Rcpn),
+                        );
+                        $rows[] = $row;
+                    };
+                }
+            }
+        }
+
+        return compact('rows', 'error', 'timestamp');
+    }
+
+    private function trackingStatus($tracking_id)
+    {
+        $keep_interval = 72;
+        $refresh_interval = 3;
+
+        $message = '';
+        $error = '';
+
+        $cache = new waSerializeCache('tracking.'.urlencode($tracking_id), $keep_interval * 3600, 'wa-plugins/shipping/russianpost');
+        try {
+            if (!($data = $cache->get())) {
+                $data = $this->getTrackingData($tracking_id);
+                if (!empty($data['timestamp'])) {
+                    $cache->set($data);
+                } else {
+                    $error = htmlentities($data['error'], ENT_NOQUOTES, 'utf-8');
+                }
+            } elseif (($data['timestamp'] + $refresh_interval * 3600) < time()) {
+                $new_data = $this->getTrackingData($tracking_id);
+                if ($new_data) {
+                    if (!empty($new_data['timestamp'])) {
+                        $data = $new_data;
+                        $cache->set($data);
+                    } else {
+                        $error = htmlentities($new_data['error'], ENT_NOQUOTES, 'utf-8');
+                    }
+
+                }
+            }
+        } catch (Exception $ex) {
+            $error = htmlentities($ex->getMessage(), ENT_NOQUOTES, 'utf-8');
+        }
+
+        if (!empty($data['rows'])) {
+
+            $generic = array(
+                'address',
+                'weight',
+                'payment',
+                'value',
+                'recipient',
+                'zip',
+            );
+            $generic = array_fill_keys($generic, '-');
+
+            foreach ($data['rows'] as &$row) {
+                if (!empty($row['date'])) {
+                    $row['date'] = strtotime($row['date']);
+                    $row['datetime'] = wa_date('humandatetime', $row['date']);
+                    $row['date'] = wa_date('humandate', $row['date']);
+                }
+                if (!empty($row['payment'])) {
+                    $row['payment'] = wa_currency($row['payment'] / 100, 'RUB');
+                }
+                if (!empty($row['value'])) {
+                    $row['value'] = wa_currency($row['value'] / 100, 'RUB');
+                }
+                if (!empty($row['weight'])) {
+                    $row['weight'] = sprintf('%0.2f', $row['weight'] / 1000);
+                }
+                foreach ($row as $field => &$cell) {
+                    $cell = htmlentities($cell, ENT_QUOTES, 'utf-8');
+                    unset($cell);
+                }
+                foreach ($generic as $field => &$value) {
+                    if (!empty($row[$field])) {
+                        $value = $row[$field];
+                    }
+                    unset($value);
+                }
+                unset($row);
+            }
+
+            if ($error) {
+                $error = sprintf('<br/>При автоматическом обновлении истории отправления произошла ошибка: <span class="errormsg">%s</span>', $error);
+            }
+
+            $message = $this->getStatusHtml($tracking_id, $data, $generic, $error);
+
+        } else {
+            if ($error) {
+                $error = sprintf('<br/>Ошибка обмена данными с сервисом Почты России для автоматического отслеживания отправления: <span class="errormsg">%s</span>', $error);
+            }
+        }
+        return compact('message', 'error');
+    }
+
+    private function getStatusHtml($tracking_id, $data, $generic, &$error)
+    {
+        $status = '';
+        if ($row = end($data['rows'])) {
+            $status = <<<HTML
+Текущий статус: <strong>{$row['operation']} {$row['datetime']}</strong>, место: {$row['post_zip']} {$row['post_name']}
+HTML;
+        }
+
+        $updated = wa_date('humandatetime', $data['timestamp']);
+
+        $table = <<<HTML
+
+HTML;
+
+        $table .= <<<HTML
+<table class="zebra table" style="white-space: nowrap;">
+<thead>
+<tr>
+    <th>Операция</th>
+    <th>Дата</th>
+    <th title="Место проведения операции">Место</th>
+</tr>
+</thead>
+HTML;
+        $table .= '<tbody>';
+
+        foreach ($data['rows'] as $row) {
+            $table .= <<<HTML
+<tr>
+    <td>{$row['operation']}<br/><span class="hint">{$row['type']}</span></td>
+    <td>{$row['datetime']}</td>
+    <td>{$row['post_name']}<br/><span class="hint">{$row['post_zip']}</span></td>
+</tr>
+HTML;
+        }
+
+
+        $table .= <<<HTML
+</tbody></table>
+HTML;
+
+        $table_frontend = <<<HTML
+
+HTML;
+
+        $table_frontend .= <<<HTML
+<table class="zebra table" style="white-space: nowrap;">
+<thead>
+<tr>
+    <th class="align-right">Операция</th>
+    <th class="align-right">Дата</th>
+    <th class="align-right" title="Место проведения операции">Место</th>
+</tr>
+</thead>
+HTML;
+        $table_frontend .= '<tbody>';
+
+        foreach ($data['rows'] as $row) {
+            $table_frontend .= <<<HTML
+<tr>
+    <td class="align-right">{$row['operation']}<br/><span class="hint">{$row['type']}</span></td>
+    <td class="align-right">{$row['datetime']}</td>
+    <td class="align-right">{$row['post_name']}<br/><span class="hint">{$row['post_zip']}</span></td>
+</tr>
+HTML;
+        }
+
+
+        $table_frontend .= <<<HTML
+</tbody></table>
+HTML;
+
+
+        $id = 'wa_plugins_shipping_russianpost_'.preg_replace('@([^a-z_0-9])@', '', $tracking_id);
+        switch (wa()->getEnv()) {
+            case 'backend':
+                $html = <<<HTML
+{$status} <a href="#" class="inline-link" id="{$id}_show" style="float: right">Подробнее...</a>
+
+<script type="text/javascript">
+(function () {
+    $('#{$id}_show').bind('click', function() {
+        var dialog =  $('#{$id}_dialog');
+        if (typeof dialog.waDialog == 'function') {
+            if (dialog.length && dialog.parents('div').length) {
+                $('#{$id}_dialog_').remove();
+                dialog.appendTo('body');
+                dialog.attr('id', dialog.attr('id')+'_');
+            }
+            $('#{$id}_dialog_').waDialog();
+        } else {
+            var a = $(this);
+            if (dialog.length) {
+                var table = dialog.find('.dialog-content-indent');
+                a.replaceWith(table);
+                dialog.remove();
+            }
+                    
+            $(this).hide();
+        }
+        return false;
+    });
+})();
+</script>
+            
+<div class="dialog" id="{$id}_dialog" style="display: none;">
+    <div class="dialog-background">
+    </div>
+    <div class="dialog-window">
+        <div class="dialog-content">
+            <div class="dialog-content-indent fields">
+                <h1>История отправления {$tracking_id}</h1>
+                <div class="block fields">
+                    <div class="field">
+                        <div class="name">Адресовано:</div>
+                        <div class="value">{$generic['zip']}, {$generic['address']}, {$generic['recipient']}</div>
+                    </div>
+                    <div class="field">
+                        <div class="name">Объявленная ценность:</div>
+                        <div class="value">{$generic['value']}</div>
+                    </div>
+                    <div class="field">
+                        <div class="name">Наложенный платеж:</div>
+                        <div class="value">{$generic['payment']}</div>
+                    </div>
+                    <div class="field">
+                        <div class="name">Вес (кг):</div>
+                        <div class="value">{$generic['weight']}</div>
+                    </div>
+                </div>
+                
+                {$table}
+                <br/>
+                <span class="hint">Дата запроса к сервису Почты России для отслеживания отправления: {$updated}</span>
+                {$error}
+            </div>
+        </div>
+        <div class="dialog-buttons">
+            <div class="dialog-buttons-gradient">
+                <a class="cancel button" href="#">Закрыть</a>
+            </div>
+        </div>
+    </div>
+</div>
+HTML;
+                break;
+            default:
+                $html = <<<HTML
+<span>{$status} <br/><a href="#" class="inline-link" id="{$id}_show" style="float: left">Показать всю историю отправления...</a><br/></span>
+<div id="{$id}_full" style="display: none;">
+Адресовано: {$generic['zip']}, {$generic['address']}, {$generic['recipient']}<br>
+Объявленная ценность: {$generic['value']}<br>
+Наложенный платеж: {$generic['payment']}<br>
+Вес (кг): {$generic['weight']}<br>
+{$table_frontend}
+<span class="hint">Дата запроса к сервису Почты России для отслеживания отправления: {$updated}</span>
+</div>
+
+
+<script type="text/javascript">
+(function () {
+    $('#{$id}_show').bind('click', function() {
+        var history =  $('#{$id}_full');
+        var a = $(this).parent();
+        if (history.length) {
+            history.show();
+            a.remove();
+        }
+        return false;
+    });
+})();
+</script>
+HTML;
+                break;
+        }
+        $error = '';
+        return $html;
     }
 
     /**
@@ -709,6 +1592,11 @@ class russianpostShipping extends waShipping
         return parent::saveSettings($settings);
     }
 
+    private static function floatval($value)
+    {
+        return floatval(str_replace(array(',', ' '), array('.', ''), $value));
+    }
+
     /**
      * Отображение указанного фрагмента текста на изображении печатной формы.
      *
@@ -731,7 +1619,7 @@ class russianpostShipping extends waShipping
             $font_path = (file_exists($font_path) && function_exists('imagettftext')) ? $font_path : false;
         }
         if (is_null($text_color)) {
-            $text_color = ($this->COLOR && false) ? ImageColorAllocate($image, 32, 32, 96) : ImageColorAllocate($image, 16, 16, 16);
+            $text_color = ($this->color && false) ? imagecolorallocate($image, 32, 32, 96) : imagecolorallocate($image, 16, 16, 16);
         }
 
         if (empty($mode)) {
@@ -786,6 +1674,24 @@ class russianpostShipping extends waShipping
         }
     }
 
+    private function printOnImageBlock(&$image, $string, $blocks, $size = 35)
+    {
+        $sizes = array();
+        $strings = array();
+        foreach ($blocks as $n => $block) {
+            $sizes[] = end($block);
+            if ($string === true) {
+                $strings[$n] = str_repeat('1234 6789 ', max(round(end($block) / 10), 8));
+            }
+        }
+        if (empty($strings)) {
+            $strings = $this->adjustSizes($string, $sizes, $size);
+        }
+        foreach ($blocks as $n => $block) {
+            $this->printOnImage($image, $strings[$n], $block[0], $block[1] + (35 - $size), $size);
+        }
+    }
+
     /**
      * Чтение содержимого графического файла.
      *
@@ -804,11 +1710,11 @@ class russianpostShipping extends waShipping
         }
         switch ($info[2]) {
             case 1:
-                // Create recource from gif image
+                // Create resource from gif image
                 $srcIm = @imagecreatefromgif($file);
                 break;
             case 2:
-                // Create recource from jpg image
+                // Create resource from jpg image
                 $srcIm = @imagecreatefromjpeg($file);
                 break;
             case 3:
@@ -819,7 +1725,7 @@ class russianpostShipping extends waShipping
                 // Create resource from psd image
                 break;
             case 6:
-                // Create recource from bmp image imagecreatefromwbmp
+                // Create resource from bmp image imagecreatefromwbmp
                 $srcIm = @imagecreatefromwbmp($file);
                 break;
             case 7:
@@ -838,5 +1744,26 @@ class russianpostShipping extends waShipping
                 break;
         }
         return empty($srcIm) ? false : $srcIm;
+    }
+
+    private function drawGrid(&$image, $image_info)
+    {
+        $width = $image_info[0];
+        $height = $image_info[1];
+        for ($x = 50; $x < $width; $x += 50) {
+            for ($y = 50; $y < $height; $y += 1000) {
+                if (($x % 1000) != 50) {
+                    $this->printOnImage($image, $x / 10, $x, $y, 15);
+                }
+            }
+        }
+
+        for ($x = 50; $x < $width; $x += 1000) {
+            for ($y = 50; $y < $height; $y += 50) {
+                if (($y % 1000) != 50) {
+                    $this->printOnImage($image, $y / 10, $x, $y, 15);
+                }
+            }
+        }
     }
 }

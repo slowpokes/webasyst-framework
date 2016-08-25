@@ -33,7 +33,9 @@ class waException extends Exception
                         $context[] = '   '.$i."\t".$line;
                     }
                 }
-                if ($i > $line_number + self::CONTEXT_RADIUS) break;
+                if ($i > $line_number + self::CONTEXT_RADIUS) {
+                    break;
+                }
             }
         }
         return "\n".implode("", $context);
@@ -59,44 +61,71 @@ class waException extends Exception
         }
 
         $message = nl2br($this->getMessage());
-        if ($wa && waSystem::getApp()) {
-            try {
-                $app = $wa->getAppInfo();
-            } catch (Exception $e) {
+
+        // CLI-friendly error message
+        if (($wa && $wa->getEnv() == 'cli') || (!$wa && php_sapi_name() == 'cli')) {
+            $result = array();
+            $result[] = date("Y-m-d H:i:s")." php ".join(" ", waRequest::server('argv'));
+            $result[] = "Error: {$this->getMessage()}";
+            $result[] = "with code {$this->getCode()} in '{$this->getFile()}' around line {$this->getLine()}:{$this->getFileContext()}";
+            $result[] = "";
+            $result[] = "Call stack:";
+            $result[] = $this->getTraceAsString();
+            if ($additional_info) {
+                $result[] = "Error while initializing waSystem during error generation: ".$additional_info;
+            }
+            return join("\n", $result);
+        }
+
+        // Modify HTTP response code when exception propagated all the way up the stack.
+        $send_response_code = true;
+        if(function_exists('debug_backtrace')) {
+            $send_response_code = count(debug_backtrace()) <= 1;
+        }
+        if ($send_response_code) {
+            $this->sendResponseCode();
+        }
+
+        // Error message in non-debug mode uses a separate file as a template
+        if (!waSystemConfig::isDebug() && $wa) {
+            if ($wa && waSystem::getApp()) {
+                try {
+                    $app = $wa->getAppInfo();
+                } catch (Exception $e) {
+                    $app = array();
+                }
+                $backend_url = $wa->getConfig()->getBackendUrl(true);
+            } else {
                 $app = array();
             }
-            $backend_url = $wa->getConfig()->getBackendUrl(true);
-        } else {
-            $app = array();
-        }
-        if (!waSystemConfig::isDebug() && $wa && $wa->getEnv() !== 'cli') {
             $env = $wa->getEnv();
+            $url = $wa->getRootUrl(false);
             $file = $code = $this->getCode();
             if (!$code || !file_exists(dirname(__FILE__).'/data/'.$code.'.php')) {
                 $file = 'error';
             }
-            if (file_exists(waConfig::get('wa_path_config').DIRECTORY_SEPARATOR.'exception'.DIRECTORY_SEPARATOR.$file.'.php')) {
-                include(waConfig::get('wa_path_config').DIRECTORY_SEPARATOR.'exception'.DIRECTORY_SEPARATOR.$file.'.php');
-            } else {
-                include(dirname(__FILE__).'/data/'.$file.'.php');
+            $file_candidates = array(
+                waConfig::get('wa_path_config').'/exception/'.$code.'.php',
+                waConfig::get('wa_path_config').'/exception/error.php',
+                dirname(__FILE__).'/data/'.$file.'.php',
+            );
+
+            foreach($file_candidates as $f) {
+                if (file_exists($f)) {
+                    ob_start();
+                    include($f);
+                    return ob_get_clean();
+                }
             }
-            exit;
+            return '';
         }
 
-        if (($wa && $wa->getEnv() == 'cli') || (!$wa && php_sapi_name() == 'cli')) {
-            return date("Y-m-d H:i:s")." php ".implode(" ", waRequest::server('argv'))."\n".
-            "Error: {$this->getMessage()}\nwith code {$this->getCode()} in '{$this->getFile()}' around line {$this->getLine()}:{$this->getFileContext()}\n".
-            "\nCall stack:\n".$this->getTraceAsString()."\n".
-            ($additional_info ? "Error while initializing waSystem during error generation: ".$additional_info."\n" : '');
-        } elseif ($this->code == 404) {
-            $response = new waResponse();
-            $response->setStatus(404);
-            $response->sendHeaders();
-        }
+        // Error message in debug mode includes development info
         $request = htmlentities(var_export($_REQUEST, true), ENT_NOQUOTES, 'utf-8');
         $params = htmlentities(var_export(waRequest::param(), true), ENT_NOQUOTES, 'utf-8');
         $context = htmlentities($this->getFileContext(), ENT_NOQUOTES, 'utf-8');
         $trace = htmlentities($this->getTraceAsString(), ENT_NOQUOTES, 'utf-8');
+        $additional_info = htmlentities($additional_info, ENT_NOQUOTES, 'utf-8');
         $result = <<<HTML
 <div style="width:99%; position:relative; text-align: left;">
     <h2 id='Title'>{$message}</h2>
@@ -123,9 +152,7 @@ HTML;
 <div><h2>Params</h2><pre>";
         $result .= print_r(waRequest::param(), true);
         if ($additional_info) {
-            $additional_info = htmlentities($additional_info, ENT_NOQUOTES, 'utf-8');
             $result .= <<<HTML
-
     <div style="text-align: left;">
         <h2>Error while initializing waSystem during error generation</h2>
         <pre>{$additional_info}</pre>
@@ -135,5 +162,14 @@ HTML;
         }
         return $result;
     }
-}
 
+    public function sendResponseCode()
+    {
+        $response = new waResponse();
+        $response->setStatus(500);
+        if (($this->code < 600) && ($this->code >= 400)) {
+            $response->setStatus($this->code);
+        }
+        $response->sendHeaders();
+    }
+}

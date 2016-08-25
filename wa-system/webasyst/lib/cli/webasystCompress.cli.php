@@ -62,6 +62,7 @@ Optional parameters:
         test         Skip minimal checking: routing setup, database configuration file.
         all          Skip all above.
         none         (default choice) Do not skip anything.
+    -php /path/to/php/bin Option to specify custom path to check php syntax
 HELP;
 
         print($help)."\n";
@@ -80,10 +81,10 @@ HELP;
                     $this->type = ifset($matches[3], 'app');
                     $this->app_id = $matches[1];
                     $this->extension_id = ifset($matches[4]);
-                } elseif (preg_match("@^wa-plugins/(payment|shipping|sms)/({$id_pattern})$@", $slug, $matches)) {
-                    $this->app_id = 'wa-plugins';
-                    $this->type = $matches[1];
-                    $this->extension_id = $matches[2];
+                } elseif (preg_match("@^(wa-plugins/(payment|shipping|sms))/({$id_pattern})$@", $slug, $matches)) {
+                    $this->app_id = $matches[1];
+                    $this->type = $matches[2];
+                    $this->extension_id = $matches[3];
                 } else {
                     throw new Exception("invalid SLUG");
                 }
@@ -97,8 +98,8 @@ HELP;
 
                 $this->tracef('PHP version %s', phpversion());
 
-
-                if ($skipped = $this->initPath()) {
+                $skipped = $this->initPath();
+                if ($skipped) {
                     $this->trace(str_repeat('-', 80));
                     $this->tracef("IGNORE %d FILE(S)", count($skipped));
                     $count = 0;
@@ -115,19 +116,22 @@ HELP;
 
                 if (!in_array($skip, array('test', 'all'), true)) {
                     //test minimal requirements
-                    if ($compress = $this->test()) {
+                    $compress = $this->test();
+                    if ($compress) {
                         $this->trace('Config check OK');
                     }
                 } else {
                     $this->trace('Config check skipped');
                 }
 
-                if ('theme' != $this->type) {
+
+                if ($compress && ('theme' != $this->type)) {
                     $style = $this->getParam('style');
+
                     if (!in_array('false', $style, true)) {
                         $count = $this->codeStyle($style);
                         if ($count === false) {
-                            $this->trace('Code style check skipped');
+                            $this->trace('Code style check skipped, try to use internal checks');
                             $compress = $this->checkCode() && $compress;
                         } elseif ($count) {
                             $compress = false;
@@ -139,6 +143,7 @@ HELP;
                         } else {
                             $this->trace('Code style check OK');
                         }
+
                     } else {
                         $this->trace('Code style check skipped');
                     }
@@ -146,11 +151,16 @@ HELP;
 
                 if ($compress && !in_array($skip, array('compress', 'all'), true)) {
                     $this->compress();
+                } elseif ($compress) {
+                    $this->trace('Test completed');
+                } else {
+                    exit(1);
                 }
             }
         } catch (Exception $ex) {
             $this->tracef("ERROR: %s\n\n", $ex->getMessage());
             $this->printHelp();
+            exit(-1);
         }
     }
 
@@ -166,7 +176,7 @@ HELP;
     private function initPath()
     {
 
-        $type = preg_replace('@s$@', '', $this->type);
+        $type = preg_replace('@(plugin|theme|app)s$@', '$1', $this->type);
         switch ($type) {
             case 'app':
                 $namespace = $this->app_id;
@@ -182,13 +192,15 @@ HELP;
             case 'payment':
                 $namespace = $this->extension_id.ucfirst($this->type);
                 $this->path = wa()->getConfig()->getPath('plugins').'/'.$this->type.'/'.$this->extension_id;
+                $type = 'plugin';
                 break;
             case 'sms':
                 $namespace = $this->extension_id.strtoupper($this->type);
                 $this->path = wa()->getConfig()->getPath('plugins').'/'.$this->type.'/'.$this->extension_id;
+                $type = 'plugin';
                 break;
             default:
-                throw new waException('');
+                throw new waException('Unknown type '.$this->type);
         }
         if (!file_exists($this->path) || !is_dir($this->path)) {
             throw new waException('Invalid SLUG: path not found');
@@ -221,16 +233,41 @@ HELP;
         return $this->filter($this->files, $blacklist);
     }
 
+    private function checkConfig($path)
+    {
+        $result = true;
+        $name = '/lib/config/'.$path.'.php';
+        $config_path = $this->path.$name;
+        if (file_exists($config_path)) {
+            $content = file_get_contents($config_path);
+            $tokens = token_get_all($content);
+            foreach ($tokens as $id => $token) {
+                if (is_array($token) && (in_array($token[0], array(T_FUNC_C, T_FUNCTION, T_CLASS, T_CLASS_C)))) {
+                    $result = false;
+                    $this->tracef('ERROR: Unexpected %s at config file %s on line', token_name($token[0]), $name, $token[2]);
+                    break;
+                }
+            }
+        }
+        return $result;
+    }
+
     private function getItemConfig($path)
     {
-        $config_path = $this->path.'/lib/config/'.$path.'.php';
+        $config = null;
+        $name = '/lib/config/'.$path.'.php';
+        $config_path = $this->path.$name;
         if (file_exists($config_path)) {
-            $config = include($config_path);
-            if (!is_array($config)) {
+            if ($this->checkConfig($path)) {
                 $config = array();
+                if (file_exists($config_path)) {
+                    $config = include($config_path);
+                    if (!is_array($config)) {
+                        $this->tracef('ERROR: Invalid or empty config %s', $name);
+                        $config = false;
+                    }
+                }
             }
-        } else {
-            $config = false;
         }
         return $config;
     }
@@ -277,7 +314,7 @@ HELP;
         try {
             $count = $this->process($files, !in_array('report', $param, true));
         } catch (Exception $ex) {
-            $this->tracef('ERROR: %s', $ex->getMessage());
+            $this->tracef("ERROR: %s\n\n", $ex->getMessage());
         }
         return $count;
     }
@@ -293,7 +330,7 @@ HELP;
             $standards = array($standards);
         }
 
-        $phpcs = new PHP_CodeSniffer(0, 4, 'UTF-8', $interactive);
+        $sniffer = new PHP_CodeSniffer(0, 4, 'UTF-8', $interactive);
         // Set file extensions if they were specified. Otherwise,
         // let PHP_CodeSniffer decide on the defaults.
         if (true) {
@@ -303,7 +340,7 @@ HELP;
                 'js',
                 'css',
             );
-            $phpcs->setAllowedFileExtensions($extensions);
+            $sniffer->setAllowedFileExtensions($extensions);
         }
 
         if (is_array($files) === false) {
@@ -320,7 +357,7 @@ HELP;
 
         $sniffs = array();
         foreach ($standards as $standard) {
-            $installed = $phpcs->getInstalledStandardPath($standard);
+            $installed = $sniffer->getInstalledStandardPath($standard);
             if ($installed !== null) {
                 $standard = $installed;
             } else {
@@ -330,14 +367,14 @@ HELP;
                     $standard = realpath($standard.'/ruleset.xml');
                 }
             }
-            $sniffs = array_merge($sniffs, $phpcs->processRuleset($standard));
+            $sniffs = array_merge($sniffs, $sniffer->processRuleset($standard));
         }
         //end foreach
 
         $sniffRestrictions = array();
 
-        $phpcs->registerSniffs($sniffs, $sniffRestrictions);
-        $phpcs->populateTokenListeners();
+        $sniffer->registerSniffs($sniffs, $sniffRestrictions);
+        $sniffer->populateTokenListeners();
 
         // The SVN pre-commit calls process() to init the sniffs
         // and ruleset so there may not be any files to process.
@@ -347,14 +384,14 @@ HELP;
         $_SERVER['argc'] = 0;
         $errors_count = 0;
         foreach ($files as $file) {
-            $phpcsFile = $phpcs->processFile($file);
+            $sniffer_file = $sniffer->processFile($file);
             // Show progress information.
-            if ($phpcsFile !== null) {
-                $count = ($phpcsFile->getErrorCount() + $phpcsFile->getWarningCount());
+            if ($sniffer_file !== null) {
+                $count = ($sniffer_file->getErrorCount() + $sniffer_file->getWarningCount());
                 if (!$interactive && $count) {
                     $report = array(
-                        'ERROR'   => $phpcsFile->getErrors(),
-                        'WARNING' => $phpcsFile->getWarnings(),
+                        'ERROR'   => $sniffer_file->getErrors(),
+                        'WARNING' => $sniffer_file->getWarnings(),
                     );
                     $this->tracef("\nFILE: %s", str_replace($this->path.'/', '', $file));
                     $this->trace(str_repeat('-', 80));
@@ -390,13 +427,11 @@ HELP;
                 $result = $this->testConfig() && $result;
                 # 1.1 Routing
                 $result = $this->testRouting() && $result;
-
                 $result = $this->testRequirements() && $result;
-
-
                 # 1.2 themes
                 # 1.3 plugins
                 # 2. Check PHP code
+                $result = $this->testPhp() && $result;
                 break;
         }
 
@@ -414,16 +449,21 @@ HELP;
 
     private function testRequirements()
     {
+        $result = true;
         $extensions = array();
-        if ($requirements = $this->getItemConfig('requirements')) {
+        $requirements = $this->getItemConfig('requirements');
+        if ($requirements) {
             foreach ($requirements as $requirement => $requirement_info) {
                 if (preg_match('@^php\.(.+)$@', $requirement, $matches)) {
                     $extensions[$matches[1]] = ifset($requirement_info['strict']);
                 }
             }
+            waRequest::setParam('extensions', $extensions);
+        } elseif ($requirements === false) {
+            $result = false;
         }
-        waRequest::setParam('extensions', $extensions);
-        return true;
+
+        return $result;
     }
 
     private function testConfig()
@@ -466,17 +506,31 @@ HELP;
                     array(
                         'handlers',
                         'rights',
+                        'custom_settings',
                     )
                 );
-                if ($this->app_id == 'shop') {
-                    $available = array_merge(
-                        $available,
-                        array(
-                            'shop_settings',
-                            'importexport',
-                            'export_profile',
-                        )
-                    );
+                switch ($this->app_id) {
+                    case 'shop':
+                        $available = array_merge(
+                            $available,
+                            array(
+                                'shop_settings',
+                                'importexport',
+                                'export_profile',
+                            )
+                        );
+                        break;
+                    case 'wa-plugins/shipping':
+                        $available = array_merge(
+                            $available,
+                            array(
+                                'external_tracking',
+                                'external',
+                            )
+                        );
+                        break;
+                    default:
+                        break;
                 }
                 break;
         }
@@ -485,6 +539,9 @@ HELP;
             if ($keys) {
                 $this->tracef("Invalid %s's settings: unknown config options (%s)", $this->type, implode(',', $keys));
             }
+        } else {
+            $this->trace('ERROR: Empty or invalid item config');
+            return false;
         }
 
         return empty($keys);
@@ -502,7 +559,7 @@ HELP;
                 //TODO test $routing
             }
         } else {
-            if ($routing !== false) {
+            if ($routing !== null) {
                 $this->tracef("Invalid %s's settings: routing exists but frontend disabled", $this->type);
                 $result = false;
             }
@@ -511,7 +568,6 @@ HELP;
             }
         }
         return $result;
-
     }
 
     private function testInstall()
@@ -530,19 +586,22 @@ HELP;
         $result = true;
         switch ($this->type) {
             case 'plugin':
-                $namespace = waRequest::param('prefix', "{$this->app_id}_{$this->extension_id}");
+                $namespace = waRequest::param('prefix', sprintf('%s_%s', $this->app_id, $this->extension_id));
+                $deprecated = 'lib/config/plugin.sql';
                 break;
-            case 'app';
-                $namespace = "{$this->app_id}";
+            case 'app':
+                $namespace = $this->app_id;
+                $deprecated = 'lib/config/app.sql';
                 break;
             default:
                 $namespace = null;
+                $deprecated = null;
                 break;
         }
 
         if ($namespace) {
-
-            if ($db = $this->getItemConfig('db')) {
+            $db = $this->getItemConfig('db');
+            if ($db) {
                 $pattern = "@^{$namespace}(_.+)?$@";
                 foreach ($db as $table => $info) {
                     if (!preg_match($pattern, $table)) {
@@ -550,14 +609,93 @@ HELP;
                         $this->tracef("Invalid table name:\t\"%s\"", $table);
                     }
                 }
-            }
-        } else {
 
+                if (!$result) {
+                    $this->tracef("Valid table names are \"%1\$s\" or \"%1\$s_*\"", $namespace);
+                }
+            } elseif ($deprecated && in_array($deprecated, $this->files)) {
+                $this->tracef("Usage %s file id deprecated, use db.php", $deprecated);
+                $this->tracef("Valid table names are \"%1\$s\" or \"%1\$s_*\"", $namespace);
+            }
         }
-        if (!$result) {
-            $this->tracef("Valid table names are \"%1\$s\" or \"%1\$s_*\"", $namespace);
+
+        return $result;
+    }
+
+    private function testPhp()
+    {
+        $result = true;
+
+        if (defined('PHP_BINARY')) {
+            $php_bin = constant('PHP_BINARY');
+        } elseif (defined('PHP_BINDIR')) {
+            $php_bin = constant('PHP_BINDIR');
+        } else {
+            $php_bin = 'php';
+        }
+
+        $command = sprintf('%s -v', $php_bin);
+        $res = $this->exec($command, $outputs);
+        if (($res !== 0) && ($php_bin != 'php')) {
+            $php_bin = 'php';
+            $command = sprintf('%s -v', $php_bin);
+            $res = $this->exec($command, $outputs);
+        }
+        if ($res === 0) {
+            $this->trace('Run PHP syntax check');
+            $this->tracef("bin path: %s\nPHP Version:\n\t%s\n", $php_bin, implode("\n\t", $outputs));
+            foreach ($this->files as $file) {
+                if (pathinfo($file, PATHINFO_EXTENSION) == 'php') {
+                    $command = sprintf('%s -l -f "%s/%s"', $php_bin, $this->path, $file);
+                    $outputs = null;
+
+                    $res = $this->exec($command, $outputs);
+
+                    if ($res !== 0) {
+                        $outputs = array_filter($outputs, 'trim');
+                        if ($outputs) {
+                            $this->tracef("PHP errors at file %s:", $file);
+                            foreach ($outputs as $output) {
+                                $this->tracef("\t%s", trim(str_replace($this->path.'/'.$file, 'file', $output)));
+                            }
+                            $result = false;
+                        }
+                    }
+                }
+            }
+
+            if ($result) {
+                $this->trace("PHP file syntax check success");
+            }
+            $this->trace();
+        } else {
+            $this->trace("PHP binary not found, compile check skipped");
         }
         return $result;
+    }
+
+    private function exec($command, &$lines)
+    {
+        $lines = array();
+        $descriptor_spec = array(
+            array('pipe', 'r'),//stdin
+            array('pipe', 'w'),//stdout
+            array('pipe', 'w'),//stderr
+        );
+        $pipes = array();
+        $process = proc_open($command, $descriptor_spec, $pipes);
+        $lines = preg_split("@[\r\n]+@", stream_get_contents($pipes[1]));
+        $res = stream_get_contents($pipes[2]);
+
+        foreach ($pipes as &$pipe) {
+            fclose($pipe);
+        }
+        proc_close($process);
+        if (strlen($res) == 0) {
+            $res = 0;
+        }
+
+        return $res;
     }
 
     private function checkCode()
@@ -576,7 +714,9 @@ HELP;
 
         foreach ($this->files as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) == 'php') {
-                $tokens = token_get_all(file_get_contents($this->path.'/'.$file));
+                $path = $this->path.'/'.$file;
+
+                $tokens = token_get_all(file_get_contents($path));
                 foreach ($tokens as $id => $token) {
                     if (is_array($token)) {
                         switch ($token[0]) {
@@ -638,14 +778,12 @@ HELP;
         # 3. Check namespaces
         # 3.1 File names
         # 3.2 Class names
-
-
         switch ($this->type) {
             case 'plugin':
-                $pattern = "@^".waRequest::param('prefix', $this->app_id.ucfirst($this->extension_id))."\w*\$@";
+                $pattern = sprintf('@^%s\w*$@', waRequest::param('prefix', $this->app_id.ucfirst($this->extension_id)));
                 break;
-            case 'app';
-                $pattern = "@^{$this->app_id}\w+\$@";
+            case 'app':
+                $pattern = sprintf('@^%s\w+$@', $this->app_id);
                 break;
             default:
                 $pattern = null;
@@ -680,7 +818,8 @@ HELP;
         }
 
         $extensions = array();
-        if ($requirements = $this->getItemConfig('requirements')) {
+        $requirements = $this->getItemConfig('requirements');
+        if ($requirements) {
             foreach ($requirements as $requirement => $requirement_info) {
                 if (preg_match('@^php\.(.+)$@', $requirement, $matches)) {
                     $extensions[$matches[1]] = ifset($requirement_info['strict']);
@@ -706,7 +845,8 @@ HELP;
         );
         $functions = array();
         foreach ($extensions as $extension) {
-            if ($extension_functions = get_extension_funcs($extension)) {
+            $extension_functions = get_extension_funcs($extension);
+            if ($extension_functions) {
                 foreach ($extension_functions as $function) {
                     $functions[$function] = $extension;
                 }
@@ -714,7 +854,6 @@ HELP;
         }
 
         return $result;
-
     }
 
     private function compress()
@@ -740,7 +879,8 @@ HELP;
         try {
             $time = microtime(true);
             $tar_object = new Archive_Tar($this->archive_path, true);
-            if ($result = $tar_object->create($archive_files)) {
+            $result = $tar_object->create($archive_files);
+            if ($result) {
                 $size = filesize($this->archive_path);
                 $this->tracef("\ntime\t%d ms\nsize\t%0.2f KByte\n", (microtime(true) - $time) * 1000, $size / 1024);
 
@@ -765,7 +905,8 @@ HELP;
         $total_size = 0;
         $count = 0;
         $time = microtime(true);
-        if ($fp = @fopen($path, 'w')) {
+        $fp = @fopen($path, 'w');
+        if ($fp) {
             foreach ($files as $file) {
                 if (file_exists($file)) {
 
@@ -813,6 +954,7 @@ HELP;
                 '@\.(exe|dll|sys)$@'                                  => 'executable file',
                 '@(/|^)[^\.]*todo$@i'                                 => 'TODO file',
                 '@(/|^)[^\.]+$@'                                      => 'unknown type file',
+                '@(/|^)[^0-9a-z_\-\.]+$@'                             => 'invalid filename characters',
             )
         );
         $skipped = array();
@@ -841,7 +983,7 @@ HELP;
         $this->trace(call_user_func_array('sprintf', $args));
     }
 
-    protected function trace($string)
+    protected function trace($string = '')
     {
         print $string."\n";
     }
