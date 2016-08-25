@@ -172,7 +172,7 @@
                             {if ifset($app.lease_price) == 'free'}
                                 {* free to install on this particular installation (cloud) *}
                                 <div class="value">
-                                    {if $app.price}<strike>{$app.price}</strike>{/if}
+                                    {if $app.price}<strike>{$app.price}</strike>&nbsp;{/if}
                                     <strong>[`Free`]</strong>
                                 </div>
                                 {if $app.price}<div class="value italic"><p class="small">{sprintf('[`Your account status enables you to install %s for free!`]', $app.name|escape)}</p></div>{/if}

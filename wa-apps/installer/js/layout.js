@@ -16,7 +16,7 @@ $.layout = {
         /* main */
     },
     options: {
-        default_list: 'apps',
+        default_list: 'featured',
         default_query: {},
         title: 'Installer',
         debug: true,

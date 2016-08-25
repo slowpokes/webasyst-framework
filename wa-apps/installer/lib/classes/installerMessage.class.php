@@ -115,4 +115,3 @@ class installerMessage
         return _w($a[1]);
     }
 }
-//EOF

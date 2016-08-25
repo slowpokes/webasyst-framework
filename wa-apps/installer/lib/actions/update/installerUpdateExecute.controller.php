@@ -23,71 +23,81 @@ class installerUpdateExecuteController extends waJsonController
 
     public function execute()
     {
-        if ($this->thread_id = waRequest::get('thread_id', false)) {
-            $cache = new waSerializeCache($this->getApp().'.'.$this->thread_id);
-            $this->urls = $cache->get();
-            $cache->delete();
-        }
-        if ($this->urls) {
-            wa()->getStorage()->close();
-            ob_start();
+        try {
+            $this->thread_id = preg_replace('@[^a-zA-Z0-9]+@', '', waRequest::get('thread_id', '', 'string'));
+            if ($this->thread_id) {
+                $path = wa()->getCachePath(sprintf('update.%s.php', $this->thread_id), 'installer');
+                if (file_exists($path)) {
+                    $this->urls = include($path);
+                }
 
-
-            try {
-                $this->model = new waAppSettingsModel();
                 $log_level = waSystemConfig::isDebug() ? waInstaller::LOG_DEBUG : waInstaller::LOG_WARNING;
-
                 $updater = new waInstaller($log_level, $this->thread_id);
-                $this->getStorage()->close();
-                $updater->init();
+                if ($this->urls) {
 
+                    $this->getStorage()->close();
+                    ob_start();
 
-                $this->model->ping();
+                    try {
+                        $this->model = new waAppSettingsModel();
 
-                $storage = wa()->getStorage();
-                $storage->close();
-                $this->urls = $updater->update($this->urls);
-                if (waRequest::request('install')) {
-                    $this->install();
-                }
+                        $updater->init();
 
-                $this->response['sources'] = $this->getResult();
-                $this->response['current_state'] = $updater->getState();
-                $this->response['state'] = $updater->getFullState(waRequest::get('mode', 'apps'));
+                        $this->model->ping();
 
-                //cleanup cache
-                $this->cleanup();
-
-                //update themes
-                foreach ($this->urls as $url) {
-                    if (preg_match('@(wa-apps/)?(.+)/themes/(.+)@', $url['slug'], $matches)) {
-                        try {
-                            $theme = new waTheme($matches[3], $matches[2]);
-                            $theme->update();
-                        } catch (Exception $ex) {
-                            waLog::log(sprintf('Error during theme %s@%s update: %s', $matches[3], $matches[2], $ex->getMessage()));
+                        $this->getStorage()->close();
+                        $this->urls = $updater->update($this->urls);
+                        if (waRequest::request('install')) {
+                            $this->install();
                         }
+
+                        $this->response['sources'] = $this->getResult();
+                        $this->response['current_state'] = $updater->getState();
+                        $this->response['state'] = $updater->getFullState(waRequest::get('mode', 'apps'));
+
+                        //cleanup cache
+                        $this->storage($this->thread_id, null);
+                        $this->cleanup();
+
+                        //update themes
+                        foreach ($this->urls as $url) {
+                            if (preg_match('@(wa-apps/)?(.+)/themes/(.+)@', $url['slug'], $matches)) {
+                                try {
+                                    $theme = new waTheme($matches[3], $matches[2]);
+                                    $theme->update();
+                                } catch (Exception $ex) {
+                                    waLog::log(sprintf('Error during theme %s@%s update: %s', $matches[3], $matches[2], $ex->getMessage()));
+                                }
+                            }
+                        }
+
+                        //and again cleanup
+                        $this->cleanup();
+
+                        $this->getConfig()->setCount(false);
+
+                        $response = $this->getResponse();
+                        $response->addHeader('Content-Type', 'application/json; charset=utf-8');
+                        $response->sendHeaders();
+                    } catch (Exception $ex) {
+                        $this->setError($ex->getMessage());
                     }
+                    $ob = ob_get_clean();
+                    if ($ob) {
+                        $this->response['warning'] = $ob;
+                        waLog::log('Output at '.__METHOD__.': '.$ob);
+                    }
+                } else {
+                    $updater->flush();
+                    throw new waException(sprintf('Nothing to update at thread %s', $this->thread_id));
                 }
-
-                //and again cleanup
-                $this->cleanup();
-
-
-                $this->getConfig()->setCount(false);
-
-                $response = $this->getResponse();
-                $response->addHeader('Content-Type', 'application/json; charset=utf-8');
-                $response->sendHeaders();
-            } catch (Exception $ex) {
-                $this->setError($ex->getMessage());
+            } else {
+                throw new waException('Empty thread id');
             }
-            if ($ob = ob_get_clean()) {
-                $this->response['warning'] = $ob;
-                waLog::log('Output at '.__METHOD__.': '.$ob);
-            }
-        } else {
-            throw new Exception('nothing to update');
+
+        } catch (Exception $ex) {
+            throw $ex;
+            //TODO use redirect/errors
         }
     }
 
@@ -154,4 +164,3 @@ class installerUpdateExecuteController extends waJsonController
         return $result_urls;
     }
 }
-//EOF

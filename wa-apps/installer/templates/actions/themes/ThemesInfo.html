@@ -231,6 +231,13 @@
                     {$theme.vendor_name|default:$theme.vendor|escape}
                 </div>
             </div>
+            {if !empty($theme.demo_url)}
+                <div class="field">
+                    <div class="value">
+                        <a href="{$theme.demo_url}" target="_blank">[`View theme demo`] <i class="icon16 new-window"></i></a>
+                    </div>
+                </div>
+            {/if}
         </div>
 
         <div class="clear-both"></div>
@@ -240,7 +247,6 @@
     <!-- product misc details -->
     <div class="block double-padded">
         <div class="fields width100px">
-
             <div class="field">
                 <div class="name">
                     [`Version`]

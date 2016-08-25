@@ -16,7 +16,6 @@ class installerUpdateStateController extends waJsonController
 {
     public function execute()
     {
-
         $updater = new waInstaller(waInstaller::LOG_TRACE);
         $this->response['state'] = $updater->getFullState(waRequest::get('mode', 'apps'));
         $this->response['current_state'] = $updater->getState();
@@ -25,4 +24,3 @@ class installerUpdateStateController extends waJsonController
         $response->sendHeaders();
     }
 }
-//EOF

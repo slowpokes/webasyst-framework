@@ -100,6 +100,3 @@ class installerAssetsAction extends waViewAction
         $this->view->assign('title', _w('Assets'));
     }
 }
-
-
-//XXX check system plugins

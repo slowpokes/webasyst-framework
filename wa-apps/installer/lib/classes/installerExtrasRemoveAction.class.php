@@ -75,7 +75,6 @@ abstract class installerExtrasRemoveAction extends waViewAction
 
             $options = array(
                 'installed' => true,
-                'local'     => true,
             );
 
 
@@ -93,7 +92,7 @@ abstract class installerExtrasRemoveAction extends waViewAction
 
             $queue = array();
 
-
+            $options['local'] = true;
             foreach ($extras_ids as $slug => $info) {
                 $slug = preg_replace('@^wa-widgets/@', 'webasyst/widgets/', $slug);
                 $slug_chunks = explode('/', $slug);
@@ -161,6 +160,7 @@ abstract class installerExtrasRemoveAction extends waViewAction
             $msg = installerMessage::getInstance()->raiseMessage($message);
             $this->redirect('?msg='.$msg.'#/'.$this->extras_type.'/');
         } catch (Exception $ex) {
+            waLog::log($ex->getMessage(), 'installer/remove.log');
             $msg = installerMessage::getInstance()->raiseMessage($ex->getMessage(), installerMessage::R_FAIL);
             $this->redirect('?msg='.$msg.'#/'.$this->extras_type.'/');
         }

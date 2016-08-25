@@ -30,10 +30,9 @@ class installerPluginsViewAction extends installerItemsAction
     {
         parent::execute();
         $return_url = waRequest::get('return_url', waRequest::server('HTTP_REFERER'));
-        if ($return_hash = waRequest::get('return_hash')) {
-            if ($return_hash = preg_replace('@^#@', '', $return_hash)) {
-                $return_url .= '#'.$return_hash;
-            }
+        $return_hash = preg_replace('@^#@', '', waRequest::get('return_hash'));
+        if ($return_hash) {
+            $return_url .= '#'.$return_hash;
         }
         $this->view->assign('top', !!preg_match('@^[^/]+$@', waRequest::get('slug')) && !waRequest::get('filter'));
         $this->view->assign('return_url', $return_url);

@@ -199,11 +199,11 @@ class Archive_Tar extends PEAR
      *                   is required.  For compatibility reason the
      *                   boolean value 'true' means 'gz'.
      * @access public
-     * @return boolean
+     * @return self
      */
-    function Archive_Tar($p_tarname, $p_compress = null)
+    function __construct($p_tarname, $p_compress = null)
     {
-        $this->PEAR();
+        parent::__construct();
         $this->_compress = false;
         $this->_compress_type = 'none';
         if (($p_compress === null) || ($p_compress == '')) {
@@ -267,13 +267,13 @@ class Archive_Tar extends PEAR
     // }}}
 
     // {{{ destructor
-    function _Archive_Tar()
+    function __destruct()
     {
         $this->_close();
         // ----- Look for a local copy to delete
         if ($this->_temp_tarname != '')
             @unlink($this->_temp_tarname);
-        $this->_PEAR();
+        parent::__destruct();
     }
     // }}}
 
@@ -576,7 +576,7 @@ class Archive_Tar extends PEAR
     * This method extract from the archive one file identified by $p_filename.
     * The return value is a string with the file content, or NULL on error.
     * @param string $p_filename     The path of the file to extract in a string.
-    * @return                       a string with the file content or NULL.
+    * @return string                a string with the file content or NULL.
     * @access public
     */
     function extractInString($p_filename)
@@ -1529,7 +1529,7 @@ class Archive_Tar extends PEAR
     * This method extract from the archive one file identified by $p_filename.
     * The return value is a string with the file content, or NULL on error.
     * @param string $p_filename     The path of the file to extract in a string.
-    * @return                       a string with the file content or NULL.
+    * @return string                a string with the file content or NULL.
     * @access private
     */
     function _extractInString($p_filename)

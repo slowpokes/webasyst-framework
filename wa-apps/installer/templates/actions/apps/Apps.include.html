@@ -37,7 +37,7 @@
                 {if isset($app.lease_price) &&(($app.lease_price == 'free')||(empty($app.lease_price)))}
                     {* free to install on this particular installation (cloud) *}
                     {if $app.price && ({$app.price|regex_replace:'@\D+@':''|floatval}>0)}
-                        <strike>{$app.price}</strike><strong title="{sprintf('[`Your account status enables you to install %s for free!`]', $app.name|escape)}">[`Free`]</strong>
+                        <strike>{$app.price}</strike>&nbsp;<strong title="{sprintf('[`Your account status enables you to install %s for free!`]', $app.name|escape)}">[`Free`]</strong>
                     {else}
                         <strong>[`Free`]</strong>
                     {/if}

@@ -170,8 +170,9 @@ class installerUpdateManagerAction extends waViewAction
                     $return_url = '?module=update&auto_submit=1';
                 }
                 $this->view->assign('return_url', $return_url);
-                $cache = new waSerializeCache($this->getApp().'.'.$state['thread_id']);
-                $cache->set($this->urls);
+                $path = wa()->getCachePath(sprintf('update.%s.php', $state['thread_id']), 'installer');
+                waUtils::varExportToFile($this->urls, $path);
+
             } else {
                 $msg = _w('Update is already in progress. Please wait while previous update session is finished before starting update session again.');
                 $this->redirect(array(
@@ -235,8 +236,6 @@ class installerUpdateManagerAction extends waViewAction
                 'subject' => empty($info['subject']) ? 'system' : $info['subject'],
                 'edition' => empty($info['edition']) ? true : $info['edition'],
             ));
-
         }
     }
 }
-//EOF

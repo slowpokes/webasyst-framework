@@ -311,7 +311,7 @@ a#wa-my-username { font-weight: bold; text-decoration: none; }
 .gray, .grey, a.gray, a.grey, .gray a, .grey a { color: #aaa; }
 .red { color: #f00; }
 .black { color: #000; }
-.hint, a.hint, span.hint { color: #aaa; font-size: .8em; font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Grande', Arial, sans-serif; }
+.hint, a.hint, span.hint { color: #aaa; font-size: 0.8em; }
 .hint a { color: #888; }
 .hint a, a.hint { text-decoration: underline !important; }
 .hr { border-top: 1px solid #ddd; margin: 5px 10px; padding: 0; }

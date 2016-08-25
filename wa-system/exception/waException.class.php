@@ -60,7 +60,7 @@ class waException extends Exception
             $additional_info = $e->getMessage();
         }
 
-        $message = nl2br($this->getMessage());
+        $message = nl2br(htmlspecialchars($this->getMessage(), ENT_NOQUOTES, 'utf-8'));
 
         // CLI-friendly error message
         if (($wa && $wa->getEnv() == 'cli') || (!$wa && php_sapi_name() == 'cli')) {
@@ -147,10 +147,7 @@ class waException extends Exception
         <pre>{$params}</pre>
     </div>
 HTML;
-        $result .= var_export($_REQUEST, true);
-        $result .= "</pre></div></div>
-<div><h2>Params</h2><pre>";
-        $result .= print_r(waRequest::param(), true);
+
         if ($additional_info) {
             $result .= <<<HTML
     <div style="text-align: left;">
