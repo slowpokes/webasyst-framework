@@ -31,9 +31,9 @@
 <input type="hidden" name="blank_type" value="F112">
 <!-- from -->
 <input type="hidden" name="from_name" value="{if !empty($settings.from_name)} {$settings.from_name|escape}{/if}">
-<input type="hidden" name="from_address_1" value="{if !empty($settings.from_address_1)} {$settings.from_address_1|escape}{/if}">
-<input type="hidden" name="from_address_2" value="{if !empty($settings.from_address_2)} {$settings.from_address_2|escape}{/if}">
-<input type="hidden" name="from_zip" value="{if !empty($settings.from_zip)} {$settings.from_zip|escape}{/if}">
+<input type="hidden" name="from_address_1" value="{if !empty($settings.from_address_1)}{$settings.from_address_1|escape}{/if}">
+<input type="hidden" name="from_address_2" value="{if !empty($settings.from_address_2)}{$settings.from_address_2|escape}{/if}">
+<input type="hidden" name="from_zip" value="{if !empty($settings.from_zip)}{$settings.from_zip|escape}{/if}">
 <!-- from end -->
 
 <fieldset>

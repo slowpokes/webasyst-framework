@@ -196,7 +196,7 @@ class digipostShipping extends waShipping
 			$blankURL = $this->getFromDigiApi("https://api.digi-post.ru/blanks?", $data, 'post');
 
 			$orderId = waRequest::get('order_id');
-			if ($blankURL->error == 0 && is_string($blankURL->message)) {
+			if ($blankURL->error == 0) {
 				$opm = new shopOrderParamsModel();
 				$opm->set($orderId, array('digipost.F112' => $blankURL->message, 'digipost.F112.date' => time()), false);
 				header("Location: $blankURL->message");
@@ -254,9 +254,9 @@ class digipostShipping extends waShipping
 			}
 
 			$blankURL = $this->getFromDigiApi("https://api.digi-post.ru/blanks?", $data, 'post');
-
+			
 			$orderId = waRequest::get('order_id');
-			if (is_string($blankURL->message)) {
+			if ($blankURL->error == 0) {
 				$opm = new shopOrderParamsModel();
 				$opm->set($orderId, array('digipost.F7' => $blankURL->message, 'digipost.F7.date' => time()), false);
 				//print_r($opm);
@@ -316,7 +316,7 @@ class digipostShipping extends waShipping
 			$blankURL = $this->getFromDigiApi("https://api.digi-post.ru/blanks?", $data, 'post');
 
 			$orderId = waRequest::get('order_id');
-			if (is_string($blankURL->message)) {
+			if ($blankURL->error == 0) {
 				$opm = new shopOrderParamsModel();
 				$opm->set($orderId, array('digipost.F116' => $blankURL, 'digipost.F116.date' => time()), false);
 				//print_r($opm);
@@ -375,7 +375,7 @@ class digipostShipping extends waShipping
 			$blankURL = $this->getFromDigiApi("https://api.digi-post.ru/blanks?", $data, 'post');
 
 			$orderId = waRequest::get('order_id');
-			if (is_string($blankURL->message)) {
+			if ($blankURL->error == 0) {
 				$opm = new shopOrderParamsModel();
 				$opm->set($orderId, array('digipost.F107' => $blankURL, 'digipost.F107.date' => time()), false);
 				//print_r($blankURL);
@@ -472,13 +472,7 @@ class digipostShipping extends waShipping
 			$order_id = waRequest::get('id', '', 'int');
 			$order = $som->getOrder($order_id, true, true);
 			
-			if(!empty($contact->get('email'))) {
-				//echo 'У контакта "'.$contact->get('name').'" не указан email, поэтому email не будут ему отсылаться.';
-			}
-			if(!empty($contact->get('phone'))) {
-				//echo 'У контакта "'.$contact->get('name').'" не указан телефон, поэтому SMS не будут ему отсылаться.';
-			}
-			
+
 			$order_data = array('postcode'=>$tracking_id, 'tracking_name'=>'Заказ #'.$order['id'], 'order_id'=>$order['id'], 'client_name'=>$order['contact']['name'],'client_phone'=>$order['contact']['phone'],'client_email'=>$order['contact']['email'], 'send_email' => 1, 'send_sms' => 1);
 			
 			
