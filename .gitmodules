@@ -9,3 +9,6 @@
 [submodule "wa-apps/shop"]
 	path = wa-apps/shop
 	url = git@github.com:slowpokes/shop-script.git
+[submodule "wa-apps/couriers"]
+	path = wa-apps/couriers
+	url = git@github.com:slowpokes/couriers.git
