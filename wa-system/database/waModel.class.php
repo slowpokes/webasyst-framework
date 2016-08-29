@@ -75,7 +75,7 @@ class waModel
         $this->type = $type ? $type : 'default';
         // VADIM CODE START
         if(!is_array($type)) {
-            $this->type = $this->getDBSheme();
+            $this->type = $this->getDBSheme($type ? $type : 'default');
         }
         // VADIM CODE END
         $this->adapter = waDbConnector::getConnection($this->type, $this->writable);
@@ -1116,14 +1116,14 @@ class waModel
     }
 
     // VADIM CODE START
-    private function getDBSheme(){
+    private function getDBSheme($type = 'default'){
         if($this->use_config_db_name){
             $db = wa()->getDb();
             if($db){
                 return $db;
             }
         }
-        return 'default';
+        return $type;
     }
 
     public function setDb($db){
