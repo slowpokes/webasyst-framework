@@ -7,3 +7,4 @@ build.php
 config.codekit
 /wa-system/webasyst/lib/updates/dev
 .idea
+.DS_Store
