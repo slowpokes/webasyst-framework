@@ -1,15 +1,18 @@
 <?php 
 
-class siteRedirectBadAction extends waViewAction
+class siteRedirectBadCli extends waCliController
 {
     public function execute()
     {
         $domain = siteHelper::getDomain();
         $redirect_model = new waRedirectModel();
         $data = $redirect_model->where("domain = '$domain'")->where("redirect !=''")->where('visible = 1')->fetchAll();
-        $db = waRequest::get('db');
+        $db = waRequest::param(0);
         $model = new waModel($db);
+        $n = count($data);
+        $i = 1;
         foreach($data as $row){
+            echo "$i / $n\n";
             $url = $row['redirect'];
             if(substr($url, 0, 1)=='/'){
                 $url = substr($url, 1);
@@ -57,9 +60,10 @@ class siteRedirectBadAction extends waViewAction
             else{
                 $redirect_model->updateById($row['id'], array('is_bad' => 1));
             }
+            $i++;
         }
 
-        echo "OK";
+        echo "OK\n";
         exit;
     }
 }
