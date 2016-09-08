@@ -46,7 +46,7 @@ class siteRedirectBadCli extends waCliController
                         }
                     }
                     elseif($part=='brand'){
-                        $tmp = $model->query("SELECT * FROM shop_brand WHERE name = :url LIMIT 1", array('url' => urlencode($slug)))->fetch();
+                        $tmp = $model->query("SELECT * FROM shop_brand WHERE name = :url LIMIT 1", array('url' => urldecode($slug)))->fetch();
                         if(!$tmp){
                             $is_bad = 1;
                         }
