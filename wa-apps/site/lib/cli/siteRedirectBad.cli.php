@@ -20,40 +20,45 @@ class siteRedirectBadCli extends waCliController
             $parts = explode('/', $url);
             if(isset($parts[0])){
                 if($parts[0]){
+                    $is_bad = 0;
                     $part = $parts[0];
                     if(!isset($parts[1])){
                         $redirect_model->updateById($row['id'], array('is_bad' => 1));
+                        continue;
                     }
                     $slug = $parts[1];
                     if($part=='category'){
                         $tmp = $model->query("SELECT * FROM shop_category WHERE url = :url LIMIT 1", array('url' => $slug))->fetch();
                         if(!$tmp){
-                            $redirect_model->updateById($row['id'], array('is_bad' => 1));
+                            $is_bad = 1;
                         }
                     }
                     elseif($part=='product'){
                         $tmp = $model->query("SELECT * FROM shop_product WHERE url = :url LIMIT 1", array('url' => $slug))->fetch();
                         if(!$tmp){
-                            $redirect_model->updateById($row['id'], array('is_bad' => 1));
+                            $is_bad = 1;
                         }
                     }
                     elseif($part=='set'){
                         $tmp = $model->query("SELECT * FROM shop_set WHERE id = :url LIMIT 1", array('url' => $slug))->fetch();
                         if(!$tmp){
-                            $redirect_model->updateById($row['id'], array('is_bad' => 1));
+                            $is_bad = 1;
                         }
                     }
                     elseif($part=='brand'){
                         $tmp = $model->query("SELECT * FROM shop_brand WHERE name = :url LIMIT 1", array('url' => urlencode($slug)))->fetch();
                         if(!$tmp){
-                            $redirect_model->updateById($row['id'], array('is_bad' => 1));
+                            $is_bad = 1;
                         }
                     }
                     else{
                         $tmp = $model->query("SELECT * FROM shop_page WHERE url = :url LIMIT 1", array('url' => $url))->fetch();
                         if(!$tmp){
-                            $redirect_model->updateById($row['id'], array('is_bad' => 1));
+                            $is_bad = 1;
                         }
+                    }
+                    if($is_bad != $row['id_bad']){
+                        $redirect_model->updateById($row['id'], array('is_bad' => $is_bad));
                     }
                 }
             }
