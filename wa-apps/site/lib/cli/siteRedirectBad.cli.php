@@ -57,7 +57,7 @@ class siteRedirectBadCli extends waCliController
                             $is_bad = 1;
                         }
                     }
-                    if($is_bad != $row['id_bad']){
+                    if($is_bad != $row['is_bad']){
                         $redirect_model->updateById($row['id'], array('is_bad' => $is_bad));
                     }
                 }
