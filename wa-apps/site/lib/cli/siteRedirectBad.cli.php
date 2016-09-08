@@ -4,10 +4,10 @@ class siteRedirectBadCli extends waCliController
 {
     public function execute()
     {
-        $domain = siteHelper::getDomain();
+        $domain = waRequest::param(0);
         $redirect_model = new waRedirectModel();
         $data = $redirect_model->where("domain = '$domain'")->where("redirect !=''")->where('visible = 1')->fetchAll();
-        $db = waRequest::param(0);
+        $db = waRequest::param(1);
         $model = new waModel($db);
         $n = count($data);
         $i = 1;
