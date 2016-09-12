@@ -44,6 +44,7 @@
                         <th><a href="#" data-sort="status">Статус</a></th>
                         <th><a href="#" data-sort="url">Старый URL</a></th>
                         <th><a href="#" data-sort="redirect">Новый URL</a></th>
+                        <th><a href="#" data-sort="is_bad">404</a></th>
                         <th> </th>
                     </tr>
                     </thead>
@@ -54,6 +55,9 @@
                         {/if}
                         <td><a href="http://{$domain_replace}/{$url.url}" target="_blank">http://{$domain_replace}/{$url.url}</a></td>
                         <td><a href="http://{$domain}{$url.redirect}" target="_blank">http://{$domain}{$url.redirect}</td>
+                        {if $url.is_bad=='1'}<td><i class="icon16 status-red"></i></td>
+                        {else}<td><i class="icon16 status-green"></i></td>
+                        {/if}
                         <td><a href="#" class="edit_row" data-id="{$url.id}"><i class="icon16 edit"></i></a> &nbsp;&nbsp;&nbsp; <a href="#" class="del_row" data-id="{$url.id}"><i class="icon16 delete"></i></a></td>
                     </tr>
                 {/foreach}

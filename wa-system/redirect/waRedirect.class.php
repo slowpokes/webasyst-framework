@@ -65,6 +65,7 @@ class waRedirect {
         $sort= 'url';
         if($paging['sort']=='redirect')$sort = 'redirect';
         if($paging['sort']=='status')$sort = "redirect != '/'";
+        if($paging['sort']=='is_bad')$sort = "is_bad";
         if($paging['order']=='desc') $sort .= " desc";
 
         $model = new waRedirectModel();
