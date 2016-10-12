@@ -11,6 +11,10 @@
     padding: 10px;
 }
 
+.type_warning{
+    background: #ffd0c8;
+}
+
 .type_string{
     background: #fff9b6;
 }

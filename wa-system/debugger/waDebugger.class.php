@@ -126,7 +126,13 @@ class waDebugger
             $str .= "<div class='debug'>";
             $str .= "<div class='debug_info'>".$this->getInfoText()."</div>";
             $queries_count = 0;
+            $prev_time = 0;
             foreach($this->typed_vars as $tv){
+                $gap = $tv['time_start'] - $prev_time;
+                $prev_time = $tv['time_end'];
+                if($gap>0.1){
+                    $str .= "<div class='typed type_warning'>Long time between queries</div>";
+                }
                 $str .= "<div class='typed type_".$tv['type']."'>";
                 $str .= "<div class='string'> ".(round($tv['time_start']*1000)/1000)." -> ".(round($tv['time_end']*1000)/1000)."</div>";
                 $str .= "<div class='string'>";
