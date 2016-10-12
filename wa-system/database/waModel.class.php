@@ -174,7 +174,6 @@ class waModel
             $table = $this->table;
         }
         if ($table) {
-            Debug::describe($table, $keys); //VADIM CODE
             return $this->adapter->schema($table, $keys);
         } else {
             return array();
@@ -239,11 +238,13 @@ class waModel
     private function run($sql, $unbuffer = false)
     {
         $sql = trim($sql);
-        Debug::queryStart();//VADIM CODE
+        if(waDebugger::isDebug()){
+            $time_start = microtime(1);
+        }
         $result = $this->adapter->query($sql);
-        if (Debug::enabled()){//VADIM CODE
-            Debug::query($sql, $result, $this->adapter->errorCode(), $this->adapter->error(), debug_backtrace());//VADIM CODE
-        }//VADIM CODE
+        if(waDebugger::isDebug()){
+            $time_end = microtime(1);
+        }
         if (!$result) {
             $error = "Query Error\nQuery: ".$sql.
                      "\nError: ".$this->adapter->errorCode().
@@ -260,6 +261,9 @@ class waModel
             }
             waLog::log($error."\nStack:\n".$stack, 'db.log');
             throw new waDbException($error, $this->adapter->errorCode());
+        }
+        if(waDebugger::isDebug()){
+            waDebugger::getInstance()->addQuery($sql, $time_start, $time_end);
         }
 
         return $result;
@@ -341,8 +345,16 @@ class waModel
                 $params = array($params);
             }
             //VADIM CODE START
-            Debug::sql($sql);
+            if(waDebugger::isDebug()){
+                $time_start = microtime(1);
+            }
             $res = $this->prepare($sql)->query($params);
+            if(waDebugger::isDebug()){
+                $time_end = microtime(1);
+            }
+            if(waDebugger::isDebug()){
+                waDebugger::getInstance()->addQuery($sql, $time_start, $time_end);
+            }
             return $res;
             //VADIM CODE END
             return $this->prepare($sql)->query($params);
@@ -361,9 +373,8 @@ class waModel
 
                 return $result;
             }
-            else{//VADIM CODE
-                Debug::setCached();//VADIM CODE
-            }//VADIM CODE
+            else{
+            }
             $this->cache = null;
             return $cache;
         }

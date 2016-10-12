@@ -1115,6 +1115,11 @@ HTML;
         return wa()->getConfig()->getBackendUrl(true);
     }
 
+    public function debugger()
+    {
+        return waDebugger::getInstance()->showInView();
+    }
+
     public function vdebug(){
         return Debug::getHtml();
     }
