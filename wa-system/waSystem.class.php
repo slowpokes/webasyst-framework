@@ -1108,7 +1108,7 @@ class waSystem
             return "/category/{$params['category_url']}/";
         }
         if($path=='shop/frontend/product'){
-            return "/category/{$params['product_url']}/";
+            return "/product/{$params['product_url']}/";
         }
         return $this->getRouting()->getUrl($path, $params, $absolute, $domain, $route);
     }
