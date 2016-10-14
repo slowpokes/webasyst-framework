@@ -824,7 +824,7 @@ HTML;
                 } elseif ($field_id == 'login') {
                     $fields[$field_id] = array(new waContactStringField($field_id, _ws('Login')), $field);
                 } elseif ($field_id == 'password') {
-                    $fields[$field_id] = array(new waContactPasswordField($field_id, _ws('Password')), $field);
+                    $fields[$field_id] = array(new waContactPasswordField($field_id, _ws('Пароль')), $field);
                     $field_id .= '_confirm';
                     $fields[$field_id] = array(new waContactPasswordField($field_id, _ws('Confirm password')), $field);
                 }
@@ -881,7 +881,7 @@ HTML;
             }
             $html .= '</div></div>';
         }
-        $signup_submit_name = !empty($config['params']['button_caption']) ? htmlspecialchars($config['params']['button_caption']) : _ws('Sign Up');
+        $signup_submit_name = !empty($config['params']['button_caption']) ? htmlspecialchars($config['params']['button_caption']) : _ws('Зарегистрироваться');
         $html .= '<div class="wa-field"><div class="wa-value wa-submit">
             <input type="submit" value="'.$signup_submit_name.'"> '.sprintf(_ws('or <a href="%s">login</a> if you already have an account'), $this->getUrl('/login')).'
         </div></div>';
