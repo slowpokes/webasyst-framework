@@ -80,6 +80,7 @@ class waRedirect {
     }
 
     static function clearFrom($url){
+        $url = trim($url);
         $arr = parse_url($url);
         $path = $arr['path'];
         if(isset($arr['query'])){
@@ -95,6 +96,7 @@ class waRedirect {
     }
 
     static function clearTo($url){
+        $url = trim($url);
         if(substr($url, 0, 7)=='http://'){
             $url = substr(7, 7);
         }
