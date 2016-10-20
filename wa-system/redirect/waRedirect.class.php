@@ -89,9 +89,6 @@ class waRedirect {
         if(substr($path, 0, 1)=='/'){
             $path = substr($path, 1);
         }
-        if(substr($path, -1)!='/'){
-            $path = $path.'/';
-        }
         return $path;
     }
 
