@@ -84,7 +84,7 @@ class waRedirect {
         $arr = parse_url($url);
         $path = $arr['path'];
         if(isset($arr['query'])){
-            $path .= $arr['query'];
+            $path .= '?'.$arr['query'];
         }
         if(substr($path, 0, 1)=='/'){
             $path = substr($path, 1);
@@ -98,7 +98,7 @@ class waRedirect {
     static function clearTo($url){
         $url = trim($url);
         if(substr($url, 0, 7)=='http://'){
-            $url = substr(7, 7);
+            $url = substr($url, 7);
         }
         elseif(substr($url, 0, 1)=='/'){
             return $url;
