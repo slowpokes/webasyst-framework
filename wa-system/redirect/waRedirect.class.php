@@ -82,6 +82,9 @@ class waRedirect {
     static function clearFrom($url){
         $arr = parse_url($url);
         $path = $arr['path'];
+        if(isset($arr['query'])){
+            $path .= $arr['query'];
+        }
         if(substr($path, 0, 1)=='/'){
             $path = substr($path, 1);
         }
