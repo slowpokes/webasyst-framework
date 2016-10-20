@@ -94,12 +94,14 @@ class waRedirect {
 
     static function clearTo($url){
         $url = trim($url);
-        if(substr($url, 0, 7)=='http://'){
-            $url = substr($url, 7);
+        $arr = parse_url($url);
+        $path = $arr['path'];
+        if(isset($arr['query'])){
+            $path .= '?'.$arr['query'];
         }
-        elseif(substr($url, 0, 1)=='/'){
-            return $url;
+        if(substr($path, 0, 1)=='/'){
+            $path = substr($path, 1);
         }
-        return '/'.$url;
+        return $path;
     }
 }
