@@ -1,0 +1,66 @@
+.debug{
+    padding: 20px;
+    background: #fff;
+    font-size: 13px;
+    font-family: Arial, "Helvetica", sans-serif;
+}
+
+.typed{
+    margin-bottom: 10px;
+    border: 1px solid rgb(191, 185, 192);
+    padding: 10px;
+}
+
+.type_warning{
+    background: #ffd0c8;
+}
+
+.type_string{
+    background: #fff9b6;
+}
+
+.type_query{
+    background: #baffc3;
+
+}
+
+.typed .string{
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.typed .params{
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.backtrace{
+    color: #555;
+    font-size: 12px;
+}
+
+.backtrace i{
+    color: #aaa;
+    font-style: normal;
+}
+
+.typed:hover .backtrace, .typed:hover .params{
+    color: #000!important;
+}
+
+.debug_info{
+    margin-bottom: 10px;
+    border: 1px solid rgb(191, 185, 192);
+    padding: 10px;
+    background: #cfd4ff;
+}
+
+.debug_info .error{
+    color: #f00;
+    font-weight: bold;
+}
+
+.typed .params b{
+    color: #f00;
+    font-weight: bold;
+}

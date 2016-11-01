@@ -306,5 +306,6 @@ class waAutoload
 
         'waDesignActions'          => 'design/actions/waDesign.actions.php',
         'waPluginsActions'         => 'plugin/actions/waPlugins.actions.php',
+        'waDebugger'               => 'debugger/waDebugger.class.php',//VADIM CODE
     );
 }

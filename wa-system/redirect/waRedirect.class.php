@@ -80,24 +80,28 @@ class waRedirect {
     }
 
     static function clearFrom($url){
+        $url = trim($url);
         $arr = parse_url($url);
         $path = $arr['path'];
+        if(isset($arr['query'])){
+            $path .= '?'.$arr['query'];
+        }
         if(substr($path, 0, 1)=='/'){
             $path = substr($path, 1);
-        }
-        if(substr($path, -1)!='/'){
-            $path = $path.'/';
         }
         return $path;
     }
 
     static function clearTo($url){
-        if(substr($url, 0, 7)=='http://'){
-            $url = substr(7, 7);
+        $url = trim($url);
+        $arr = parse_url($url);
+        $path = $arr['path'];
+        if(isset($arr['query'])){
+            $path .= '?'.$arr['query'];
         }
-        elseif(substr($url, 0, 1)=='/'){
-            return $url;
+        if(substr($path, 0, 1)=='/'){
+            $path = substr($path, 1);
         }
-        return '/'.$url;
+        return '/'.$path;
     }
 }
