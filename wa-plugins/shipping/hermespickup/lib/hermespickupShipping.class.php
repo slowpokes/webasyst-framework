@@ -62,7 +62,7 @@ class hermespickupShipping extends waShipping
     }
 
     private static function getSubComment($params){
-        return $params['id'].' - '.$params['city']." - ".$params['address'].' - '.$params['name'];
+        return '<span class="hermes-point">'.$params['id'].' - '.$params['city']." - ".$params['address'].' - '.$params['name'].'</span>';
     }
 
     public function allowedCurrency()
