@@ -19,7 +19,7 @@ class waLogModel extends waModel
             $actions = $config->getLogActions();
             // Check action
             if (!isset($actions[$action])) {
-                if (waSystemConfig::isDebug()) {
+                if (waSystemConfig::isDebug()&&false) {//VADIM CODE
                     throw new waException('Unknown action for log '.$action);
                 } else {
                     return false;
