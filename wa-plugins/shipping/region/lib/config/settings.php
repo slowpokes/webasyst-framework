@@ -12,6 +12,12 @@ return array(
         'description' => 'Укажите сумму, которая будет вычитаться вместо бесплатной доставки',
         'control_type' => waHtmlControl::INPUT,
     ),
+    'change_shipping_amount' => array(
+        'value' => '0',
+        'title' => 'Массовое изменение стоимости',
+        'description' => 'Укажите сумму, на которую будет увеличена (уменьшена) стоимость доставки всех регионов',
+        'control_type' => waHtmlControl::CUSTOM . ' ' . 'regionShipping::settingChangeShippingAmountControl',
+    ),
     'regions' => array(
         'title' => 'Регионы',
         'control_type' => waHtmlControl::CUSTOM.' '.'regionShipping::settingRegionControl',

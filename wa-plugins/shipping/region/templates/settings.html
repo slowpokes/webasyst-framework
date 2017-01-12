@@ -1,0 +1,16 @@
+{literal}
+    <script>
+        $(document).ready(function () {
+            $('#change_shipping_amount').click(function () {
+                var change_amount = prompt('На какую сумму изменить стоимость?', '0');
+                if (change_amount != 0 && change_amount != null) {
+                    $(".inp_price input").each(function () {
+                        if ($(this).val() != 0) {
+                            $(this).val(+$(this).val() + +change_amount);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+{/literal}

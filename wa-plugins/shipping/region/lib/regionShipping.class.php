@@ -121,4 +121,18 @@ class regionShipping extends waShipping
         }
         return $result;
     }
+
+    public function getSettingsHTML($params = array())
+    {
+        $view = wa()->getView();
+        $html = '';
+        $html .= $view->fetch($this->path . '/templates/settings.html');
+        $html .= parent::getSettingsHTML($params);
+        return $html;
+    }
+
+    public static function settingChangeShippingAmountControl()
+    {
+        return '<input id="change_shipping_amount" type="button" class="button green" value="Изменить стоимость" />';
+    }
 }

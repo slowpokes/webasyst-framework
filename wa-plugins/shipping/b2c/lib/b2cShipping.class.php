@@ -175,4 +175,9 @@ class b2cShipping extends waShipping
     public function requestedAddressFields(){
         return false;
     }
+
+    public static function settingChangeShippingAmountControl()
+    {
+        return '<input id="change_shipping_amount" type="button" class="button green" value="Изменить стоимость" />';
+    }
 }

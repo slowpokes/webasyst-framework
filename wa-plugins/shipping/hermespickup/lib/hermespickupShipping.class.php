@@ -245,4 +245,10 @@ class hermespickupShipping extends waShipping
         $html = $view->fetch($this->path.'/templates/map.html');
         echo $html;
     }
+
+    public static function settingChangeShippingAmountControl()
+    {
+        return '<input id="change_shipping_amount" type="button" class="button green" value="Изменить стоимость" />';
+    }
+
 }
