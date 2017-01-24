@@ -223,7 +223,7 @@ CREATE TABLE `shop_cart_items` (
   `promo` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `code` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=20448 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=20450 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1932,4 +1932,4 @@ CREATE TABLE `wa_country` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-24 14:50:11
+-- Dump completed on 2017-01-24 15:00:04

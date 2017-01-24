@@ -235,7 +235,7 @@ CREATE TABLE `shop_cart_items` (
   `promo` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `code` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=32897 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=32899 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -402,7 +402,7 @@ CREATE TABLE `shop_checkout_flow` (
   `step` tinyint(2) NOT NULL DEFAULT '0',
   `description` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7127 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=7129 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -834,7 +834,7 @@ CREATE TABLE `shop_order` (
   PRIMARY KEY (`id`),
   KEY `state_id` (`state_id`),
   KEY `contact_id` (`contact_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4508 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=4509 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -864,7 +864,7 @@ CREATE TABLE `shop_order_items` (
   PRIMARY KEY (`id`),
   KEY `product_order` (`product_id`,`order_id`),
   KEY `order_type` (`order_id`,`type`)
-) ENGINE=MyISAM AUTO_INCREMENT=17351 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=17353 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -885,7 +885,7 @@ CREATE TABLE `shop_order_log` (
   `text` text,
   PRIMARY KEY (`id`),
   KEY `order_id` (`order_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=50402 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=50404 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -904,7 +904,7 @@ CREATE TABLE `shop_order_log_full` (
   `value` text NOT NULL,
   `status` int(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=349915 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=349943 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1991,4 +1991,4 @@ CREATE TABLE `wa_country` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-24 14:49:58
+-- Dump completed on 2017-01-24 15:00:03

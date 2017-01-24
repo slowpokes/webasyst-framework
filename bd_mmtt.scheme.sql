@@ -3,7 +3,6 @@
 -- Host: localhost    Database: bd_mmtt
 -- ------------------------------------------------------
 -- Server version	5.5.49-0ubuntu0.14.04.1
--- Test modify
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -36,7 +35,7 @@ CREATE TABLE `SC_discussions` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11356 DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=711;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
--- 
+--
 -- Table structure for table `redirect`
 --
 
@@ -278,7 +277,7 @@ CREATE TABLE `shop_cart_items` (
   `promo` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `code` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=163733 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=163852 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -444,7 +443,7 @@ CREATE TABLE `shop_checkout_flow` (
   `step` tinyint(2) NOT NULL DEFAULT '0',
   `description` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=34714 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=34722 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -804,7 +803,7 @@ CREATE TABLE `shop_lostcarts` (
   `order_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=13122 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13125 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -819,7 +818,7 @@ CREATE TABLE `shop_multilead` (
   `user_id` int(11) NOT NULL,
   `create_datetime` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1026884 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1027190 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -893,7 +892,7 @@ CREATE TABLE `shop_order` (
   PRIMARY KEY (`id`),
   KEY `state_id` (`state_id`),
   KEY `contact_id` (`contact_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=15197 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=15198 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -923,7 +922,7 @@ CREATE TABLE `shop_order_items` (
   PRIMARY KEY (`id`),
   KEY `product_order` (`product_id`,`order_id`),
   KEY `order_type` (`order_id`,`type`)
-) ENGINE=MyISAM AUTO_INCREMENT=83104 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=83126 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -944,7 +943,7 @@ CREATE TABLE `shop_order_log` (
   `text` text,
   PRIMARY KEY (`id`),
   KEY `order_id` (`order_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=220179 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=220207 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -963,7 +962,7 @@ CREATE TABLE `shop_order_log_full` (
   `value` text NOT NULL,
   `status` int(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1314011 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1314170 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1215,7 +1214,7 @@ CREATE TABLE `shop_product_log_full` (
   `status` int(1) NOT NULL,
   `params` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=335763 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=335772 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2129,4 +2128,4 @@ CREATE TABLE `wa_country` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-24 14:24:47
+-- Dump completed on 2017-01-24 15:00:03
