@@ -65,7 +65,7 @@ CREATE TABLE `shop_affiliate_transaction` (
   `type` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `contact_id` (`contact_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -124,7 +124,7 @@ CREATE TABLE `shop_banner` (
   `width` int(11) NOT NULL,
   `height` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,7 +141,7 @@ CREATE TABLE `shop_banner_image` (
   `position` int(11) NOT NULL,
   `banner_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,7 +167,7 @@ CREATE TABLE `shop_brand` (
   `banner` int(11) NOT NULL,
   `has_products` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=332 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -183,7 +183,7 @@ CREATE TABLE `shop_brandtag` (
   `sort` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -198,7 +198,7 @@ CREATE TABLE `shop_brandtag_brand` (
   `brand` varchar(1000) NOT NULL,
   `brandtag_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=509 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -223,7 +223,7 @@ CREATE TABLE `shop_cart_items` (
   `promo` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `code` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=20450 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -268,7 +268,7 @@ CREATE TABLE `shop_category` (
   KEY `parent_id` (`parent_id`),
   KEY `left_key` (`left_key`),
   KEY `right_key` (`right_key`)
-) ENGINE=MyISAM AUTO_INCREMENT=2753 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -307,7 +307,7 @@ CREATE TABLE `shop_category_broken` (
   KEY `parent_id` (`parent_id`),
   KEY `left_key` (`left_key`),
   KEY `right_key` (`right_key`)
-) ENGINE=MyISAM AUTO_INCREMENT=820 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -387,7 +387,7 @@ CREATE TABLE `shop_checkout_flow` (
   `step` tinyint(2) NOT NULL DEFAULT '0',
   `description` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4659 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -425,7 +425,7 @@ CREATE TABLE `shop_coupon` (
   `min_order_amount` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -575,7 +575,7 @@ CREATE TABLE `shop_feature` (
   `val_line` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=257 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -593,7 +593,7 @@ CREATE TABLE `shop_feature_values_color` (
   `value` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `values` (`feature_id`,`value`)
-) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -613,7 +613,7 @@ CREATE TABLE `shop_feature_values_dimension` (
   `value_base_unit` double NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `feature_id` (`feature_id`,`value`,`unit`,`type`)
-) ENGINE=MyISAM AUTO_INCREMENT=492 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -630,7 +630,7 @@ CREATE TABLE `shop_feature_values_double` (
   `value` double NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `values` (`feature_id`,`value`)
-) ENGINE=MyISAM AUTO_INCREMENT=105 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -687,7 +687,7 @@ CREATE TABLE `shop_feature_values_varchar` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `values` (`feature_id`,`value`),
   KEY `feature_id` (`feature_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4156 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -725,7 +725,7 @@ CREATE TABLE `shop_importexport` (
   `config` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`plugin`,`id`,`sort`)
-) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -766,7 +766,7 @@ CREATE TABLE `shop_notification` (
   `status` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `event` (`event`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -820,7 +820,7 @@ CREATE TABLE `shop_order` (
   PRIMARY KEY (`id`),
   KEY `state_id` (`state_id`),
   KEY `contact_id` (`contact_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2092 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -850,7 +850,7 @@ CREATE TABLE `shop_order_items` (
   PRIMARY KEY (`id`),
   KEY `product_order` (`product_id`,`order_id`),
   KEY `order_type` (`order_id`,`type`)
-) ENGINE=MyISAM AUTO_INCREMENT=12392 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -871,7 +871,7 @@ CREATE TABLE `shop_order_log` (
   `text` text,
   PRIMARY KEY (`id`),
   KEY `order_id` (`order_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=27720 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -891,7 +891,7 @@ CREATE TABLE `shop_order_log_full` (
   `status` int(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `order_id` (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=172458 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -951,7 +951,7 @@ CREATE TABLE `shop_page` (
   `sort` int(11) NOT NULL DEFAULT '0',
   `status` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -988,7 +988,7 @@ CREATE TABLE `shop_plugin` (
   `combine_id` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `type` (`type`)
-) ENGINE=MyISAM AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1059,7 +1059,7 @@ CREATE TABLE `shop_product` (
   PRIMARY KEY (`id`),
   KEY `url` (`url`),
   KEY `total_sales` (`total_sales`)
-) ENGINE=MyISAM AUTO_INCREMENT=7083 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1080,7 +1080,7 @@ CREATE TABLE `shop_product_features` (
   UNIQUE KEY `feature` (`product_id`,`sku_id`,`feature_id`,`feature_value_id`),
   KEY `product_feature` (`product_id`,`feature_id`,`feature_value_id`),
   KEY `feature_value_id` (`feature_value_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=197450 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1123,7 +1123,7 @@ CREATE TABLE `shop_product_images` (
   `filename` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=33602 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1143,7 +1143,7 @@ CREATE TABLE `shop_product_log_full` (
   `status` int(1) NOT NULL,
   `params` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=82067 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1248,7 +1248,7 @@ CREATE TABLE `shop_product_reviews` (
   KEY `status` (`status`),
   KEY `parent_id` (`parent_id`),
   KEY `product_id` (`product_id`,`review_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1329,7 +1329,7 @@ CREATE TABLE `shop_product_skus` (
   `disable_discount` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=16047 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1372,7 +1372,7 @@ CREATE TABLE `shop_product_stocks_log` (
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`,`sku_id`),
   KEY `stock_id` (`stock_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10548 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1408,7 +1408,7 @@ CREATE TABLE `shop_promo` (
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
   `countdown_datetime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1494,7 +1494,7 @@ CREATE TABLE `shop_search_word` (
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=50803 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1606,7 +1606,7 @@ CREATE TABLE `shop_stock` (
   `name` varchar(255) DEFAULT NULL,
   `public` int(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1655,7 +1655,7 @@ CREATE TABLE `shop_tag` (
   `count` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=5353 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1671,7 +1671,7 @@ CREATE TABLE `shop_tax` (
   `included` int(11) NOT NULL DEFAULT '0',
   `address_type` varchar(8) NOT NULL DEFAULT 'shipping',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1724,7 +1724,7 @@ CREATE TABLE `shop_type` (
   `upselling` tinyint(1) NOT NULL DEFAULT '0',
   `count` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1842,7 +1842,7 @@ CREATE TABLE `wa_contact` (
   UNIQUE KEY `login` (`login`),
   KEY `name` (`name`),
   KEY `id_name` (`id`,`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1879,7 +1879,7 @@ CREATE TABLE `wa_contact_data` (
   KEY `contact_id` (`contact_id`),
   KEY `value` (`value`),
   KEY `field` (`field`)
-) ENGINE=MyISAM AUTO_INCREMENT=62 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1900,7 +1900,7 @@ CREATE TABLE `wa_contact_emails` (
   UNIQUE KEY `contact_sort` (`contact_id`,`sort`),
   KEY `email` (`email`),
   KEY `status` (`status`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1932,4 +1932,4 @@ CREATE TABLE `wa_country` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-24 15:00:04
+-- Dump completed on 2017-01-24 15:31:08
