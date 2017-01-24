@@ -3,6 +3,7 @@
 -- Host: localhost    Database: bd_mmtt
 -- ------------------------------------------------------
 -- Server version	5.5.49-0ubuntu0.14.04.1
+-- Test modify
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -35,7 +36,7 @@ CREATE TABLE `SC_discussions` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11356 DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=711;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
+-- 
 -- Table structure for table `redirect`
 --
 
