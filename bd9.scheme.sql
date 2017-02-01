@@ -4289,8 +4289,7 @@ CREATE TABLE `warehouse_consignment_sku` (
   `order_id` varchar(255) DEFAULT NULL,
   `defect` tinyint(1) NOT NULL DEFAULT '0',
   `comment` varchar(1024) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `wh_sku_id` (`wh_sku_id`,`consignment_id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -4425,6 +4424,7 @@ CREATE TABLE `warehouse_purchase` (
   `invoice_date` date NOT NULL,
   `shop` varchar(255) CHARACTER SET utf8 NOT NULL,
   `sku_id` int(11) NOT NULL,
+  `warehouse_sku_id` int(11) NOT NULL,
   `full_name` varchar(255) CHARACTER SET utf8 NOT NULL,
   `type` varchar(255) CHARACTER SET utf8 NOT NULL,
   `url` varchar(255) CHARACTER SET utf8 NOT NULL,
@@ -4482,4 +4482,4 @@ CREATE TABLE `warehouse_purchase_provider_product` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-01 10:16:34
+-- Dump completed on 2017-02-01 15:21:41
