@@ -3634,7 +3634,6 @@ CREATE TABLE `smartb_image` (
   `sort` int(11) NOT NULL DEFAULT '0',
   `custom_html` varchar(10000) NOT NULL,
   `custom_html_position` varchar(255) NOT NULL,
-  `scheduled` tinyint(1) NOT NULL DEFAULT '0',
   `schedule_datetime_start` date NOT NULL,
   `schedule_datetime_end` date NOT NULL,
   PRIMARY KEY (`id`)
@@ -4482,4 +4481,4 @@ CREATE TABLE `warehouse_purchase_provider_product` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-01 10:08:14
+-- Dump completed on 2017-02-01 10:09:32
