@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>{$wa->title()|escape}</title>
@@ -41,6 +41,22 @@
             mainInit();
         });
     </script>
+
+    {if $wa->shop}
+        {$cart_count = $wa->shop->cart->count()}
+        {$cart_total = $wa->shop->cart->total()}
+        {if $cart_count>0}
+            {literal}
+                <style>.cart_empty{display: none}</style>
+            {/literal}
+            <script>cart_empty = false;cart_total = '{$cart_total|default:0}';</script>
+        {else}
+            {literal}
+                <style>.cart_notempty{display: none}</style>
+                <script>cart_empty = true;</script>
+            {/literal}
+        {/if}
+    {/if}
 
 </head>
 <body>
