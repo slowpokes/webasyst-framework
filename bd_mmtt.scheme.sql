@@ -220,6 +220,7 @@ CREATE TABLE `shop_brand` (
   `site_id` int(11) NOT NULL,
   `image` varchar(255) NOT NULL,
   `has_products` int(11) NOT NULL,
+  `carousel` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2128,4 +2129,4 @@ CREATE TABLE `wa_country` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-01 10:16:34
+-- Dump completed on 2017-02-13 13:27:48
