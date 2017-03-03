@@ -166,6 +166,7 @@ CREATE TABLE `shop_brand` (
   `carousel` int(11) NOT NULL,
   `banner` int(11) NOT NULL,
   `has_products` int(11) NOT NULL,
+  `h1` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1572,6 +1573,28 @@ CREATE TABLE `shop_set_products` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `shop_smartdiscount`
+--
+
+DROP TABLE IF EXISTS `shop_smartdiscount`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shop_smartdiscount` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `create_datetime` datetime NOT NULL,
+  `status` int(11) NOT NULL,
+  `datetime_from` datetime NOT NULL,
+  `datetime_to` datetime NOT NULL,
+  `condition_amount` int(11) NOT NULL,
+  `condition_products` int(11) NOT NULL,
+  `offer` varchar(20) NOT NULL,
+  `params` text NOT NULL,
+  `condition_coupon` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `shop_smartset`
 --
 
@@ -1932,4 +1955,4 @@ CREATE TABLE `wa_country` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-13 13:27:47
+-- Dump completed on 2017-02-21 14:54:59
