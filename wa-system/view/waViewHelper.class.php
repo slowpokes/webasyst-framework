@@ -598,6 +598,9 @@ HTML;
                 }
             }
         }
+        if($cache) {
+            $cache->set("block/$id", '', 3600);
+        }
         return '';
     }
 
