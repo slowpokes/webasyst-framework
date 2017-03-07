@@ -63,7 +63,7 @@ class waAppConfig extends SystemConfig
                     $cache_class = 'wa'.ucfirst($cache_type).'CacheAdapter';
                     try {
                         $cache_adapter = new $cache_class($options);
-                        $this->cache = new waCache($cache_adapter, $this->application);
+                        $this->cache = new waCache($cache_adapter, wa()->replaceName($this->application));//VADIM CODE
                     } catch (waException $e) {
                         waLog::log($e->getMessage()." (".$e->getCode().")\n".$e->getTraceAsString());
                     }
