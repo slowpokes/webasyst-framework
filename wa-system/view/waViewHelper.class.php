@@ -549,6 +549,16 @@ HTML;
 
     public function block($id, $params = array())
     {
+        //VADIM CODE START
+        $result = null;
+        $cache = wa()->getCache();
+        if($cache){
+            $result = $cache->get("block/$id");
+        }
+        if ($result !== null) {
+            return $result;
+        }
+        //VADIM CODE END
         if ($id &&  wa()->appExists('site')) {
             wa('site');
             $model = new siteBlockModel();
@@ -571,7 +581,13 @@ HTML;
             if ($block) {
                 try {
                     $this->view->assign($params);
-                    return $this->view->fetch('string:'.$block['content']);
+                    //VADIM CODE START
+                    $result = $this->view->fetch('string:'.$block['content']);
+                    if($cache) {
+                        $cache->set("block/$id", $result, 3600);
+                    }
+                    return $result;
+                    //VADIM CODE END
                 } catch (Exception $e) {
                     if (waSystemConfig::isDebug()) {
                         return '<pre class="error">'.htmlentities($e->getMessage(),ENT_QUOTES,'utf-8')."</pre>";
@@ -581,6 +597,9 @@ HTML;
                     }
                 }
             }
+        }
+        if($cache) {
+            $cache->set("block/$id", '', 3600);
         }
         return '';
     }

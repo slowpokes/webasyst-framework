@@ -4397,6 +4397,21 @@ CREATE TABLE `warehouse_product_skus` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `warehouse_product_skus_barcode`
+--
+
+DROP TABLE IF EXISTS `warehouse_product_skus_barcode`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `warehouse_product_skus_barcode` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sku_id` int(11) NOT NULL,
+  `barcode` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `warehouse_products`
 --
 
@@ -4483,4 +4498,4 @@ CREATE TABLE `warehouse_purchase_provider_product` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-13 13:27:51
+-- Dump completed on 2017-02-21 14:55:00
