@@ -891,7 +891,9 @@ CREATE TABLE `shop_order_log_full` (
   `value` text NOT NULL,
   `status` int(1) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `order_id` (`order_id`)
+  KEY `order_id` (`order_id`),
+  KEY `order_id_2` (`order_id`),
+  KEY `datetime` (`datetime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1955,4 +1957,4 @@ CREATE TABLE `wa_country` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-21 14:54:59
+-- Dump completed on 2017-03-16 12:55:36

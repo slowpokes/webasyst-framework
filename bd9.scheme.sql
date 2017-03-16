@@ -4237,6 +4237,38 @@ CREATE TABLE `wa_widget_params` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `warehouse_barcodelist`
+--
+
+DROP TABLE IF EXISTS `warehouse_barcodelist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `warehouse_barcodelist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `create_datetime` datetime NOT NULL,
+  `creator` varchar(255) CHARACTER SET utf8 NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `warehouse_barcodelist_products`
+--
+
+DROP TABLE IF EXISTS `warehouse_barcodelist_products`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `warehouse_barcodelist_products` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `barcodelist_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `barcodelist_id` (`barcodelist_id`,`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `warehouse_categories`
 --
 
@@ -4406,7 +4438,7 @@ DROP TABLE IF EXISTS `warehouse_product_skus_barcode`;
 CREATE TABLE `warehouse_product_skus_barcode` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sku_id` int(11) NOT NULL,
-  `barcode` varchar(255) NOT NULL,
+  `barcode` varchar(255) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -4498,4 +4530,4 @@ CREATE TABLE `warehouse_purchase_provider_product` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-21 14:55:00
+-- Dump completed on 2017-03-16 12:55:38
