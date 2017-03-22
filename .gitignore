@@ -8,3 +8,4 @@ config.codekit
 /wa-system/webasyst/lib/updates/dev
 .idea
 .DS_Store
+wa-apps/wh
