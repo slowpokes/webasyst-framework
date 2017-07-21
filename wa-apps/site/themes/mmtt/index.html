@@ -8,6 +8,7 @@
 
     <link href="/wa-apps/shop/themes/mmtt/css/bootstrap.min.css" rel="stylesheet">
     {include file="$wa_active_theme_path/app_head.html"}
+    {include file="../../../shop/themes/mmtt/incl_css.html"}
 
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -21,26 +22,11 @@
     <link rel="alternate" media="only screen and (max-width: 640px)" href="http://m.1mmtt.ru{$smarty.server.REQUEST_URI}">
 
     <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-migrate-1.2.1.min.js"></script>
-    <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.tools.min.js"></script>
-
-    <script type="text/javascript" src="{$wa_app_static_url}js/banner.js"></script>
-
-    {$wa->js()}
-    {$wa->headJs()}
-
-    {include file="../../../shop/themes/mmtt/incl.html"}
 
     {* @event frontend_head.%plugin_id% *}
     {if isset($frontend_head)}
         {foreach $frontend_head as $_}{$_}{/foreach}
     {/if}
-
-    <script>
-        $(document).ready(function () {
-            mainInit();
-        });
-    </script>
 
     {if $wa->shop}
         {$cart_count = $wa->shop->cart->count()}
@@ -64,11 +50,7 @@
 <div class="wrapper">
 <div class="wrapper2">
     {include file="header.html"}
-    <div class="main-container">
-        <script>
-            $(".main-container").css('min-height', $(window).height());
-            $('body').addClass('with-bg');
-        </script>
+    <div id="main-container" class="main-container" style="min-height: 1200px;">
         {include file="$wa_active_theme_path/top_menu.html"}
         <div class="main_content">
             {$content}
@@ -86,7 +68,23 @@
 </noindex>
 
 <script>
-    $(".container").css('min-height', 'auto');
+    $("#main-container").css('min-height', 'auto');
+</script>
+
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.tools.min.js"></script>
+
+<script type="text/javascript" src="{$wa_app_static_url}js/banner.js"></script>
+
+{$wa->js()}
+{$wa->headJs()}
+
+{include file="../../../shop/themes/mmtt/incl_js.html"}
+
+<script>
+    $(document).ready(function () {
+        mainInit();
+    });
 </script>
 {$wa->debugger()}
 </body>
