@@ -6,7 +6,6 @@
     <meta name="Keywords" content="{$wa->meta('keywords')|escape}" />
     <meta name="Description" content="{$wa->meta('description')|escape}" />
 
-    <link href="/wa-apps/shop/themes/mmtt/css/bootstrap.min.css" rel="stylesheet">
     {include file="$wa_active_theme_path/app_head.html"}
     {include file="../../../shop/themes/mmtt/incl_css.html"}
 
@@ -71,12 +70,10 @@
     $("#main-container").css('min-height', 'auto');
 </script>
 
-<link href="/wa-apps/shop/themes/mmtt/css/default.min.css?672a1c" rel="stylesheet" type="text/css">
-
-
+<link href="/wa-apps/shop/themes/mmtt/css/bootstrap.min.css" rel="stylesheet">
+{include file="../../../shop/themes/mmtt/incl_css.html"}
 <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-migrate-1.2.1.min.js"></script>
 <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.tools.min.js"></script>
-
 <script type="text/javascript" src="{$wa_app_static_url}js/banner.js"></script>
 
 {$wa->js()}
