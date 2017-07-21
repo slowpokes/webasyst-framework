@@ -21,6 +21,14 @@
 
     <link rel="alternate" media="only screen and (max-width: 640px)" href="http://m.1mmtt.ru{$smarty.server.REQUEST_URI}">
 
+    {$wa->js()}
+    {$wa->headJs()}
+
+    {* @event frontend_head.%plugin_id% *}
+    {if isset($frontend_head)}
+        {foreach $frontend_head as $_}{$_}{/foreach}
+    {/if}
+
     <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.11.1.min.js"></script>
 
     {if $wa->shop}
@@ -69,14 +77,6 @@
 <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-migrate-1.2.1.min.js"></script>
 <script type="text/javascript" src="/wa-apps/shop/themes/mmtt/js/jquery.tools.min.js"></script>
 <script type="text/javascript" src="{$wa_app_static_url}js/banner.js"></script>
-
-{$wa->js()}
-{$wa->headJs()}
-
-{* @event frontend_head.%plugin_id% *}
-{if isset($frontend_head)}
-    {foreach $frontend_head as $_}{$_}{/foreach}
-{/if}
 
 {include file="../../../shop/themes/mmtt/incl_js.html"}
 
