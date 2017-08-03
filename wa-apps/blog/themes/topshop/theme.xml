@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE theme PUBLIC "wa-app-theme" "http://www.webasyst.com/wa-content/xml/wa-app-theme.dtd">
+<theme id="topshop" system="0" vendor="898299" author="wa-magazin.ru" app="blog" parent_theme_id="shop:topshop" version="1.0">
+  <name locale="en_US">Themes TopShop for Blog</name>
+  <name locale="ru_RU">Тема «TopShop» для Блог</name>
+  <description locale="en_US">Adaptive design theme TopShop</description>
+  <description locale="ru_RU">Адаптивная тема «TopShop»</description>
+  <files>
+    <file path="index.html" parent="1"/>
+    <file path="blog.js" custom="0"/>
+    <file path="comment.html" custom="0">
+      <description locale="en_US">One comment template</description>
+      <description locale="ru_RU">Вывод одного комментария из списка</description>
+    </file>
+    <file path="comments.html" custom="0">
+      <description locale="en_US">Post comment list</description>
+      <description locale="ru_RU">Комментарии к записи блога</description>
+    </file>
+    <file path="head.html" custom="0">
+      <description locale="en_US">Blog app's &lt;head&gt; instructions</description>
+      <description locale="ru_RU">Блок &lt;head&gt; приложения «Блог»</description>
+    </file>
+    <file path="main.html">
+      <description locale="en_US">Main layout</description>
+      <description locale="ru_RU">Основное макет вывода содержимого и навигации в приложении «Блог»</description>
+    </file>
+    <file path="error.html" custom="0">
+      <description locale="en_US">Error page</description>
+      <description locale="ru_RU">Страница ошибки</description>
+    </file>
+    <file path="page.html" custom="0">
+      <description locale="en_US">Static info page</description>
+      <description locale="ru_RU">Информационная страница</description>
+    </file>
+    <file path="stream.html" custom="0">
+      <description locale="en_US">Post stream wrapper</description>
+      <description locale="ru_RU">Обертка для страницы вывода списка записей</description>
+    </file>
+    <file path="stream_search.html" custom="0">
+      <description locale="en_US">Post search (filtering) results, e.g. custom search, by tag, by author</description>
+      <description locale="ru_RU">Результат поиска (фильтрации) записей, например, по тегу или автору</description>
+    </file>
+    <file path="stream_posts.html" custom="0">
+      <description locale="en_US">Default post list view mode</description>
+      <description locale="ru_RU">Основной вид списка записей блога</description>
+    </file>
+    <file path="post.html" custom="0">
+      <description locale="en_US">Dedicated post page</description>
+      <description locale="ru_RU">Страница одной записи блога</description>
+    </file>
+    <file path="post.album.html" custom="0">
+      <description locale="en_US">Photo album attached to the blog post</description>
+      <description locale="ru_RU">Фотоальбом, прикрепленный к записи в блоге</description>
+    </file>
+    <file path="my.nav.html">
+      <description locale="en_US">Customer account navigation menu</description>
+      <description locale="ru_RU">Меню навигации в личном кабинете покупателя</description>
+    </file>
+    <file path="login.html" parent="1">
+        </file>
+    <file path="signup.html" parent="1">
+        </file>
+    <file path="forgotpassword.html" parent="1">
+        </file>
+    <file path="my.profile.html" parent="1">
+        </file>
+    </files>
+  <about locale="en_US"/>
+  <about locale="ru_RU">Универсальное семейство тем дизайна "TopShop" для базовых приложений фреймворка Вебасист:
+    Сайт, Блог, Фото, Shop-Script и других. Темы дизайна "TopShop" оптимизированы для всех современных браузеров,
+    планшетных компьютеров и мобильных устройств на основе iOS и Android.
+  </about>
+</theme>

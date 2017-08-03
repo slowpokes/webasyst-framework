@@ -1,0 +1,52 @@
+{strip}
+
+{if !empty($breadcrumbs)}
+<div class="breadcrumbs">
+    <ul>
+    <li>{if $theme_settings.logo_link}<a href="{$theme_settings.logo_link}">{else}<a href="{$wa_app_url}">{/if}[`Home`]</a></li>
+    {foreach $breadcrumbs as $breadcrumb}
+    <li><a href="{$breadcrumb.url}">{$breadcrumb.name|escape}</a></li>
+    {/foreach}
+        {if $page.title}
+        <li>{$page.title}</li>
+        {/if}
+    </ul>
+</div>
+{else}
+{if $wa->currentUrl() != $wa_app_url}
+<div class="breadcrumbs">
+    <ul>
+        <li>{if $theme_settings.logo_link}<a href="{$theme_settings.logo_link}">{else}<a href="{$wa_app_url}">{/if}[`Home`]</a></li>
+        {if $page.title}
+        <li>{$page.title}</li>
+        {/if}
+    </ul>
+</div>
+{/if}
+{/if}
+
+<h3>{$page.title}</h3>
+
+{if $wa->currentUrl() == $wa_app_url}
+
+    {$subpages = $wa->site->pages()}
+
+{else}
+
+    {$subpages = $wa->site->pages($page.id)}
+
+{/if}
+
+<ul class="list-page-inline">
+    {foreach $subpages as $p}
+    {if $p.full_url}
+        <li><a href="{$p.url}">{$p.name}</a></li>
+        {if !$p@last}<li>|</li>{/if}
+    {/if}
+    {/foreach}
+</ul>
+<div class="page-content">
+    {$page.content}
+</div>
+
+{/strip}

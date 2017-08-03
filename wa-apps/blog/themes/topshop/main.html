@@ -1,0 +1,93 @@
+{* @event (frontend_action_default|frontend_action_post|frontend_action_page|frontend_action_error).%plugin_id%.nav_before *}
+{foreach $frontend_action as $plugin => $output}
+{if !empty($output.nav_before)}{$output.nav_before}{/if}
+{/foreach}
+
+    <div class="row">
+        <div class="col-lg-3 col-xs-12 col-sm-4">
+
+
+            <!-- search -->
+            <form method="get" action="{$wa_app_url}" class="search-blog">
+                <div class="input-group">
+                    <input class="form-control" type="search" name="query" {if !empty($blog_query)}value="{$blog_query}"{/if} placeholder="[`Search posts`]">
+                    <span class="input-group-btn">
+                    <button class="btn" type="submit">[`Search`]</button>
+                </span>
+                </div>
+            </form>
+
+            <ul class="split-catalog{if isset($post.title) and !empty($post.title)} hidden-sm-down{/if}">
+                <li class="header">[`Blogs`]</li>
+                {foreach $wa->blog->blogs() as $blog}
+                <li class="{if $wa->globals('blog_id') eq $blog.id && empty($is_search)}selected{/if}">
+                    <a href="{$blog.link}">{$blog.name}</a>
+                </li>
+                {foreachelse}
+                <li>
+                    <a href="{$wa->blog->url()}">[`All`]</a>
+                </li>
+                {/foreach}
+                <!-- PLUGINS -->
+                {* @event (frontend_action_default|frontend_action_post|frontend_action_page|frontend_action_error).%plugin_id%.sidebar *}
+                {foreach $frontend_action as $plugin => $output}
+                {if !empty($output.sidebar)}
+                <li class="{$plugin}">
+                    {$output.sidebar}
+                </li>
+                {/if}
+                {/foreach}
+            </ul>
+
+
+            <!-- info pages -->
+            {$blog_pages=$wa->blog->pages()}
+            {if $blog_pages}
+            <ul class="split-catalog{if isset($post.title) and !empty($post.title)} hidden-sm-down{/if}">
+                <li class="header">[`Pages`]</li>
+                {foreach $blog_pages as $p}
+                <li><a href="{$p.url}">{$p.name}</a></li>
+                {/foreach}
+            </ul>
+            {/if}
+
+
+            <!-- TIMELINE navigation -->
+            {$timeline = $wa->blog->timeline()}
+            {if !empty($timeline)}
+            <ul class="split-catalog hidden-sm-down">
+                <li class="header">[`Calendar`]</li>
+                <ul class="timeline">
+                    {$year=null}
+                    {foreach $timeline as $year_month => $item}
+                    {if $year neq $item.year}
+                    {if !$item@first}
+                </ul>
+                {/if}
+                <li>
+                {$year=$item.year}
+                <a href="{$item.year_link}">{$item.year|default:'NULL'}</a>
+                <ul>
+                    {/if}
+                    <li {if $item.selected}class="selected"{/if}>
+                    <a href="{$item.link}" title="{_w("%d post","%d posts",$item.count)}">{_ws(date("F",gmmktime(0,0,0,$item.month,1)))} ({$item.count})</a>
+                    </li>
+                    {if $item@last}
+                </ul>
+                </li>
+                {/if}
+                {/foreach}
+                </ul>
+
+            {/if}
+        </div>
+        <div class="col-lg-9 col-xs-12 col-sm-8">
+            {if empty($posts) && $wa->currentUrl() == $wa_app_url}
+            <h1 class="category-name">[`Welcome to your new blog!`]</h1>
+            <p>{sprintf('[`Start by <a href="%s">writing a post</a> in your blog backend.`]', $wa_backend_url|cat:'blog/')}</p>
+            {else}
+
+                {$content}
+            {/if}
+        </div>
+    </div>
