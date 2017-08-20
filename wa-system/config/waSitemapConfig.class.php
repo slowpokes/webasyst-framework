@@ -71,6 +71,7 @@ class waSitemapConfig
 
         $xml  = "<url>\n";
         $xml .= "\t<loc>".htmlspecialchars($loc, ENT_NOQUOTES)."</loc>\n";
+        /* VADIM CODE START
         $xml .= "\t<lastmod>".date('c', $lastmod)."</lastmod>\n";
         if ($changefreq) {
             $xml .= "\t<changefreq>".$changefreq."</changefreq>\n";
@@ -78,6 +79,7 @@ class waSitemapConfig
         if ($priority) {
             $xml .= "\t<priority>".str_replace(',', '.', min(1.0, max(0.0, $priority)))."</priority>\n";
         }
+        VADIM CODE END */
         $xml .= "</url>\n";
         echo $xml;
     }
