@@ -42,7 +42,16 @@ function smarty_function_wa_pagination($params, &$smarty)
             $html .= '<li><span>...</span></li>';
         } else {
             $page_url = $url.($url && $p == 1 ? ($url_params ? '?'.$url_params : '') : '?page='.$p.($url_params ? '&'.$url_params : ''));
+            /* VADIM CODE START
             $html .= '<li'.($p == $page ? ' class="selected"' : '').'><a href="'.$page_url.'">'.$p.'</a></li>';
+            */
+            if($p == $page){
+                $html .= '<li class="selected"><span>'.$p.'</span></li>';
+            }
+            else{
+                $html .= '<li><a href="'.$page_url.'">'.$p.'</a></li>';
+            }
+            // VADIM CODE END
             $p++;
         }
     }
