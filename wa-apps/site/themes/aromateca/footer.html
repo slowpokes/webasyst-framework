@@ -12,6 +12,18 @@
                 {$wa->block("aromateca_footer_1")}
             </div>
             <div class="footer_block">
+                <div class="title">О компании</div>
+                <ul>
+                    <li><a href="{if $page.url|default=='o_magazine/'}javascript:void(0);{else}/o_magazine/{/if}">О магазине</a></li>
+                    <li><a href="{if $page.url|default=='dostavka-po-rossii'}javascript:void(0);{else}/dostavka-po-rossii{/if}">Условия доставки</a></li>
+                    <li><a href="{if $page.url|default=='sposoby-oplaty/'}javascript:void(0);{else}/sposoby-oplaty/{/if}">Способы оплаты</a></li>
+                    <li><a href="{if $page.url|default=='skidki/'}javascript:void(0);{else}/skidki/{/if}">Система скидок</a></li>
+                    <li><a href="{if $page.url|default=='kak-zakazat/'}javascript:void(0);{else}/kak-zakazat/{/if}">Как сделать заказ?</a></li>
+                    <li><a href="{if $page.url|default=='vozvrat/'}javascript:void(0);{else}/vozvrat/{/if}">Возврат</a></li>
+                    <li><a href="{if $page.url|default=='contacts/'}javascript:void(0);{else}/contacts/{/if}">Контакты</a></li>
+                    <li><a href="{if $page.url|default=='podarochnyy-sertifikat'}javascript:void(0);{else}/podarochnyy-sertifikat{/if}">Подарочный сертификат</a></li>
+                    <li><a href="{if $page.url|default=='vopros-otvet/'}javascript:void(0);{else}/vopros-otvet/{/if}">Вопрос-ответ</a></li>
+                </ul>
                 {$wa->block("aromateca_footer_2")}
             </div>
             <div class="footer_block">
