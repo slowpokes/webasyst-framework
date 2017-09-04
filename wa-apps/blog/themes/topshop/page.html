@@ -1,0 +1,12 @@
+<h3>{$page.name}</h3>
+{$subpages = $wa->blog->pages($page.id)}
+{if $subpages}
+<ul class="list-page-inline">
+   {foreach $subpages as $p}
+    <li><a href="{$p.url}">{$p.name}</a></li>
+   {/foreach}
+</ul>
+{/if}
+<div class="page-content">
+    {$page.content}
+</div>

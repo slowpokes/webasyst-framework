@@ -1,0 +1,47 @@
+{* post stream (list): minimalistic view mode; used for post filtering by tags, author, search, etc. *}
+
+{foreach $posts as $post}
+    <div class="post search-match" id="post-{$post.id}">
+        <h3 class="category-name">{$post.title}</h3>
+        <div class="credentials">
+
+            {if isset($post.user.photo_url_20)}
+            {if $post.user.posts_link}
+            <a href="{$post.user.posts_link}">
+                <img src="{$post.user.photo_url_20}" class="userpic" alt="">
+            </a>
+            {else}
+            <img src="{$post.user.photo_url_20}" class="userpic" alt="">
+            {/if}
+            {/if}
+
+            {if $post.user.posts_link}
+            <a href="{$post.user.posts_link}" class="username">{$post.user.name}</a>
+            {else }
+            <span class="username">{$post.user.name}</span>
+            {/if}
+            <span class="hint date">{$post.datetime|wa_datetime:"humandate"}</span>
+            {if $show_comments && $post.comments_allowed}
+            {if !empty($post.comment_count)}
+            <a href="{$post.link}#comments">
+                {_w('%d comment','%d comments',$post.comment_count)}
+            </a>
+            {else}
+            {*
+            <a href="{$post.link}#comments" class="hint">
+                [`no comments`]
+            </a>
+            *}
+            {/if}
+            {/if}
+        </div>
+        <div class="text">
+            {$post.text|strip_tags|truncate:400}
+        </div>
+        <a href="{$post.link}" itemprop="url">Читать далее &rarr;</a>
+    </div>
+{foreachelse}
+    {if !isset($page) || $page lt 2}
+        {_w('%d post','%d posts',0)}
+    {/if}
+{/foreach}
