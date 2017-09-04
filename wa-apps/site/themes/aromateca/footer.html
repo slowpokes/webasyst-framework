@@ -2,6 +2,13 @@
     <div class="footer_content">
         <div class="footer_line">
             <div class="footer_block">
+                <div class="title">Каталог товаров</div>
+                <ul class="footer_sitemap">
+                    <li><a href='{if $category.url|default=='zhenskaya-parfyumeriya'}javascript:void(0);{else}/category/zhenskaya-parfyumeriya/{/if}'>Женская парфюмерия</a></li>
+                    <li><a href='{if $category.url|default=='muzhskaya-parfyumeriya'}javascript:void(0);{else}/category/muzhskaya-parfyumeriya/{/if}'>Мужская парфюмерия</a></li>
+                    <li><a href='{if $category.url|default=='ukhod-i-gigiena-dlya-zhenshchin'}javascript:void(0);{else}/category/ukhod-i-gigiena-dlya-zhenshchin/{/if}'>Уход и гигиена для женщин</a></li>
+                    <li><a href='{if $category.url|default=='decorativnaja-kosmetika'}javascript:void(0);{else}/category/decorativnaja-kosmetika/{/if}'>Косметика</a></li>
+                </ul>
                 {$wa->block("aromateca_footer_1")}
             </div>
             <div class="footer_block">
