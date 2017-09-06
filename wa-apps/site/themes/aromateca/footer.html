@@ -4,25 +4,25 @@
             <div class="footer_block">
                 <div class="title">Каталог товаров</div>
                 <ul class="footer_sitemap">
-                    <li><a href='{if $category.url|default=='zhenskaya-parfyumeriya'}javascript:void(0);{else}/category/zhenskaya-parfyumeriya/{/if}'>Женская парфюмерия</a></li>
-                    <li><a href='{if $category.url|default=='muzhskaya-parfyumeriya'}javascript:void(0);{else}/category/muzhskaya-parfyumeriya/{/if}'>Мужская парфюмерия</a></li>
-                    <li><a href='{if $category.url|default=='ukhod-i-gigiena-dlya-zhenshchin'}javascript:void(0);{else}/category/ukhod-i-gigiena-dlya-zhenshchin/{/if}'>Уход и гигиена для женщин</a></li>
-                    <li><a href='{if $category.url|default=='decorativnaja-kosmetika'}javascript:void(0);{else}/category/decorativnaja-kosmetika/{/if}'>Косметика</a></li>
+                    <li>{if $category.url|default:''=='zhenskaya-parfyumeriya'}<span class="fake-link">Женская парфюмерия</span>{else}<a href='/category/zhenskaya-parfyumeriya/'>Женская парфюмерия</a>{/if}</li>
+                    <li>{if $category.url|default:''=='muzhskaya-parfyumeriya'}<span class="fake-link">Мужская парфюмерия</span>{else}<a href='/category/muzhskaya-parfyumeriya/'>Мужская парфюмерия</a>{/if}</li>
+                    <li>{if $category.url|default:''=='ukhod-i-gigiena-dlya-zhenshchin'}<span class="fake-link">Уход и гигиена для женщин</span>{else}<a href='/category/ukhod-i-gigiena-dlya-zhenshchin/'>Уход и гигиена для женщин</a>{/if}</li>
+                    <li>{if $category.url|default:''=='decorativnaja-kosmetika'}<span class="fake-link">Косметика</span>{else}<a href='/category/decorativnaja-kosmetika/'>Косметика</a>{/if}</li>
                 </ul>
                 {$wa->block("aromateca_footer_1")}
             </div>
             <div class="footer_block">
                 <div class="title">О компании</div>
                 <ul>
-                    <li><a href="{if $page.url|default=='o_magazine/'}javascript:void(0);{else}/o_magazine/{/if}">О магазине</a></li>
-                    <li><a href="{if $page.url|default=='dostavka-po-rossii'}javascript:void(0);{else}/dostavka-po-rossii{/if}">Условия доставки</a></li>
-                    <li><a href="{if $page.url|default=='sposoby-oplaty/'}javascript:void(0);{else}/sposoby-oplaty/{/if}">Способы оплаты</a></li>
-                    <li><a href="{if $page.url|default=='skidki/'}javascript:void(0);{else}/skidki/{/if}">Система скидок</a></li>
-                    <li><a href="{if $page.url|default=='kak-zakazat/'}javascript:void(0);{else}/kak-zakazat/{/if}">Как сделать заказ?</a></li>
-                    <li><a href="{if $page.url|default=='vozvrat/'}javascript:void(0);{else}/vozvrat/{/if}">Возврат</a></li>
-                    <li><a href="{if $page.url|default=='contacts/'}javascript:void(0);{else}/contacts/{/if}">Контакты</a></li>
-                    <li><a href="{if $page.url|default=='podarochnyy-sertifikat'}javascript:void(0);{else}/podarochnyy-sertifikat{/if}">Подарочный сертификат</a></li>
-                    <li><a href="{if $page.url|default=='vopros-otvet/'}javascript:void(0);{else}/vopros-otvet/{/if}">Вопрос-ответ</a></li>
+                    <li>{if $page.url|default:''=='o_magazine/'}<span class="fake-link">О магазине</span>{else}<a href='/o_magazine/'>О магазине</a>{/if}</li>
+                    <li>{if $page.url|default:''=='dostavka-po-rossii'}<span class="fake-link">Условия доставки</span>{else}<a href='/dostavka-po-rossii'>Условия доставки</a>{/if}</li>
+                    <li>{if $page.url|default:''=='sposoby-oplaty/'}<span class="fake-link">Способы оплаты</span>{else}<a href='/sposoby-oplaty/'>Способы оплаты</a>{/if}</li>
+                    <li>{if $page.url|default:''=='skidki/'}<span class="fake-link">Система скидок</span>{else}<a href='/skidki/'>Система скидок</a>{/if}</li>
+                    <li>{if $page.url|default:''=='kak-zakazat/'}<span class="fake-link">Как сделать заказ?</span>{else}<a href='/kak-zakazat/'>Как сделать заказ?</a>{/if}</li>
+                    <li>{if $page.url|default:''=='vozvrat/'}<span class="fake-link">Возврат</span>{else}<a href='/vozvrat/'>Возврат</a>{/if}</li>
+                    <li>{if $page.url|default:''=='contacts/'}<span class="fake-link">Контакты</span>{else}<a href='/contacts/'>Контакты</a>{/if}</li>
+                    <li>{if $page.url|default:''=='podarochnyy-sertifikat'}<span class="fake-link">Подарочный сертификат</span>{else}<a href='/podarochnyy-sertifikat'>Подарочный сертификат</a>{/if}</li>
+                    <li>{if $page.url|default:''=='vopros-otvet/'}<span class="fake-link">Вопрос-ответ</span>{else}<a href='/vopros-otvet/'>Вопрос-ответ</a>{/if}</li>
                 </ul>
             </div>
             <div class="footer_block">
