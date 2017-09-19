@@ -2,10 +2,28 @@
     <div class="footer_content">
         <div class="footer_line">
             <div class="footer_block">
+                <div class="title">Каталог товаров</div>
+                <ul class="footer_sitemap">
+                    <li>{if $category.url|default:''=='zhenskaya-parfyumeriya'}<span class="fake-link">Женская парфюмерия</span>{else}<a href='/category/zhenskaya-parfyumeriya/'>Женская парфюмерия</a>{/if}</li>
+                    <li>{if $category.url|default:''=='muzhskaya-parfyumeriya'}<span class="fake-link">Мужская парфюмерия</span>{else}<a href='/category/muzhskaya-parfyumeriya/'>Мужская парфюмерия</a>{/if}</li>
+                    <li>{if $category.url|default:''=='ukhod-i-gigiena-dlya-zhenshchin'}<span class="fake-link">Уход и гигиена для женщин</span>{else}<a href='/category/ukhod-i-gigiena-dlya-zhenshchin/'>Уход и гигиена для женщин</a>{/if}</li>
+                    <li>{if $category.url|default:''=='decorativnaja-kosmetika'}<span class="fake-link">Косметика</span>{else}<a href='/category/decorativnaja-kosmetika/'>Косметика</a>{/if}</li>
+                </ul>
                 {$wa->block("aromateca_footer_1")}
             </div>
             <div class="footer_block">
-                {$wa->block("aromateca_footer_2")}
+                <div class="title">О компании</div>
+                <ul>
+                    <li>{if $page.url|default:''=='o_magazine/'}<span class="fake-link">О магазине</span>{else}<a href='/o_magazine/'>О магазине</a>{/if}</li>
+                    <li>{if $page.url|default:''=='dostavka-po-rossii'}<span class="fake-link">Условия доставки</span>{else}<a href='/dostavka-po-rossii'>Условия доставки</a>{/if}</li>
+                    <li>{if $page.url|default:''=='sposoby-oplaty/'}<span class="fake-link">Способы оплаты</span>{else}<a href='/sposoby-oplaty/'>Способы оплаты</a>{/if}</li>
+                    <li>{if $page.url|default:''=='skidki/'}<span class="fake-link">Система скидок</span>{else}<a href='/skidki/'>Система скидок</a>{/if}</li>
+                    <li>{if $page.url|default:''=='kak-zakazat/'}<span class="fake-link">Как сделать заказ?</span>{else}<a href='/kak-zakazat/'>Как сделать заказ?</a>{/if}</li>
+                    <li>{if $page.url|default:''=='vozvrat/'}<span class="fake-link">Возврат</span>{else}<a href='/vozvrat/'>Возврат</a>{/if}</li>
+                    <li>{if $page.url|default:''=='contacts/'}<span class="fake-link">Контакты</span>{else}<a href='/contacts/'>Контакты</a>{/if}</li>
+                    <li>{if $page.url|default:''=='podarochnyy-sertifikat'}<span class="fake-link">Подарочный сертификат</span>{else}<a href='/podarochnyy-sertifikat'>Подарочный сертификат</a>{/if}</li>
+                    <li>{if $page.url|default:''=='vopros-otvet/'}<span class="fake-link">Вопрос-ответ</span>{else}<a href='/vopros-otvet/'>Вопрос-ответ</a>{/if}</li>
+                </ul>
             </div>
             <div class="footer_block">
                 {$wa->block("aromateca_footer_5")}
