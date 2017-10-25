@@ -40,7 +40,7 @@ class waRedirect {
         $array['redirect'] = self::clearTo($array['redirect']);
         $model = new waRedirectModel();
         if($array['url']=='/')return 0;
-        $exist = $model->getByField('url', $array['url']);
+        $exist = $model->getByField(array('url' => $array['url'], 'domain' => $array['domain']));
         if($exist){
             return 0;
         }
