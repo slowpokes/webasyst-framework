@@ -106,8 +106,8 @@
         return false;
     });
     $("#btn_bulk").click(function(){
-        $.post("?module=redirect&action=bulk&domain_id={$domain_id}" , $('#bulk_form').serialize(), function (json) {
-            window.location.hash = '#/redirect/?page=1';
+        $.post("?module=redirect&action=bulk&domain_id={$domain_id}" , $('#bulk_form').serialize(), function (result) {
+            alert(result);
         }, "json");
         return false;
     });
