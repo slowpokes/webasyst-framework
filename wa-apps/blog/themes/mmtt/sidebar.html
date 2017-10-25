@@ -1,45 +1,54 @@
 <div class="sidebar blog_sidebar brand_page">
     <div class="sidebar_links brand_sidebar_links">
-        {$month_year = array()}
-        {$month_rus = array('Хуябрь', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь',
-        'Октябрь', 'Ноябрь', 'Декабрь')}
-        {$latest_posts = $wa->blog->posts()}
-        {foreach $latest_posts as $p}
-            {if !isset($month_year[$p.datetime|date_format:'Y'])}
-                {$month_year[$p.datetime|date_format:'Y'] = array()}
-            {/if}
-            {if !isset($month_year[$p.datetime|date_format:'Y'][$p.datetime|date_format:'m'])}
-                {$month_year[$p.datetime|date_format:'Y'][$p.datetime|date_format:'m'] = array()}
-            {/if}
-            {$month_year[$p.datetime|date_format:'Y'][$p.datetime|date_format:'m'][] = $p}
-        {/foreach}
-        <ul class="news">
-            {foreach $month_year as $key=>$month}
-                <li class="closed depth_0 has-children">
-                    <a href="#" class="sidebar_link">{$key}</a>
-                    <ul>
-                        {foreach $month as $m}
-                            <li class="closed depth_1 has-children">
-                                <a href="#" class="sidebar_link">{$month_rus[$m[0].datetime|date_format:'n']}</a>
-                                <ul>
-                                    {foreach $m as $p}
-                                        <li class="depth_2 {if isset($post)&&($post.id==$p.id)}current{/if}">
-                                            <a id="post-link-{$p.id}" href="{$p.link}">
-                                                <div class="news-date">{$p.datetime|date_format:'d.m.Y'}</div>
-                                                {$p.title}
-                                            </a>
-                                        </li>
-                                    {/foreach}
-                                </ul>
-                            </li>
-                        {/foreach}
-                    </ul>
-                </li>
-            {/foreach}
-        </ul>
+        {if isset($post)}
+            {$latest_posts = $wa->blog->posts($post.blog_id, 5)}
+        {else}
+            {$latest_posts = $wa->blog->posts(2, 5)}
+        {/if}
+        {if !empty($latest_posts)}<!-- latest posts-->
+            <ul>
+                <li class="title"><span>Последние статьи</span></li>
+                <ul>
+                    {foreach $latest_posts as $p}
+                        <li>
+                            <a href="{$p.link}">
+                                <div class="sidebar-date">{$p.datetime|wa_datetime:"date"}</div>
+                                {$p.title}
+                            </a>
+                        </li>
+                    {/foreach}
+                </ul>
+            </ul>
+        {/if}
     </div>
-</div>
 
-<script>
-    openLink($(".blog_sidebar").find('.current'));
-</script>
+    {$products = $wa->shop_mmtt->productSet('hits')}
+
+    {$limit = 10}
+
+    <link type="text/css" rel="stylesheet" href="/wa-apps/shop/themes/mmtt/css/lightslider.min.css" />
+    <script src="/wa-apps/shop/themes/mmtt/js/lightslider.min.js"></script>
+
+    {$i = 1}
+    <div class="title">Хиты продаж</div>
+    <div id="hits-slider">
+        {foreach $products as $product}
+            {if $i<=$limit}
+                <div class="sidebar-product">
+                    {include file="./product_sidebar.html"}
+                </div>
+            {/if}
+            {$i = $i+1}
+        {/foreach}
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            /*
+            $("#hits-slider").lightSlider({
+                item: 1
+            });
+            */
+        });
+    </script>
+</div>

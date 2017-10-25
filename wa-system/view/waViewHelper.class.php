@@ -1119,6 +1119,13 @@ HTML;
                 }
             }
             $class = $app.'ViewHelper';
+            //VADIM CODE START
+            $all_apps = wa()->getApps();
+            if(isset($all_apps[$app]['id'])){
+                $app_real_id = $all_apps[$app]['id'];
+                $class = $app_real_id.'ViewHelper';
+            }
+            //VADIM CODE END
             if (class_exists($class)) {
                 self::$helpers[$app] = new $class($wa);
             } else {
