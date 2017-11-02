@@ -8,6 +8,7 @@
         </div>
         <div class="block s-routing-header">
             <a href="#" class="inline-link" id="s-redirect-add"><i class="icon16 add"></i><b><i>Добавить редирект</i></b></a>
+            <a href="#" class="inline-link" id="s-bulk-add"><i class="icon16 add"></i><b><i>Добавить пакетно</i></b></a>
         </div>
         <div class="block double-padded">
             <div id="add_form_block" class="hidden">
@@ -29,6 +30,24 @@
                         <div class="field">
                             <div class="value">
                                 <input id="btn_add" type="submit" value="Сохранить" class="button green"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="bulk_form_block" class="hidden">
+                <form method="post" id="bulk_form">
+                    <div class="field-group">
+                        <div class="field">
+                            <div class="name">Ссылки</div>
+                            <div class="value">
+                                <textarea name="text" class="long"></textarea>
+                            </div>
+                        </div>
+                        <input type="hidden" value="{$domain_id}" name="domain_id" class="long"/>
+                        <div class="field">
+                            <div class="value">
+                                <input id="btn_bulk" type="submit" value="Сохранить" class="button green"/>
                             </div>
                         </div>
                     </div>
@@ -76,9 +95,19 @@
         $("#add_form_block").toggle();
         return false;
     });
+    $("#s-bulk-add").click(function(){
+        $("#bulk_form_block").toggle();
+        return false;
+    });
     $("#btn_add").click(function(){
         $.post("?module=redirect&action=add&domain_id={$domain_id}" , $('#add_form').serialize(), function (json) {
             $("#redirect_table > tbody").prepend(getLineStr(json.data.info));
+        }, "json");
+        return false;
+    });
+    $("#btn_bulk").click(function(){
+        $.post("?module=redirect&action=bulk&domain_id={$domain_id}" , $('#bulk_form').serialize(), function (result) {
+            alert(result);
         }, "json");
         return false;
     });

@@ -5,7 +5,7 @@ class blogFrontendLayout extends waLayout
     public function execute()
     {
 
-        $this->getResponse()->addJs("js/jquery.pageless2.js?v=".wa()->getVersion(), true);
+        //$this->getResponse()->addJs("js/jquery.pageless2.js?v=".wa()->getVersion(), true);
         $this->view->assign('site_theme_url', wa()->getDataUrl('themes', true, 'site').'/'.waRequest::param('theme', 'default').'/');
         $this->view->assign('action', $action = waRequest::param('action', 'default'));
         waRequest::setParam('action', $action);

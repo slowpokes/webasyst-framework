@@ -1,0 +1,19 @@
+<div class="small_product">
+    <div class="small-product-box">
+        <div class="image_main">
+            <a href="{$product.frontend_url}">
+                <span class="image pc_image">
+                    {$wa->shop_mmtt->productImgHtml($product, '180x240', ['alt' => $product.name, 'default' => "`$wa_theme_url`img/dummy200.png", 'class' => 'product-image'])}
+                </span>
+            </a>
+            <div class='pc_name'>
+                <div class="pr-name">
+                    <a href="{$product.frontend_url}" title="{$product.cf_type|default:''} {$product.name}">{$product.name}</a>
+                </div>
+            </div>
+        </div>
+        <div class="pr-type">
+            {$product.cf_type|default:''}
+        </div>
+    </div>
+</div>

@@ -116,7 +116,7 @@
                             {if $n == 'description'}
                             <div class="value"><textarea name="params[{$n}]">{$p|escape}</textarea></div>
                             {else}
-                            <div class="value"><input type="text" name="params[{$n}]" value="{$p|escape}" /></div>
+                            <div class="value"><input type="text" name="params[{$n}]" value="{$p|escape|default:''}" /></div>
                             {/if}
                         </div>
                         {/foreach}

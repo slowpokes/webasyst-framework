@@ -243,6 +243,7 @@ class waPageActions extends waActions
     {
         $params = $other_params = array();
         $vars = array(
+            'h1' => 'H1',
             'keywords' => _ws('META Keywords'),
             'description' => _ws('META Description')
         );
