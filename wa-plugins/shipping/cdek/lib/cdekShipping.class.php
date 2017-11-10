@@ -45,15 +45,17 @@ class cdekShipping extends waShipping
                     if ($result = $this->price($params['to'], $params['weight'], $total_price, $method_id, $height, $width, $length)) {
 
                         $est_delivery = '';
-                        $est_delivery .= waDateTime::format('humandate', strtotime($result['deliveryDateMin'])) . " - " . waDateTime::format('humandate', strtotime($result['deliveryDateMax']));
+                        $est_delivery .= waDateTime::format('humandate', strtotime($result['deliveryDateMin'])) . " - " . waDateTime::format(
+                                'humandate', strtotime($result['deliveryDateMax'])
+                            );
 
                         $rate = doubleval(ifset($result['price'], 0));
                         if (doubleval($this->surcharge) > 0) {
-                            $rate+= $rate * (doubleval($this->surcharge) / 100.0);
+                            $rate += $rate + doubleval($this->surcharge);
                         }
 
                         if (doubleval($this->surcharge_by_order) > 0) {
-                            $rate+= $total_price * (doubleval($this->surcharge_by_order) / 100.0);
+                            $rate += $total_price * (doubleval($this->surcharge_by_order) / 100.0);
                         }
 
                         $services[$method_id] = array(
@@ -124,9 +126,11 @@ class cdekShipping extends waShipping
 
     public function allowedAddress()
     {
-        return array(array(
-            'country' => array('rus'),
-        ));
+        return array(
+            array(
+                'country' => array('rus'),
+            )
+        );
     }
 
     public function customFields(waOrder $order)
@@ -296,8 +300,10 @@ class cdekShipping extends waShipping
 
                 @curl_setopt($ch, CURLOPT_URL, $url);
                 @curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                @curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json')
+                @curl_setopt(
+                    $ch, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json'
+                    )
                 );
                 @curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
@@ -321,12 +327,15 @@ class cdekShipping extends waShipping
                 $hint .= " PHP ini option 'allow_url_fopen' are disabled;";
             } else {
                 $postdata = http_build_query($params);
-                $context = stream_context_create(array('http' =>
+                $context = stream_context_create(
                     array(
-                        'method' => 'POST',
-                        'content' => $postdata
+                        'http' =>
+                            array(
+                                'method' => 'POST',
+                                'content' => $postdata
+                            )
                     )
-                ));
+                );
                 $response = file_get_contents($url, false, $context);
             }
         }
@@ -403,6 +412,15 @@ class cdekShipping extends waShipping
         return $view;
     }
 
+    public function mapAction()
+    {
+        $view = wa()->getView();
+        $view->assign('points', self::getAllPoints());
+        $html = $view->fetch($this->path . '/templates/map.html');
+        echo $html;
+    }
+
+
     public function map()
     {
         $config_path = $this->path . '/lib/config/map.php';
@@ -410,6 +428,15 @@ class cdekShipping extends waShipping
             $map = include($config_path);
         }
         return $map;
+    }
+
+    private static function getAllPoints()
+    {
+        $data = file_get_contents('https://integration.cdek.ru/pvzlist.php?type=PVZ');
+        $xml = new SimpleXMLElement($data);
+        $json = json_encode($xml);
+        $data = json_decode($json, true);
+        return $data['Pvz'];
     }
 
 }
