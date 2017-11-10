@@ -51,7 +51,7 @@ class cdekShipping extends waShipping
 
                         $rate = doubleval(ifset($result['price'], 0));
                         if (doubleval($this->surcharge) > 0) {
-                            $rate += $rate + doubleval($this->surcharge);
+                            $rate = $rate + doubleval($this->surcharge);
                         }
 
                         if (doubleval($this->surcharge_by_order) > 0) {

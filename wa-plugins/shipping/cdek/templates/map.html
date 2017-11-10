@@ -47,7 +47,8 @@
             link = $('#shipping_map').data('link');
         }
         {foreach $points as $point}
-            addPoint('{$point.id}', '{$point.name}', '{$point.address}', '{$point.latitude}', '{$point.longitude}', link);
+            addPoint('{$point['@attributes']['Code']}', '{$point['@attributes']['Name']}', '{$point['@attributes']['FullAddress']}', '{$point['@attributes']['coordY']}',
+                '{$point['@attributes']['coordX']}', link);
         {/foreach}
     }
 
