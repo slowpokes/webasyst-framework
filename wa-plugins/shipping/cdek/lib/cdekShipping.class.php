@@ -45,9 +45,13 @@ class cdekShipping extends waShipping
                     if ($result = $this->price($params['to'], $params['weight'], $total_price, $method_id, $height, $width, $length)) {
 
                         $est_delivery = '';
-                        $est_delivery .= waDateTime::format('humandate', strtotime($result['deliveryDateMin'])) . " - " . waDateTime::format(
-                                'humandate', strtotime($result['deliveryDateMax'])
-                            );
+                        /* $est_delivery .= waDateTime::format('humandate', strtotime($result['deliveryDateMin'])) . " - " . waDateTime::format(
+                                 'humandate', strtotime($result['deliveryDateMax'])
+                             );*/
+                        $min_delivery = $result['deliveryPeriodMin'] + $this->getSettings('wait_for_send');
+                        $max_delivery = $result['deliveryPeriodMax'] + $this->getSettings('wait_for_send');
+
+                        $est_delivery .=  $min_delivery . ' - ' .  $max_delivery . ' дня';
 
                         $rate = doubleval(ifset($result['price'], 0));
                         if (doubleval($this->surcharge) > 0) {
