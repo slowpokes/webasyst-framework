@@ -49,7 +49,7 @@ class cdekShipping extends waShipping
                                  'humandate', strtotime($result['deliveryDateMax'])
                              );*/
                         $min_delivery = $result['deliveryPeriodMin'] + $this->getSettings('wait_for_send');
-                        $max_delivery = $result['deliveryPeriodMax'] + $this->getSettings('wait_for_send');
+                        $max_delivery = $result['deliveryPeriodMax'] + $this->getSettings('wait_for_send') + 1;
 
                         $est_delivery .=  $min_delivery . ' - ' .  $max_delivery . ' дня';
 
