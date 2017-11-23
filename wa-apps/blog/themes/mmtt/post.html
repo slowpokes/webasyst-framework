@@ -4,6 +4,36 @@
 <div itemscope itemtype="http://schema.org/BlogPosting" class="content_small">
 
     <div class="post" role="main" id="post-{$post.id}">
+
+        {$posts = $wa->blog->posts($post.blog_id, 10)}
+        {$prev = ''}
+        {$next = ''}
+        {$post_found = false}
+        {foreach $posts as $p}
+            {if $post_found}
+                {if $next==''}
+                    {$next = $p.link}
+                {/if}
+            {else}
+                {if $p.id != $post.id}
+                    {$prev = $p.link}
+                {/if}
+            {/if}
+            {if $p.id == $post.id}
+                {$post_found = true}
+            {/if}
+        {/foreach}
+
+        <div>
+            {if $prev}
+                <a href="{$prev}">&larr; предыдущая новость</a>
+            {/if}
+            &nbsp;
+            {if $next}
+                <a style="float: right" href="{$next}">следующая новость &rarr;</a>
+            {/if}
+        </div>
+
         <h1 itemprop="name">
             {$post.title}
 
@@ -37,6 +67,16 @@
                 {foreach $post.plugins.after as $plugin => $output}{$output}{/foreach}
             </div>
         {/if}
+
+        <div>
+            {if $prev}
+                <a href="{$prev}">&larr; предыдущая новость</a>
+            {/if}
+            &nbsp;
+            {if $next}
+                <a style="float: right" href="{$next}">следующая новость &rarr;</a>
+            {/if}
+        </div>
 
     </div>
 
