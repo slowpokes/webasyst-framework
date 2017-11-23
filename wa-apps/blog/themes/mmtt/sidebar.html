@@ -17,6 +17,10 @@
                             </a>
                         </li>
                     {/foreach}
+                    <li class="regular link">
+                        <br>
+                        <span><a href="/blog/">смотреть все</a></span>
+                    </li>
                 </ul>
             </ul>
         {/if}
@@ -34,7 +38,7 @@
     <div id="hits-slider">
         {foreach $products as $product}
             {if $i<=$limit}
-                <div class="sidebar-product">
+                <div class="sidebar-product" style="width: 215px">
                     {include file="./product_sidebar.html"}
                 </div>
             {/if}
@@ -44,11 +48,9 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            /*
             $("#hits-slider").lightSlider({
                 item: 1
             });
-            */
         });
     </script>
 </div>
