@@ -1,10 +1,6 @@
-[submodule "wa-apps/warehouse"]
-	path = wa-apps/warehouse
-	url = git@github.com:slowpokes/warehouse.git
-	ignore = dirty
-[submodule "wa-apps/courier"]
-	path = wa-apps/courier
-	url = git@github.com:slowpokes/courier.git
+[submodule "wa-apps/wh"]
+	path = wa-apps/wh
+	url = git@github.com:slowpokes/wh.git
 	ignore = dirty
 [submodule "wa-apps/shop"]
 	path = wa-apps/shop
@@ -12,3 +8,9 @@
 [submodule "wa-apps/couriers"]
 	path = wa-apps/couriers
 	url = git@github.com:slowpokes/couriers.git
+[submodule "wa-apps/shipment"]
+	path = wa-apps/shipment
+	url = git@github.com:slowpokes/shipment.git
+[submodule "wa-apps/smartb"]
+	path = wa-apps/smartb
+	url = git@github.com:slowpokes/smartb.git

@@ -68,8 +68,8 @@ return array(
     ),
     'surcharge' => array(
         'value' => 0,
-        'title' => 'Надбавка (% от доставки)',
-        'description' => 'Указанный процент берется от стоимости доставки.',
+        'title' => 'Надбавка (рублей)',
+        'description' => 'Добавляет стоимость к доставке в рублях.',
         'control_type' => waHtmlControl::INPUT,
     ),
     'tariff_list' => array(
