@@ -2,7 +2,7 @@
 
 {foreach $posts as $post}
     <div class="post" id="post-{$post.id}" {if $wa->param('blog_url')}itemprop="blogPosts" {/if}itemscope itemtype="http://schema.org/BlogPosting">
-        <h2>
+        <h2 class="regular">
             <a href="{$post.link}" itemprop="url">{$post.title}</a>
 
             {* @event prepare_posts_frontend.%plugin_id%.post_title *}
