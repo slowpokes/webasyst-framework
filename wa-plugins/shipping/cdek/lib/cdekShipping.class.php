@@ -393,6 +393,7 @@ class cdekShipping extends waShipping
 
     public function tracking($tracking_id = null)
     {
+        return $this->myTracking($tracking_id);
         $url = "http://www.edostavka.ru/nakladnoy/?RegistrNum=" . urlencode($tracking_id);
         return 'Отслеживание отправления: <a href="' . $url . '" target="_blank">' . $url . '</a>';
     }
@@ -442,5 +443,25 @@ class cdekShipping extends waShipping
         $data = json_decode($json, true);
         return $data['Pvz'];
     }
+
+    private function myTracking($barcode){
+        $model = new waModel();
+        $data = $model->query("SELECT * FROM shipment_codecheck WHERE barcode = '$barcode' ORDER BY operation_date, datetime, id")->fetchAll();
+        $result = "";
+        if(count($data)>0){
+            $result = "<table class='tracking_table table'>";
+            foreach($data as $line){
+                $result .= "<tr>";
+                $result .= "<td>".date('d.m.Y H:i', strtotime($line['operation_date']))."</td>";
+                $result .= "<td>{$line['operation_place']}</td>";
+                $result .= "<td>{$line['operation_type']}</td>";
+                $result .= "<td>{$line['operation_text']}</td>";
+                $result .= "</tr>";
+            }
+            $result .= "</table>";
+        }
+        return $result;
+    }
+
 
 }
