@@ -37,11 +37,17 @@
 
     {if !$is_lazyloading}
 </div>
-    <ul class="menu-h" id="stream-paging">
-        {for $p=1 to $pages}
-            <li{if $p eq $page} class="selected"{/if}><a href="{if $p eq $page}#page_{$page}{else}?page={$p}{/if}">{$p}</a></li>
-        {/for}
-    </ul>
+    <div class="products_navigation products_navigation_bottom">
+        <div class="paginator">
+            <ul>
+                {for $p=1 to $pages}
+                    <li{if $p eq $page} class="selected"{/if}><a href="{if $p eq $page}#page_{$page}{else}?page={$p}{/if}">{$p}</a></li>
+                {/for}
+            </ul>
+        </div>
+
+        <div class="cb"></div>
+    </div>
 {/if}
 
 {if $page eq 1 && !$wa->globals('disable_pageless')}
