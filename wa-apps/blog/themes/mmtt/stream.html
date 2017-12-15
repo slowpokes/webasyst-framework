@@ -1,6 +1,10 @@
 {* post list: view mode depends on the context: either "stream_search.html" or "stream_posts.html" *}
+{$wa->title('Полезные статьи на сайте 1mmtt.ru discount shop')}
+{$wa->meta('description', "Только самые полезные статьи в блоге на сайте компании - 1mmtt.ru discount shop. Откройте для себя все секреты парфюмерии вместе с нами.")}
 {include 'sidebar.html' inline}
 <div class="content_small">
+
+    <h1>Полезные статьи о парфюмерии</h1>
 
 {if !$is_lazyloading}
 <div id="post-stream" role="main" class="lazyloading" {if $wa->param('blog_url')}itemscope itemtype="http://schema.org/Blog"{/if}>
@@ -33,11 +37,17 @@
 
     {if !$is_lazyloading}
 </div>
-    <ul class="menu-h" id="stream-paging">
-        {for $p=1 to $pages}
-            <li{if $p eq $page} class="selected"{/if}><a href="{if $p eq $page}#page_{$page}{else}?page={$p}{/if}">{$p}</a></li>
-        {/for}
-    </ul>
+    <div class="products_navigation products_navigation_bottom">
+        <div class="paginator">
+            <ul>
+                {for $p=1 to $pages}
+                    <li{if $p eq $page} class="selected"{/if}><a href="{if $p eq $page}#page_{$page}{else}?page={$p}{/if}">{$p}</a></li>
+                {/for}
+            </ul>
+        </div>
+
+        <div class="cb"></div>
+    </div>
 {/if}
 
 {if $page eq 1 && !$wa->globals('disable_pageless')}
