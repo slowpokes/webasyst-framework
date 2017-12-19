@@ -1,16 +1,12 @@
-[submodule "wa-apps/wh"]
-	path = wa-apps/wh
-	url = git@github.com:slowpokes/wh.git
-	ignore = dirty
-[submodule "wa-apps/shop"]
-	path = wa-apps/shop
-	url = git@github.com:slowpokes/shop-script.git
 [submodule "wa-apps/couriers"]
 	path = wa-apps/couriers
 	url = git@github.com:slowpokes/couriers.git
 [submodule "wa-apps/shipment"]
 	path = wa-apps/shipment
 	url = git@github.com:slowpokes/shipment.git
+[submodule "wa-apps/shop"]
+    path = wa-apps/shop
+    url = git@github.com:slowpokes/shop.git
 [submodule "wa-apps/smartb"]
 	path = wa-apps/smartb
 	url = git@github.com:slowpokes/smartb.git
