@@ -1,0 +1,82 @@
+<div id="kmbitcoin">
+    <div class="kmbitcoin-notpaid" style="{if !$kmbitcoin_paid}display: none;{/if}">
+        {if $kmbitcoin_before}
+        <h3 class="kmbitcoin-before">
+            {$kmbitcoin_before}
+        </h3>
+        {/if}
+        {if $kmbitcoin_qr}
+        <div class="kmbitcoin-qr"><img src="{$kmbitcoin_qr}"></div>
+        {/if}
+        <p class="kmbitcoin-satoshi">Сумма в Биткоинах: <strong>{$kmbitcoin_satoshi|replace:',':'.'}</strong></p>
+        <p class="kmbitcoin-address">Кошелек: <strong><a href="bitcoin:{$kmbitcoin_address}?amount={$kmbitcoin_satoshi|replace:',':'.'}&label={$wa->appName()|urlencode}_{$wa->accountName()|urlencode}_{$kmbitcoin_order_id}">{$kmbitcoin_address}</a></strong></p>
+        {if $kmbitcoin_after}
+        <p class="small kmbitcoin-after">
+            {$kmbitcoin_after}
+        </p>
+        {/if}
+    </div>
+
+    <div class="kmbitcoin-paid" style="{if $kmbitcoin_paid}display: none;{/if}">
+        <div class="kmbitcoin-proccessing"
+             style="{if $kmbitcoin_confirmations >= $kmbitcoin_confirmation_nedded}display:none;{/if}">
+            <h3>Ваш платеж обрабатывается</h3>
+
+            <p>Всего <strong class="kmbitcoin-confirmations">{$kmbitcoin_confirmations}</strong> подтверждений сети
+                Биткоин из <strong class="kmbitcoin-confirmations-needed">{$kmbitcoin_confirmation_nedded}</strong> необходимых.
+            </p>
+
+            <p class="small">
+                Скорость подтверждения транзакций зависит от загруженности сети Биткоин и может длиться от 20 минут до нескольких дней.<br>
+                Вы всегда сможете увидеть статус обработки на <a href="{$kmbitcoin_order_url}">странице заказа</a> и в <a href="https://bitaps.com/ru/{$kmbitcoin_address}" target="_blank">сети Биткоин</a>.
+            </p>
+        </div>
+
+        <h3 class="kmbitcoin-done"
+            style="{if $kmbitcoin_confirmations < $kmbitcoin_confirmation_nedded}display:none;{/if}">
+            Ваш платеж полностью получен!
+        </h3>
+    </div>
+
+    <p class="small kmbitcoin-proccessing">Обновление информации произойдет через <span data-kmbitcoin-refresh></span> сек.</p>
+
+</div>
+
+<script>
+    (function () {
+        'use strict';
+
+        var $kmbitcoin = $('#kmbitcoin'),
+            sec = 10,
+            wait = 10,
+            counter = 1;
+
+        function requestStatus() {
+            $kmbitcoin.find('.kmbitcoin-confirmations').text('...');
+            $.get("{$kmbitcoin_url}?id={$kmbitcoin_order_id}", function (r) {
+                if (r.paid) {
+                    $kmbitcoin.find('.kmbitcoin-notpaid').hide();
+                    $kmbitcoin.find('.kmbitcoin-paid').show();
+                    setTimeout(function () {
+                        $kmbitcoin.find('.kmbitcoin-confirmations').text(r.confirmations);
+                    }, 500);
+                }
+                if (r.confirmations >= r.confirmations_needed) {
+                    $kmbitcoin.find('.kmbitcoin-proccessing').hide();
+                    return;
+                }
+                counter = Math.round(counter * 1.8);
+                sec = counter * wait;
+                setTimeout(requestStatus, sec * 1000 - 1000);
+            }, 'json');
+        }
+
+        $kmbitcoin.find('[data-kmbitcoin-refresh]').text(wait);
+        setTimeout(requestStatus, wait * 1000);
+        setInterval(function () {
+            sec--;
+            $kmbitcoin.find('[data-kmbitcoin-refresh]').text(sec);
+        }, 1000);
+
+    }());
+</script>
