@@ -12,17 +12,15 @@ return array(
         'description'  => 'Укажите сумму, которая будет вычитаться вместо бесплатной доставки',
         'control_type' => waHtmlControl::INPUT,
     ),
-    'prompt_address' =>array(
-        'value'        => false,
-        'title'        => 'Запрашивать адрес',
-        'description'  => 'Запрашивать адрес у покупателя',
+    'require_zip'  => array(
+        'value'        => '',
+        'title'        => 'Запрашивать индекс',
         'control_type' => waHtmlControl::CHECKBOX,
     ),
-    'change_shipping_amount' => array(
-        'value' => '0',
-        'title' => 'Массовое изменение стоимости',
-        'description' => 'Укажите сумму, на которую будет увеличена (уменьшена) стоимость доставки всех регионов',
-        'control_type' => waHtmlControl::CUSTOM.' '.'regionShipping::settingChangeShippingAmountControl',
+    'uniq_id'  => array(
+        'value'        => '',
+        'title'        => 'ID',
+        'control_type' => waHtmlControl::INPUT,
     ),
     'shipment_type'  => array(
         'value'        => '',
@@ -30,10 +28,11 @@ return array(
         'control_type' => waHtmlControl::SELECT,
         'options'      => waShipping::getTypes(),
     ),
-    'regions' => array(
-        'title' => 'Регионы',
-        'control_type' => waHtmlControl::CUSTOM.' '.'regionShipping::settingRegionControl',
+    'closed_cities' => array(
+        'title' => 'Отключенные города',
+        'control_type' => waHtmlControl::CUSTOM.' '.'cityShipping::settingClosedCitiesControl',
     ),
+
 );
 
 //EOF

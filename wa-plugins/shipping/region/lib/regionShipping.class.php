@@ -14,20 +14,25 @@ class regionShipping extends waShipping
                     $rate = $price;
                     $order_price = $this->getTotalPrice();
                     if($order_price>=$this->free_shipping){
-                        if ($this->free_shipping_amount > 0) {
-                            $rate = $price - $this->free_shipping_amount;
-                            if ($rate < 0) {
+                        if($this->free_shipping_amount > 0){
+                            $rate =  $price - $this->free_shipping_amount;
+                            if($rate < 0){
                                 $rate = 0;
                             }
-                        } else {
+                        }
+                        else {
                             $rate = 0;
                         }
                     }
+
                     return array(
                         'delivery' => array(
                             'est_delivery' => $time,
                             'currency'     => 'RUB',
                             'rate'         => $rate,
+                            'params' => array(
+                                'shipment_type' => $this->shipment_type,
+                            ),
                         ),
                     );
                 }
@@ -122,17 +127,21 @@ class regionShipping extends waShipping
         return $result;
     }
 
-    public function getSettingsHTML($params = array())
-    {
+    public function getSettingsHTML($params = array()){
         $view = wa()->getView();
         $html = '';
-        $html .= $view->fetch($this->path . '/templates/settings.html');
+        $html .= $view->fetch($this->path.'/templates/settings.html');
         $html .= parent::getSettingsHTML($params);
         return $html;
     }
 
-    public static function settingChangeShippingAmountControl()
-    {
+    public static function settingChangeShippingAmountControl () {
         return '<input id="change_shipping_amount" type="button" class="button green" value="Изменить стоимость" />';
+    }
+
+    public function requestedAddressFields()
+    {
+        //request either all or no address fields depending on the value of the corresponding plugin settings option
+        return $this->prompt_address ? array() : false;
     }
 }
