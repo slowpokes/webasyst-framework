@@ -12,8 +12,8 @@ return array(
 
     'php.gd' => array(
         'description' => 'Printfom display',
-        'strict' => false,
-        'value' => 1,
+        'strict'      => false,
+        'value'       => 1,
     ),
 );
 //EOF

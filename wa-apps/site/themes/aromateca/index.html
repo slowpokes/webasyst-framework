@@ -7,6 +7,7 @@
     <meta name="Description" content="{$wa->meta('description')|escape}"/>
     <meta name='yandex-verification' content='50ce4b30f8570592'/>
     <meta name="google-site-verification" content="fZ16paJa0YnpLaTi6pTFoOBb6BOmEXEuJY9oMOcYA5U"/>
+    {include file="$wa_active_theme_path/../common/css.html"}
     <link href="/wa-apps/shop/themes/aromateca/css/aromateca.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
     <link href="/wa-apps/shop/themes/aromateca/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -14,7 +15,9 @@
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
 
-    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/wa-content/js/jquery/jquery-migrate-1.2.1.min.js"></script>
+    {include file="$wa_active_theme_path/../common/js.html"}
 
     {$wa->js()}
     {$wa->headJs()}

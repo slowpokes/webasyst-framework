@@ -68,7 +68,7 @@ class russianpost2Shipping extends waShipping
         $params['description_wrapper'] = '%s';
         $currency = waCurrency::getInfo('RUB');
         $params['title_wrapper'] = '%s';
-        $params['control_wrapper'] = '<tr title="%3$s"><td>%1$s</td><td>&rarr;</td><td>%2$s ' . $currency['sign'] . '</td></tr>';
+        $params['control_wrapper'] = '<tr title="%3$s"><td>%1$s</td><td>&rarr;</td><td>%2$s '.$currency['sign'].'</td></tr>';
         $params['size'] = 6;
         for ($zone = 1; $zone <= 5; $zone++) {
             $params['value'] = floatval(isset($costs[$zone]) ? $costs[$zone] : 0.0);
@@ -137,11 +137,11 @@ class russianpost2Shipping extends waShipping
 
                 waHtmlControl::addNamespace($region_params, $id);
                 $avia_params = array(
-                    'namespace' => $region_params['namespace'],
-                    'control_wrapper' => '%2$s',
+                    'namespace'           => $region_params['namespace'],
+                    'control_wrapper'     => '%2$s',
                     'description_wrapper' => false,
-                    'title_wrapper' => false,
-                    'value' => $params['value'][$id]['avia_only'],
+                    'title_wrapper'       => false,
+                    'value'               => $params['value'][$id]['avia_only'],
                 );
                 $region_params['value'] = max(0, min(5, $params['value'][$id][$name]));
 
@@ -175,7 +175,7 @@ class russianpost2Shipping extends waShipping
     {
         $address = array(
             'country' => 'rus',
-            'region' => array(),
+            'region'  => array(),
         );
         foreach ($this->region as $region => $options) {
             if (!empty($options['zone'])) {
@@ -209,11 +209,11 @@ class russianpost2Shipping extends waShipping
     public function requestedAddressFields()
     {
         return array(
-            'zip' => array(),
+            'zip'     => array(),
             'country' => array('hidden' => true, 'value' => 'rus', 'cost' => true),
-            'region' => array('cost' => true),
-            'city' => array(),
-            'street' => array(),
+            'region'  => array('cost' => true),
+            'city'    => array(),
+            'street'  => array(),
         );
     }
 
@@ -304,30 +304,31 @@ class russianpost2Shipping extends waShipping
                 if (!empty($this->region[$region_id]) && !empty($this->region[$region_id]['zone'])) {
                     $services = array();
 
-                    $delivery_date = waDateTime::format('humandate', strtotime('+1 week')) . ' — ' . waDateTime::format('humandate', strtotime('+2 week'));
+                    $delivery_date = waDateTime::format('humandate', strtotime('+1 week')).' — '.waDateTime::format('humandate', strtotime('+2 week'));
 
                     $rate = $this->getZoneRates($weight, $this->getTotalPrice(), $this->region[$region_id]['zone']);
                     if (empty($this->region[$region_id]['avia_only'])) {
-                        if ($rate['ground'] < 370) {
+                        if($rate['ground']<370){
                             $rate['ground'] = 370;
                         }
                         $order_price = $this->getTotalPrice();
-                        if ($order_price >= $this->free_shipping) {
-                            if ($this->free_shipping_amount > 0) {
-                                $rate['ground'] = $rate['ground'] - $this->free_shipping_amount;
-                                if ($rate['ground'] < 0) {
+                        if($order_price >= $this->free_shipping){
+                            if($this->free_shipping_amount > 0){
+                                $rate['ground'] =  $rate['ground'] - $this->free_shipping_amount;
+                                if($rate['ground'] < 0){
                                     $rate['ground'] = 0;
                                 }
-                            } else {
+                            }
+                            else {
                                 $rate['ground'] = 0;
                             }
                         }
                         $services['ground'] = array(
-                            'name' => 'Наземный транспорт',
-                            'id' => 'ground',
+                            'name'         => 'Наземный транспорт',
+                            'id'           => 'ground',
                             'est_delivery' => '7 - 14 дней',
-                            'rate' => $rate['ground'],
-                            'currency' => 'RUB',
+                            'rate'         => $rate['ground'],
+                            'currency'     => 'RUB',
                         );
                     }
                 } else {
@@ -356,15 +357,15 @@ class russianpost2Shipping extends waShipping
     {
         return extension_loaded('gd') ? array(
             112 => array(
-                'name' => 'Форма №112ЭП',
+                'name'        => 'Форма №112ЭП',
                 'description' => 'Бланк приема переводов в адрес физических и юридических лиц',
             ),
             113 => array(
-                'name' => 'Форма №113',
+                'name'        => 'Форма №113',
                 'description' => 'Бланк почтового перевода наложенного платежа',
             ),
             116 => array(
-                'name' => 'Форма №116',
+                'name'        => 'Форма №116',
                 'description' => 'Бланк сопроводительного адреса к посылке',
             ),
         ) : array();
@@ -381,7 +382,7 @@ class russianpost2Shipping extends waShipping
      */
     public function displayPrintForm($id, waOrder $order, $params = array())
     {
-        $method = 'displayPrintForm' . $id;
+        $method = 'displayPrintForm'.$id;
         if (method_exists($this, $method)) {
             if (extension_loaded('gd')) {
                 return $this->$method($order, $params);
@@ -455,7 +456,7 @@ class russianpost2Shipping extends waShipping
                 $this->view()->assign(
                     array(
                         'src_front' => http_build_query(array_merge($request, array('side' => 'front'))),
-                        'src_back' => http_build_query(array_merge($request, array('side' => 'back'))),
+                        'src_back'  => http_build_query(array_merge($request, array('side' => 'back'))),
                     )
                 );
                 if (!$strict && !$order) {
@@ -466,7 +467,7 @@ class russianpost2Shipping extends waShipping
                 break;
         }
 
-        return $this->view()->fetch($this->path . '/templates/form113.html');
+        return $this->view()->fetch($this->path.'/templates/form113.html');
     }
 
     /**
@@ -520,7 +521,7 @@ class russianpost2Shipping extends waShipping
                 $this->view()->assign(
                     array(
                         'src_front' => http_build_query(array_merge($request, array('side' => 'front'))),
-                        'src_back' => http_build_query(array_merge($request, array('side' => 'back'))),
+                        'src_back'  => http_build_query(array_merge($request, array('side' => 'back'))),
                     )
                 );
                 if (!$strict && !$order) {
@@ -531,7 +532,7 @@ class russianpost2Shipping extends waShipping
                 break;
         }
 
-        return $this->view()->fetch($this->path . '/templates/form112.html');
+        return $this->view()->fetch($this->path.'/templates/form112.html');
     }
 
     /**
@@ -637,7 +638,7 @@ class russianpost2Shipping extends waShipping
                 $this->view()->assign(
                     array(
                         'src_front' => http_build_query(array_merge($request, array('side' => 'front'))),
-                        'src_back' => http_build_query(array_merge($request, array('side' => 'back'))),
+                        'src_back'  => http_build_query(array_merge($request, array('side' => 'back'))),
                     )
                 );
                 if (!$strict && !$order) {
@@ -648,7 +649,7 @@ class russianpost2Shipping extends waShipping
                 $this->view()->assign('address', $this->splitAddress($order));
                 break;
         }
-        return $this->view()->fetch($this->path . '/templates/form116.html');
+        return $this->view()->fetch($this->path.'/templates/form116.html');
     }
 
     /**
@@ -730,7 +731,7 @@ class russianpost2Shipping extends waShipping
         static $convert = false;
 
         if (is_null($font_path)) {
-            $font_path = $this->path . '/lib/config/data/arial.ttf';
+            $font_path = $this->path.'/lib/config/data/arial.ttf';
             $font_path = (file_exists($font_path) && function_exists('imagettftext')) ? $font_path : false;
         }
         if (is_null($text_color)) {
@@ -799,7 +800,7 @@ class russianpost2Shipping extends waShipping
     private function read($file, &$info)
     {
         if ($file) {
-            $file = $this->path . '/lib/config/data/' . $file;
+            $file = $this->path.'/lib/config/data/'.$file;
         }
         $info = @getimagesize($file);
         if (!$info) {
@@ -843,16 +844,15 @@ class russianpost2Shipping extends waShipping
         return !$srcIm ? false : $srcIm;
     }
 
-    private function myTracking($barcode)
-    {
+    private function myTracking($barcode){
         $model = new waModel();
         $data = $model->query("SELECT * FROM shipment_codecheck WHERE barcode = '$barcode' ORDER BY operation_date, datetime, id")->fetchAll();
         $result = "";
-        if (count($data) > 0) {
+        if(count($data)>0){
             $result = "<table class='tracking_table table'>";
-            foreach ($data as $line) {
+            foreach($data as $line){
                 $result .= "<tr>";
-                $result .= "<td>" . date('d.m.Y H:i', strtotime($line['operation_date'])) . "</td>";
+                $result .= "<td>".date('d.m.Y H:i', strtotime($line['operation_date']))."</td>";
                 $result .= "<td>{$line['operation_place']}</td>";
                 $result .= "<td>{$line['operation_type']}</td>";
                 $result .= "<td>{$line['operation_text']}</td>";
