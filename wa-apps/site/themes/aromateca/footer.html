@@ -14,6 +14,7 @@
             <div class="footer_block">
                 <div class="title">О компании</div>
                 <ul>
+                    <li>{if $page.url|default:''=='kiberponedelnik/'}<span class="fake-link">Киберпонедельник</span>{else}<a href='/kiberponedelnik/'>Киберпонедельник</a>{/if}</li>
                     <li>{if $page.url|default:''=='o_magazine/'}<span class="fake-link">О магазине</span>{else}<a href='/o_magazine/'>О магазине</a>{/if}</li>
                     <li>{if $page.url|default:''=='dostavka-po-rossii'}<span class="fake-link">Условия доставки</span>{else}<a href='/dostavka-po-rossii'>Условия доставки</a>{/if}</li>
                     <li>{if $page.url|default:''=='sposoby-oplaty/'}<span class="fake-link">Способы оплаты</span>{else}<a href='/sposoby-oplaty/'>Способы оплаты</a>{/if}</li>
