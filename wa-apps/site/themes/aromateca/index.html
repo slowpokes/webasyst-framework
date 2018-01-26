@@ -40,14 +40,21 @@
     {include file="$wa_active_theme_path/header.html"}
     <div class="cb"></div>
     {include file="$wa_active_theme_path/top_menu.html"}
-    <div class="main_content">
+    <div class="main_content container">
         {$content}
         <div class="cb"></div>
         <!--div class="catalog-link">
             <a href="/category/zhenshchinam/">Перейти в каталог</a>
         </div-->
     </div>
-    <script>$('.main_content').css('height', 'auto');</script>
+    <style>
+            .container {
+                width: 1110px;
+            }
+            .content_small {
+                width: 880px;
+            }
+    </style>
     <div class="push"></div>
 </div>
 {include file="footer.html"}
