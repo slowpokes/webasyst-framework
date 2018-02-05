@@ -2,41 +2,47 @@
 
 {foreach $posts as $post}
     <div class="post" id="post-{$post.id}" {if $wa->param('blog_url')}itemprop="blogPosts" {/if}itemscope itemtype="http://schema.org/BlogPosting">
-        <h2 class="regular">
-            <a href="{$post.link}" itemprop="url">{$post.title}</a>
+        <div class="post-image">
+            <img src="{blogLogopostPlugin::getImgUrl($post.id)}" />
+        </div>
+        <div class="post-text">
+            <h2 class="regular">
+                <a href="{$post.link}" itemprop="url">{$post.title}</a>
 
-            {* @event prepare_posts_frontend.%plugin_id%.post_title *}
-            {if !empty($post.plugins.post_title)}
-                {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
+                {* @event prepare_posts_frontend.%plugin_id%.post_title *}
+                {if !empty($post.plugins.post_title)}
+                    {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
+                {/if}
+
+            </h2>
+            <div class="credentials">
+
+                <span class="hint date">{$post.datetime|wa_datetime:"humandate"}</span>
+
+            </div>
+
+            {* @event prepare_posts_frontend.%plugin_id%.before *}
+            {if !empty($post.plugins.before)}
+                <div class="text_before">
+                    {foreach $post.plugins.before as $plugin => $output}{$output}{/foreach}
+                </div>
             {/if}
 
-        </h2>
-        <div class="credentials">
-
-            <span class="hint date">{$post.datetime|wa_datetime:"humandate"}</span>
-
-        </div>
-
-        {* @event prepare_posts_frontend.%plugin_id%.before *}
-        {if !empty($post.plugins.before)}
-            <div class="text_before">
-                {foreach $post.plugins.before as $plugin => $output}{$output}{/foreach}
+            <div class="text">
+                {$post.text|strip_tags}
+                {if $post.cutted}
+                    <a href="{$post.link}">{$post.cut_link_label|default:'[`Continue reading →`]'}</a>
+                {/if}
             </div>
-        {/if}
 
-        <div class="text">
-            {$post.text}
-            {if $post.cutted}
-                <a href="{$post.link}">{$post.cut_link_label|default:'[`Continue reading →`]'}</a>
+            {* @event prepare_posts_frontend.%plugin_id%.after *}
+            {if !empty($post.plugins.after)}
+                <div class="text_after">
+                    {foreach $post.plugins.after as $plugin => $output}{$output}{/foreach}
+                </div>
             {/if}
         </div>
-
-        {* @event prepare_posts_frontend.%plugin_id%.after *}
-        {if !empty($post.plugins.after)}
-            <div class="text_after">
-                {foreach $post.plugins.after as $plugin => $output}{$output}{/foreach}
-            </div>
-        {/if}
+        <div class="post-end"></div>
 
     </div>
 {foreachelse}

@@ -1,0 +1,22 @@
+{if $post.id}
+    <script type="text/javascript" src="{$wa_app_static_url}plugins/logopost/js/ajaxupload.js"></script>
+    <script type="text/javascript" src="{$wa_app_static_url}plugins/logopost/js/script.js"></script>
+    <div id="logopost-plugin">
+        <div class="field">
+            <div class="name">
+                Изображение 
+            </div>
+            <div class="value">
+                <div id="logopost-preview">
+                    {if $post.image}
+                        <img src="{$wa_url}wa-data/public/blog/plugins/logopost/images/{$post.image}" />
+                    {/if}
+                </div>
+                <div id="logopost-response"></div>
+                <input type="hidden" name="post_id" value="{$post.id}" />
+                <a id="uploadButton" href="javascript:void(0);"><i  class="icon16 add" title="Загрузить"></i></a>
+                <a id="deleteButton" {if !$post.image}style="display:none;"{/if} href="javascript:void(0);"><i class="icon16 delete" title="Удалить"></i></a>
+            </div>
+        </div>
+    </div>
+{/if}
