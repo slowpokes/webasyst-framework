@@ -1,0 +1,19 @@
+<div class="header-top">
+    <div class="header-top-content">
+        <div class="user-links">
+            {if $wa->user()->isAuth()}
+                <a href="{$wa->getUrl('/frontend/my')}">{$wa->user('name')}</a> |
+                <a href="?logout">[s`Log out`]</a>
+            {else}
+                <span class="hidden-link" data-link="{base64_encode('/login/')}">Личный кабинет</span> |
+                <span class="hidden-link" data-link="{base64_encode('/signup/')}">Регистрация</span>
+            {/if}
+        </div>
+        <div class="header-city">
+            
+        </div>
+        <div class="track-order">
+            <span class="hidden-link" data-link="{base64_encode('/trackorder/')}">Проверить статус посылки</span>
+        </div>
+    </div>
+</div>
