@@ -97,7 +97,11 @@
 
 <script>
     $("#post-link-{$post.id}").parentsUntil('.sidebar').removeClass('closed');
+</script>
+<script>
     $(document).ready(function () {
-        initInlineProducts();
+        setTimeout(function () {
+            initInlineProducts();
+        }, 1000);
     });
 </script>
