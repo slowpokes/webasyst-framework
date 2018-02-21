@@ -26,31 +26,4 @@
         {/if}
     </div>
 
-    {$products = $wa->shop_mmtt->productSet('hits')}
-
-    {$limit = 10}
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css">
-    <script src="https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js"></script>
-
-    {$i = 1}
-    <div class="title">Хиты продаж</div>
-    <div style="margin: 0 -5px">
-        <div id="hits-slider">
-            {foreach $products as $product}
-                {if $i<=$limit}
-                    <div class="sidebar-product" style="width: 215px">
-                        {include file="./product_sidebar.html"}
-                    </div>
-                {/if}
-                {$i = $i+1}
-            {/foreach}
-        </div>
-    </div>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#hits-slider').bxSlider();
-        });
-    </script>
 </div>
