@@ -1469,7 +1469,7 @@ class waSystem
                 $class_name = $event_app_id.ucfirst($plugin_id).'Plugin';
                 if (!class_exists($class_name)) {
                     if (waSystemConfig::isDebug()) {
-                        waLog::log('Event handler class does not exist: '.$class_name);
+                        //waLog::log('Event handler class does not exist: '.$class_name);
                     }
                     continue;
                 }
