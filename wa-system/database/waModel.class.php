@@ -12,6 +12,7 @@
  * @package wa-system
  * @subpackage database
  */
+
 class waModel
 {
     const INSERT_ON_DUPLICATE_KEY_UPDATE = 1;
@@ -65,6 +66,7 @@ class waModel
     //private $readonly   = false;
 
     protected $use_config_db_name = false; //VADIM CODE
+
     /**
      * @param string $type
      * @param bool $writable
@@ -74,7 +76,7 @@ class waModel
         $this->writable = $writable;
         $this->type = $type ? $type : 'default';
         // VADIM CODE START
-        if(!is_array($type)) {
+        if (!is_array($type)) {
             $this->type = $this->getDBSheme($type ? $type : 'default');
         }
         // VADIM CODE END
@@ -91,14 +93,14 @@ class waModel
     public function getMetadata()
     {
         if ($this->table && !$this->fields) {
-            $runtime_cache = new waRuntimeCache('db/'.$this->table);
+            $runtime_cache = new waRuntimeCache('db/' . $this->table);
             if ($this->fields = $runtime_cache->get()) {
                 return $this->fields;
             }
             if (SystemConfig::isDebug()) {
                 $this->fields = $this->getFields();
             } else {
-                $cache = new waSystemCache('db/'.$this->table);
+                $cache = new waSystemCache('db/' . $this->table);
                 if (!($this->fields = $cache->get())) {
                     $this->fields = $this->getFields();
                     $cache->set($this->fields);
@@ -238,31 +240,32 @@ class waModel
     private function run($sql, $unbuffer = false)
     {
         $sql = trim($sql);
-        if(waDebugger::isDebug()){
+
+        if (waDebugger::isDebug()) {
             $time_start = microtime(1);
         }
         $result = $this->adapter->query($sql);
-        if(waDebugger::isDebug()){
+        if (waDebugger::isDebug()) {
             $time_end = microtime(1);
         }
         if (!$result) {
-            $error = "Query Error\nQuery: ".$sql.
-                     "\nError: ".$this->adapter->errorCode().
-                     "\nMessage: ".$this->adapter->error();
+            $error = "Query Error\nQuery: " . $sql .
+                "\nError: " . $this->adapter->errorCode() .
+                "\nMessage: " . $this->adapter->error();
             $trace = debug_backtrace();
             $stack = "";
             $default = array('file' => 'n/a', 'line' => 'n/a');
             foreach ($trace as $i => $row) {
                 $row = array_merge($row, $default);
-                $stack .= $i.". ".$row['file'].":".$row['line']."\n".
-                     (isset($row['class']) ? $row['class'] : '').
-                     (isset($row['type']) ? $row['type'] : '').
-                     $row['function']."()\n";
+                $stack .= $i . ". " . $row['file'] . ":" . $row['line'] . "\n" .
+                    (isset($row['class']) ? $row['class'] : '') .
+                    (isset($row['type']) ? $row['type'] : '') .
+                    $row['function'] . "()\n";
             }
-            waLog::log($error."\nStack:\n".$stack, 'db.log');
+            waLog::log($error . "\nStack:\n" . $stack, 'db.log');
             throw new waDbException($error, $this->adapter->errorCode());
         }
-        if(waDebugger::isDebug()){
+        if (waDebugger::isDebug()) {
             waDebugger::getInstance()->addQuery($sql, $time_start, $time_end);
         }
 
@@ -306,7 +309,11 @@ class waModel
         }
         $waDbQueryAnalyzer = new waDbQueryAnalyzer($sql);
         switch ($waDbQueryAnalyzer->getQueryType()) {
-            case 'update': case 'replace': case 'delete': case 'insert': $this->cleanCache();
+            case 'update':
+            case 'replace':
+            case 'delete':
+            case 'insert':
+                $this->cleanCache();
         }
 
         if (func_num_args() > 2) {
@@ -345,14 +352,14 @@ class waModel
                 $params = array($params);
             }
             //VADIM CODE START
-            if(waDebugger::isDebug()){
+            if (waDebugger::isDebug()) {
                 $time_start = microtime(1);
             }
             $res = $this->prepare($sql)->query($params);
-            if(waDebugger::isDebug()){
+            if (waDebugger::isDebug()) {
                 $time_end = microtime(1);
             }
-            if(waDebugger::isDebug()){
+            if (waDebugger::isDebug()) {
                 waDebugger::getInstance()->addQuery($sql, $time_start, $time_end);
             }
             return $res;
@@ -372,8 +379,7 @@ class waModel
                 $this->cache = null;
 
                 return $result;
-            }
-            else{
+            } else {
             }
             $this->cache = null;
             return $cache;
@@ -446,14 +452,14 @@ class waModel
         $values = array();
         foreach ($data as $f => $value) {
             if (isset($this->fields[$f])) {
-                $values[] = $this->escapeField($f)." = ".$this->getFieldValue($f, $value);
+                $values[] = $this->escapeField($f) . " = " . $this->getFieldValue($f, $value);
             }
         }
 
         if ($values && $where) {
-            $sql = "UPDATE ".($options ? $options." " : "").$this->table."
-                   SET ".implode(", ", $values)."
-                   WHERE ".$where;
+            $sql = "UPDATE " . ($options ? $options . " " : "") . $this->table . "
+                   SET " . implode(", ", $values) . "
+                   WHERE " . $where;
             if ($return_object) {
                 return $this->query($sql);
             } else {
@@ -483,8 +489,8 @@ class waModel
             }
         }
         if ($values) {
-            $sql = "REPLACE INTO ".$this->table."
-                   (".implode(", ", array_keys($values)).") VALUES (".implode(", ", $values).")";
+            $sql = "REPLACE INTO " . $this->table . "
+                   (" . implode(", ", array_keys($values)) . ") VALUES (" . implode(", ", $values) . ")";
             return $this->exec($sql);
         }
         return true;
@@ -522,14 +528,14 @@ class waModel
             case 'tinyint':
             case 'int':
             case 'integer':
-                return (int) $value;
+                return (int)$value;
             case 'decimal':
             case 'double':
             case 'float':
                 if (strpos($value, ',') !== false) {
                     $value = str_replace(',', '.', $value);
                 }
-                return str_replace(',', '.', (double) $value);
+                return str_replace(',', '.', (double)$value);
             case 'date':
                 if (!$value) {
                     if ($is_null) {
@@ -538,7 +544,7 @@ class waModel
                         return "'0000-00-00'";
                     }
                 }
-                return "'".$this->escape($value)."'";
+                return "'" . $this->escape($value) . "'";
             case 'datetime':
                 if (!$value) {
                     if ($is_null) {
@@ -547,12 +553,12 @@ class waModel
                         return "'0000-00-00 00:00:00'";
                     }
                 }
-                return "'".$this->escape($value)."'";
+                return "'" . $this->escape($value) . "'";
             case 'varchar':
             case 'string':
             case 'text':
             default:
-                return "'".$this->escape($value)."'";
+                return "'" . $this->escape($value) . "'";
         }
     }
 
@@ -571,14 +577,16 @@ class waModel
     public function insert($data, $type = 0)
     {
         $values = array();
+
         foreach ($data as $field => $value) {
             if (isset($this->fields[$field])) {
                 $values[$this->escapeField($field)] = $this->getFieldValue($field, $value);
             }
         }
+
         if ($values) {
-            $sql = "INSERT ".($type === 2 ? "IGNORE " : "")." INTO ".$this->table."
-                   (".implode(", ", array_keys($values)).") VALUES (".implode(", ", $values).")";
+            $sql = "INSERT " . ($type === 2 ? "IGNORE " : "") . " INTO " . $this->table . "
+                   (" . implode(", ", array_keys($values)) . ") VALUES (" . implode(", ", $values) . ")";
             if ($type === 1 || $type === true) {
                 $sql .= " ON DUPLICATE KEY UPDATE ";
                 if (is_array($this->id)) {
@@ -595,7 +603,7 @@ class waModel
                     } else {
                         $comma = true;
                     }
-                    $sql .= $field." = VALUES(".$field.")";
+                    $sql .= $field . " = VALUES(" . $field . ")";
                 }
             }
             if (!$this->isAutoIncrement()) {
@@ -749,7 +757,7 @@ class waModel
      */
     public function getAll($key = null, $normalize = false)
     {
-        $sql = "SELECT * FROM ".$this->table;
+        $sql = "SELECT * FROM " . $this->table;
         return $this->query($sql)->fetchAll($key, $normalize);
     }
 
@@ -760,7 +768,7 @@ class waModel
      */
     public function countAll()
     {
-        return $this->query("SELECT COUNT(*) FROM ".$this->table)->fetchField();
+        return $this->query("SELECT COUNT(*) FROM " . $this->table)->fetchField();
     }
 
     /**
@@ -775,7 +783,7 @@ class waModel
         if (is_array($data)) {
             foreach ($data as $key => $value) {
                 if ($type === 'int') {
-                    $data[$key] = (int) $value;
+                    $data[$key] = (int)$value;
                 } elseif ($type === 'like') {
                     $value = str_replace('\\', '\\\\', $value);
                     $data[$key] = str_replace(array('%', '_'), array('\%', '\_'), $this->adapter->escape($value));
@@ -787,7 +795,7 @@ class waModel
         }
         switch ($type) {
             case 'int':
-                return (int) $data;
+                return (int)$data;
             case 'like':
                 $data = str_replace('\\', '\\\\', $data);
                 return str_replace(array('%', '_'), array('\%', '\_'), $this->adapter->escape($data));
@@ -867,13 +875,13 @@ class waModel
             $all = $value;
             $value = false;
         }
-        $sql = "SELECT * FROM ".$this->table;
+        $sql = "SELECT * FROM " . $this->table;
         $where = $this->getWhereByField($field, $value);
         if ($where != '') {
-            $sql .= " WHERE ".$where;
+            $sql .= " WHERE " . $where;
         }
         if ($limit) {
-            $sql .= " LIMIT ".(int) $limit;
+            $sql .= " LIMIT " . (int)$limit;
         } elseif (!$all) {
             $sql .= " LIMIT 1";
         }
@@ -892,7 +900,7 @@ class waModel
      *
      * @param string|array $field
      * @param string|array $value
-     * @param string|bool  $add_table_name table alias to prefix field names with; true to use original table name.
+     * @param string|bool $add_table_name table alias to prefix field names with; true to use original table name.
      * @throws waException when field does not exist.
      * @return string
      */
@@ -912,7 +920,7 @@ class waModel
 
         // Table prefix for field names
         if ($add_table_name) {
-            $prefix = is_string($add_table_name) ? $add_table_name."." : $this->table.".";
+            $prefix = is_string($add_table_name) ? $add_table_name . "." : $this->table . ".";
         } else {
             $prefix = "";
         }
@@ -923,7 +931,7 @@ class waModel
                 throw new waException(sprintf(_ws('Unknown field %s'), $field));
             }
             if ($value) {
-                return $prefix.$this->escapeField($field)." IN ('".implode("','", $this->escape($value))."')";
+                return $prefix . $this->escapeField($field) . " IN ('" . implode("','", $this->escape($value)) . "')";
             } else {
                 // analog field IN ('') - it's always false
                 return '0';
@@ -931,8 +939,8 @@ class waModel
         }
 
         // Single field, single value
-        return $prefix.$this->escapeField($field).
-                       ($value === null ? " IS NULL" : " = ".$this->getFieldValue($field, $value));
+        return $prefix . $this->escapeField($field) .
+            ($value === null ? " IS NULL" : " = " . $this->getFieldValue($field, $value));
     }
 
     /**
@@ -944,9 +952,9 @@ class waModel
      */
     public function countByField($field, $value = null)
     {
-        $sql = "SELECT COUNT(*) FROM ".$this->table;
+        $sql = "SELECT COUNT(*) FROM " . $this->table;
         if ($where = $this->getWhereByField($field, $value)) {
-            $sql .= " WHERE ".$where;
+            $sql .= " WHERE " . $where;
         }
         return $this->query($sql)->fetchField();
     }
@@ -979,7 +987,7 @@ class waModel
     public function deleteByField($field, $value = null)
     {
         if ($where = $this->getWhereByField($field, $value)) {
-            $sql = "DELETE FROM ".$this->table." WHERE ".$where;
+            $sql = "DELETE FROM " . $this->table . " WHERE " . $where;
             return $this->exec($sql);
         }
         return true;
@@ -1010,7 +1018,7 @@ class waModel
                 return false;
             }
             try {
-                $this->query("SELECT ".$this->escapeField($field[1])." FROM ".$field[0]." WHERE 0");
+                $this->query("SELECT " . $this->escapeField($field[1]) . " FROM " . $field[0] . " WHERE 0");
                 return true;
             } catch (waDbException $e) {
                 return false;
@@ -1127,22 +1135,39 @@ class waModel
     }
 
     // VADIM CODE START
-    private function getDBSheme($type = 'default'){
-        if($this->use_config_db_name){
+    private function getDBSheme($type = 'default')
+    {
+        if ($this->use_config_db_name) {
             $db = wa()->getDb();
-            if($db){
+            if ($db) {
                 return $db;
             }
         }
         return $type;
     }
 
-    public function setDb($db){
+    public function setDb($db)
+    {
         $this->type = $db;
     }
 
-    public function showScheme(){
-        echo "\nDB sheme is ".$this->getDBSheme()."\n";
+    public function showScheme()
+    {
+        echo "\nDB sheme is " . $this->getDBSheme() . "\n";
     }
+
+    /**
+     * Форматирует дату для добавления в базу
+     *
+     * @param $date
+     * @return false|string
+     */
+    public function formatDate($date)
+    {
+        $time = strtotime($date);
+
+        return date('Y-m-d', $time);
+    }
+
     // VADIM CODE END
 }
