@@ -24,6 +24,12 @@
     {$wa->js()}
     {$wa->headJs()}
 
+    {if $smarty.server.REQUEST_URI=='/'}
+        <meta property="og:locale" content="ru RU" />
+        <meta property="og:url" content="https://1mmtt.ru/" />
+
+    {/if}
+
     {* @event frontend_head.%plugin_id% *}
     {if isset($frontend_head)}
         {foreach $frontend_head as $_}{$_}{/foreach}
