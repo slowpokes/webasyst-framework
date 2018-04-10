@@ -24,8 +24,6 @@
     {$wa->js()}
     {$wa->headJs()}
 
-    {$wa->head()}
-
     {* @event frontend_head.%plugin_id% *}
     {if isset($frontend_head)}
         {foreach $frontend_head as $_}{$_}{/foreach}
