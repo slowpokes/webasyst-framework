@@ -37,7 +37,7 @@ class photosConfig extends waAppConfig
 
     public function onCount()
     {
-        return null;
+        return null;//VADIM CODE
         $photo_model = new photosPhotoModel();
         $count = $photo_model->countAll($t = $this->getLastLoginTime(false));
         return $count ? $count : null;

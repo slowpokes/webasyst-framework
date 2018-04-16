@@ -87,6 +87,7 @@ class blogConfig extends waAppConfig
 
     public function onCount()
     {
+        return null;//VADIM CODE
         $full = !func_get_args();
 
         $app = $this->getApplication();
