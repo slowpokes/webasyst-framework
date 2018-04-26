@@ -24,6 +24,7 @@ class installerConfig extends waAppConfig
 
     public function onCount()
     {
+        return null;//VADIM CODE
         $args = func_get_args();
         $force = array_shift($args);
 
