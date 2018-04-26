@@ -14,8 +14,13 @@ return array(
     'params' => array(
         'blog_url_type' => array(
             'name'  => _w('Published blogs & URLs'),
-            'type'  => 'radio_select',
+            'type'  => 'radio_checkbox',
             'items' => array(
+                -2 => array(
+                    'name'        => 'Выбранные блоги',
+                    'description' => sprintf(_w('Post URLs: <strong>%s</strong>'), '/post_url/', 'none'),
+                    'items'       => $blog_model ? $blog_model->select('id,name')->where("status='".blogBlogModel::STATUS_PUBLIC."'")->fetchAll('id', true) : array(),
+                ),
                 -1 => array(
                     'name'        => sprintf(_w('All blogs. Plain URLs (%s)'), '/post_url/'),
                     'description' => sprintf(_w('<br />Post URLs: <strong>%s</strong>, e.g. %s<br />Blog post list URLs: <strong>%s</strong>, e.g. %s'),
@@ -28,11 +33,11 @@ return array(
                         '/blog_url/post_url/', '/misc/my-first-post/',
                         '/blog_url/', '/misc/, /family/'),
                 ),
-                array(
+             /*   array(
                     'name'        => _w('One blog'),
                     'description' => sprintf(_w('Post URLs: <strong>%s</strong>'), '/post_url/', 'none'),
                     'items'       => $blog_model ? $blog_model->select('id,name')->where("status='".blogBlogModel::STATUS_PUBLIC."'")->fetchAll('id', true) : array(),
-                ),
+                ),*/
             ),
         ),
         'post_url_type' => array(

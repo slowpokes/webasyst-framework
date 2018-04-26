@@ -7,7 +7,7 @@ class blogFrontController extends waFrontController
         if (!$plugin && $module == 'frontend') {
             try {
                 if (!waRequest::param('page_id')) {
-                    $request_url = parse_url($this->system->getRootUrl().$this->system->getConfig()->getRequestUrl());
+                    $request_url = parse_url($this->system->getRootUrl() . $this->system->getConfig()->getRequestUrl());
                     if (isset($request_url['path']) && $request_url['path'] && (substr($request_url['path'], -1) != '/')) {
                         $request_url['path'] .= '/';
                         $this->system->getResponse()->redirect(implode('', $request_url), 301);
@@ -19,14 +19,21 @@ class blogFrontController extends waFrontController
                 #determine blog ID which are dependent on routing settings
                 $blog_model = new blogBlogModel();
                 $blogs = array();
-                $params['blog_url_type'] = waRequest::param('blog_url_type', 0, waRequest::TYPE_INT);
+
+                if (is_array($params['blog_url_type'])) {
+                    $params['blog_url_type'] = waRequest::param('blog_url_type', [], waRequest::TYPE_ARRAY);
+                } else {
+                    $params['blog_url_type'] = waRequest::param('blog_url_type', 0, waRequest::TYPE_INT);
+                }
+
                 if (!($title = waRequest::param('title'))) {
                     $title = wa()->accountName();
                 }
 
                 $blog_url = waRequest::param('blog_url', '', waRequest::TYPE_STRING_TRIM);
                 $main_page = false;
-                if ($params['blog_url_type'] > 0) {
+
+                if ($params['blog_url_type'] > 0 && !is_array($params['blog_url_type'])) {
                     if ($blog = $blog_model->getByField(array('id' => $params['blog_url_type'], 'status' => blogBlogModel::STATUS_PUBLIC))) {
                         $blogs[] = $blog;
                         $main_page = true;
@@ -34,6 +41,10 @@ class blogFrontController extends waFrontController
                 } elseif (strlen($blog_url)) {
                     if ($blog = $blog_model->getBySlug($blog_url, true, array('id', 'name', 'url'))) {
                         $blogs[] = $blog;
+                    }
+                } elseif (is_array($params['blog_url_type'])) {
+                    if ($blog = $blog_model->select('id, name, url')->where("`id` IN('" . implode("', '", $params['blog_url_type']) . "')")->fetchAll('id')) {
+                        $blogs = $blog;
                     }
                 } else {
                     $blogs = blogHelper::getAvailable();
@@ -47,7 +58,7 @@ class blogFrontController extends waFrontController
                 }
 
                 if ($blogs) {
-                    if ((count($blogs) == 1) && (($params['blog_url_type'] != 0) || strlen($blog_url))) {
+                    if ((count($blogs) == 1) && (($params['blog_url_type'] != 0) || strlen($blog_url)) && !is_array($params['blog_url_type'])) {
                         $blog = reset($blogs);
                         $params['blog_id'] = intval($blog['id']);
                         $params['blog_url'] = $blog['url'];
@@ -66,13 +77,13 @@ class blogFrontController extends waFrontController
                 } else {
                     throw new waException(_w('Blog not found'), 404);
                 }
-                
+
                 wa()->getResponse()->setTitle($title);
                 if ($main_page) {
                     wa()->getResponse()->setMeta('keywords', waRequest::param('meta_keywords'));
                     wa()->getResponse()->setMeta('description', waRequest::param('meta_description'));
                 }
-                
+
 
                 waRequest::setParam($params);
                 parent::execute($plugin, $module, $action, $default);
