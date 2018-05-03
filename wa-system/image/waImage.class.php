@@ -12,20 +12,21 @@
  * @package wa-system
  * @subpackage image
  */
+
 class waImage
 {
-    const NONE    = 'NONE';
-    const AUTO    = 'AUTO';
+    const NONE = 'NONE';
+    const AUTO = 'AUTO';
     const INVERSE = 'INVERSE';
-    const WIDTH   = 'WIDTH';
-    const HEIGHT  = 'HEIGHT';
+    const WIDTH = 'WIDTH';
+    const HEIGHT = 'HEIGHT';
 
     const CENTER = 'CENTER';
     const BOTTOM = 'BOTTOM';
 
-    const ALIGN_TOP_LEFT     = 'ALIGN_TOP_LEFT';
-    const ALIGN_TOP_RIGHT    = 'ALIGN_TOP_RIGHT';
-    const ALIGN_BOTTOM_LEFT  = 'ALIGN_BOTTOM_LEFT';
+    const ALIGN_TOP_LEFT = 'ALIGN_TOP_LEFT';
+    const ALIGN_TOP_RIGHT = 'ALIGN_TOP_RIGHT';
+    const ALIGN_BOTTOM_LEFT = 'ALIGN_BOTTOM_LEFT';
     const ALIGN_BOTTOM_RIGHT = 'ALIGN_BOTTOM_RIGHT';
     const ALIGN_CENTER = 'ALIGN_CENTER';
 
@@ -56,19 +57,19 @@ class waImage
         try {
             $file = realpath($file);
             $image_info = @getimagesize($file);
+        } catch (Exception $e) {
         }
-        catch (Exception $e){}
         if (empty($file) OR empty($image_info)) {
-            if(!preg_match('//u', $file)) {
-                $file = iconv('windows-1251','utf-8',$file);
+            if (!preg_match('//u', $file)) {
+                $file = iconv('windows-1251', 'utf-8', $file);
             }
-            throw new waException(_ws('Not an image or invalid image: ').$file);
+            throw new waException(_ws('Not an image or invalid image: ') . $file);
         }
-        $this->file   = $file;
-        $this->width  = $image_info[0];
+        $this->file = $file;
+        $this->width = $image_info[0];
         $this->height = $image_info[1];
-        $this->type   = $image_info[2];
-        $this->mime   = image_type_to_mime_type($this->type);
+        $this->type = $image_info[2];
+        $this->mime = image_type_to_mime_type($this->type);
 
     }
 
@@ -79,20 +80,22 @@ class waImage
      */
     public function getExt()
     {
-        switch ($this->type)
-        {
-            case IMAGETYPE_JPEG: {
-                return 'jpg';
-                break;
-            }
-            case IMAGETYPE_GIF: {
-                return 'gif';
-                break;
-            }
-            case IMAGETYPE_PNG: {
-                return 'png';
-                break;
-            }
+        switch ($this->type) {
+            case IMAGETYPE_JPEG:
+                {
+                    return 'jpg';
+                    break;
+                }
+            case IMAGETYPE_GIF:
+                {
+                    return 'gif';
+                    break;
+                }
+            case IMAGETYPE_PNG:
+                {
+                    return 'png';
+                    break;
+                }
         }
         return null;
     }
@@ -106,7 +109,7 @@ class waImage
         }
         $adapters[] = self::Imagick;
         $adapters[] = self::Gd;
-        foreach($adapters as $adapter) {
+        foreach ($adapters as $adapter) {
             if (extension_loaded(strtolower($adapter))) {
                 break;
             } else {
@@ -131,7 +134,7 @@ class waImage
             $adapter = self::getDefaultAdapter();
         }
 
-        $class = 'waImage'.$adapter;
+        $class = 'waImage' . $adapter;
 
         if (!class_exists($class, true)) {
             throw new waException(sprintf(_ws('Not %s image adapter'), $adapter));
@@ -174,47 +177,33 @@ class waImage
      */
     public function resize($width = null, $height = null, $master = null, $deny_exceed_original_sizes = true)
     {
-        if (!$master)
-        {
+        if (!$master) {
             $master = self::AUTO;
-        }
-        elseif ($master == self::WIDTH && !empty($width))
-        {
+        } elseif ($master == self::WIDTH && !empty($width)) {
             $master = self::AUTO;
             $height = null;
-        }
-        elseif ($master == self::HEIGHT && ! empty($height))
-        {
+        } elseif ($master == self::HEIGHT && !empty($height)) {
             $master = self::AUTO;
             $width = null;
         }
 
-        if (empty($width))
-        {
-            if ($master === self::NONE)
-            {
+        if (empty($width)) {
+            if ($master === self::NONE) {
                 $width = $this->width;
-            }
-            else
-            {
+            } else {
                 $master = self::HEIGHT;
             }
         }
 
-        if (empty($height))
-        {
-            if ($master === self::NONE)
-            {
+        if (empty($height)) {
+            if ($master === self::NONE) {
                 $height = $this->height;
-            }
-            else
-            {
+            } else {
                 $master = self::WIDTH;
             }
         }
 
-        switch ($master)
-        {
+        switch ($master) {
             case self::AUTO:
                 {
                     $master = ($this->width / $width) > ($this->height / $height) ? self::WIDTH : self::HEIGHT;
@@ -227,8 +216,7 @@ class waImage
                 }
         }
 
-        switch ($master)
-        {
+        switch ($master) {
             case self::WIDTH:
                 {
                     $height = $this->height * $width / $this->width;
@@ -241,7 +229,7 @@ class waImage
                 }
         }
 
-        $width  = max(round($width), 1);
+        $width = max(round($width), 1);
         $height = max(round($height), 1);
 
         if ($deny_exceed_original_sizes && ($width > $this->width || $height > $this->height)) {
@@ -265,7 +253,7 @@ class waImage
      */
     public function rotate($degrees)
     {
-        $degrees = (int) $degrees;
+        $degrees = (int)$degrees;
         $this->_rotate($degrees);
         return $this;
     }
@@ -294,46 +282,34 @@ class waImage
         $width = ($width > $this->width) ? $this->width : $width;
         $height = ($height > $this->height) ? $this->height : $height;
 
-        if ($offset_x === self::CENTER)
-        {
+        if ($offset_x === self::CENTER) {
             //Center
             $offset_x = round(($this->width - $width) / 2);
-        }
-        elseif ($offset_x === self::BOTTOM)
-        {
+        } elseif ($offset_x === self::BOTTOM) {
             //Bottom
             $offset_x = $this->width - $width;
-        }
-        elseif ($offset_x < 0)
-        {
+        } elseif ($offset_x < 0) {
             $offset_x = $this->width - $width + $offset_x;
         }
 
-        if ($offset_y === self::CENTER)
-        {
+        if ($offset_y === self::CENTER) {
             //Center
             $offset_y = round(($this->height - $height) / 2);
-        }
-        elseif ($offset_y === self::BOTTOM)
-        {
+        } elseif ($offset_y === self::BOTTOM) {
             //Bottom
             $offset_y = $this->height - $height;
-        }
-        elseif ($offset_y < 0)
-        {
+        } elseif ($offset_y < 0) {
             $offset_y = $this->height - $height + $offset_y;
         }
 
-        $max_width  = $this->width  - $offset_x;
+        $max_width = $this->width - $offset_x;
         $max_height = $this->height - $offset_y;
 
-        if ($width > $max_width)
-        {
+        if ($width > $max_width) {
             $width = $max_width;
         }
 
-        if ($height > $max_height)
-        {
+        if ($height > $max_height) {
             $height = $max_height;
         }
 
@@ -358,19 +334,21 @@ class waImage
      */
     public function save($file = null, $quality = 100)
     {
-        if (!$file)    {
+        if (!$file) {
             $file = $this->file;
         }
-        if (is_file($file))    {
+
+        if (is_file($file)) {
             if (!is_writable($file)) {
-                if(!preg_match('//u', $file)) {
-                    $file = iconv('windows-1251','utf-8',$file);
+                if (!preg_match('//u', $file)) {
+                    $file = iconv('windows-1251', 'utf-8', $file);
                 }
-                throw new waException(_ws('File must be writable: ').$file);
+                throw new waException(_ws('File must be writable: ') . $file);
             }
         }
 
         $quality = min(max($quality, 1), 100);
+
         return $this->_save($file, $quality);
     }
 

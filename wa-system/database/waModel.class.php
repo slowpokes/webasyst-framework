@@ -438,6 +438,7 @@ class waModel
      * </pre>
      *
      * @return bool|null|waDbResultUpdate Result of query execution
+     * @throws waException
      */
     public function updateByField($field, $value, $data = null, $options = null, $return_object = false)
     {

@@ -323,7 +323,7 @@ class waContactAddressOneLineFormatter extends waContactFieldFormatter
  * Currently not used. */
 class waContactAddressSeveralLinesFormatter extends waContactAddressOneLineFormatter
 {
-    public function format($data)
+    public function format($data, $format = null)
     {
         $parts = $this->getParts($data);
 
@@ -360,7 +360,7 @@ class waContactAddressSeveralLinesFormatter extends waContactAddressOneLineForma
 
 class waContactAddressDataFormatter extends waContactAddressOneLineFormatter
 {
-    public function format($data)
+    public function format($data, $format = null)
     {
         $parts = $this->getParts($data);
         $data['value'] = array();
