@@ -17,6 +17,11 @@ return array(
         'title'        => 'Запрашивать индекс',
         'control_type' => waHtmlControl::CHECKBOX,
     ),
+    'show_description'  => array(
+        'value'        => '',
+        'title'        => 'Показывать описание',
+        'control_type' => waHtmlControl::CHECKBOX,
+    ),
     'uniq_id'  => array(
         'value'        => '',
         'title'        => 'ID',
