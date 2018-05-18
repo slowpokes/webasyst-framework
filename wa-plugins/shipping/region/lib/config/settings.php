@@ -30,6 +30,11 @@ return array(
         'control_type' => waHtmlControl::SELECT,
         'options'      => waShipping::getTypes(),
     ),
+    'show_description'  => array(
+        'value'        => '',
+        'title'        => 'Показывать описание',
+        'control_type' => waHtmlControl::CHECKBOX,
+    ),
     'regions' => array(
         'title' => 'Регионы',
         'control_type' => waHtmlControl::CUSTOM.' '.'regionShipping::settingRegionControl',
