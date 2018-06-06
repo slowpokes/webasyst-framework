@@ -27,6 +27,7 @@ class cityShipping extends waShipping
                     'rate' => $order_price >= $this->free_shipping ? 0 : $data['price'],
                     'params' => array(
                         'shipment_type' => $this->shipment_type,
+                        'commission' => $this->getSettings('commission')
                     ),
                 ),
             );
