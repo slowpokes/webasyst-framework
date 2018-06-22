@@ -24,6 +24,12 @@ return array(
         'description' => 'Укажите сумму, на которую будет увеличена (уменьшена) стоимость доставки всех регионов',
         'control_type' => waHtmlControl::CUSTOM.' '.'regionShipping::settingChangeShippingAmountControl',
     ),
+    'commission' => array(
+        'value'        => '0',
+        'title'        => 'Плата за сумму объявленной ценности посылки',
+        'description'  => 'Укажите размер комиссии в процентах. Например, укажите 4, если с каждого рубля взимается 4 копейки.',
+        'control_type' => waHtmlControl::INPUT,
+    ),
     'shipment_type'  => array(
         'value'        => '',
         'title'        => 'Тип доставки',

@@ -25,6 +25,8 @@ class regionShipping extends waShipping
                         }
                     }
 
+                    $rate += $order_price * ($this->commission / 100);
+
                     return array(
                         'delivery' => array(
                             'est_delivery' => $time,
