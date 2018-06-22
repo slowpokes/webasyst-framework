@@ -13,6 +13,15 @@ return array(
         'password' => 't7bLHYTQ',
         'url' => 'https://api.accordpost.ru/ff/v1/wsrv'
     ),
+    'logsis_api' => array(
+        'api_key' => '24f18c2f43cf454b141518290dc27f63',
+        'url' => 'http://cab.logsis.ru/apiv2/'
+    ),
+    'eway_api' => array(
+        'login' => 'OPDCL',
+        'password' => 'HDhZRiQ',
+        'url' => 'https://lk.easyway.ru/EasyWay/hs/EWA_API/v2/'
+    ),
     'hermes_api'=> array(
         'login' => 'aromacode2',
         'password' => '&^=0]X%)',
@@ -67,18 +76,9 @@ return array(
         'sdtems' => 'Почта EMS',
         'sdtkaz' => 'Почта СНГ Казахстан',
         'sdtbel' => 'Почта СНГ Беларусь',
-
-        /* 'ruspost' => 'Почта России',
-         'post' => 'Почта России',
-         'ruspost1' => 'Почта России 1 класс',
-         'pr1' => 'Почта России 1 класс',
-         'ems' => 'Почта EMS',
-         'sng' => 'Почта СНГ',*/
-
         'b2c' => 'Курьер B2C',
         'cdek' => 'Курьер СДЭК',
         'moscow' => 'Курьер Мо',
-
         'cdekpickup' => 'ПВЗ - СДЭК',
         'hermes' => 'ПВЗ - Гермес'
     ),
@@ -115,7 +115,7 @@ return array(
     'barcodes_limit' => 10,
     'php_path' => 'php',
     'status_assembly' => 'processing',
- /*   'company' => array(
+    'company' => array(
         'name' => 'Лидер Бренд',
         'boss' => 'Юдин Д.Г.',
         'address' => '115191, г.Москва, ул. 2-я Рощинская, д.4, оф.503',
@@ -126,36 +126,10 @@ return array(
         'bank' => 'ТОЧКА ПАО БАНКА "ФК ОТКРЫТИЕ"',
         'kor' => '30101810845250000999',
         'bik' => '044525999'
-    ),*/
+    ),
     /******************
      * DATABASES *
      ******************/
-    'databases' => array(
-        'mmtt' => array(
-            'id_contact' => 'default',
-            'prefix' => '#MT-',
-            'cli' => 'php /home/bd9/bd9.ru/cli.php shop_mmtt consolePluginUpdate',
-            'url' => 'http://bd9.ru/webasyst/shop_mmtt/',
-        ),
-        'aromateca' => array(
-            'id_contact' => 'default',
-            'prefix' => 'AR-',
-            'cli' => 'php /home/bd9/bd9.ru/cli.php shop_aromateca consolePluginUpdate',
-            'url' => 'http://bd9.ru/webasyst/shop_aromateca/',
-        ),
-        'magic' => array(
-            'id_contact' => 'default',
-            'prefix' => 'MG-',
-            'cli' => 'php /home/bd9/bd9.ru/cli.php shop_magic consolePluginUpdate',
-            'url' => 'http://bd9.ru/webasyst/shop_magic/',
-        ),
-        'cttt' => array(
-            'id_contact' => 'default',
-            'prefix' => 'CT-',
-            'cli' => 'php /home/bd9/bd9.ru/cli.php shop_cttt consolePluginUpdate',
-            'url' => 'http://bd9.ru/webasyst/shop_cttt/',
-        ),
-    ),
     'company' => array(
         'name' => 'Стандарт Сервис',
         'boss' => 'Курков Ю. Е.',
@@ -177,7 +151,10 @@ return array(
             'b2c' => array(18),
             'hermes' => array(19),
             'cdek' => array(25),
-            'post' => array(14),
+            'sdtpost' => array(14),
+            'eway' => array(14),
+            'logsis' => array(14),
+            'ewaypickup' => array(31),
             'pr1' => array(16),
             'sng' => array(23, 24),
             'ems' => array(26),

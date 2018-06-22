@@ -19,8 +19,8 @@ class waLogModel extends waModel
             $actions = $config->getLogActions();
             // Check action
             if (!isset($actions[$action])) {
-                if (waSystemConfig::isDebug()&&false) {//VADIM CODE
-                    throw new waException('Unknown action for log '.$action);
+                if (waSystemConfig::isDebug() && false) {//VADIM CODE
+                    throw new waException('Unknown action for log ' . $action);
                 } else {
                     return false;
                 }
@@ -54,22 +54,22 @@ class waLogModel extends waModel
     {
         $where_string = "l.action != 'login' AND l.action != 'logout'";
         if (!empty($where['max_id'])) {
-            $where_string .= ' AND l.id < '.(int)$where['max_id'];
+            $where_string .= ' AND l.id < ' . (int)$where['max_id'];
             unset($where['max_id']);
         }
         if (!empty($where['min_id'])) {
-            $where_string .= ' AND l.id > '.(int)$where['min_id'];
+            $where_string .= ' AND l.id > ' . (int)$where['min_id'];
             unset($where['min_id']);
         }
         $where = array_intersect_key($where, $this->getMetadata());
         if ($where) {
-            $where_string .= ' AND ('.$this->getWhereByField($where).')';
+            $where_string .= ' AND (' . $this->getWhereByField($where) . ')';
         }
         $sql = "SELECT l.*, c.name contact_name, c.photo contact_photo, c.firstname, c.lastname, c.middlename,
 c.company, c.is_company, c.is_user
-                FROM ".$this->table." l
+                FROM " . $this->table . " l
                 LEFT JOIN wa_contact c ON l.contact_id = c.id
-                WHERE ".$where_string."
+                WHERE " . $where_string . "
                 ORDER BY l.id DESC
                 LIMIT 50";
         return $this->query($sql)->fetchAll();

@@ -17,6 +17,17 @@ return array(
         'title'        => 'Запрашивать индекс',
         'control_type' => waHtmlControl::CHECKBOX,
     ),
+    'show_description'  => array(
+        'value'        => '',
+        'title'        => 'Показывать описание',
+        'control_type' => waHtmlControl::CHECKBOX,
+    ),
+    'commission'  => array(
+        'value'        => '0',
+        'title'        => 'Надбавочная стомость от стоимости заказа',
+        'control_type' => waHtmlControl::INPUT,
+        'description'  => 'Укажите процентную ставку, которая будет дополнительно прибавляться к сумме доставки в зависимости от суммы заказа (только наложенный платеж)',
+    ),
     'uniq_id'  => array(
         'value'        => '',
         'title'        => 'ID',

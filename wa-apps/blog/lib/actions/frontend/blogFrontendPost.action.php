@@ -119,6 +119,7 @@ class blogFrontendPostAction extends blogViewAction
             }
             throw new waException(_w('Post not found'), 404);
         }
+
         $this->getRequest()->setParam('blog_id', $post['blog_id']);
 
         if (isset($post['comments']) && !empty($post['comments'])) {

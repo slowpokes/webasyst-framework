@@ -27,9 +27,9 @@ function wa_dumpc()
     }
 
     // Show where we've been called from
-    if(function_exists('debug_backtrace')) {
+    if (function_exists('debug_backtrace')) {
         echo "dumped from ";
-        foreach(debug_backtrace() as $row) {
+        foreach (debug_backtrace() as $row) {
             if (ifset($row['file']) == __FILE__ || (empty($row['file']) && ifset($row['function']) == 'wa_dumpc')) {
                 continue;
             }
@@ -38,8 +38,8 @@ function wa_dumpc()
         }
     }
 
-    foreach(func_get_args() as $v) {
-        echo "\n".wa_dump_helper($v)."\n";
+    foreach (func_get_args() as $v) {
+        echo "\n" . wa_dump_helper($v) . "\n";
     }
     if (php_sapi_name() != 'cli') {
         echo "</pre>\n";
@@ -77,8 +77,8 @@ function wa_lambda($args, $body)
     }
 
     static $fn = array();
-    $hash = $args.md5($args.$body).md5($body);
-    if(!isset($fn[$hash])) {
+    $hash = $args . md5($args . $body) . md5($body);
+    if (!isset($fn[$hash])) {
         $fn[$hash] = create_function($args, $body);
     }
     return $fn[$hash];
@@ -89,7 +89,7 @@ function wa_lambda($args, $body)
  * Use of this function does not produce a notice for undefined vars and array indexes,
  * but has a side-effect of creating var or index with NULL value.
  */
-function ifset(&$var, $def=null)
+function ifset(&$var, $def = null)
 {
     if (isset($var)) {
         return $var;
@@ -102,7 +102,7 @@ function ifset(&$var, $def=null)
  * Use of this function does not produce a notice for undefined vars and array indexes,
  * but has a side-effect of creating var or index with NULL value.
  */
-function ifempty(&$var, $def=null)
+function ifempty(&$var, $def = null)
 {
     if (empty($var)) {
         return $def;
@@ -121,7 +121,7 @@ function wa_is_int($val)
         return false;
     }
     // typecast trick works fine for anything else except boolean true
-    return ($val !== true) && ((string)(int) $val) === ((string) $val);
+    return ($val !== true) && ((string)(int)$val) === ((string)$val);
 }
 
 /**
@@ -150,7 +150,7 @@ function wa_dump_helper(&$value, &$level_arr = array(), $cli = null)
 
     // Simple types
     if (is_resource($value)) {
-        return print_r($value, 1).' ('.get_resource_type($value).')';
+        return print_r($value, 1) . ' (' . get_resource_type($value) . ')';
     } else if (is_float($value)) {
         return print_r($value, 1);
     } else if (!is_array($value) && !is_object($value)) {
@@ -167,7 +167,7 @@ function wa_dump_helper(&$value, &$level_arr = array(), $cli = null)
     // So, we have a nested type like array or object.
     // Check for recursion, and build line break with tabs
     $br = "\n";
-    foreach($level_arr as $k => &$v) {
+    foreach ($level_arr as $k => &$v) {
         $br .= "  ";
 
         // Check for references we've already seen.
@@ -186,7 +186,7 @@ function wa_dump_helper(&$value, &$level_arr = array(), $cli = null)
             $same = true;
         }
         if ($same) {
-            return (is_object($value) ? get_class($value).' object' : 'Array').' ** RECURSION (level '.($k - $level).') **';
+            return (is_object($value) ? get_class($value) . ' object' : 'Array') . ' ** RECURSION (level ' . ($k - $level) . ') **';
         }
     }
     unset($v);
@@ -197,61 +197,63 @@ function wa_dump_helper(&$value, &$level_arr = array(), $cli = null)
             $huge_classes = array_flip(array('waSystem', 'waModel', 'waSmarty3View', 'waViewHelper', 'waWorkflow', 'Smarty', 'Smarty_Internal_Template'));
             $class = get_class($value);
             do {
-                if(isset($huge_classes[$class])) {
-                    return get_class($value)." object { ** skipped".(isset($huge_classes[get_class($value)]) ? '' : " as a descendant of $class").' ** }';
+                if (isset($huge_classes[$class])) {
+                    return get_class($value) . " object { ** skipped" . (isset($huge_classes[get_class($value)]) ? '' : " as a descendant of $class") . ' ** }';
                 }
-            } while ( ( $class = get_parent_class($class)));
+            } while (($class = get_parent_class($class)));
         }
-        $str = get_class($value).' object';
+        $str = get_class($value) . ' object';
 
         // Cast to array to show protected and private members
-        $value_to_iterate = (array) $value;
+        $value_to_iterate = (array)$value;
 
         if ($value_to_iterate) {
-            $str .= $br.'{';
+            $str .= $br . '{';
         } else {
-            return $str.' {}';
+            return $str . ' {}';
         }
 
     } else {
         $str = 'Array';
         if ($value) {
-            $str .= $br.'(';
+            $str .= $br . '(';
         } else {
-            return $str.'()';
+            return $str . '()';
         }
         $value_to_iterate =& $value;
     }
 
     $level_arr[] = &$value;
-    foreach($value_to_iterate as $key => &$val) {
+    foreach ($value_to_iterate as $key => &$val) {
         if (!$cli) {
             $key = htmlspecialchars($key);
         }
-        $str .= $br."  ".$key.' => '.wa_dump_helper($val, $level_arr, $cli);
+        $str .= $br . "  " . $key . ' => ' . wa_dump_helper($val, $level_arr, $cli);
     }
     array_pop($level_arr);
 
-    $str .= is_array($value) ? $br.')' : $br.'}';
+    $str .= is_array($value) ? $br . ')' : $br . '}';
     return $str;
 }
 
 function wa_make_pattern($string, $separator = '/')
 {
-    $metacharacters = array('?','+','*','.','(',')','[',']','{','}','<','>','^','$');
+    $metacharacters = array('?', '+', '*', '.', '(', ')', '[', ']', '{', '}', '<', '>', '^', '$');
     $metacharacters[] = $separator;
-    foreach($metacharacters as &$char){
+    foreach ($metacharacters as &$char) {
         $char = "\\{$char}";
         unset($char);
     }
-    $cleanup_pattern = '@('.implode('|',$metacharacters).')@';
-    return preg_replace($cleanup_pattern,'\\\\$1',$string);
+    $cleanup_pattern = '@(' . implode('|', $metacharacters) . ')@';
+    return preg_replace($cleanup_pattern, '\\\\$1', $string);
 }
+
 // VADIM CODE START
-function remove_from_query_string($needle) {
+function remove_from_query_string($needle)
+{
     $query_string = $_SERVER['QUERY_STRING']; // Work on a seperate copy and preserve the original for now
-    $query_string = preg_replace("/\&$needle=[a-zA-Z0-9].*?(\&|$)/", '&',   $query_string);
-    $query_string = preg_replace("/(&)+/","&",$query_string); // Supposed to pull out all repeating &s, however it allows 2 in a row(&&). Good enough for now
+    $query_string = preg_replace("/\&$needle=[a-zA-Z0-9].*?(\&|$)/", '&', $query_string);
+    $query_string = preg_replace("/(&)+/", "&", $query_string); // Supposed to pull out all repeating &s, however it allows 2 in a row(&&). Good enough for now
     $_SERVER['QUERY_STRING'] = $query_string;
     unset($_GET[$needle]);
 }
@@ -265,7 +267,8 @@ function remove_from_query_string($needle) {
  * @param mixed $diff Result of diff
  * @return boolean If or not differ
  */
-function wa_array_diff_r($value1, $value2, &$diff) {
+function wa_array_diff_r($value1, $value2, &$diff)
+{
     if (is_array($value1) && is_array($value2)) {
         $kyes = array_unique(array_merge(array_keys($value1), array_keys($value2)));
         $result = false;
@@ -286,5 +289,30 @@ function wa_array_diff_r($value1, $value2, &$diff) {
         return false;
     }
 }
+
+/**
+ * Chelbeh code start
+ */
+
+/**
+ * Функция склонения числительных в русском языке
+ *
+ * @param int $number Число которое нужно просклонять
+ * @param array $titles Массив слов для склонения
+ * @param bool $just_word
+ * @return string
+ */
+function _p($number, $titles = [], $just_word = false)
+{
+    $cases = array(2, 0, 1, 1, 1, 2);
+    if ($just_word) {
+        return $titles[($number % 100 > 4 && $number % 100 < 20) ? 2 : $cases[min($number % 10, 5)]];
+    }
+    return $number . " " . $titles[($number % 100 > 4 && $number % 100 < 20) ? 2 : $cases[min($number % 10, 5)]];
+}
+
+/**
+ * Chelbeh code end
+ */
 
 

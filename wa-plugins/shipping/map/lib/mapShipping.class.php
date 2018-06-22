@@ -48,6 +48,7 @@ class mapShipping extends waShipping
                     'lat' => str_replace(',', '.', $point['lat']),
                     'lon' => str_replace(',', '.', $point['lon']),
                     'shipment_type' => $this->shipment_type,
+                    'commission' => $this->getSettings('commission')
                 ),
             );
         }
