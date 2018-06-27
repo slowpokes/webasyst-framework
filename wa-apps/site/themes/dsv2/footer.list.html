@@ -1,0 +1,16 @@
+<div class="col-md-{$md|default:4} col-sm-{$sm|default:6} col-xs-{$xs|default:6}">
+<div class="footer-column">{$mytitle|default:''}</div>
+{if count($array)}
+<ul class="list-unstyled {$ulclass|default:''}">
+{if !empty($hide)}
+	{foreach $array as $item}
+	{if !isset($item.{$hide})}<li><a href="{$item.url}">{$item.name}</a></li>{/if}
+	{/foreach}
+{else}
+	{foreach $array as $item}
+	<li><a href="{$item.url}">{$item.name}</a></li>
+	{/foreach}
+{/if}
+</ul>
+{/if}
+</div>

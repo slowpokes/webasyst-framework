@@ -1,0 +1,31 @@
+{function name="page_item" item=[]}
+    {if isset($item.childs)}
+        {if empty($item.parent_id)}
+            {$li = "dropdown"}
+        {else}
+            {$li = "dropdown-submenu"}
+        {/if}
+        <li class="{$li}{if $wa->currentUrl() == $item.url || $wa->currentUrl()|strstr:$item.url} active{/if}">
+            <a href="{$item.url}">{$item.name}</a>
+            <ul class="dropdown-menu">
+                {foreach $item.childs as $ic}
+                    {if isset($ic.nomenu)}{continue}{/if}
+                    {page_item item=$ic}
+                {/foreach}
+            </ul>
+        </li>
+    {else}
+        <li{if $wa->currentUrl() == $item.url} class="active"{/if}><a href="{$item.url}">{$item.name}</a></li>
+    {/if}
+{/function}
+
+<nav class="navbar navbar-default navbar-pages">
+    <div class="container">
+        <ul class="nav navbar-nav">
+            {foreach $_links as $a}
+                {if isset($a.nomenu)}{continue}{/if}
+                {page_item item=$a}
+            {/foreach}
+        </ul>
+    </div>
+</nav>

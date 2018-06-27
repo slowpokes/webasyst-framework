@@ -40,8 +40,7 @@
 	'opal' => '#005962',
 	'deepblue' => '#00275E'
 ]}
-<style>
-
+<style type="text/css">
 {if isset($customcolor) && isset($customhover)}
 	{$color1 = $customcolor}
 	{$color2 = $customhover}
@@ -49,16 +48,15 @@
 	{$color1 = $color[$theme]}
 	{$color2 = $hover[$theme]}
 {/if}
-
 /* theme color 1 */
 .{$theme} .theme-color,
 .{$theme} .theme-color-wh,
-.{$theme} .navbar-default .navbar-nav>.active>a,
-.{$theme} .navbar-default .navbar-nav>.active>a:hover,
-.{$theme} .navbar-default .navbar-nav>.active>a:focus,
-.{$theme} .navbar-default .navbar-nav .selected>a,
-.{$theme} .navbar-default .navbar-nav .selected>a:hover,
-.{$theme} .navbar-default .navbar-nav .selected>a:focus,
+.{$theme} .navbar-categories .navbar-nav>.active>a,
+.{$theme} .navbar-categories .navbar-nav>.active>a:hover,
+.{$theme} .navbar-categories .navbar-nav>.active>a:focus,
+.{$theme} .navbar-categories .navbar-nav .selected>a,
+.{$theme} .navbar-categories .navbar-nav .selected>a:hover,
+.{$theme} .navbar-categories .navbar-nav .selected>a:focus,
 .{$theme} #cart.highlight>a .fa,
 .{$theme} .wa-horizontal .wa-form .wa-submit a { color: {$color1} !important }
 /* theme color 2 */
@@ -66,12 +64,11 @@
 .{$theme} .theme-color-hover:hover,
 .{$theme} .footer ul li a:hover,
 .{$theme} .usermenu > li > a:hover,
-.{$theme} .navbar-default .navbar-nav>li>a:hover,
-.{$theme} .navbar-default .navbar-nav>li>a:focus,
 .{$theme} div.dropdown-menu ul li a:hover,
 .{$theme} .breadcrumb a:hover,
 .{$theme} .user-toolbar ul>li:hover>a .fa { color: {$color2} !important }
-
+.{$theme} .navbar-categories .navbar-nav>li>a:hover,
+.{$theme} .navbar-categories .navbar-nav>li>a:focus { color: {$color2} }
 /* theme background-color 1 */
 .{$theme} .theme-background,
 .{$theme} .theme-background-wh,
@@ -91,7 +88,6 @@
 .{$theme} .hub-tabs.nav-tabs > .active > a, 
 .{$theme} .hub-tabs.nav-tabs > .active > a:hover, 
 .{$theme} .hub-tabs.nav-tabs > .active > a:focus { background-color: {$color1} !important }
-
 /* theme background-color 2 */
 .{$theme} .theme-background:hover,
 .{$theme} .user-toolbar ul>li:hover .count,
@@ -100,13 +96,15 @@
 
 /* theme border-color 1 */
 .{$theme} .theme-border-color,
+.{$theme} .navbar-pages .navbar-nav>.active,
 .{$theme} .search.active_search input,
 .{$theme} .search.active_search button,
 .{$theme} .theme-border-color-hover:hover,
 .{$theme} .modal-content,
 .{$theme} .tab-dsv .nav-tabs,
-.{$theme} blockquote:hover { border-color: {$color1} !important }
-
+.{$theme} blockquote:hover,
+.header .dropdown-menu,
+.sidebar-nav .dropdown-menu { border-color: {$color1} !important }
 /* theme box-shadow color 1 */
 .{$theme} .theme-shadow-color:hover { 
   -moz-box-shadow: 0 1px 5px {$color1};
@@ -117,6 +115,7 @@
 .custom .tt-input:focus,
 .custom .wa-captcha-input:focus,
 .custom .wa-form .wa-value input[type="text"]:focus,
+.custom .wa-form .wa-value input[type="email"]:focus,
 .custom .wa-form .wa-value input[type="password"]:focus,
 .custom .form-control:focus,
 .custom textarea:focus,
@@ -130,6 +129,7 @@
 .lightblue .tt-input:focus,
 .lightblue .wa-captcha-input:focus,
 .lightblue .wa-form .wa-value input[type="text"]:focus,
+.lightblue .wa-form .wa-value input[type="email"]:focus,
 .lightblue .wa-form .wa-value input[type="password"]:focus,
 .lightblue .form-control:focus,
 .lightblue textarea:focus,
@@ -141,6 +141,7 @@
 .blue .tt-input:focus,
 .blue .wa-captcha-input:focus,
 .blue .wa-form .wa-value input[type="text"]:focus,
+.blue .wa-form .wa-value input[type="email"]:focus,
 .blue .wa-form .wa-value input[type="password"]:focus,
 .blue .form-control:focus,
 .blue textarea:focus,
@@ -152,6 +153,7 @@
 .indigo .tt-input:focus,
 .indigo .wa-captcha-input:focus,
 .indigo .wa-form .wa-value input[type="text"]:focus,
+.indigo .wa-form .wa-value input[type="email"]:focus,
 .indigo .wa-form .wa-value input[type="password"]:focus,
 .indigo .form-control:focus,
 .indigo textarea:focus,
@@ -163,6 +165,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(63,81,181,.6) !importa
 .deeppurple .tt-input:focus,
 .deeppurple .wa-captcha-input:focus,
 .deeppurple .wa-form .wa-value input[type="text"]:focus,
+.deeppurple .wa-form .wa-value input[type="email"]:focus,
 .deeppurple .wa-form .wa-value input[type="password"]:focus,
 .deeppurple .form-control:focus,
 .deeppurple textarea:focus,
@@ -174,6 +177,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(103,58,183,.6) !import
 .purple .tt-input:focus,
 .purple .wa-captcha-input:focus,
 .purple .wa-form .wa-value input[type="text"]:focus,
+.purple .wa-form .wa-value input[type="email"]:focus,
 .purple .wa-form .wa-value input[type="password"]:focus,
 .purple .form-control:focus,
 .purple textarea:focus,
@@ -185,6 +189,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(156,39,176,.6) !import
 .pink .tt-input:focus,
 .pink .wa-captcha-input:focus,
 .pink .wa-form .wa-value input[type="text"]:focus,
+.pink .wa-form .wa-value input[type="email"]:focus,
 .pink .wa-form .wa-value input[type="password"]:focus,
 .pink .form-control:focus,
 .pink textarea:focus,
@@ -196,6 +201,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(233,30,99,.6) !importa
 .red .tt-input:focus,
 .red .wa-captcha-input:focus,
 .red .wa-form .wa-value input[type="text"]:focus,
+.red .wa-form .wa-value input[type="email"]:focus,
 .red .wa-form .wa-value input[type="password"]:focus,
 .red .form-control:focus,
 .red textarea:focus,
@@ -207,6 +213,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(229,28,35,.6) !importa
 .cyan .tt-input:focus,
 .cyan .wa-captcha-input:focus,
 .cyan .wa-form .wa-value input[type="text"]:focus,
+.cyan .wa-form .wa-value input[type="email"]:focus,
 .cyan .wa-form .wa-value input[type="password"]:focus,
 .cyan .form-control:focus,
 .cyan textarea:focus,
@@ -218,6 +225,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0,188,212,.6) !importa
 .teal .tt-input:focus,
 .teal .wa-captcha-input:focus,
 .teal .wa-form .wa-value input[type="text"]:focus,
+.teal .wa-form .wa-value input[type="email"]:focus,
 .teal .wa-form .wa-value input[type="password"]:focus,
 .teal .form-control:focus,
 .teal textarea:focus,
@@ -229,6 +237,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0,150,136,.6) !importa
 .green .tt-input:focus,
 .green .wa-captcha-input:focus,
 .green .wa-form .wa-value input[type="text"]:focus,
+.green .wa-form .wa-value input[type="email"]:focus,
 .green .wa-form .wa-value input[type="password"]:focus,
 .green .form-control:focus,
 .green textarea:focus,
@@ -240,6 +249,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(37,155,36,.6) !importa
 .lightgreen .tt-input:focus,
 .lightgreen .wa-captcha-input:focus,
 .lightgreen .wa-form .wa-value input[type="text"]:focus,
+.lightgreen .wa-form .wa-value input[type="email"]:focus,
 .lightgreen .wa-form .wa-value input[type="password"]:focus,
 .lightgreen .form-control:focus,
 .lightgreen textarea:focus,
@@ -251,6 +261,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(139,195,74,.6) !import
 .lime .tt-input:focus,
 .lime .wa-captcha-input:focus,
 .lime .wa-form .wa-value input[type="text"]:focus,
+.lime .wa-form .wa-value input[type="email"]:focus,
 .lime .wa-form .wa-value input[type="password"]:focus,
 .lime .form-control:focus,
 .lime textarea:focus,
@@ -262,6 +273,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(205,220,57,.6) !import
 .yellow .tt-input:focus,
 .yellow .wa-captcha-input:focus,
 .yellow .wa-form .wa-value input[type="text"]:focus,
+.yellow .wa-form .wa-value input[type="email"]:focus,
 .yellow .wa-form .wa-value input[type="password"]:focus,
 .yellow .form-control:focus,
 .yellow textarea:focus,
@@ -273,6 +285,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(253,216,53,.6) !import
 .amber .tt-input:focus,
 .amber .wa-captcha-input:focus,
 .amber .wa-form .wa-value input[type="text"]:focus,
+.amber .wa-form .wa-value input[type="email"]:focus,
 .amber .wa-form .wa-value input[type="password"]:focus,
 .amber .form-control:focus,
 .amber textarea:focus,
@@ -284,6 +297,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(255,193,7,.6) !importa
 .orange .tt-input:focus,
 .orange .wa-captcha-input:focus,
 .orange .wa-form .wa-value input[type="text"]:focus,
+.orange .wa-form .wa-value input[type="email"]:focus,
 .orange .wa-form .wa-value input[type="password"]:focus,
 .orange .form-control:focus,
 .orange textarea:focus,
@@ -295,6 +309,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(255,152,0,.6) !importa
 .deeporange .tt-input:focus,
 .deeporange .wa-captcha-input:focus,
 .deeporange .wa-form .wa-value input[type="text"]:focus,
+.deeporange .wa-form .wa-value input[type="email"]:focus,
 .deeporange .wa-form .wa-value input[type="password"]:focus,
 .deeporange .form-control:focus,
 .deeporange textarea:focus,
@@ -306,6 +321,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(255,87,34,.6) !importa
 .brown .tt-input:focus,
 .brown .wa-captcha-input:focus,
 .brown .wa-form .wa-value input[type="text"]:focus,
+.brown .wa-form .wa-value input[type="email"]:focus,
 .brown .wa-form .wa-value input[type="password"]:focus,
 .brown .form-control:focus,
 .brown textarea:focus,
@@ -317,6 +333,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(121,85,72,.6) !importa
 .opal .tt-input:focus,
 .opal .wa-captcha-input:focus,
 .opal .wa-form .wa-value input[type="text"]:focus,
+.opal .wa-form .wa-value input[type="email"]:focus,
 .opal .wa-form .wa-value input[type="password"]:focus,
 .opal .form-control:focus,
 .opal textarea:focus,
@@ -328,6 +345,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0,122,135,.6) !importa
 .deepblue .tt-input:focus,
 .deepblue .wa-captcha-input:focus,
 .deepblue .wa-form .wa-value input[type="text"]:focus,
+.deepblue .wa-form .wa-value input[type="email"]:focus,
 .deepblue .wa-form .wa-value input[type="password"]:focus,
 .deepblue .form-control:focus,
 .deepblue textarea:focus,
@@ -336,8 +354,6 @@ border-color: #003580 !important;
 -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0,53,128,.6) !important;
 box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0,53,128,.6) !important;
 }
-
-
 {if $wa_app == 'shop'}
 	/* shop */
 	.{$theme} .slider .bx-wrapper .bx-pager.bx-default-pager a:hover,
@@ -376,49 +392,7 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0,53,128,.6) !importan
 	.{$theme} .ui-dialog .ui-dialog-title,
 	.{$theme} .quickorder-header { border-bottom-color:{$color1} }
 	.{$theme} .da-slide .da-link:hover { border-color: {$color1}; background: {$color1} }
-
-	.lightblue .da-slide h2 i,
-	.lightblue .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading1.png) repeat }
-	.blue .da-slide h2 i,
-	.blue .slider .bx-wrapper h2 i  { background: url({$wa_active_theme_url}img/themesettings/bg-heading2.png) repeat }
-	.indigo .da-slide h2 i,
-	.indigo .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading3.png) repeat }
-	.deeppurple .da-slide h2 i,
-	.deeppurple .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading4.png) repeat }
-	.purple .da-slide h2 i,
-	.purple .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading5.png) repeat }
-	.pink .da-slide h2 i,
-	.pink .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading6.png) repeat }
-	.red .da-slide h2 i,
-	.red .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading7.png) repeat }
-	.cyan .da-slide h2 i,
-	.cyan .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading8.png) repeat }
-	.teal .da-slide h2 i,
-	.teal .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading9.png) repeat }
-	.green .da-slide h2 i,
-	.green .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading10.png) repeat }
-	.lightgreen .da-slide h2 i,
-	.lightgreen .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading11.png) repeat }
-	.lime .da-slide h2 i,
-	.lime .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading12.png) repeat }
-	.yellow .da-slide h2 i,
-	.yellow .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading13.png) repeat }
-	.amber .da-slide h2 i,
-	.amber .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading14.png) repeat }
-	.orange .da-slide h2 i,
-	.orange .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading15.png) repeat }
-	.deeporange .da-slide h2 i,
-	.deeporange .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading16.png) repeat }
-	.brown .da-slide h2 i,
-	.brown .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading17.png) repeat }
-	.opal .da-slide h2 i,
-	.opal .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading18.png) repeat }
-	.deepblue .da-slide h2 i,
-	.deepblue .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-heading19.png) repeat }
-	.custom .da-slide h2 i,
-	.custom .slider .bx-wrapper h2 i { background: url({$wa_active_theme_url}img/themesettings/bg-custom.png) repeat }
 {/if}
-
 {if $wa_app == 'blog'}
 	/* blog */
 	.{$theme} .timeline .timeline-body h2 a:hover,
@@ -427,19 +401,15 @@ box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0,53,128,.6) !importan
 	.{$theme} .comments-header,
 	.{$theme} .comment-form h4 { color: {$color1} }
 {/if}
-
 {if $wa_app == 'photos'}
 	/* photos */
 	.{$theme} ul.photostream li.selected img { border-color: {$color1} }
 	.{$theme} .photo-albums a:hover { background-color: {$color1} }
 	.{$theme} #photo-author a { color: {$color1} }
 {/if}
-
-{if $theme_settings.sidebar && !($wa->isMobile() || $wa->userAgent('device') == 'ipad')}
 	.{$theme} .sidebar-news .sidebar-post:hover:after { border-top-color: {$color1} }
 	.{$theme} .sidebar-plugin ul li a:hover,
 	.{$theme} .sidebar-info li a:hover { color: {$color1} }
 	.{$theme} ul.blog-tags a:hover { background-color: {$color1} }
 	.{$theme} .sidebar-photos li img:hover { box-shadow: 0 0 0 2px {$color1} }
-{/if}
 </style>

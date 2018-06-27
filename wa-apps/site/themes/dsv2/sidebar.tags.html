@@ -1,0 +1,12 @@
+{if $cloud = $wa->shop->tags($limit|default:10)}
+<div class="sidebar-tags">
+    <div class="headline">
+        <div class="h3 theme-border-color">{$mytitle|default:'[`Tags`]'}</div>
+    </div>
+    <ul class="list-unstyled blog-tags">
+        {foreach $cloud as $tag}
+            <li><a href="{$wa->getUrl('shop/frontend')}tag/{$tag.uri_name}/"><i class="fa fa-tags"></i> {$tag.name|escape}</a></li>        
+        {/foreach}
+    </ul>
+</div>
+{/if}

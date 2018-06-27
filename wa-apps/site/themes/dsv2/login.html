@@ -4,7 +4,7 @@
           <h1>[`Login`]</h1>
           {$wa->authAdapters()}
           <div class="wa-horizontal">
-            {$wa->loginForm($error)}
+              {$wa->loginForm($error, empty($without_form))}
           </div>
         </div>
     </div>

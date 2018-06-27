@@ -1,12 +1,24 @@
-{$icon_size=$theme_settings.social_size|substr:18}
-{assign var="pos" value=$icon_size|strpos:"."}
-{$size = $icon_size|substr:0:$pos}
-{if $theme_settings.vk != ''}<li><a href="{$theme_settings.vk}" class="{$size}" target="_blank"><i class="icon {$size} vk"></i></a></li>{/if}<!-- вконтакте -->
-{if $theme_settings.fb != ''}<li><a href="{$theme_settings.fb}" class="{$size}" target="_blank"><i class="icon {$size} fb"></i></a></li>{/if}<!-- facebook -->
-{if $theme_settings.tt != ''}<li><a href="https://twitter.com/{$theme_settings.tt}" class="{$size}" target="_blank"><i class="icon {$size} twitter"></i></a></li>{/if}
-{if $theme_settings.gp != ''}<li><a href="{$theme_settings.gp}" class="{$size}" target="_blank"><i class="icon {$size} gp"></i></a></li>{/if}
-{if $theme_settings.ok != ''}<li><a href="{$theme_settings.ok}" class="{$size}" target="_blank"><i class="icon {$size} ok"></i></a></li>{/if}
-{if $theme_settings.skype != ''}<li><a href="skype:{$theme_settings.skype}?add" class="{$size}"><i class="icon {$size} skype"></i></a></li>{/if}
-{if $theme_settings.rss && $wa->blog}<li><a href="{$wa->getUrl('blog/frontend/rss')}" class="{$size}"><i class="icon {$size} rss"></i></a></li>{/if}
-{if $theme_settings.youtube != ''}<li><a href="{$theme_settings.youtube}" class="{$size}" target="_blank"><i class="icon {$size} youtube"></i></a></li>{/if}
-{if $theme_settings.vimeo != ''}<li><a href="{$theme_settings.vimeo}" class="{$size}" target="_blank"><i class="icon {$size} vimeo"></i></a></li>{/if}
+{**
+* @param array $array ['vk','fb','tt']
+*}
+{$communities = []}
+{if $theme_settings.community_vk}{$communities[] = ["name" => "vk","url" => $theme_settings.community_vk,"fa" => "vk","title" => "Вконтакте"]}{/if}
+{if $theme_settings.community_fb}{$communities[] = ["name" => "fb","url" => $theme_settings.community_fb,"fa" => "facebook","title" => "Facebook"]}{/if}
+{if $theme_settings.community_tt}{$communities[] = ["name" => "tt","url" => $theme_settings.community_tt,"fa" => "twitter","title" => "Twitter"]}{/if}
+{if $theme_settings.community_ok}{$communities[] = ["name" => "ok","url" => $theme_settings.community_ok,"fa" => "odnoklassniki","title" => "Одноклассники"]}{/if}
+{if $theme_settings.community_sk}{$communities[] = ["name" => "sk","url" => "skype:`$theme_settings.community_sk`?chat","fa" => "skype","title" => "Skype"]}{/if}
+{if $theme_settings.community_gp}{$communities[] = ["name" => "gp","url" => $theme_settings.community_gp,"fa" => "google-plus","title" => "Google Plus"]}{/if}
+{if $theme_settings.community_ig}{$communities[] = ["name" => "ig","url" => $theme_settings.community_ig,"fa" => "instagram","title" => "Instagram"]}{/if}
+{if $theme_settings.community_yt}{$communities[] = ["name" => "yt","url" => $theme_settings.community_yt,"fa" => "youtube","title" => "Youtube"]}{/if}
+{if $theme_settings.community_vm}{$communities[] = ["name" => "vm","url" => $theme_settings.community_vm,"fa" => "vimeo","title" => "Vimeo"]}{/if}
+{if $theme_settings.community_lj}{$communities[] = ["name" => "lj","url" => $theme_settings.community_lj,"fa" => "pencil","title" => "Live Journal"]}{/if}
+{if $theme_settings.community_pt}{$communities[] = ["name" => "pt","url" => $theme_settings.community_pt,"fa" => "pinterest-p","title" => "Pinterest"]}{/if}
+
+<div class="communities mb-30 clearfix">
+    <ul class="list-unstyled">
+        {foreach $communities as $c}
+        {if isset($array) && !in_array($c.name,$array)}{continue}{/if}
+        <li><a href="{$c.url}" class="{$c.name} rounded-x text-center" title="{$wa->accountName()} {$c.title}" rel="nofollow" target="_blank"><i class="fa fa-{$c.fa}"></i></a></li>
+        {/foreach}
+    </ul>
+</div>

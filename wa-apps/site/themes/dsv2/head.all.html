@@ -1,18 +1,90 @@
-<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
+<style type="text/css">
+body.boxed-layout {
+    {if $theme_settings.bg_color}
+        background-color: {$theme_settings.bg_color};
+    {/if}
+    {if $theme_settings.bg_type == "texture" && $theme_settings.bg_texture != "none"}
+        background-image: url("{$wa_theme_url}img/themesettings/texture/{$theme_settings.bg_texture}.png");
+    {/if}
+    {if $theme_settings.bg_type == "image" && $theme_settings.bg_image != "none"}
+        background-image: url("{$wa_theme_url}img/themesettings/bgimage/{$theme_settings.bg_image}.jpg");
+    {/if}
+    {if $theme_settings.bg_type == "custom" && $theme_settings.bg_custom}
+        background-image: url("{$wa_theme_url}{$theme_settings.bg_custom}");
+    {/if}
+    {if $theme_settings.bg_type != "texture"}
+        {if $theme_settings.bg_attachment}
+            background-attachment: fixed;
+        {/if}
+        {if $theme_settings.bg_size}
+            background-size: cover;
+        {/if}
+        background-position: {$theme_settings.bg_position};
+    {/if}
+}
+
+{if $theme_settings.navbar_background_color}
+    .navbar-pages { background-color:{$theme_settings.navbar_background_color} }
+{/if}
+{if $theme_settings.navbar_color}
+    .navbar-pages .navbar-nav>li>a,
+    .navbar-pages .navbar-nav>li>a:hover { color:{$theme_settings.navbar_color} !important }
+{/if}
+{if $theme_settings.navbar_categories_bg}
+    .navbar-categories { background-color:{$theme_settings.navbar_categories_bg} }
+{/if}
+{if $theme_settings.navbar_categories_c}
+    .navbar-categories .navbar-nav>li>a,
+    .navbar-categories .navbar-nav>li>a:hover { color:{$theme_settings.navbar_categories_c} !important }
+{/if}
+{if $theme_settings.footer_background}
+.footer { background-color:{$theme_settings.footer_background} !important }
+{/if}
+{if $theme_settings.footer_color}
+.footer,
+.footer .simple-list a,
+.footer .simple-list li,
+.footer .copyright { color:{$theme_settings.footer_color} !important }
+{/if}
+{if $theme_settings.footer_header}
+.footer .footer-column { color:{$theme_settings.footer_header} !important }
+{/if}
+{if $theme_settings.toolbar_background}
+.wrapper-toolbar{ background-color:{$theme_settings.toolbar_background} }
+{/if}
+{if $theme_settings.toolbar_background_hover}
+.user-toolbar ul>li:hover{
+    background-color:{$theme_settings.toolbar_background_hover}
+}
+{/if}
+{if $theme_settings.toolbar_color_empty}
+.user-toolbar ul>li>a{ color:{$theme_settings.toolbar_color_empty} }
+{/if}
+{if $theme_settings.toolbar_color_fill}
+.user-toolbar ul>li.highlight>a,
+.user-toolbar ul>li.highlight>a .fa{ color:{$theme_settings.toolbar_color_fill} }
+{/if}
+{if $theme_settings.toolbar_counter}
+.user-toolbar ul>li.highlight .count{ background-color:{$theme_settings.toolbar_counter} !important}
+{/if}
+{if $theme_settings.toolbar_border}
+.user-toolbar ul>li{ border-right-color:{$theme_settings.toolbar_border} }
+{/if}
+</style>
+<script type="text/javascript" src="{$wa_static_url}wa-content/js/jquery-plugins/jquery.cookie.js"></script>
 <script>
 $.dsv = {
-    {if $wa->shop}
-    	shop_url: "{$wa->getUrl('shop/frontend')}",
-    	default_img_url: "{$wa_theme_url}img/dummy96.png",
-	    {$currency_info = $wa->shop->currency(true)}
-	    {if !isset($currency_info.sign_delim)}{$currency_info.sign_delim = " "}{/if}
-	    {if !isset($currency_info.sign_position)}{$currency_info.sign_position = 1}{/if}
-	    {if !isset($currency_info.sign_html)}{$currency_info.sign_html = $currency_info.sign}{/if}
-	    {if !isset($currency_info.decimal_point)}{$currency_info.decimal_point = ','}{/if}
-	    {if !isset($currency_info.frac_digits)}{$currency_info.frac_digits = 2}{/if}
-	    {if !isset($currency_info.thousands_sep)}{$currency_info.thousands_sep = ' '}{/if}
-	    currency: {json_encode($currency_info)},
-
-	{/if}
+{if $wa->shop}
+shop_url:"{$wa->getUrl('shop/frontend')}",
+default_img_url:"{$wa_theme_url}img/dummy96.png",
+{$currency_info = $wa->shop->currency(true)}
+{if !isset($currency_info.sign_delim)}{$currency_info.sign_delim = " "}{/if}
+{if !isset($currency_info.sign_position)}{$currency_info.sign_position = 1}{/if}
+{if !isset($currency_info.sign_html)}{$currency_info.sign_html = $currency_info.sign}{/if}
+{if !isset($currency_info.decimal_point)}{$currency_info.decimal_point = ','}{/if}
+{if !isset($currency_info.frac_digits)}{$currency_info.frac_digits = 2}{/if}
+{if !isset($currency_info.thousands_sep)}{$currency_info.thousands_sep = ' '}{/if}
+currency:{json_encode($currency_info)},
+{/if}
 }
 </script>

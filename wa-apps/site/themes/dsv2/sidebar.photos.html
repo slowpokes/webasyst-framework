@@ -1,0 +1,15 @@
+{$photos = $wa->photos->photos($condition|default:null,null,$limit|default:16)}
+<div class="sidebar-latest-photos">
+    <div class="headline">
+        <div class="h3 theme-border-color">{$mytitle|default:'[`Latest Photos`]'}</div>
+    </div>
+    <ul class="list-unstyled sidebar-photos">
+        {foreach $photos as $photo}
+        <li>
+            <a href="{$photo.frontend_link|default:'#'}">
+            {$wa->photos->getImgHtml($photo, "58x58",['class'=>'hover-effect','alt'=>$photo.name])}
+            </a>
+        </li>
+        {/foreach}
+    </ul>
+</div>
