@@ -1,0 +1,28 @@
+{$_breadcrumbs = []}
+
+{$_is_main_page = ( $wa->currentUrl() == $wa_url )}
+{$_is_personal_area = ( $wa->currentUrl() == $wa->getUrl('/frontend/my') )}
+{$_main_page = ["url" => $wa_url, "name" =>  "[`Homepage`]"]}
+
+{if !($_is_main_page)}
+    {$_breadcrumbs[] = $_main_page}
+    {if !empty($breadcrumbs)}
+        {$_breadcrumbs = array_merge($_breadcrumbs,$breadcrumbs)}
+    {/if}
+{/if}
+
+{if !empty($_breadcrumbs)}
+<ol class="breadcrumb no-sb-padded" itemprop="breadcrumb">
+    {foreach $_breadcrumbs as $breadcrumb}
+        {if !empty($breadcrumb)}
+            <li>
+                <a href="{$breadcrumb.url}">{$breadcrumb.name|escape}</a>
+            </li>
+        {/if}
+    {/foreach}
+    {$crumb = $wa->globals("crumb")}
+    {if !empty($crumb)}
+        <li class="active">{$crumb}</li>
+    {/if}
+</ol>
+{/if}

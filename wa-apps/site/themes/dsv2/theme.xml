@@ -1,104 +1,170 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE theme PUBLIC "wa-app-theme" "http://www.webasyst.com/wa-content/xml/wa-app-theme.dtd">
-<theme id="dsv2" system="0" vendor="988467" author="Designsovkusom" app="site" version="2.2.1">
+<theme id="dsv2" system="0" vendor="988467" author="Designsovkusom" app="site" version="2.5.6">
     <name locale="en_US">Design with taste 2</name>
     <name locale="ru_RU">Дизайн со вкусом 2</name>
     <description locale="en_US">Adaptive design theme for all base Webasyst apps</description>
     <description locale="ru_RU">Семейство адаптивных тем дизайна для всех базовых приложений Webasyst</description>
     <files>
-        <file path="index.html" custom="0">
-    		<description locale="en_US">Core layout of the Default theme family</description>
-    		<description locale="ru_RU"/>
+        <file path="bootstrap.min.css" custom="0">
+            <description locale="en_US">Bootstrap v3.2.0</description>
         </file>
-    	<file path="main.html" custom="0">
-    		<description locale="en_US">Main layout for the Site app content</description>
-    		<description locale="en_US">Основной вывод приложения «Сайт»</description>
-    	</file>
-        <file path="page.html" custom="0">
-    		<description locale="en_US">Static page content and navigation</description>
-    		<description locale="ru_RU">Содержимое открытой страницы и навигация по страницам</description>
+        <file path="breadcrumbs.html" custom="0">
+            <description locale="en_US">Breadcrumbs template</description>
+            <description locale="ru_RU">Шаблон хлебных крошек</description>
         </file>
-        <file path="login.html" custom="0">
-    		<description locale="en_US">Login page</description>
-    		<description locale="ru_RU">Страница входа для пользователей</description>
-    	</file>
-        <file path="signup.html" custom="0">
-            <description locale="en_US">Sign up page</description>
-            <description locale="ru_RU">Страница регистрации пользователей</description>
+        <file path="dark.css" custom="0">
+            <description locale="en_US">Dark styles</description>
+            <description locale="ru_RU">Стили темного оформление</description>
+        </file>
+        <file path="dsv.css" custom="0">
+            <description locale="en_US">Base styles «Design with taste 2»</description>
+            <description locale="ru_RU">Базовый набор стилей «Дизайн со вкусом 2»</description>
+        </file>
+        <file path="dsv.min.css" custom="0">
+            <description locale="en_US">Base styles «Design with taste 2» (compressed)</description>
+            <description locale="ru_RU">Базовый набор стилей (минимизированный)</description>
+        </file>
+        <file path="dsv.js" custom="0">
+            <description locale="en_US">Main js file</description>
+            <description locale="ru_RU">Основной js файл</description>
+        </file>
+        <file path="dsv.logo.html" custom="0">
+            <description locale="en_US">Logo template</description>
+            <description locale="ru_RU">Вывод логотипа</description>
+        </file>
+        <file path="dsv.social.html" custom="0">
+            <description locale="en_US">Social icons template</description>
+            <description locale="ru_RU">Вывод социальных иконок</description>
+        </file>
+        <file path="dsv.user.css" custom="0">
+            <description locale="en_US">User css styles</description>
+            <description locale="ru_RU">Пользовательский файл стилей</description>
+        </file>
+        <file path="error.html" custom="0">
+            <description locale="en_US">404 and other errors</description>
+            <description locale="ru_RU">404 и другие ошибки</description>
+        </file>
+        <file path="flying.cart.html" custom="0">
+            <description locale="en_US">Flying cart template</description>
+            <description locale="ru_RU">Всплывающая корзина</description>
+        </file>
+        <file path="font-awesome.min.css" custom="0">
+            <description locale="en_US">Font Awesome 4.7.0</description>
+        </file>
+        <file path="footer.list.html" custom="0">
+            <description locale="en_US">Footer list template</description>
+            <description locale="ru_RU">Шаблон списка подвала</description>
         </file>
         <file path="forgotpassword.html" custom="0">
             <description locale="en_US">Forgot password page</description>
             <description locale="ru_RU">Страница сброса пароля</description>
         </file>
-        <file path="error.html" custom="0">
-    		<description locale="en_US">404 and other errors</description>
-    		<description locale="ru_RU">404 и другие ошибки</description>
-        </file>
-        <file path="bootstrap.min.css" custom="0">
-            <description locale="ru_RU">Bootstrap v3.2.0</description>
-        </file>
-        <file path="dsv.css" custom="0">
-            <description locale="ru_RU">Базовый набор стилей «Дизайн со вкусом 2»</description>
-        </file>
-        <file path="responsive.css" custom="0">
-            <description locale="ru_RU">Дополнительные стили для адаптации шаблона</description>
-        </file>
-        <file path="font-awesome.min.css" custom="0">
-            <description locale="ru_RU">Font Awesome 4.1.0</description>
-        </file>
-        <file path="html5shiv.min.js" custom="0">
-            <description locale="ru_RU">HTML5 Shiv 3.7.2</description>
-        </file>
-        <file path="respond.min.js" custom="0">
-            <description locale="ru_RU">Respond.js v1.4.2</description>
-        </file>
-        <file path="bootstrap.min.js" custom="0">
-            <description locale="ru_RU">Bootstrap v3.2.0</description>
-        </file>
-        <file path="bootstrap-hover-dropdown.min.js" custom="0">
-            <description locale="ru_RU">Bootstrap Hover Dropdown Plugin</description>
-        </file>
-        
-        <file path="dsv.logo.html" custom="0">
-            <description locale="ru_RU">Вывод логотипа</description>
-        </file>
-        <file path="dsv.social.html" custom="0">
-            <description locale="ru_RU">Вывод социальных иконок</description>
-        </file>
-        <file path="dsv.js" custom="0">
-            <description locale="ru_RU">Основной js файл</description>
+        <file path="head.all.html" custom="0">
+            <description locale="en_US">&lt;head&gt; block of apps</description>
+            <description locale="ru_RU">Блок &lt;head&gt; приложений</description>
         </file>
         <file path="head.html" custom="0">
+            <description locale="en_US">&lt;head&gt; block of app «Site»</description>
             <description locale="ru_RU">Блок &lt;head&gt; приложения «Сайт»</description>
         </file>
-        <file path="search.html" custom="1">
-            <description locale="ru_RU">Форма поиска</description>
+        <file path="header.html" custom="0">
+            <description locale="en_US">Header template</description>
+            <description locale="ru_RU">Шаблон шапки</description>
         </file>
-        <file path="menu.html" custom="1">
-            <description locale="ru_RU">Меню категорий</description>
+        <file path="header.mobile.html" custom="0">
+            <description locale="en_US">Header mobile template</description>
+            <description locale="ru_RU">Шаблон мобильной шапки</description>
         </file>
-        <file path="menu.mobile.html" custom="1">
-            <description locale="ru_RU">Каталог для мобильных устройств</description>
-        </file>
-        <file path="dsv.user.css" custom="1">
-            <description locale="ru_RU">Пользовательский файл стилей</description>
-        </file>
-        <file path="sidebar.html" custom="1">
-            <description locale="ru_RU">Содержание боковой панели</description>
-        </file>
-        <file path="sidebar.css" custom="1">
-            <description locale="ru_RU">css стили боковой панели</description>
-        </file>
-        <file path="social.vkontakte.html" custom="1">
-            <description locale="ru_RU">Виджет сообщества Вконтакте</description>
-        </file>
-        <file path="social.facebook.html" custom="1">
-            <description locale="ru_RU">Виджет сообщества facebook</description>
-        </file>
-        <file path="holidays.html" custom="1">
+        <file path="holidays.html" custom="0">
+            <description locale="en_US">Holiday styles</description>
             <description locale="ru_RU">Стили праздников</description>
         </file>
-        <file path="themes.html" custom="1">
+        <file path="index.html" custom="0">
+    		<description locale="en_US">Core layout of the Default theme family</description>
+    		<description locale="ru_RU"/>
+        </file>
+        <file path="js.html" custom="0">
+            <description locale="en_US">JS files (site)</description>
+            <description locale="ru_RU">JS файлы (сайт)</description>
+        </file>
+        <file path="login.html" custom="0">
+            <description locale="en_US">Login page</description>
+            <description locale="ru_RU">Страница входа для пользователей</description>
+        </file>
+    	<file path="main.html" custom="0">
+    		<description locale="en_US">Main layout for the Site app content</description>
+    		<description locale="en_US">Основной вывод приложения «Сайт»</description>
+    	</file>
+        <file path="menu.app.html" custom="0">
+            <description locale="en_US">Site and Shop application menu</description>
+            <description locale="ru_RU">Меню приложения Сайт и Магазин</description>
+        </file>
+        <file path="menu.mobile.html" custom="0">
+            <description locale="en_US">Mobile menu</description>
+            <description locale="ru_RU">Мобильное меню</description>
+        </file>
+        <file path="menu.pages.html" custom="0">
+            <description locale="en_US">Menu pages</description>
+            <description locale="ru_RU">Меню страниц</description>
+        </file>
+        <file path="my.nav.html" custom="0">
+            <description locale="en_US">Customer account navigation menu</description>
+            <description locale="ru_RU">Меню навигации в личном кабинете пользователя</description>
+        </file>
+        <file path="my.profile.html" custom="0">
+            <description locale="en_US">My profile</description>
+            <description locale="ru_RU">Личный кабинет</description>
+        </file>
+        <file path="page.html" custom="0">
+    		<description locale="en_US">Static page content and navigation</description>
+    		<description locale="ru_RU">Содержимое открытой страницы и навигация по страницам</description>
+        </file>
+        <file path="searchform.html" custom="0">
+            <description locale="en_US">Search form</description>
+            <description locale="ru_RU">Форма поиска</description>
+        </file>
+        <file path="sidebar.blog.html" custom="0">
+            <description locale="en_US">Latest posts template (Sidebar)</description>
+            <description locale="ru_RU">Шаблон вывода последних постов (Боковая панель)</description>
+        </file>
+        <file path="sidebar.css" custom="0">
+            <description locale="ru_RU">css стили боковой панели</description>
+        </file>
+        <file path="sidebar.html" custom="0">
+            <description locale="en_US">Sidebar template</description>
+            <description locale="ru_RU">Шаблон боковой панели</description>
+        </file>
+        <file path="sidebar.nav.html" custom="0">
+            <description locale="en_US">Sidebar navigation template</description>
+            <description locale="ru_RU">Шаблон навигации боковой панели</description>
+        </file>
+        <file path="sidebar.pages.html" custom="0">
+            <description locale="en_US">Page list template (Sidebar)</description>
+            <description locale="ru_RU">Шаблон вывода страниц (Боковая панель)</description>
+        </file>
+        <file path="sidebar.photos.html" custom="0">
+            <description locale="en_US">Latest photos template (Sidebar)</description>
+            <description locale="ru_RU">Шаблон последних фотографий (Боковая панель)</description>
+        </file>
+        <file path="sidebar.tags.html" custom="0">
+            <description locale="en_US">Shop tags template (Sidebar)</description>
+            <description locale="ru_RU">Шаблон тегов (Боковая панель)</description>
+        </file>
+        <file path="signup.html" custom="0">
+            <description locale="en_US">Sign up page</description>
+            <description locale="ru_RU">Страница регистрации пользователей</description>
+        </file>
+        <file path="social.vkontakte.html" custom="0">
+            <description locale="ru_RU">Vkontakte </description>
+            <description locale="ru_RU">Виджет сообщества Вконтакте</description>
+        </file>
+        <file path="social.facebook.html" custom="0">
+            <description locale="en_US">Facebook widget</description>
+            <description locale="ru_RU">Виджет сообщества facebook</description>
+        </file>
+        <file path="themes.html" custom="0">
+            <description locale="en_US">Color schemes</description>
             <description locale="ru_RU">Стили цветовой схемы</description>
         </file>
     </files>
@@ -115,6 +181,78 @@
 ]]>
     </about>
     <settings>
+        <setting var="divider_site" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1. Site
+<![CDATA[
+<style>
+    .fields .heading {
+        color: #000;
+        font-size: 24px;
+        font-weight: 500;
+        margin: 15px 0 5px;
+    }
+    .heading br { display: none; }
+</style>
+]]>
+            </name>
+            <name locale="ru_RU">1. Сайт
+<![CDATA[
+<style>
+    .fields .heading {
+        color: #000;
+        font-size: 24px;
+        font-weight: 500;
+        margin: 15px 0 5px;
+    }
+    .heading br { display: none; }
+</style>
+]]>
+            </name>
+        </setting>
+        <setting var="logo" control_type="image">
+            <value/>
+            <filename>img/mylogo.*</filename>
+            <name locale="en_US">Company Logo</name>
+            <name locale="ru_RU">Логотип компании</name>
+        </setting>
+        <setting var="slogan" control_type="text">
+            <value/>
+            <name locale="en_US">The company tagline</name>
+            <name locale="ru_RU">Слоган компании</name>
+            <description locale="en_US">Example: Modern online shop</description>
+            <description locale="ru_RU">Например: Современный интернет-магазин</description>
+        </setting>
+        <setting var="authtype" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Use default auth forms</name>
+            <name locale="ru_RU">Использовать стандартные формы регистрации</name>
+        </setting>
+        <setting var="agreement_link" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Personal data processing link</name>
+            <name locale="ru_RU">Ссылка на страницу политики обработки персональных данных</name>
+        </setting>
+        <setting var="layout" control_type="select">
+            <value>wide</value>
+            <name locale="en_US">Layout</name>
+            <name locale="ru_RU">Макет</name>
+            <options>
+                <option value="boxed">
+                    <name locale="ru_RU">Ограничен</name>
+                    <name locale="en_US">Boxed</name>
+                </option>
+                <option value="wide">
+                    <name locale="ru_RU">На всю ширину</name>
+                    <name locale="en_US">Wide</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="divider_colors" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.1. Color scheme</name>
+            <name locale="ru_RU">1.1. Цветовая гамма</name>
+        </setting>
         <setting var="color_scheme" control_type="image_select">
             <value>img/themesettings/lightblue.png</value>
             <name locale="ru_RU">Цветовая гамма</name>
@@ -145,17 +283,52 @@
             <value/>
             <name locale="en_US">Custom color</name>
             <name locale="ru_RU">Свой цвет</name>
-            <description locale="en_US">Example: #000000</description>
-            <description locale="ru_RU">Например: #000000</description>
         </setting>
         <setting var="custom_color_hover" control_type="color">
             <value/>
             <name locale="en_US">Custom hover color</name>
             <name locale="ru_RU">Свой цвет при наведении</name>
-            <description locale="en_US">Example: #000000</description>
-            <description locale="ru_RU">Например: #000000</description>
         </setting>
-        <setting var="texture" control_type="select">
+        <setting var="dark" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Use dark styles</name>
+            <name locale="ru_RU">Испрользовать темные стили</name>
+        </setting>
+        <setting var="divider_background" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.2. Background</name>
+            <name locale="ru_RU">1.2. Фон</name>
+        </setting>
+        <setting var="bg_type" control_type="radio">
+            <value>image</value>
+            <name locale="en_US">Background
+<![CDATA[
+<p class="red" style="font-size: 12px; margin: 0 -500px 0 0;">Requires set the setting «Layout» - Boxed</p>
+]]>
+            </name>
+            <name locale="ru_RU">Фон
+<![CDATA[
+<p class="red" style="font-size: 12px; margin: 0 -500px 0 0;">Требуется настройка «Макет» - Ограничен</p>
+]]>
+            </name>
+            <description locale="en_US">Requires setting of Layout - Boxed</description>
+            <description locale="ru_RU">Требуется настройка Макет - Ограничен</description>
+            <options>
+                <option value="texture">
+                    <name locale="en_US">texture</name>
+                    <name locale="ru_RU">текстура</name>
+                </option>
+                <option value="image">
+                    <name locale="en_US">image</name>
+                    <name locale="ru_RU">изображение</name>
+                </option>
+                <option value="custom">
+                    <name locale="en_US">custom background</name>
+                    <name locale="ru_RU">свой фон</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="bg_texture" control_type="select">
             <value>none</value>
             <name locale="en_US">Background texture</name>
             <name locale="ru_RU">Текстура заднего фона</name>
@@ -316,7 +489,7 @@
                 </option>
             </options>
         </setting>
-        <setting var="bgimage" control_type="select">
+        <setting var="bg_image" control_type="select">
             <value>none</value>
             <name locale="en_US">Background image</name>
             <name locale="ru_RU">Фоновое изображение</name>
@@ -399,53 +572,226 @@
                 </option>
             </options>
         </setting>
-        <setting var="custom_background" control_type="image">
+        <setting var="bg_custom" control_type="image">
             <value/>
             <filename>img/custom_background.*</filename>
             <name locale="en_US">Custom background</name>
             <name locale="ru_RU">Своё фоновое изображение</name>
         </setting>
-        <setting var="custom_background_color" control_type="color">
+        <setting var="bg_color" control_type="color">
             <value/>
             <name locale="en_US">Color of custom background</name>
             <name locale="ru_RU">Цвет фонового изображение</name>
-            <description locale="en_US">Example: #000000</description>
-            <description locale="ru_RU">Например: #000000</description>
         </setting>
-        <setting var="layout" control_type="select">
-            <value>wide</value>
-            <name locale="en_US">Boxed layout of template</name>
-            <name locale="ru_RU">Макет</name>
+        <setting var="bg_attachment" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Fixed background</name>
+            <name locale="ru_RU">Зафиксировать фон</name>
+        </setting>
+        <setting var="bg_size" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Cover background</name>
+            <name locale="ru_RU">Растянуть фон</name>
+        </setting>
+        <setting var="bg_position" control_type="select">
+            <value>top</value>
+            <name locale="en_US">Background position</name>
+            <name locale="ru_RU">Положение фона</name>
             <options>
-                <option value="boxed">
-                    <name locale="ru_RU">Ограничен</name>
-                    <name locale="en_US">Boxed</name>
+                <option value="top left">
+                    <name locale="en_US">top left</name>
+                    <name locale="ru_RU">в левом верхнем углу</name>
                 </option>
-                <option value="wide">
-                    <name locale="ru_RU">На всю ширину</name>
-                    <name locale="en_US">Wide</name>
+                <option value="top">
+                    <name locale="en_US">top</name>
+                    <name locale="ru_RU">по центру вверху</name>
+                </option>
+                <option value="top right">
+                    <name locale="en_US">top right</name>
+                    <name locale="ru_RU">в правом верхнем углу</name>
+                </option>
+                <option value="left">
+                    <name locale="en_US">left</name>
+                    <name locale="ru_RU">по левому краю и по центру</name>
+                </option>
+                <option value="center">
+                    <name locale="en_US">center</name>
+                    <name locale="ru_RU">по центру</name>
+                </option>
+                <option value="right">
+                    <name locale="en_US">right</name>
+                    <name locale="ru_RU">по правому краю и по центру</name>
+                </option>
+                <option value="bottom left">
+                    <name locale="en_US">bottom left</name>
+                    <name locale="ru_RU">в левом нижнем углу</name>
+                </option>
+                <option value="bottom">
+                    <name locale="en_US">bottom</name>
+                    <name locale="ru_RU">по центру внизу</name>
+                </option>
+                <option value="bottom right">
+                    <name locale="en_US">bottom right</name>
+                    <name locale="ru_RU">в правом нижнем углу</name>
                 </option>
             </options>
         </setting>
-        <setting var="authtype" control_type="checkbox">
+        <setting var="divider_menupages" control_type="group_divider">
             <value/>
-            <name locale="en_US">Use default auth forms</name>
-            <name locale="ru_RU">Использовать стандартные формы регистрации</name>
-            <description locale="en_US">Needed, if you use custom fields in forms</description>
-            <description locale="ru_RU">Необходимо, если вы используете кастомные поля в формах</description>
+            <name locale="en_US">1.3. Menu</name>
+            <name locale="ru_RU">1.3. Меню</name>
         </setting>
         <setting var="menu" control_type="select">
-            <value>site</value>
-            <name locale="en_US">Main menu from pages of app</name>
-            <name locale="ru_RU">Главное меню из страниц приложения</name>
+            <value>site-pages</value>
+            <name locale="en_US">Header links</name>
+            <name locale="ru_RU">Ссылки в верхнем меню</name>
             <options>
-                <option value="site">
-                    <name locale="ru_RU">Сайт</name>
-                    <name locale="en_US">Site</name>
+                <option value="site-pages">
+                    <name locale="ru_RU">Страницы приложения «Сайт»</name>
+                    <name locale="en_US">Site app pages</name>
                 </option>
-                <option value="shop">
-                    <name locale="ru_RU">Магазин</name>
-                    <name locale="en_US">Shop</name>
+                <option value="shop-pages">
+                    <name locale="ru_RU">Страницы приложения «Магазин»</name>
+                    <name locale="en_US">Shop app pages</name>
+                </option>
+                <option value="blog-pages">
+                    <name locale="ru_RU">Страницы приложения «Блог»</name>
+                    <name locale="en_US">Blog app pages</name>
+                </option>
+                <option value="photos-pages">
+                    <name locale="ru_RU">Страницы приложения «Фото»</name>
+                    <name locale="en_US">Photos app pages</name>
+                </option>
+                <option value="hub-pages">
+                    <name locale="ru_RU">Страницы приложения «Хаб»</name>
+                    <name locale="en_US">Hub app pages</name>
+                </option>
+                <option value="none">
+                    <name locale="ru_RU">Не показывать</name>
+                    <name locale="en_US">None</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="navbar_background_color" control_type="color">
+            <value/>
+            <name locale="en_US">Background color of menu pages</name>
+            <name locale="ru_RU">Фоновый цвет меню страниц</name>
+        </setting>
+        <setting var="navbar_color" control_type="color">
+            <value/>
+            <name locale="en_US">Text color of menu pages</name>
+            <name locale="ru_RU">Цвет текста меню страниц</name>
+        </setting>
+        <setting var="catalog_image" control_type="radio">
+            <value>none</value>
+            <name locale="ru_RU">Иконки категорий в меню</name>
+            <name locale="en_US">Categories icons</name>
+            <options>
+                <option value="none">
+                    <name locale="ru_RU">Без изображения</name>
+                    <name locale="en_US">Without image</name>
+                    <description locale="ru_RU">Скрывает изображение подкатегории</description>
+                    <description locale="en_US">Disable image</description>
+                </option>
+                <option value="params">
+                    <name locale="ru_RU">Параметр image</name>
+                    <name locale="en_US">Param image</name>
+                    <description locale="ru_RU">Изображение категории берется из дополнительных параметров. Параметр image=путь к изображению</description>
+                    <description locale="en_US">Category image load from custom parameter "image=file url"</description>
+                </option>
+                <option value="categoryimages">
+                    <name locale="ru_RU">плагин "Логотип категории"</name>
+                    <name locale="en_US">plugin "Category logo"</name>
+                    <description locale="ru_RU">Требуется приобритение плагина</description>
+                    <description locale="en_US">required plugin</description>
+                </option>
+                <option value="categoryimage">
+                    <name locale="ru_RU">плагин "Картинки для категорий"</name>
+                    <name locale="en_US">plugin "Category images"</name>
+                    <description locale="ru_RU">Требуется приобритение плагина</description>
+                    <description locale="en_US">required plugin</description>
+                </option>
+                <option value="wmimage">
+                    <name locale="ru_RU">плагин "Иконка, изображение и баннер для категории"</name>
+                    <name locale="en_US">plugin "Icon, image and banner for category"</name>
+                    <description locale="ru_RU">Требуется приобритение плагина</description>
+                    <description locale="en_US">required plugin</description>
+                </option>
+            </options>
+        </setting>
+        <setting var="catalog_depth" control_type="select">
+            <value>2</value>
+            <name locale="ru_RU">Уровень вложенности меню категорий</name>
+            <name locale="en_US">Maximum subcategory level depth</name>
+            <options>
+                <option value="1">
+                    <name locale="en_US">1</name>
+                </option>
+                <option value="2">
+                    <name locale="en_US">2</name>
+                </option>
+                <option value="3">
+                    <name locale="en_US">3</name>
+                </option>
+                <option value="4">
+                    <name locale="en_US">4</name>
+                </option>
+                <option value="5">
+                    <name locale="en_US">5</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="navbar_categories_bg" control_type="color">
+            <value/>
+            <name locale="en_US">Background color of categories</name>
+            <name locale="ru_RU">Фоновый цвет категорий</name>
+        </setting>
+        <setting var="navbar_categories_c" control_type="color">
+            <value/>
+            <name locale="en_US">Text color of categories</name>
+            <name locale="ru_RU">Цвет текста категорий</name>
+        </setting>
+        <setting var="divider_footer" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.4. Footer</name>
+            <name locale="ru_RU">1.4. Подвал</name>
+        </setting>
+        <setting var="footer_background" control_type="color">
+            <value/>
+            <name locale="en_US">Custom background of footer</name>
+            <name locale="ru_RU">Пользовательские фоновый цвет подвала</name>
+        </setting>
+        <setting var="footer_header" control_type="color">
+            <value/>
+            <name locale="en_US">Custom headers color of footer</name>
+            <name locale="ru_RU">Пользовательские цвет текста заголовков подвала</name>
+        </setting>
+        <setting var="footer_color" control_type="color">
+            <value/>
+            <name locale="en_US">Custom text color of footer</name>
+            <name locale="ru_RU">Пользовательские цвет текста подвала</name>
+        </setting>
+        <setting var="divider_options" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.5. Options</name>
+            <name locale="ru_RU">1.5. Варианты</name>
+        </setting>
+        <setting var="appmenu" control_type="select">
+            <value>both</value>
+            <name locale="en_US">Position of application menu(Catalog)</name>
+            <name locale="ru_RU">Положение меню приложения(Каталог)</name>
+            <options>
+                <option value="horizontal">
+                    <name locale="ru_RU">В горизонтальном меню</name>
+                    <name locale="en_US">Horizontal menu</name>
+                </option>
+                <option value="vertical">
+                    <name locale="ru_RU">В боковой панели</name>
+                    <name locale="en_US">Sidebar</name>
+                </option>
+                <option value="both">
+                    <name locale="ru_RU">Оба варианта</name>
+                    <name locale="en_US">Both</name>
                 </option>
             </options>
         </setting>
@@ -468,143 +814,173 @@
                 </option>
             </options>
         </setting>
-        <setting var="logo" control_type="image">
-            <value></value>
-            <filename>img/mylogo.*</filename>
-            <name locale="en_US">Company Logo</name>
-            <name locale="ru_RU">Логотип компании</name>
-        </setting>
-        <setting var="slogan" control_type="text">
-            <value/>
-            <name locale="en_US">The company slogan
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 30px -500px 0 0;">Holidays</p>                 
-            ]]>
-            </name>
-            <name locale="ru_RU">Слоган компании
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 30px -500px 0 0;">Праздники</p>                 
-            ]]>
-            </name>
-            <description locale="en_US">Example: Modern online shop</description>
-            <description locale="ru_RU">Например: Современный интернет-магазин</description>
-        </setting>
         <setting var="newyear" control_type="checkbox">
             <value/>
-            <name locale="en_US">Use New Year holiday styles
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 30px -500px 0 0;">Social networks</p>                 
-            ]]>
-            </name>
-            <name locale="ru_RU">Использовать новогоднее оформление
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 30px -500px 0 0;">Социальные сети</p>                 
-            ]]>
-            </name>
+            <name locale="en_US">Use New Year holiday styles</name>
+            <name locale="ru_RU">Использовать новогоднее оформление</name>
         </setting>
-        <setting var="social_size" control_type="image_select">
-            <value>img/themesettings/medium.png</value>
-            <name locale="ru_RU">Размер социальных иконок</name>
-            <name locale="en_US">Social icons size</name>
-            <options>
-                <option value="img/themesettings/small.png"/>
-                <option value="img/themesettings/medium.png"/>
-                <option value="img/themesettings/large.png"/>
-            </options>
+        <setting var="divider_socials" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.6. Social networks</name>
+            <name locale="ru_RU">1.6. Социальные сети</name>
         </setting>
-        <setting var="social_inverse" control_type="checkbox">
-            <value>1</value>
-            <name locale="en_US">Inverse icons styles</name>
-            <name locale="ru_RU">Инвертировать стили иконок</name>
-        </setting>
-        <setting var="fb" control_type="text">
-            <value>https://www.facebook.com/</value>
-            <name locale="en_US">Facebook page URL</name>
-            <name locale="ru_RU">Адрес страницы во «Фейсбуке»</name>
-            <description locale="en_US">Example: https://www.facebook.com/Webasyst</description>
-            <description locale="ru_RU">Например: https://www.facebook.com/Webasyst</description>
-        </setting>
-        <setting var="vk" control_type="text">
-            <value>http://vk.com/</value>
-            <name locale="en_US">VK.com page URL</name>
-            <name locale="ru_RU">Адрес страницы или группы во «ВКонтакте»</name>
+        <setting var="community_vk" control_type="text">
+            <value>#</value>
+            <name locale="en_US">VK</name>
+            <name locale="ru_RU">Вконтакте</name>
             <description locale="en_US">Example: http://vk.com/webasyst_ru</description>
             <description locale="ru_RU">Например: http://vk.com/webasyst_ru</description>
         </setting>
-        <setting var="gp" control_type="text">
-            <value>https://plus.google.com/</value>
-            <name locale="en_US">Gooogle Plus page URL</name>
-            <name locale="ru_RU">Адрес страницы Google Plus</name>
-            <description locale="en_US">Example: https://plus.google.com/mypage/</description>
-            <description locale="ru_RU">Например: https://plus.google.com/mypage/</description>
+        <setting var="community_fb" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Facebook</name>
+            <description locale="en_US">Example: https://www.facebook.com/Webasyst.RU</description>
+            <description locale="ru_RU">Например: https://www.facebook.com/Webasyst.RU</description>
         </setting>
-        <setting var="tt" control_type="text">
-            <value><![CDATA[username]]></value>
-            <name locale="en_US">Twitter username</name>
-            <name locale="ru_RU">Имя пользователя в Твиттере</name>
-            <description locale="en_US">Example: webasyst</description>
-            <description locale="ru_RU">Например: webasyst_ru</description>
+        <setting var="community_tt" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Twitter</name>
+            <description locale="en_US">Example: https://twitter.com/webasyst_ru</description>
+            <description locale="ru_RU">Например: https://twitter.com/webasyst_ru</description>
         </setting>
-        <setting var="youtube" control_type="text">
-            <value/>
-            <name locale="en_US">Youtube channel link</name>
-            <name locale="ru_RU">Ссылка на канал youtube</name>
-            <description locale="en_US">Example: http://www.youtube.com/user/yourchannel</description>
-            <description locale="ru_RU">Например: http://www.youtube.com/user/yourchannel</description>
+        <setting var="community_ok" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Odnoklassniki</name>
+            <name locale="ru_RU">Одноклассники</name>
+            <description locale="en_US">Example: https://ok.ru/mylink</description>
+            <description locale="ru_RU">Например: https://ok.ru/mylink</description>
         </setting>
-        <setting var="vimeo" control_type="text">
-            <value/>
-            <name locale="en_US">Vimeo channel link</name>
-            <name locale="ru_RU">Ссылка на канал vimeo</name>
-            <description locale="en_US">Example: http://vimeo.com/yourchannel</description>
-            <description locale="ru_RU">Например: http://vimeo.com/yourchannel</description>
+        <setting var="community_gp" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Google plus</name>
+            <description locale="en_US">Example: https://plus.google.com/116636673175550063887/</description>
+            <description locale="ru_RU">Например: https://plus.google.com/116636673175550063887/</description>
         </setting>
-        <setting var="ok" control_type="text">
-            <value/>
-            <name locale="en_US">Odnoklassniki community link</name>
-            <name locale="ru_RU">Сообщество одноклассники</name>
-            <description locale="en_US">Example: http://www.odnoklassniki.ru/groupname</description>
-            <description locale="ru_RU">Например: http://www.odnoklassniki.ru/groupname</description>
+        <setting var="community_ig" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Instagram</name>
+            <description locale="en_US">Example: https://www.instagram.com/username/</description>
+            <description locale="ru_RU">Например: https://www.instagram.com/username/</description>
         </setting>
-        <setting var="skype" control_type="text">
-            <value/>
-            <name locale="en_US">Skype username</name>
-            <name locale="ru_RU">Пользователь скайп</name>
+        <setting var="community_yt" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Youtube</name>
+            <description locale="en_US">Example: http://www.youtube.com/user/username/</description>
+            <description locale="ru_RU">Например: http://www.youtube.com/user/username/</description>
+        </setting>
+        <setting var="community_vm" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Vimeo</name>
+            <description locale="en_US">Example: https://vimeo.com/webasyst/</description>
+            <description locale="ru_RU">Например: https://vimeo.com/webasyst/</description>
+        </setting>
+        <setting var="community_lj" control_type="text">
+            <value>#</value>
+            <name locale="en_US">livejournal</name>
+            <name locale="ru_RU">Живой журнал</name>
+            <description locale="en_US">Example: http://username.livejournal.com/</description>
+            <description locale="ru_RU">Например: http://username.livejournal.com/</description>
+        </setting>
+        <setting var="community_pt" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Pinterest</name>
+            <description locale="en_US">Example: https://www.pinterest.com/username/</description>
+            <description locale="ru_RU">Например: https://www.pinterest.com/username/</description>
+        </setting>
+        <setting var="community_sk" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Skype</name>
             <description locale="en_US">Example: myusername</description>
             <description locale="ru_RU">Например: myusername</description>
         </setting>
         <setting var="rss" control_type="checkbox">
             <value/>
-            <name locale="en_US">RSS
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 65px -500px 0 0;">Sidebar</p>                 
-            ]]>
-            </name>
-            <name locale="ru_RU">RSS подписка в подвале
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 65px -500px 0 0;">Боковая панель</p>                 
-            ]]>
-            </name>
+            <name locale="en_US">RSS</name>
+            <name locale="ru_RU">RSS подписка в подвале</name>
         </setting>
-        <setting var="catalog_header" control_type="select">
-            <value>light</value>
-            <name locale="en_US">Catalog header style</name>
-            <name locale="ru_RU">Стиль заголовка каталога</name>
+        <setting var="divider_usermenu" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.7. User menu</name>
+            <name locale="ru_RU">1.7. Пользовательское меню</name>
+        </setting>
+        <setting var="toolbar_background" control_type="color">
+            <value/>
+            <name locale="en_US">Toolbar background color</name>
+            <name locale="ru_RU">Цвет фона пользовательского меню</name>
+        </setting>
+        <setting var="toolbar_background_hover" control_type="color">
+            <value/>
+            <name locale="en_US">Toolbar background color (hover)</name>
+            <name locale="ru_RU">Цвет фона пользовательского меню (при наведении)</name>
+        </setting>
+        <setting var="toolbar_color_empty" control_type="color">
+            <value/>
+            <name locale="en_US">Toolbar text color(empty)</name>
+            <name locale="ru_RU">Цвет текста пользовательского меню(пустое)</name>
+        </setting>
+        <setting var="toolbar_color_fill" control_type="color">
+            <value/>
+            <name locale="en_US">Toolbar text color(fill)</name>
+            <name locale="ru_RU">Цвет текста пользовательского меню(заполненное)</name>
+        </setting>
+        <setting var="toolbar_border" control_type="color">
+            <value/>
+            <name locale="en_US">Toolbar border color</name>
+            <name locale="ru_RU">Цвет границы пользовательского меню</name>
+        </setting>
+        <setting var="toolbar_counter" control_type="color">
+            <value/>
+            <name locale="en_US">Toolbar counters color</name>
+            <name locale="ru_RU">Цвет индикаторов пользовательского меню</name>
+        </setting>
+        <setting var="divider_sidebar_app" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.8. Sidebar (apps)</name>
+            <name locale="ru_RU">1.8. Боковая панель (приложения)</name>
+        </setting>
+        <setting var="sidebar_site" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Site</name>
+            <name locale="ru_RU">Сайт</name>
+        </setting>
+        <setting var="sidebar_shop" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Shop</name>
+            <name locale="ru_RU">Магазин</name>
+        </setting>
+        <setting var="sidebar_blog" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Blog</name>
+            <name locale="ru_RU">Блог</name>
+        </setting>
+        <setting var="sidebar_photos" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Photos</name>
+            <name locale="ru_RU">Фото</name>
+        </setting>
+        <setting var="divider_sidebar_blocks" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.9. Sidebar (blocks)</name>
+            <name locale="ru_RU">1.9. Боковая панель (блоки)</name>
+        </setting>
+        <setting var="sidebar_nav_type" control_type="select">
+            <value>megamenu</value>
+            <name locale="en_US">Sidebar navigation type</name>
+            <name locale="ru_RU">Тип навигации в боковой панели</name>
             <options>
-                <option value="light">
-                    <name locale="ru_RU">светлый</name>
-                    <name locale="en_US">light</name>
+                <option value="megamenu">
+                    <name locale="ru_RU">мегаменю</name>
+                    <name locale="en_US">megamenu</name>
                 </option>
-                <option value="dark">
-                    <name locale="ru_RU">темный</name>
-                    <name locale="en_US">dark</name>
+                <option value="hover">
+                    <name locale="ru_RU">одноколоночное</name>
+                    <name locale="en_US">1 column</name>
+                </option>
+                <option value="default">
+                    <name locale="ru_RU">по умолчанию</name>
+                    <name locale="en_US">default</name>
                 </option>
             </options>
-        </setting>
-        <setting var="sidebar" control_type="checkbox">
-            <value/>
-            <name locale="en_US">Show / hide sidebar</name>
-            <name locale="ru_RU">Отобразить / скрыть боковую панель</name>
         </setting>
         <setting var="sidebar_news" control_type="checkbox">
             <value>1</value>
@@ -631,18 +1007,15 @@
             <name locale="en_US">Show / hide communities widgets</name>
             <name locale="ru_RU">Отобразить / скрыть виджеты сообществ</name>
         </setting>
-        <setting var="sidebar_photos" control_type="checkbox">
+        <setting var="sidebar_lastphotos" control_type="checkbox">
             <value>1</value>
-            <name locale="en_US">Show / hide latest photos
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 30px -500px 0 0;">VK Community</p>                 
-            ]]>
-            </name>
-            <name locale="ru_RU">Отобразить / скрыть последние фото
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 30px -500px 0 0;">Сообщество Вконтакте</p>                 
-            ]]>
-            </name>
+            <name locale="en_US">Show / hide latest photos</name>
+            <name locale="ru_RU">Отобразить / скрыть последние фото</name>
+        </setting>
+        <setting var="divider_vkontakte" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.10. Vkontakte</name>
+            <name locale="ru_RU">1.10. Вконтакте</name>
         </setting>
         <setting var="vk_id" control_type="text">
             <value/>
@@ -652,12 +1025,12 @@
             <description locale="ru_RU">Например: 21415010</description>
         </setting>
         <setting var="vk_mode" control_type="select">
-            <value></value>
+            <value/>
             <name locale="en_US">Widget mode</name>
             <name locale="ru_RU">Вид виджета</name>
             <options>
                 <option value="0">
-                    <name locale="ru_RU">Участиники сообщества</name>
+                    <name locale="ru_RU">Участники сообщества</name>
                     <name locale="en_US">Community members</name>
                 </option>
                 <option value="1">
@@ -669,6 +1042,11 @@
                     <name locale="en_US">News</name>
                 </option>
             </options>
+        </setting>
+        <setting var="vk_wide" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Wide mode for news</name>
+            <name locale="ru_RU">Расширенный режим для новостей</name>
         </setting>
         <setting var="vk_height" control_type="text">
             <value>300</value>
@@ -693,18 +1071,14 @@
         </setting>
         <setting var="vk_color3" control_type="color">
             <value/>
-            <name locale="en_US">Button color
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 30px -500px 0 0;">Facebook community</p>                 
-            ]]>
-            </name>
-            <name locale="ru_RU">Цвет кнопок
-            <![CDATA[
-                <p style="color:#000; font-weight:bold; margin: 30px -500px 0 0;">Сообщество facebook</p>                 
-            ]]>
-            </name>
+            <name locale="en_US">Button color</name>
+            <name locale="ru_RU">Цвет кнопок</name>
             <description locale="en_US">Example: #000000</description>
             <description locale="ru_RU">Например: #000000</description>
+        </setting>
+        <setting var="divider_facebook" control_type="group_divider">
+            <value/>
+            <name locale="en_US">1.11. Facebook</name>
         </setting>
         <setting var="fb_href" control_type="text">
             <value/>
@@ -720,40 +1094,25 @@
             <description locale="en_US">Example: 400</description>
             <description locale="ru_RU">Например: 400</description>
         </setting>
-        <setting var="fb_color" control_type="select">
-            <value>dark</value>
-            <name locale="en_US">Color scheme</name>
-            <name locale="ru_RU">Цветовая схема</name>
-            <options>
-                <option value="light">
-                    <name locale="ru_RU">светлая</name>
-                    <name locale="en_US">light</name>
-                </option>
-                <option value="dark">
-                    <name locale="ru_RU">темная</name>
-                    <name locale="en_US">dark</name>
-                </option>
-            </options>
+        <setting var="fb_cover" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Hide Cover Photo</name>
+            <name locale="ru_RU">Скрыть фоновое изображение</name>
         </setting>
-         <setting var="fb_faces" control_type="checkbox">
-            <value>1</value>
+        <setting var="fb_faces" control_type="checkbox">
+            <value/>
             <name locale="en_US">Show Friends' Faces</name>
             <name locale="ru_RU">Показать лица друзей</name>
         </setting>
         <setting var="fb_header" control_type="checkbox">
-            <value>1</value>
-            <name locale="en_US">Show header</name>
-            <name locale="ru_RU">Показать заголовок</name>
+            <value/>
+            <name locale="en_US">Use Small Header</name>
+            <name locale="ru_RU">Использовать маленький заголовок</name>
         </setting>
         <setting var="fb_stream" control_type="checkbox">
             <value/>
-            <name locale="en_US">Show latest posts</name>
-            <name locale="ru_RU">Показать последние посты</name>
-        </setting>
-        <setting var="fb_border" control_type="checkbox">
-            <value>1</value>
-            <name locale="en_US">Show border</name>
-            <name locale="ru_RU">Показать границу</name>
+            <name locale="en_US">Show Page Posts</name>
+            <name locale="ru_RU">Показать посты страницы</name>
         </setting>
     </settings>
     <locales>
@@ -764,6 +1123,14 @@
         <locale>
             <msgid>Catalog</msgid>
             <msgstr locale="ru_RU">Каталог</msgstr>
+        </locale>
+        <locale>
+            <msgid>Menu</msgid>
+            <msgstr locale="ru_RU">Меню</msgstr>
+        </locale>
+        <locale>
+            <msgid>Show all</msgid>
+            <msgstr locale="ru_RU">Смотреть все</msgstr>
         </locale>
         <locale>
             <msgid>Subscribe to our email newsletter</msgid>
@@ -796,6 +1163,10 @@
         <locale>
             <msgid>Company</msgid>
             <msgstr locale="ru_RU">Компания</msgstr>
+        </locale>
+        <locale>
+            <msgid>Apps</msgid>
+            <msgstr locale="ru_RU">Приложения</msgstr>
         </locale>
         <locale>
             <msgid>Contacts</msgid>
@@ -852,6 +1223,26 @@
         <locale>
             <msgid>To cart</msgid>
             <msgstr locale="ru_RU">Перейти в корзину</msgstr>
+        </locale>
+        <locale>
+            <msgid>Feedback</msgid>
+            <msgstr locale="ru_RU">Обратная связь</msgstr>
+        </locale>
+        <locale>
+            <msgid>Feedback form</msgid>
+            <msgstr locale="ru_RU">Форма обратной связи</msgstr>
+        </locale>
+        <locale>
+            <msgid>Categories</msgid>
+            <msgstr locale="ru_RU">Категории</msgstr>
+        </locale>
+        <locale>
+            <msgid>By submitting this form I agree to</msgid>
+            <msgstr locale="ru_RU">Нажимая на кнопку подтверждения, я соглашаюсь с</msgstr>
+        </locale>
+        <locale>
+            <msgid>personal data protection policy</msgid>
+            <msgstr locale="ru_RU">политикой обработки персональных данных</msgstr>
         </locale>
     </locales>
 </theme>

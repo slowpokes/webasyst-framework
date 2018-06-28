@@ -1,0 +1,166 @@
+{function name="catalog_image" item=[]}
+    {$image_url = false}
+    {if $theme_settings.catalog_image == 'params' && isset($item.params.image)}
+        {$image_url = $item.params.image}
+    {elseif $theme_settings.catalog_image == 'categoryimages' && class_exists('shopCategoryimagesPlugin')}
+        {$image_url = shopCategoryImagesPlugin::getCategoryLittleThumbUrl($item.id)}
+    {elseif $theme_settings.catalog_image == 'categoryimage' && class_exists('shopCategoryimagePlugin') && isset($sc.image)}
+        {$image_url = "{$wa_url}wa-data/public/shop/categories/{$item.id}/{$item.id}.36{$item.image}"}
+    {elseif $theme_settings.catalog_image == 'wmimage' && class_exists('shopWmimageincatPlugin')}
+        {$image_url = shopWmimageincatPlugin::getCategoryImage($item.id,'icon')}
+    {/if}
+    {if $image_url !== false}
+        <img src="{$image_url}" alt="{$item.name|escape}" class="catalogImg">
+    {/if}
+{/function}
+
+{function name="catalog_item" item=[]}
+    {if count($item.childs)}
+        {if $item.depth > 0}
+            {$li = "dropdown-submenu"}
+        {else}
+            {$li = "dropdown"}
+        {/if}
+        <li class="{$li}{if $selected_category == $item.id} active{/if}{if $item.depth == 0 && isset($item.params.col)} megamenu{/if}">
+            {if isset($item.params.badge) && isset($item.params.badgeclass) && $item.depth > 0}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}" data-icon-id="{$item.id}" class="badge-on">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if}
+                    {catalog_image item=$item}
+                    {$item.name}
+                </a>
+            {else}
+                <a href="{$item.url}" data-icon-id="{$item.id}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if}
+                    {catalog_image item=$item}
+                    {$item.name}
+                </a>
+            {/if}
+            {if $item.depth == 0 && isset($item.params.col)}
+                <div class="dropdown-menu container{if isset($item.params.right)} menu-right{/if}">
+                    <div class="col-xs-12 col-header"></div>
+                    <div class="col-xs-12 col-body">
+                        {$sum=0}
+                        {$next=1}
+                        {foreach $item.childs as $ic}
+                            {$col=3}
+                            {$split = 0}
+
+                            {if isset($ic.params.col)}
+                                {$col=$ic.params.col}
+                            {/if}
+
+                            {if isset($ic.params.split)}
+                                {$split = $ic.params.split}
+                                {* количество элементов в колонке *}
+                                {$subcat_count=(count($ic.childs)/$split)|ceil}
+                            {/if}
+
+                            <div class="col-xs-{$col}">
+                                <div class="col-header">
+                                    <a href="{$ic.url}" data-icon-id="{$ic.id}">
+                                        {if isset($ic.params.icon)}
+                                            <img src="{$wa_static_url}{$ic.params.icon}" alt="{$ic.name}" class="subcat-icon">
+                                        {/if}
+                                        {$ic.name}
+                                    </a>
+                                </div>
+                                <ul class="fa-ul">
+                                    {if count($ic.childs)}
+                                        {foreach $ic.childs as $icc}
+                                            {$next=1}
+                                            <li><i class="fa-li fa fa-{$icc.params.fa|default:'caret-right'} fa-fw"></i><a href="{$icc.url}">{$icc.name}</a></li>
+                                            {if $split> 0 && $subcat_count>1 && $icc@iteration is div by $subcat_count}
+                                                    </ul>
+                                                </div>
+                                                {$sum=$sum+$col}
+
+                                                {if $sum==12}
+                                                    <div class="clearfix"></div>
+                                                    {$sum=0}
+
+                                                    {$next=0}
+                                                {/if}
+
+                                                {if !$icc@last}
+                                                    <div class="col-xs-{$col}">
+                                                        <ul class="fa-ul">
+                                                            <li class="empty">&nbsp;</li>
+                                                {else}
+                                                    <div class="col-xs-12" style="display: none">
+                                                        <ul class="fa-ul">
+                                                            <li></li>
+                                                {/if}
+                                            {/if}
+                                        {/foreach}
+                                    {/if}
+                                </ul>
+                            </div>
+
+                            {if $next}
+                                {$sum=$sum+$col}
+                            {/if}
+                            {if $sum==12}
+                                <div class="clearfix"></div>
+                                {$sum=0}
+                            {/if}
+                        {/foreach}
+                    </div>
+                    <div class="col-xs-12 col-footer"></div>
+                </div>
+            {else}
+                <ul class="dropdown-menu">
+                    {foreach $item.childs as $ic}
+                        {catalog_item item=$ic}
+                    {/foreach}
+                </ul>
+            {/if}
+        </li>
+    {else}
+        <li{if $selected_category == $item.id} class="active"{/if}>
+            {if isset($item.params.badge) && isset($item.params.badgeclass) && $item.depth>0}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}" data-icon-id="{$item.id}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if}
+                    {catalog_image item=$item}
+                    {$item.name}
+                </a>
+            {else}
+                <a href="{$item.url}" data-icon-id="{$item.id}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if}
+                    {catalog_image item=$item}
+                    {$item.name}
+                </a>
+            {/if}
+        </li>
+    {/if}
+{/function}
+
+<nav class="navbar navbar-default navbar-categories">
+    <div class="container">
+        <ul class="nav navbar-nav">
+            {foreach $categories as $c}
+                {catalog_item item=$c}
+            {/foreach}
+            {if $wa_app == "shop"}
+                {foreach $frontend_nav as $_key => $_}
+                <li class="dropdown megamenu">
+                    <a href="#">{if substr($_key, -7) == '-plugin'}{$wa->pluginName(substr($_key, 0, -7))}{else}[`More`]{/if}</a>
+                    <div class="dropdown-menu container">
+                        <div class="col-xs-12 col-body">
+                            {$_|replace:"menu-v":"list-unstyled list-inline plugin"}
+                        </div>
+                    </div>
+                </li>
+                {/foreach}
+                <!-- 'frontend_nav_aux' plugins -->
+                {foreach $frontend_nav_aux as $_key => $_}
+                <li class="dropdown megamenu">
+                    <a href="#">{if substr($_key, -7) == '-plugin'}{$wa->pluginName(substr($_key, 0, -7))}{else}[`More`]{/if}</a>
+                    <div class="dropdown-menu container">
+                        <div class="col-xs-12 col-body">
+                            {$_|replace:"menu-v":"list-unstyled list-inline plugin"}
+                        </div>
+                    </div>
+                </li>
+                {/foreach}
+            {/if}
+        </ul>
+    </div>
+</nav>

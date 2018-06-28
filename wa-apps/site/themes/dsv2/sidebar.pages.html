@@ -1,0 +1,18 @@
+{if count($array)}
+<div class="sidebar-info">
+    <div class="headline">
+        <div class="h3 theme-border-color">{$mytitle|default:'[`Information`]'}</div>
+    </div>
+    <ul class="list-unstyled">
+    	{if !empty($hide)}
+			{foreach $array as $item}
+			{if !isset($item.{$hide})}<li><i class="fa fa-angle-right fa-lg theme-color-wh"></i> <a href="{$item.url}">{$item.title}</a></li>{/if}
+			{/foreach}
+		{else}
+			{foreach $array as $item}
+			<li><i class="fa fa-angle-right fa-lg theme-color-wh"></i> <a href="{$item.url}">{$item.name}</a></li>
+			{/foreach}
+		{/if}
+    </ul>
+</div>
+{/if}

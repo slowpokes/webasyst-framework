@@ -1,0 +1,127 @@
+<div class="header hidden-xs">
+    <div class="auth">
+        <div class="container">
+            <div class="row">
+                <ul class="applist list-unstyled pull-left hidden-xs">
+                    {$app_icons=[
+                        $wa->getUrl('shop/frontend')=>$theme_settings.icon_shop|default:'fa-home',
+                        $wa->getUrl('blog/frontend')=>$theme_settings.icon_blog|default:'fa-newspaper-o',
+                        $wa->getUrl('photos/frontend')=>$theme_settings.icon_photos|default:'fa-camera-retro',
+                        $wa->getUrl('hub/frontend')=>$theme_settings.icon_hub|default:'fa-weixin',
+                        $wa->getUrl('helpdesk/frontend')=>$theme_settings.icon_helpdesk|default:'fa-life-ring'
+                    ]}
+                    {foreach $wa->apps() as $a}
+                        <li{if $a.url==$wa_app_url} class="active"{/if}>
+                        <a href="{$a.url}" {if $a@first}style="border-left: 1px solid #ececec;"{/if}><i class="fa {$app_icons[$a.url]|default:'fa-globe'} fa-lg"></i> {$a.name}</a>
+                        </li>
+                    {/foreach}
+                </ul>
+                <ul class="usermenu pull-right">
+                    {if $wa->isAuthEnabled()}
+                        {if $wa->user()->isAuth()}
+                            {if $wa->shop}
+                                <li><a href="{$wa->myUrl()}" style="border-left: 1px solid #ececec;">[s`My account`]</a></li>
+                            {/if}
+                            <li><a href="?logout"><span class="hidden-sm hidden-xs">{$wa->user('firstname')},</span> [s`Log out`]</a></li>
+                        {else}
+                            {if !$theme_settings.authtype}
+                                <li><a href="#" data-toggle="modal" data-target="#signupModal" style="border-left: 1px solid #ececec;">[s`Sign up`]</a></li>
+                            {else}
+                                <li><a href="{$wa->signupUrl()}" style="border-left: 1px solid #ececec;">[s`Sign up`]</a></li>
+                            {/if}
+                            <li><a href="#" data-toggle="modal" data-target="#loginModal">[s`Log in`]</a></li>
+                        {/if}
+                    {/if}
+                    {if $wa_app == "shop" && count($currencies) > 1}
+                    <li class="dropdown crcy">
+                        {$currency = $wa->shop->currency()}
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">[`Currency`] <span class="theme-color-wh hidden-xs hidden-sm">{$currency}</span></a>
+                        <ul class="dropdown-menu currencies" role="menu">
+                            {foreach $currencies as $c_code => $c}
+                                <li{if $c_code == $currency} class="active"{/if}><a data-crcy="{$c_code}">{if $c.code=="RUB"}{$c.sign_html}{else}{$c.sign}{/if}{if $c_code == $currency} <i class="fa fa-check theme-color-wh"></i>{/if}</a></li>
+                            {/foreach}
+                        </ul>
+                    </li>
+                    {/if}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-content">
+        <div class="container">
+            <div class="row vertical-align">
+                {********* ЛОГО / LOGO ****************}
+                <div class="col-md-3 col-sm-4 col-xs-12">
+                    <div class="logo">
+                        {include file="dsv.logo.html" inline}
+                        {if $theme_settings.slogan}
+                            <span>{$theme_settings.slogan}</span>
+                        {/if}
+                    </div>
+                </div>
+
+                {********* ПОИСК / SEARCH *************}
+                <div class="col-md-3 col-sm-4">
+                    {if in_array($wa_app,['site','shop','photos','mailer'])}
+                        {include file="searchform.html" inline}
+                    {else}
+                        {include file="`$wa_active_theme_path`/searchform.html" inline}
+                    {/if}
+                </div>
+
+                {********* КОНТАКТЫ / CONTACTS ********}
+                <div class="col-md-{if $theme_settings.cart == 'top'}3{else}6{/if} col-sm-4">
+                    <ul class="phones list-unstyled pull-right">
+                        {if $wa->block("site.phones")}
+                            {$wa->block("site.phones")}
+                        {else}
+                            <li><i class="fa fa-phone fa-fw"></i> {if $wa->shop}{$wa->shop->settings('phone')}{/if}</li>
+                            <li><a href='#'>8 (800) 999-40-40</a></li>
+                            {if $wa->shop && $wa->shop->settings('phone')}
+                                <li>
+                                    {if $wh = $wa->shop->settings('workhours')}
+                                    {$wh.days_from_to}{if $wh.hours_from && $wh.hours_to} {$wh.hours_from}—{$wh.hours_to}{/if}
+                                    {/if}
+                                </li>
+                            {/if}
+                        {/if}
+                    </ul>
+                </div>
+
+                {********* КОРЗИНА / CART *************}
+                {if $wa->shop && $theme_settings.cart == "top"}
+                <div class="col-md-3 hidden-sm hidden-xs">
+                    {$cart_total = $wa->shop->cart->total()}
+                    {$cart_count = $wa->shop->cart->count()}
+                    <div id="cart" class="pull-right cart{if $cart_total} highlight{/if} cart-top" data-placement="bottom">
+                        <a href="{$wa->getUrl('shop/frontend/cart')}" rel="nofollow">
+                            <i class="fa fa-shopping-cart fa-lg"></i>
+                            <span class="toolbar-title hidden-xs">[s`Cart`]</span>
+                            <span class="cart-count count">{$cart_count}</span>
+                            <span class="cart-total price hidden-sm hidden-xs">{wa_currency_html($cart_total, $wa->shop->currency())}</span>
+                        </a>
+                        {if strpos($wa->currentUrl(), 'cart') === false && strpos($wa->currentUrl(), 'checkout') === false && !$wa->isMobile() && $wa->userAgent('device') != 'ipad'}
+                            {include file="flying.cart.html"}
+                        {/if}
+                    </div>
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+
+    {********* СТРАНИЦЫ / PAGES ***********}
+    {if count($_links)}
+        {include file="menu.pages.html" inline}
+    {/if}
+
+    {********* КАТЕГОРИИ / CATEGORIES *****}
+    {if in_array($wa_app,['site','shop','mailer'])}
+        {if $wa->shop && count($categories) && in_array($theme_settings.appmenu,['both','horizontal'])}
+            {include file="menu.app.html" inline}
+        {/if}
+    {else}
+        {include file="`$wa_active_theme_path`/menu.app.html" inline}
+    {/if}
+</div>

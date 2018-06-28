@@ -1,0 +1,187 @@
+{function page_item_mobile item=[]}
+<li class="list-group-item list-toggle{if $wa->currentUrl() == $item.url} active{/if}">
+    <a href="{$item.url}">{$item.name}</a>
+    {if isset($item.childs)}
+        <a href="#page{$item.id}" data-toggle="collapse" data-parent="#pages" class="collapsed accordion-toggle icon"><i class="fa"></i></a>
+        <ul id="page{$item.id}" class="collapse">
+            {foreach $item.childs as $ic}
+                {page_item_mobile item=$ic}
+            {/foreach}
+        </ul>
+    {/if}
+</li>
+{/function}
+
+{function catalog_item_mobile item=[]}
+    {if $item.depth < $depth && count($item.childs)}
+        <li class="list-group-item list-toggle{if $selected_category == $item.id} active{/if}">
+            <a href="{$item.url}">{$item.name}</a>
+            <a href="#cat{$item.id}" data-toggle="collapse" data-parent="#categories" class="collapsed accordion-toggle icon"><i class="fa"></i></a>
+            <ul id="cat{$item.id}" class="collapse">
+                {foreach $item.childs as $ic}
+                    {catalog_item_mobile item=$ic}
+                {/foreach}
+            </ul>
+        </li>
+    {else}
+        <li class="list-group-item list-toggle{if $selected_category == $item.id} active{/if}">
+            <a href="{$item.url}">{$item.name}</a>
+        </li>
+    {/if}
+{/function}
+
+<div class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="leftNav">
+    {********* АВТОРИЗАЦИЯ / AUTH *********}
+    <ul class="list-group auth">
+        {if $wa->isAuthEnabled()}
+            <li class="list-group-item">
+            {if $wa->user()->isAuth()}
+                <a href="?logout" class="pull-right">[s`Log out`]</a>
+                <a href="{if $wa->myUrl()}{$wa->myUrl()}{else}javascript:void(0);{/if}"><i class="fa fa-user fa-fw"></i> {$wa->user('firstname')|default:'[`My account`]'}</a>
+            {else}
+                {if $theme_settings.authtype}
+                    <a href="{$wa->signupUrl()}" class="pull-right">[s`Sign up`]</a>
+                    <a href="{$wa->loginUrl()}"><i class="fa fa-user fa-fw"></i>[s`Log in`]</a>
+                {else}
+                    <a href="javascript:void(0);" class="pull-right" data-signup="1">[s`Sign up`]</a>
+                    <a href="javascript:void(0);" data-auth="1"><i class="fa fa-user fa-fw"></i>[s`Log in`]</a>
+                {/if}
+            {/if}
+            </li>
+        {/if}
+    </ul>
+    <ul class="list-group">
+        {********* ОБРАТНАЯ СВЯЗЬ / FEEDBACK **}
+        <li class="list-group-item">
+            <a href="#feedbackModal" data-toggle="modal">
+                <i class="fa fa-commenting fa-fw"></i>[`Feedback`]
+            </a>
+        </li>
+    </ul>
+
+    {********* СТРАНИЦЫ / PAGES ***********}
+    {if count($_links)}
+    <ul class="list-group" id="pages">
+        <li class="list-group-item">
+            <a href="{$wa_static_url}">[`Homepage`]</a>
+        </li>
+        {foreach $_links as $a}
+            {if isset($a.nomenu)}{continue}{/if}
+            {page_item_mobile item=$a}
+        {/foreach}
+    </ul>
+    {/if}
+
+    {********* ПРИЛОЖЕНИЯ / APPS **********}
+    {if $apps = $wa->apps()}
+    {$app_icons=[
+        $wa->getUrl('shop/frontend')=>'fa-home',
+        $wa->getUrl('blog/frontend')=>'fa-newspaper-o',
+        $wa->getUrl('photos/frontend')=>'fa-camera-retro',
+        $wa->getUrl('hub/frontend')=>'fa-weixin',
+        $wa->getUrl('helpdesk/frontend')=>'fa-life-ring'
+    ]}
+    <div class="h4">[`Apps`]</div>
+    <ul class="list-group">
+        {foreach $apps as $a}
+            <li class="list-group-item{if $a.url==$wa_app_url} active{/if}">
+                <a href="{$a.url}"><i class="fa {$app_icons[$a.url]|default:'fa-globe'} fa-fw"></i>{$a.name}</a>
+            </li>
+        {/foreach}
+    </ul>
+    {/if}
+</div>
+
+{********* КАТЕГОРИИ / CATEGORIES *****}
+{if $wa->shop && count($categories)}
+<div class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="rightNav">
+    <div class="h2">[`Categories`]</div>
+    <ul class="list-group" id="categories">
+        {foreach $categories as $c}
+            {catalog_item_mobile item=$c depth=2}
+        {/foreach}
+    </ul>
+</div>
+{/if}
+<div class="shadow-overlay"></div>
+
+<div class="header-mobile visible-xs">
+    <div class="container">
+        <button type="button" id="showLeft" class="btn-hm">
+            <i class="fa fa-bars"></i>
+        </button>
+        <div class="header-content">
+            {********* ЛОГОТИП / LOGO *************}
+            <span class="logo">{include file="dsv.logo.html" inline}</span>
+
+            <ul class="phones list-unstyled">
+                {if $wa->block("site.phones")}
+                    {$wa->block("site.phones")}
+                {else}
+                    <li><i class="fa fa-phone fa-fw"></i> {if $wa->shop}{$wa->shop->settings('phone')}{/if}</li>
+                    <li><a href='#'>8 (800) 999-40-40</a></li>
+                    {if $wa->shop && $wa->shop->settings('phone')}
+                        <li>
+                            {if $wh = $wa->shop->settings('workhours')}
+                            {$wh.days_from_to}{if $wh.hours_from && $wh.hours_to} {$wh.hours_from}—{$wh.hours_to}{/if}
+                            {/if}
+                        </li>
+                    {/if}
+                {/if}
+            </ul>
+
+            <button type="button" class="btn-hm visible-xs collapsed" id="showSearch" data-toggle="collapse" data-target="#searchform"></button>
+
+            <ul class="list-md pull-right hidden-xs">
+                {********* ВАЛЮТА / CURRENCY **********}
+                {if $wa_app == "shop" && count($currencies) > 1}
+                <li class="dropdown crcy">
+                    {$currency = $wa->shop->currency()}
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{$currency}</a>
+                    <ul id="mobile-crcy" class="dropdown-menu currencies" role="menu">
+                        {foreach $currencies as $c_code => $c}
+                            <li{if $c_code == $currency} class="active"{/if}><a data-crcy="{$c_code}" href="#">{if $c.code=="RUB"}{$c.sign_html}{else}{$c.sign}{/if}{if $c_code == $currency} <i class="fa fa-check theme-sc"></i>{/if}</a></li>
+                        {/foreach}
+                    </ul>
+                </li>
+                {/if}
+
+                {********* АВТОРИЗАЦИЯ / AUTH *********}
+                {if $wa->isAuthEnabled()}
+                    {if $wa->user()->isAuth()}
+                        {if $wa->myUrl()}
+                        <li><a href="{$wa->myUrl()}">{$wa->user('firstname')|default:'[`My account`]'}</a></li>
+                        {else}
+                        <li>{$wa->user('firstname')|default:'[`My account`]'}</li>
+                        {/if}
+                        <li><a href="?logout">[s`Log out`]</a></li>
+                    {else}
+                        {if $theme_settings.authtype}
+                            <li><a href="{$wa->loginUrl()}">[s`Log in`]</a></li>
+                            <li><a href="{$wa->signupUrl()}">[s`Sign up`]</a></li>
+                        {else}
+                            <li><a href="javascript:void(0);" data-auth="1">[s`Log in`]</a></li>
+                            <li><a href="javascript:void(0);" data-signup="1">[s`Sign up`]</a></li>
+                        {/if}
+                    {/if}
+                {/if}
+            </ul>
+
+            <div class="mb-10">
+                <button type="button" id="showRight" class="btn-hm fw-3">[`Categories`]</button>
+                <button type="button" class="pull-right btn-hm hidden-xs" data-toggle="collapse" data-target="#searchform"><i class="fa fa-search"></i></button>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        {********* ПОИСК / SEARCH *************}
+        <div class="collapse" id="searchform">
+            {if in_array($wa_app,['site','shop','photos','mailer'])}
+                {include file="searchform.html" without_id=true inline}
+            {else}
+                {include file="`$wa_active_theme_path`/searchform.html" inline}
+            {/if}
+        </div>
+    </div>
+</div>

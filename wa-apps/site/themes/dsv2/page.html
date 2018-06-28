@@ -1,3 +1,9 @@
+{if !isset($page.hidesidebar) && $theme_settings.sidebar_site}
+    {$wa->globals("sidebar",true)}
+{/if}
+
+{$wa->globals("crumb",$page.name)}
+
 <div class="headline">
   <h1 class="theme-border-color">{$page.name}</h1>
 </div>

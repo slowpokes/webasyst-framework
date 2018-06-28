@@ -1,0 +1,14 @@
+{if $latest_posts = $wa->blog->posts($blog_id|default:null,$limit|default:4)}
+<div class="sidebar-news hidden-sm hidden-xs">
+    <div class="headline">
+        <div class="h3 theme-border-color">{$mytitle|default:'[`Latest news`]'}</div>
+    </div>
+    {foreach $latest_posts as $_post}
+    <div class="sidebar-post">
+        <p><a href="{$_post.link}" class="post-title">{$_post.title|truncate:50:"...":true}</a></p>
+        <p><a href="{$_post.user.posts_link}" class="theme-color" rel="nofollow">{$_post.user.name}</a></p>
+        <p><span>{$_post.datetime|wa_date:"humandatetime"}</span></p>
+    </div>
+    {/foreach}
+</div>
+{/if}
