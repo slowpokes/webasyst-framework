@@ -186,6 +186,12 @@ class waInstallerApps
         static $domain = null;
         if ($domain === null) {
             $domain = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+            //VADIM CODE START
+            $config_domain = self::getGenericConfig('identity_domain');
+            if($config_domain){
+                $domain = $config_domain;
+            }
+            //VADIM CODE END
             $domain = preg_replace('@(^www\.|:\d+$)@', '', $domain);
         }
         return $domain;
@@ -902,6 +908,7 @@ class waInstallerApps
         $enum_options = array();
         if (isset($options['status'])) {
             $installed_apps = self::getConfig(self::CONFIG_APPS);
+            $installed_apps = self::getInstalledApps();
             if ($options['status'] === true) {
                 $enum_options['items'] = $installed_apps;
             } elseif ($options['status'] === false) {
@@ -2181,5 +2188,21 @@ class waInstallerApps
             $path = 'wa-apps/'.$app_id.'/'.$type;
         }
         return $path;
+    }
+
+    private static function getInstalledApps(){
+        $installed_apps = self::getConfig(self::CONFIG_APPS);
+        $result = array();
+        foreach ($installed_apps as $app_id => $info){
+            if(is_array($info)){
+                if(isset($info['app'])){
+                    $result[$info['app']] = 1;
+                }
+            }
+            else{
+                $result[$app_id] = 1;
+            }
+        }
+        return $result;
     }
 }
