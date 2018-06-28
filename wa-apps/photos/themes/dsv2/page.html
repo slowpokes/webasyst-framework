@@ -1,0 +1,11 @@
+{if $theme_settings.sidebar_photos && !isset($page.hidesidebar)}
+	{$wa->globals("sidebar",true)}
+{/if}
+{$wa->globals("crumb",$page.name)}
+
+<div class="headline">
+	<h1>{$page.name}</h1>
+</div>
+<div id="page" role="main">
+	{$page.content}
+</div>

@@ -1,0 +1,133 @@
+{function name="blog_side_item" item=[]}
+    <li{if $wa->globals('blog_id') eq $item.id && empty($is_search)} class="active"{/if}>
+        <a href="{$item.link}">{$item.name}</a>
+    </li>
+{/function}
+
+{function name="menu_item" item=[]}
+    {if isset($item.childs)}
+        {if empty($item.parent_id)}
+            {$li = "dropdown"}
+        {else}
+            {$li = "dropdown-submenu"}
+        {/if}
+        <li class="{$li}{if $wa->currentUrl() == $item.url} active{/if}">
+            {if isset($item.params.badge) && isset($item.params.badgeclass) && empty($item.parent_id)}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}" class="badge-on">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {else}
+                <a href="{$item.url}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {/if}
+
+            <ul class="dropdown-menu">
+                {foreach $item.childs as $ic}
+                    {menu_item item=$ic}
+                {/foreach}
+            </ul>
+        </li>
+    {else}
+        <li{if $wa->currentUrl() == $item.url} class="active"{/if}>
+            {if isset($item.params.badge) && isset($item.params.badgeclass) && empty($item.parent_id)}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {else}
+                <a href="{$item.url}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {/if}
+        </li>
+    {/if}
+{/function}
+
+{function name="menu_side_item" item=[]}
+    {if isset($item.childs)}
+        <li class="list-group-item list-toggle dropdown-submenu{if $wa->currentUrl() == $item.url} active{/if}">
+            {if isset($item.params.badge) && isset($item.params.badgeclass)}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}" class="badge-on">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {else}
+                <a href="{$item.url}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {/if}
+            <ul class="dropdown-menu">
+                {foreach $item.childs as $ic}
+                    {menu_item item=$ic}
+                {/foreach}
+            </ul>
+        </li>
+    {else}
+        <li class="list-group-item list-toggle{if $wa->currentUrl() == $item.url} active{/if}">
+            {if isset($item.params.badge) && isset($item.params.badgeclass)}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}" class="badge-on">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {else}
+                <a href="{$item.url}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {/if}
+        </li>
+    {/if}
+{/function}
+{if in_array($theme_settings.appmenu,['both','horizontal'])}
+<div class="sidebar-nav margin-bottom-20">
+    <ul id="sidebar-nav" class="list-group collapse in">
+        {if $rss = $wa->blog->rssUrl()}
+        <li class="list-group-item list-toggle">
+            <a href="{$rss}" title="[s`RSS`]"><i class="fa fa-rss"></i> [s`RSS`]</a>
+        </li>
+        {/if}
+
+        {$timeline = $wa->blog->timeline()}
+        {if !empty($timeline)}
+            <li class="list-group-item list-toggle dropdown-submenu">
+                <a href="javascript:void(0)">[`Calendar`]</a>
+                <ul class="dropdown-menu">
+                    {$year=null}
+                    {foreach $timeline as $year_month => $item}
+                        {if $year neq $item.year}
+                            {if !$item@first}
+                                    </ul>
+                                </li>
+                            {/if}
+                            <li class="dropdown-submenu{if $item.year_selected} active{/if}">
+                            {$year=$item.year}
+                            <a href="{$item.year_link}" class="dropdown-toggle disabled" data-toggle="dropdown" data-hover="dropdown" data-delay="500" data-close-others="false">{$item.year|default:'NULL'}</a>
+                            <ul class="dropdown-menu">
+                        {/if}
+                        <li {if $item.selected}class="active"{/if}>
+                            <a href="{$item.link}" title="{_w("%d post","%d posts",$item.count)}">{_ws(date("F",gmmktime(0,0,0,$item.month,1)))}</a>
+                        </li>
+                        {if $item@last}
+                                </ul>
+                            </li>
+                        {/if}
+                    {/foreach}
+                </ul>
+            </li>
+        {/if}
+
+        {$blogs = $wa->blog->blogs()}
+        {if count($blogs) > 1}
+            <li class="list-group-item list-toggle dropdown-submenu{if is_array($wa->globals('blog_id')) && empty($is_search)} active{/if}">
+                <a href="{$wa->blog->url()}">[`All posts`]</a>
+                <ul class="dropdown-menu">
+                    {foreach $blogs as $blog}
+                        {blog_side_item item=$blog}
+                    {/foreach}
+                </ul>
+            </li>
+        {/if}
+
+        {if $blog_pages=$wa->blog->pages()}
+            {foreach $blog_pages as $_page}
+                {menu_side_item item=$_page}
+            {/foreach}
+        {/if}
+    </ul>
+
+    <!-- PLUGINS -->
+    {* @event (frontend_action_default|frontend_action_post|frontend_action_page|frontend_action_error).%plugin_id%.sidebar *}
+    {foreach $frontend_action as $plugin => $output}
+    {if !empty($output.sidebar)}
+        <div class="{$plugin}">
+            {$output.sidebar}
+        </div>
+    {/if}
+    {/foreach}
+</div>
+{/if}

@@ -1,0 +1,55 @@
+<nav class="navbar navbar-default navbar-categories">
+    <div class="container">
+        <ul class="nav navbar-nav">
+        	<li {if $wa->currentUrl() == $wa_app_url} class="active"{/if}>
+                <a href="{$wa_app_url}">[`Photostream`]</a>
+            </li>
+            <li {if $wa->param('action') neq 'page' && $wa->param('action') neq 'album' && $wa->param('hash') == 'favorites'} class="selected"{/if}>
+                <a href="{$wa_app_url}favorites/">[`Editors’ choice`]</a>
+            </li>
+
+            <!-- albums -->
+            {if $albums = $wa->photos->albums(0)}
+            <li class="dropdown">
+                <a href="javascript:void(0);" class="dropdown-toggle{if !$mobile} disabled{/if}" data-toggle="dropdown" data-hover="dropdown" data-delay="500" data-close-others="true">[`Albums`]</a>
+                <ul class="dropdown-menu">
+                    {foreach $albums as $album}
+                        <li>
+                            <a href="{$album.url}">{$album.name}</a>
+                        </li>
+                    {/foreach}
+                </ul>
+            </li>
+            {/if}
+
+            <!-- tags -->
+            {if $cloud = $wa->photos->tags()}
+            <li>
+                <a href="#" onClick="return false" class="dropdown-toggle disabled" data-toggle="dropdown" data-hover="dropdown" data-delay="500" data-close-others="true">[`Tags`] <i class="fa fa-angle-down"></i></a>
+                <ul class="dropdown-menu">
+                    {foreach $cloud as $tag}
+                        <a href="{$wa_app_url}tag/{$tag.uri_name}/" style="font-size: {$tag.size}%; opacity: {$tag.opacity}">{$tag.name|escape}</a>
+                    {/foreach}
+                </ul>
+            </li>
+            {/if}
+
+            {$photos_pages=$wa->photos->pages()}
+            {if $photos_pages}
+                {foreach $photos_pages as $_page}
+                <li>
+                    <a href="{$_page.url|escape}"{if !empty($_page.childs)} class="dropdown-toggle disabled" data-toggle="dropdown" data-hover="dropdown" data-delay="500" data-close-others="true"{/if}>{$_page.name}{if !empty($_page.childs)} <i class="fa fa-angle-down"></i>{/if}</a>
+                    {if !empty($_page.childs)}
+                        {wa_print_tree tree=$_page.childs class="dropdown-menu" attrs = 'id="page-list"' elem ='<a href=":url" title=":title">:name</a>' collapsible_class='collapsible' selected=$wa->param('page_id')}
+                    {/if}
+                </li>
+                {/foreach}
+            {/if}
+            <!-- plugins -->
+            {* @event frontend_sidebar.%plugin_id%.menu *}
+            {foreach $frontend_sidebar as $plugin_id => $item}{if !empty($item.menu)}
+            <li>{$item.menu}</li>
+            {/if}{/foreach}
+        </ul>
+    </div>
+</nav>

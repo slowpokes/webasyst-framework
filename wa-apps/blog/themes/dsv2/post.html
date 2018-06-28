@@ -1,3 +1,9 @@
+{if $theme_settings.sidebar_blog_post && $theme_settings.sidebar_blog}
+    {$wa->globals("sidebar",true)}
+{/if}
+
+{$wa->globals("crumb",$post.title)}
+
 <div itemscope itemtype="http://schema.org/BlogPosting">
     <div class="post" role="main" id="post-{$post.id}">
         <h1 itemprop="name">

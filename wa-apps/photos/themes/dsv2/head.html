@@ -1,0 +1,13 @@
+<!-- photos app css -->
+<link href="{$wa_active_theme_url}dsv.photos.css?v{$wa_theme_version}" rel="stylesheet" type="text/css">
+<!--
+<script type="text/javascript" src="{$wa_active_theme_url}js/jquery.wookmark.min.js?v{$wa->version(true)}"></script>
+<script type="text/javascript" src="{$wa_active_theme_url}js/jquery.waitforimages.min.js?v{$wa->version(true)}"></script>
+<script type="text/javascript" src="{$wa_active_theme_url}default.photos.js?v={$wa->version(true)}"></script> 
+-->
+{if $nofollow}
+    <!-- "nofollow" for duplicate photo pages (context dependent) -->
+    <meta name="robots" content="nofollow" />
+{/if}
+{* @event frontend_assets.%plugin_id% *}
+{foreach $frontend_assets as $item}{if !empty($item)}{$item}{/if}{/foreach}

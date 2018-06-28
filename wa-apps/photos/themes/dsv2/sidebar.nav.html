@@ -1,0 +1,67 @@
+{function name="menu_item" item=[]}
+    {if isset($item.childs)}
+        {if empty($item.parent_id)}
+            {$li = "dropdown"}
+        {else}
+            {$li = "dropdown-submenu"}
+        {/if}
+        <li class="{$li}{if $wa->currentUrl() == $item.url || $wa->currentUrl()|strstr:$item.url} active{/if}">
+            <a href="{$item.url}">{$item.name}</a>
+            <ul class="dropdown-menu">
+                {foreach $item.childs as $ic}
+                    {menu_item item=$ic}
+                {/foreach}
+            </ul>
+        </li>
+    {else}
+        <li{if $wa->currentUrl() == $item.url} class="active"{/if}><a href="{$item.url}">{$item.name}</a></li>
+    {/if}
+{/function}
+
+{function name="menu_side_item" item=[]}
+    {if isset($item.childs)}
+        <li class="list-group-item list-toggle dropdown-submenu{if $wa->currentUrl() == $item.url} active{/if}">
+            {if isset($item.params.badge) && isset($item.params.badgeclass)}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}" class="badge-on">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {else}
+                <a href="{$item.url}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {/if}
+            <ul class="dropdown-menu">
+                {foreach $item.childs as $ic}
+                    {menu_item item=$ic}
+                {/foreach}
+            </ul>
+        </li>
+    {else}
+        <li class="list-group-item list-toggle{if $wa->currentUrl() == $item.url} active{/if}">
+            {if isset($item.params.badge) && isset($item.params.badgeclass)}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}" class="badge-on">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {else}
+                <a href="{$item.url}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {/if}
+        </li>
+    {/if}
+{/function}
+
+{if in_array($theme_settings.appmenu,['both','vertical'])}
+<div class="sidebar-nav mb-20">
+    <ul id="sidebar-nav" class="list-group collapse in">
+        <li class="list-group-item list-toggle{if $action == 'default'} active{/if}">
+            <a href="{$wa_app_url}">[`Photostream`]</a>
+        </li>
+        {if $albums = $wa->photos->albums(0)}
+            {foreach $albums as $a}
+                {menu_side_item item=$a}
+            {/foreach}
+        {/if}
+
+        {if $photos_pages=$wa->photos->pages()}
+            {foreach $photos_pages as $_page}
+                {menu_side_item item=$_page}
+            {/foreach}
+        {/if}
+    </ul>
+</div>
+{/if}

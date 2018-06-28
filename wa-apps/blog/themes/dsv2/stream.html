@@ -1,4 +1,8 @@
-{* post stream (list) wrapper *}
+{if $theme_settings.sidebar_blog_home && $theme_settings.sidebar_blog}
+    {$wa->globals("sidebar",true)}
+{/if}
+
+{$wa->globals("crumb","[`Blogs`]")}
 
 {if !$is_lazyloading}
 <div id="post-stream" role="main" class="lazyloading" {if $wa->param('blog_url')}itemscope itemtype="http://schema.org/Blog"{/if}>
