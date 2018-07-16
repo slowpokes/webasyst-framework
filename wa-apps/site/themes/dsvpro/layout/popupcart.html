@@ -1,0 +1,46 @@
+<div id="flying-cart" class="flyingCart{if $cart_count == 0} is-empty{/if}">
+    <div class="flyingCart__content">
+        {foreach $wa->shop->cart->items() as $item}
+            {$cart_p = $wa->shop->product($item.product_id)}
+            {if $cart_p.skus[$item.sku_id].image_id}
+                {$item.product.image_id = $cart_p.skus[$item.sku_id].image_id}
+            {/if}
+
+            <div class="row" data-skuid="{$item.id}">
+                <div class="col-xs-4 flyingCart__image">
+                    {$wa->shop->productImgHtml($item.product, '96x96', ['alt' => $item.product.name|escape,'default' => "`$wa_theme_url`img/noimage96.png"])}
+                </div>
+                <div class="col-xs-8">
+                    <p class="flyingCart__name fs-15em fw-5">{$item.product.name|escape}{if $item.sku_name && $item.sku_name != $item.product.name} <span class="gray">{$item.sku_name|escape}</span>{/if}</p>
+                    <p class="flyingCart__price color-price fs-13em fw-7">
+                        {$item.price = $wa->shop->cart->getItemTotal($item.id)}
+                        {wa_currency_html($item.price, $wa->shop->currency())}
+                    </p>
+                    <a href="javascript:void(0)" class="flyingCart__delete fs-13em">[`Delete`]</a>
+                    <span class="flyingCart__count hidden">{$item.quantity}</span>
+                </div>
+            </div>
+        {/foreach}
+    </div>
+    <div class="flyingCart__summary">
+        <div class="row">
+            <div class="col-xs-12">
+                <p><span class="gray fs-13em">[`Total`]</span>: <span class="fw-7 fs-14em js-cart-total">{wa_currency_html($cart_total, $wa->shop->currency())}</span></p>
+                <a href="{$wa->getUrl('shop/frontend/cart')}" class="btn btn-primary btn-block">[`Shopping cart`]</a>
+            </div>
+        </div>
+    </div>
+    <div id="flying_cart_template" class="hidden">
+        <div class="row">
+            <div class="col-xs-4 flyingCart__image">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="flyingcart template">
+            </div>
+            <div class="col-xs-8">
+                <p class="flyingCart__name fs-15em fw-5"></p>
+                <p class="flyingCart__price color-price fs-13em fw-7"></p>
+                <a href="javascript:void(0)" class="flyingCart__delete fs-13em">[`Delete`]</a>
+                <span class="flyingCart__count hidden"></span>
+            </div>
+        </div>
+    </div>
+</div>

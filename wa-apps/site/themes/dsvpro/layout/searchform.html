@@ -1,0 +1,15 @@
+{strip}
+{if $wa->shop}
+    <form method="get" action="{$wa->getUrl('shop/frontend/search')}">
+        <div class="input-group">
+            <input class="search-form__input form-control" type="search" name="query" placeholder="[s`Search`]" autocomplete="off"{if isset($autocomplete)} id="searchAjax"{/if}{if !empty($query)} value="{$query}"{/if}>
+            <span class="input-group-btn">
+                <button class="search-form__button btn" type="submit"><i class="mi mi-search mi-24 search-form__icon"></i></button>
+            </span>
+        </div>
+    </form>
+    {if isset($autocomplete)}
+        <div class="search-form__collapse"></div>
+    {/if}
+{/if}
+{/strip}

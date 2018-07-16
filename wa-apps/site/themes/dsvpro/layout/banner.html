@@ -1,0 +1,6 @@
+<div class="sales collapse{if !$wa->cookie('sales', 0)} in{/if} hidden-xs" id="sales">
+    <div class="container-fluid sales__container"{if $theme_settings.banner_bg} style="background-image: url({$wa_theme_url}{$theme_settings.banner_bg})"{/if}>
+        <a href="{$theme_settings.banner_link}" class="sales__link"{if $theme_settings.banner_link_blank} target="_blank"{/if} rel="nofollow"></a>
+        <a href="#sales" data-toggle="collapse" class="sales__close td-none fs-13em"><i class="mi mi-close mi-24"></i>[`Close`]</a>
+    </div>
+</div>

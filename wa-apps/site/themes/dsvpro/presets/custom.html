@@ -1,0 +1,610 @@
+{* ЦВЕТА / COLORS *}
+{$color_blue = "#007dc6"}
+{$color_red = "#e51b24"}
+{$color_yellow = "#ffc120"}
+{$color_white = "#fff"}
+{$color_font = "#222"}
+{$color_link = "#007dc6"}
+{$color_link_hover = "#1292ed"}
+{*
+_bg - background-color
+_bc - border-color
+_c - color
+_h - hover effect
+_f - focus effect
+*}
+{$content_bg = $color_white}
+{$header_bg = $content_bg}
+{$footer_bg = $content_bg}
+{$footer_bc = "#f4f4f4"}
+{$subscribe_bg = $content_bg}
+{$copyright_bg = $content_bg}
+
+{$dropdown_bg = "rgba(255,255,255,0.96);"}
+{$dropdown_c = $color_blue}
+{$dropdown_nav_bg = $color_white}
+{$dropdown_nav_c = "#333"}
+{$dropdown_nav_c_h = "#b3b3b3"}
+{$megamenu_c = $dropdown_nav_c}
+{$megamenu_c_h = $dropdown_nav_c_h}
+{$megamenu_heading_c = "#000"}
+
+{$input_bg = $color_white}
+{$input_bc = "#ccc"}
+{$input_bc_f = "#7fbbe6"}
+{$input_c = "#555"}
+{$checkbox_bg = $color_white}
+{$checkbox_bc = "#aaa"}
+{$checkbox_checked_bg = "#76c143"}
+{$checkbox_checked_bc = "#76c143"}
+{$checkbox_checked_c = $color_white}
+<style>
+    /* цвет текста */
+    html, body { color: {$color_font}; }
+
+    /* цвет ссылок */
+    a { color: {$color_link}; }
+
+    /* цвет наведения ссылок */
+    a:hover { color: {$color_link_hover}; }
+
+    /* черные ссылки / текст */
+    .black,
+    a.black { color: #000; }
+
+    /* серые ссылки / текст */
+    .gray,
+    a.gray { color: #555; }
+
+    /* обычные ссылки / текст */
+    .darken,
+    a.darken { color: {$color_font}; }
+
+    /* разделитель : цвет */
+    hr { border-color: #eee; }
+
+    /* цитата : граница */
+    blockquote { border-color: #eee; }
+
+    /* фон содержимого сайта */
+    body.body-auth,
+    .wrapper { background: {$content_bg}; }
+
+    /* ШАПКИ ОБЩЕЕ */
+    .header { background: {$header_bg}; }
+
+    /* верхнее меню : фон */
+    .topMenu { background: #555; }
+
+    /* верхнее меню : цвет меню страниц */
+    .topMenu__pages,
+    .topMenu__pages a { color: #d9d9d9; }
+
+    /* верхнее меню : цвет сравнение, избранное */
+    .topMenu__link
+    .topMenu__link:hover { color: {$color_white}; }
+
+    .topMenu__badge {
+        background: #959595; /* верхнее меню : фон индикаторов */
+    color: {$color_white}; /* верхнее меню : цвет индикаторов */
+    }
+    .full .topMenu__badge {
+    background: {$color_yellow}; /* верхнее меню : фон активных индикаторов */
+    color: #000; /* верхнее меню : цвет активных индикаторов */
+    }
+
+    .mi-icon-badge[data-badge]::after {
+        background: #777; /* шапка : индикаторы иконок : фон */
+    color: {$color_white}; /* шапка : индикаторы иконок : цвет */
+    }
+
+    .full .mi-icon-badge[data-badge]::after {
+    background: {$color_yellow}; /* шапка : индикаторы иконок : активный фон */
+    color: {$color_font}; /* шапка : индикаторы иконок : активный цвет */
+    }
+
+    /* шапка : поиск : цвет границы */
+    .search-form__button,
+    .search-form__input { border-color: #b3b3b3; }
+
+    .search-form__button {
+    background: {$color_yellow}; /* шапка : поиск : фон кнопки */
+    color: {$color_font}; /* шапка : поиск : цвет кнопки */
+    }
+
+
+    /* ШАПКА 1 */
+    /* шапка 1 : фон */
+    .headerContent_theme_ua { background: {$header_bg}; }
+
+    /* шапка 1 : категории : фон */
+    .navbar_theme_ua { background: {$header_bg}; }
+
+    /* шапка 1 : категории : цвет текста */
+    .navbar_theme_ua .navbar-nav>li>a { color: {$color_font}; }
+
+    /* шапка 1 : категории : цвет границы */
+    .navbar_theme_ua .navbar-nav>li>a:hover { border-color: #000; }
+
+    /* шапка 1 : цвет иконок */
+    .headerLinks_theme_ua .headerLinks__link { color: #1d1d1d; }
+
+    .headerLinks_theme_ua .full .headerLinks__icon::after {
+    background-color: {$color_red}; /* шапка 1 : индикаторы иконок : активный фон */
+    color: {$color_white}; /* шапка 1 : индикаторы иконок : активный цвет */
+    }
+
+    /* ШАПКА 2 */
+    /* шапка 2 : цвет текста, ссылок */
+    .header_theme_am,
+    .header_theme_am a { color: {$color_white}; }
+
+    /* шапка 2 : фон */
+    .headerContent_theme_am { background: #303030; }
+
+    /* шапка 2 : навцигация : фон */
+    .navbar_theme_am { background: transparent; }
+
+    /* шапка 2 : навцигация : цвет текста */
+    .navbar_theme_am .navbar-nav>li>a,
+    .navbar_theme_am .navbar-nav>li>a:hover { color: #ccc; }
+
+    /* шапка 2 : навигация : цвет текста каталога */
+    .dropdown_theme_am > a { color: {$color_white} !important}
+
+    /* шапка 2 : навигация : цвет стрелки фикс. каталога */
+    .header_theme_am.affix .navbar-nav>li:first-child>a::after { color: {$color_yellow} }
+
+    /* шапка 2 : поиск : цвет границы */
+    .search-form_theme_am .search-form__button,
+    .search-form_theme_am .search-form__input { border-color: transparent; }
+
+
+    /* ШАПКА 3 */
+    /* шапка 3 : фон */
+    .header_theme_wm { background: {$color_blue}; }
+
+    /* шапка 3 : цвет текста, ссылок */
+    .topMenu_theme_wm,
+    .topMenu_theme_wm a { color: {$color_white}; }
+
+    /* шапка 3 : верхнее меню : фон */
+    .topMenu_theme_wm { background: transparent; }
+
+    /* шапка 3 : поиск : цвет границы */
+    .search-form_theme_wm .search-form__button,
+    .search-form_theme_wm .search-form__input { border-color: transparent; }
+
+    /* шапка 3 : навигация : фон */
+    .navbar_theme_wm { background: {$color_white}; }
+
+    /* шапка 3 : навигация : цвет ссылок */
+    .navbar_theme_wm .navbar-nav>li>a { color: {$color_blue}; }
+
+    /* шапка 3 : навигация : цвет промо */
+    .navbar_theme_wm .navbar-promo { color: #f58339 !important; }
+
+    /* шапка 3 : навигация : цвет стрелки фикс. каталога */
+    .navbar-bars__arrow { color: {$color_yellow} }
+
+    /* ШАПКА 4 */
+    /* шапка 4 : цвет текста, ссылок */
+    .header_theme_el,
+    .header_theme_el a { color: #1d1d1d; }
+
+    .topMenu_theme_el {
+        background: #f7f7f7; /* шапка 4 : верхнее меню : фон */
+        border-color: #ddd; /* шапка 4 : верхнее меню : цвет границы */
+    }
+
+    /* шапка 4 : верхнее меню : цвет меню страниц */
+    .topMenu_theme_el .topMenu__pages,
+    .topMenu_theme_el .topMenu__pages a { color: {$color_font} }
+
+    /* шапка 4 : верхнее меню : цвет сравнение, избранное */
+    .topMenu_theme_el .topMenu__link:hover,
+    .topMenu_theme_el .topMenu__link { color: {$color_font} }
+
+    /* шапка 4 : поиск : фон кнопки */
+    .search-form_theme_el .search-form__button { background: transparent; }
+
+    /* шапка 4 : корзина : цвет иконки */
+    .header_theme_el .headerContent__cart i { color: {$color_red}; }
+
+    /* шапка 4 : категории : фон */
+    .navbar_theme_el { background-color: #323639; }
+
+    /* шапка 4 : категории : цвет текста */
+    .navbar_theme_el .navbar-nav>li>a,
+    .navbar_theme_el .navbar-nav>li>a:hover,
+    .navbar_theme_el .navbar-nav>li>a:focus { color: {$color_white} }
+
+    /* шапка 4 : категории : фон наведение */
+    .navbar_theme_el .navbar-nav>li>a:hover { background-color: #a6283e; }
+
+    /* ВЫПАДАЮЩИЕ СПИСКИ */
+    /* выпадающие списки : фон */
+    .dropdown-menu { background-color: {$dropdown_bg}; }
+
+    /* выпадающие списки : стрелка : фон */
+    .dropdown-arrow>.dropdown-menu::after { border-bottom-color: {$dropdown_bg}; }
+
+    /* выпадающие списки : цвет ссылок */
+    .dropdown-menu>li>a { color: {$dropdown_c}; }
+
+    /* выпадающие списки : цвет стрелок */
+    .dropdown>a::after,
+    .dropdown-submenu>a::after { color: #ccc; }
+
+    /* выпадающие списки : навигация : фон */
+    .navbar-nav .dropdown-menu { background-color: {$dropdown_nav_bg}; }
+
+    /* выпадающие списки : навигация : цвет текст */
+    .navbar .dropdown-menu>li>a { color: {$dropdown_nav_c}; }
+
+    /* выпадающие списки : навигация : цвет текст наведения */
+    .navbar .dropdown-menu>li>a:hover { color: {$dropdown_nav_c_h}; }
+
+    /* выпадающие списки : навигация шапка 1 : цвет границы */
+    .navbar_theme_ua ul.dropdown-menu { border-color: #000; }
+
+    /* выпадающие списки : навигация шапка 2 : цвет текста наведение */
+    .dropdown-menu_theme_am>li>a:hover { color: {$color_blue}; }
+
+    /* выпадающие списки : мегаменю : цвет заголовков*/
+    .megaMenu .megaMenu__heading { color: {$megamenu_heading_c}; }
+
+    /* выпадающие списки : мегаменю : цвет текста */
+    .megaMenu li a { color: {$megamenu_c}; }
+
+    /* выпадающие списки : мегаменю : цвет текста наведение */
+    .megaMenu li a:hover { color: {$megamenu_c_h}; }
+
+    /* выпадающие списки : меню шапка 2 : цвет текста */
+    .amaMenu a { color: #5a5a5a; }
+
+    /* ПОДПИСКА */
+    .subscribe {
+    background-color: {$subscribe_bg}; /* подписка : фон */
+    border-color: {$footer_bc}; /* подписка : цвет границы */
+    color: {$color_font}; /* подписка : цвет текста */
+    }
+
+    /* ПОДВАЛ */
+    .footer {
+    background-color: {$footer_bg}; /* подвал : фон */
+    border-color: {$footer_bc}; /* подвал : цвет границы */
+    color: {$color_font}; /* подвал : цвет текста */
+    }
+
+    /* подвал : цвет ссылок */
+    .footer a { color: {$color_blue}; }
+
+    /* КОПИРАЙТ */
+    .copyright {
+        background-color: #fafafa; /* копирайт : фон */
+    border-color: {$footer_bc}; /* копирайт : цвет границы */
+    color: #424242; /* копирайт : цвет текста */
+    }
+
+    /* ФОРМЫ */
+    .form input[type="text"],
+    .form input[type="password"],
+    .form input[type="email"],
+    .form select,
+    .form textarea,
+    .form-control {
+    background-color: {$input_bg}; /* формы : поля : фон */
+    border-color: {$input_bc}; /* формы : поля : граница */
+    color: {$input_c}; /* формы : поля : цвет текста */
+    }
+
+    /* формы : поля : цвет границы фокуса */
+    .form input[type="text"]:focus,
+    .form input[type="password"]:focus,
+    .form input[type="email"]:focus,
+    .form select:focus,
+    .form textarea:focus { border-color: {$input_bc_f}; }
+
+    .checkbox:not(:checked)+label::before {
+    background-color: {$checkbox_bg}; /* формы : чекбокс : фон */
+    border-color: {$checkbox_bc}; /* формы : чекбокс : граница */
+    }
+
+    .checkbox:checked+label::before {
+    background-color: {$checkbox_checked_bg}; /* формы : чекбокс : фон */
+    border-color: {$checkbox_checked_bc}; /* формы : чекбокс : граница */
+    color: {$checkbox_checked_c}; /* формы : чекбокс : цвет текста */
+    }
+
+    .radio:not(:checked)+label::before,
+    .radio:checked+label::before {
+    background: {$color_white}; /* формы : радио : фон */
+    border-color: #878787; /* формы : радио : граница */
+    }
+
+    /* формы : радио : фон кружка */
+    .radio:checked+label::after { background: #878787; }
+
+    .btn-default {
+        color: #000; /* кнопка : обычная : цвет текста */
+    background-color: {$color_white}; /* кнопка : обычная : фон */
+    border-color: #caced4; /* кнопка : обычная : граница */
+    }
+
+    .btn-primary,
+    .login .form.auth input[type="submit"] {
+    color: {$color_white}; /* кнопка : синяя : цвет текста */
+    background-color: {$color_blue}; /* кнопка : синяя : фон */
+    border-color: {$color_blue}; /* кнопка : синяя : граница */
+    }
+
+    .btn-primary:hover,
+    .login .form.auth input[type="submit"]:hover {
+    color: {$color_white}; /* кнопка : синяя : цвет текста наведения */
+    background-color: #005d93; /* кнопка : синяя : фон наведения*/
+    border-color: #005d93; /* кнопка : синяя : граница наведения */
+    }
+
+    .btn-danger {
+    color: {$color_white}; /* кнопка : красная : цвет текста */
+    background-color: {$color_red}; /* кнопка : красная : фон */
+    border-color: {$color_red}; /* кнопка : красная : граница */
+    }
+
+    .btn-danger:hover {
+    color: {$color_white}; /* кнопка : красная : цвет текста наведения */
+    background-color: #b40028; /* кнопка : красная : фон наведения */
+    border-color: #b40028; /* кнопка : красная : граница наведения */
+    }
+
+    /* БОКОВАЯ ПАНЕЛЬ */
+    .sbNav__header {
+        background: #f2f8fd; /* бок. категории : заголовок : фон */
+        border-color: #e9e9e9; /* бок. категории : заголовок : граница */
+    color: {$color_font} !important; /* бок. категории : заголовок : цвет текста */
+    }
+
+    /* бок. категории : заголовок : цвет стрелки */
+    .sbNav__header::after { color: {$color_yellow}; }
+
+    /* бок. категории : ссылки : фон */
+    .sbNav__li { background: {$color_white}; }
+
+    /* бок. категории : ссылки : цвет текста */
+    .sbNav__link,
+    .sbNav .dropdown-menu>li>a { color: #555; }
+
+    /* бок. категории : ссылки : цвет текста наведения */
+    .sbNav__link:hover,
+    .sbNav .dropdown-menu>li>a:hover { color: {$color_blue}; }
+
+    /* бок. панель : заголовки : цвет текста */
+    .sbHeading { color: #000; }
+
+    /* бок. панель : бренды : цвет ссылок */
+    .sbBrands a { color: #333; }
+
+    /* бок. панель : новости : цвет наименования */
+    .sbPosts__name { color: #333; }
+
+    /* бок. панель : новости : цвет информации */
+    .sbPosts__info { color: #888; }
+
+    /* бок. панель : теги : граница */
+    .sbTags__item { border-color: #f1f1f1; }
+
+    /* бок. панель : теги : фон наведения */
+    .sbTags__item:hover { background: #f1f1f1; }
+
+    /* бок. панель : теги : цвет текст */
+    .sbTags__tag { color: #5a5a5a !important; }
+
+    /* бок. панель : слайдер : цвет стрелок */
+    .slick-sb .slick-arrow::before { color: #000; }
+
+    /* СЛАЙДЕР */
+    /* слайдер : точки : цвет */
+    .slick-dots li button { color: #c9c9c9; }
+
+    /* слайдер : точки : активный цвет */
+    .slick-dots li.slick-active button { color: #707070; }
+
+    /* слайдер : стрелки : фон */
+    .slick-arrow { background: rgba(255,255,255,0.3); }
+
+    /* слайдер : стрелки : фон наведение */
+    .slick-arrow:hover,
+    .slick-arrow:focus { background-color: #fff; }
+
+    /* слайдер : стрелки : цвет */
+    .slick-arrow::before { color: #c7c7c7; }
+
+    /* МАГАЗИН */
+    /* карточка товара : фон */
+    .products__inner { background: #fff; }
+
+    /* карточка товара : граница наведение */
+    .products.thumbs .products__item:hover .products__inner { border-color: #8c8c8c; }
+
+    /* карточка товара : цвет названия */
+    .products__link { color: #444; }
+
+    /* карточка товара : цвет цены */
+    .products__price { color: {$color_blue}; }
+
+    /* карточка товара : цвет цены в фиксированной форме */
+    .productAffix__price { color: {$color_blue}; }
+
+    /* карточка товара : цвет избранного, сравнения */
+    .product__action { color: #666; }
+
+    .products__quickview {
+        background: #fff; /* карточка товара : быстрый просмотр : фон */
+        color: #222; /* карточка товара : быстрый просмотр : текст */
+    }
+
+    /* услуги : цвет иконки */
+    .service__icon { color: #5e5e5e; }
+
+    /* услуги : цвет наведения иконки */
+    .service:hover .service__icon  { color: #21242a; }
+
+    /* заголовки : граница */
+    .heading::before { background: {$color_red}; }
+
+
+    .nav-tabs:not(.quickview__tabs)>li.active>a,
+    .nav-tabs:not(.quickview__tabs)>li.active>a:hover,
+    .nav-tabs:not(.quickview__tabs)>li.active>a:focus {
+    color: {$color_red}; /* табы : активная вкладка : цвет текущей */
+    border-color: {$color_red}; /* табы : активная вкладка : граница текущей */
+    }
+
+    /* посты : граница */
+    .post__panel { border-color: #e7e7e7; }
+
+    /* посты : граница наведения */
+    .post:hover .post__panel { border-color: {$color_red}; }
+
+    /* посты : цвет заголовка наведение */
+    .post:hover .h2 { color: {$color_red}; }
+
+    /* посты : маска изображения */
+    .timeline__mask { background: {$color_red}; }
+
+    /* бренды : цвет границы */
+    .brands,
+    .brands__all { border-color: #ebebeb; }
+
+    /* описание : разделитель : граница */
+    .about hr { border-color: #e4e4e4; }
+
+    /* описание : разделитель : граница наведения */
+    .about:hover hr { border-color: {$color_blue}; }
+
+    /* сортировка : цвет границы */
+    .sort { border-color: #e9e9e9; }
+
+    .sort .dropdown>a {
+        background: #dfebed; /* сортировка : кнопка : фон */
+        border-color: #c2cfd6; /* сортировка : кнопка : граница */
+    color: {$color_font}; /* сортировка : кнопка : текст */
+    }
+
+    .sort .dropdown .dropdown-menu {
+    background: {$color_white}; /* сортировка : список : фон */
+    border-color: {$color_blue}; /* сортировка : список : граница */
+    color: {$color_font}; /* сортировка : список : текст */
+    }
+
+    .sort .selected a { color: {$color_blue}; } /* сортировка : список : текст активный */
+
+    /* сортировка : вид : цвет */
+    .sort__view a { color: #d9d9d9; }
+
+    /* сортировка : вид : цвет активный */
+    .sort__view a.active { color: #9ed6fa; }
+
+    /* фильтр : фон */
+    .filter,
+    .sbSort__inner { background: {$color_white}; }
+
+    /* фильтр : граница */
+    .filter,
+    .filter__block { border-color: #f0f0f0; }
+
+    /* фильтр : слайдер : фон */
+    .ui-slider-horizontal.ui-widget-content { background: #bbb; }
+
+    /* фильтр : слайдер : активный фон и кружки */
+    .ui-slider-horizontal .ui-widget-header,
+    .ui-slider-horizontal .ui-slider-handle.ui-state-default { background: {$color_blue}; }
+
+    /* фильтр : стрелки : цвет */
+    .filter__header a::before,
+    .sbSort__btn::before { border-top-color: #ffc120; }
+
+    /* фильтр моб : кнопки : фон */
+    .filterMobile { background: #f2f8fd; }
+
+    /* фильтр моб : разделитель : фон */
+    .sbSort { background: #e9e9e9; }
+
+
+    /* форма продукта : фон */
+    .productForm { background: #fff; }
+
+    /* форма продукта : граница */
+    .productForm,
+    .productForm__header { border-color: #c2cfd6; }
+
+    /* форма продукта : заголовок : фон */
+    .productForm__header { background: #f2f8fd; }
+
+    /* количество : фон */
+    .qty { background: #eee; }
+
+    /* количество : кнопки : фон */
+    .qty button { background: #ddd; }
+
+    /* количество : кнопки : цвет */
+    .qty__plus::before { border-bottom-color: #444 !important; }
+    .qty__minus::before { border-top-color: #444 !important; }
+
+    @media (min-width: 991px) {
+        .cartOrder__block {
+            background: #fff; /* корзина : форма : фон */
+            border-color: #c2cfd6; /* корзина : форма : граница */
+        }
+    }
+
+    /* оформление : фон */
+    .panel { background: {$content_bg}; }
+
+    /* мои заказы : фон */
+    .myTable { background: #fff; }
+
+    /* мои заказы : граница */
+    .myTable,
+    .myOrders__table>.row { border-color: #dbdbdb; }
+
+    /* мои заказы : заголовок : фон */
+    .myTable__header { background: #f1f8fd; }
+
+    /* статусная строка : линия : фон */
+    .progress-step::after { background-color: #c0ced4; }
+
+    .progress-step .progress-marker {
+        color: #fff; /* статусная строка : маркер : текст */
+        background-color: #fff; /* статусная строка : маркер : фон */
+        border-color: #c0ced4; /* статусная строка : маркер : граница */
+    }
+
+    .progress-step.is-active .progress-marker {
+        background-color: #6dc150; /* статусная строка : маркер : фон активный */
+        border-color: #6dc150; /* статусная строка : маркер : граница активная */
+    }
+
+    .progress-step:hover .progress-marker {
+        background-color: #8cce76; /* статусная строка : маркер : фон наведения*/
+        border-color: #8cce76; /* статусная строка : маркер : граница наведения */
+    }
+
+    /* БЛОГ , ФОТО */
+    /* блог : разделитель : фон */
+    .timeline::before { background-color: #eee; }
+
+    /* блог : метка даты : цвет */
+    .timeline__badge,
+    .timeline__panel::before { color: #ccc; }
+
+    /* отзывы  : граница */
+    .review { border-color: #e3e3e3; }
+
+    /* отзывы : дата : цвет текста */
+    .review__date { color: #8c8c8c; }
+
+    /* фото : маска */
+    .photos__item_mask { background-color: {$color_red}; }
+</style>

@@ -1,0 +1,27 @@
+{strip}
+{if $wa->shop}
+    {$promos = $wa->shop->promos()}
+    {if count($promos) > 0}
+        <div class="sidebar__block">
+            <ul class="sbPromo list-unstyled slick-sb dataSlider" data-slick='{ "dots": true, "fade": true, "adaptiveHeight": true }'>
+                {foreach $promos as $promo}
+                    <li class="sbPromo__li">
+                        <a class="td-none sbPromo__link" href="{$promo.link|escape}"></a>
+                        {if !empty($promo.title)}
+                            <div class="black fw-7 sbPromo__name">{$promo.title|escape}</div>
+                        {/if}
+                        {if !empty($promo.body)}
+                            <div class="gray sbPromo__description">{$promo.body|escape}</div>
+                        {/if}
+                        {if $promo@first}
+                            <img class="sbPromo__image img-responsive" src="{$promo.image}" alt="{$promo.title|escape}">
+                        {else}
+                            <img class="sbPromo__image img-responsive" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-lazy="{$promo.image}" alt="{$promo.title|escape}">
+                        {/if}
+                    </li>
+                {/foreach}
+            </ul>
+        </div>
+    {/if}
+{/if}
+{/strip}

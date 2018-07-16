@@ -1,0 +1,1788 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE theme PUBLIC "wa-app-theme" "http://www.webasyst.com/wa-content/xml/wa-app-theme.dtd">
+<theme id="dsvpro" system="0" vendor="988467" author="Designsovkusom" app="site" version="1.5.1">
+    <name locale="en_US">Design with taste PRO</name>
+    <name locale="ru_RU">Дизайн со вкусом PRO</name>
+    <description locale="en_US">Adaptive design theme for all base Webasyst apps</description>
+    <description locale="ru_RU">Семейство адаптивных тем дизайна для всех базовых приложений Webasyst</description>
+    <files>
+        <file path="config.js.html" custom="0">
+            <description locale="en_US">Javascript config</description>
+            <description locale="ru_RU">Конфигурация Javascript</description>
+        </file>
+        <file path="error.html" custom="0">
+            <description locale="en_US">404 and other errors</description>
+            <description locale="ru_RU">404 и другие ошибки</description>
+        </file>
+        <file path="forgotpassword.html" custom="0">
+            <description locale="en_US">Forgot password page</description>
+            <description locale="ru_RU">Страница сброса пароля</description>
+        </file>
+        <file path="head.html" custom="0">
+            <description locale="en_US">Site app's &lt;head&gt; instructions</description>
+            <description locale="ru_RU">Блок &lt;head&gt; приложения «Сайт»</description>
+        </file>
+        <file path="header.html" custom="0">
+            <description locale="en_US">Header template</description>
+            <description locale="ru_RU">Шаблон шапки</description>
+        </file>
+        <file path="header-mobile.html" custom="0">
+            <description locale="en_US">Header mobile template</description>
+            <description locale="ru_RU">Шаблон мобильной шапки</description>
+        </file>
+        <file path="header_theme_am.html" custom="0">
+            <description locale="en_US">Header 2</description>
+            <description locale="ru_RU">Шапка 2</description>
+        </file>
+        <file path="header_theme_el.html" custom="0">
+            <description locale="en_US">Header 4</description>
+            <description locale="ru_RU">Шапка 4</description>
+        </file>
+        <file path="header_theme_ua.html" custom="0">
+            <description locale="en_US">Header 1</description>
+            <description locale="ru_RU">Шапка 1</description>
+        </file>
+        <file path="header_theme_wm.html" custom="0">
+            <description locale="en_US">Header 3</description>
+            <description locale="ru_RU">Шапка 3</description>
+        </file>
+        <file path="index.html" custom="0">
+            <description locale="en_US">Core layout of the theme</description>
+            <description locale="ru_RU"/>
+        </file>
+        <file path="js.html" custom="0">
+            <description locale="en_US">Site app's javascript</description>
+            <description locale="ru_RU">Javascript приложения «Сайт»</description>
+        </file>
+        <file path="login.html" custom="0">
+            <description locale="en_US">Login page</description>
+            <description locale="ru_RU">Страница входа для пользователей</description>
+        </file>
+        <file path="layout/banner.html" custom="0">
+            <description locale="en_US">Banner template</description>
+            <description locale="ru_RU">Шаблон баннера шапки</description>
+        </file>
+        <file path="layout/breadcrumbs.html" custom="0">
+            <description locale="en_US">Breadcrumbs template</description>
+            <description locale="ru_RU">Шаблон хлебных крошек</description>
+        </file>
+        <file path="layout/footerlist.html" custom="0">
+            <description locale="en_US">Footer list template</description>
+            <description locale="ru_RU">Шаблон вывода списков в подвале сайта</description>
+        </file>
+        <file path="layout/logo.html" custom="0">
+            <description locale="en_US">Logo template</description>
+            <description locale="ru_RU">Шаблон вывода логотипа</description>
+        </file>
+        <file path="layout/payment.html" custom="0">
+            <description locale="en_US">Payment template</description>
+            <description locale="ru_RU">Шаблон иконок оплаты</description>
+        </file>
+        <file path="layout/popupcart.html" custom="0">
+            <description locale="en_US">Header cart</description>
+            <description locale="ru_RU">Всплывающая корзина</description>
+        </file>
+        <file path="layout/searchform.html" custom="0">
+            <description locale="en_US">Search form</description>
+            <description locale="ru_RU">Форма поиска</description>
+        </file>
+        <file path="layout/settings.html" custom="0">
+            <description locale="en_US">Common settings</description>
+            <description locale="ru_RU">Общие настройки</description>
+        </file>
+        <file path="layout/share.html" custom="0">
+            <description locale="en_US">Social communities template</description>
+            <description locale="ru_RU">Шаблон ссылок на социальные сети</description>
+        </file>
+        <file path="layout/topmenu.html" custom="0">
+            <description locale="en_US">Header top menu</description>
+            <description locale="ru_RU">Верхнее меню шапки</description>
+        </file>
+        <file path="main.html" custom="0">
+            <description locale="en_US">Main layout for the Site app content</description>
+            <description locale="ru_RU">Основной вывод приложения «Сайт»</description>
+        </file>
+        <file path="my.nav.html">
+            <description locale="en_US">My profile navigation</description>
+            <description locale="ru_RU">Навигационное меню внутри личного кабинета</description>
+        </file>
+        <file path="my.profile.html">
+            <description locale="en_US">My profile: contact info editing form</description>
+            <description locale="ru_RU">Личный кабинет: редактирование контактной информации</description>
+        </file>
+        <file path="page.html" custom="0">
+            <description locale="en_US">Static page content and navigation</description>
+            <description locale="ru_RU">Содержимое открытой страницы и навигация по страницам</description>
+        </file>
+        <file path="presets/default.html" custom="0">
+            <description locale="en_US">Default color scheme</description>
+            <description locale="ru_RU">Цвета по умолчанию</description>
+        </file>
+        <file path="presets/custom.html" custom="0">
+            <description locale="en_US">Custom color scheme</description>
+            <description locale="ru_RU">Свои цвета</description>
+        </file>
+        <file path="presets/newyear.html" custom="0">
+            <description locale="en_US">New year color scheme</description>
+            <description locale="ru_RU">Новогодняя тема</description>
+        </file>
+        <file path="sidebar.html" custom="0">
+            <description locale="en_US">Sidebar template</description>
+            <description locale="ru_RU">Шаблон боковой панели</description>
+        </file>
+        <file path="sidebar/nav.html" custom="0">
+            <description locale="en_US">Sidebar nav template</description>
+            <description locale="ru_RU">Шаблон навигации в боковой панели</description>
+        </file>
+        <file path="sidebar/photos.html" custom="0">
+            <description locale="en_US">Sidebar photos template</description>
+            <description locale="ru_RU">Шаблон фото в боковой панели</description>
+        </file>
+        <file path="sidebar/posts.html" custom="0">
+            <description locale="en_US">Sidebar posts template</description>
+            <description locale="ru_RU">Шаблон постов в боковой панели</description>
+        </file>
+        <file path="sidebar/promos.html" custom="0">
+            <description locale="en_US">Sidebar promos template</description>
+            <description locale="ru_RU">Шаблон промо карточек в боковой панели</description>
+        </file>
+        <file path="sidebar/related.html" custom="0">
+            <description locale="en_US">Sidebar recommended products template</description>
+            <description locale="ru_RU">Шаблон рекомендуемых товаров в боковой панели</description>
+        </file>
+        <file path="sidebar/tags.html" custom="0">
+            <description locale="en_US">Sidebar product tags template</description>
+            <description locale="ru_RU">Шаблон тегов в боковой панели</description>
+        </file>
+        <file path="signup.html" custom="0">
+            <description locale="en_US">Sign up page</description>
+            <description locale="ru_RU">Страница регистрации пользователей</description>
+        </file>
+        <file path="social/instagram.html" custom="0">
+            <description locale="en_US">instagram profile widget</description>
+            <description locale="ru_RU">Виджет профиля instagram</description>
+        </file>
+        <file path="social/facebook.html" custom="0">
+            <description locale="en_US">Facebook page plugin</description>
+            <description locale="ru_RU">Плагин страницы facebook</description>
+        </file>
+        <file path="social/odnoklassniki.html" custom="0">
+            <description locale="en_US">Odnoklassniki group plugin</description>
+            <description locale="ru_RU">Плагин группы Одноклассники</description>
+        </file>
+        <file path="social/twitter.html" custom="0">
+            <description locale="en_US">Odnoklassniki group plugin</description>
+            <description locale="ru_RU">Плагин группы Одноклассники</description>
+        </file>
+        <file path="social/vkontakte.html" custom="0">
+            <description locale="en_US">VK community widget</description>
+            <description locale="ru_RU">Виджет сообщества Вконтакте</description>
+        </file>
+        <file path="site.css" custom="0">
+            <description locale="en_US">Site app styles of Design with taste PRO</description>
+            <description locale="ru_RU">Стили приложения Сайт Дизайн со вкусом PRO</description>
+        </file>
+        <file path="css/mi.min.css" custom="0">
+            <description locale="en_US">Material icons styles</description>
+            <description locale="ru_RU">Стили иконок Material icons</description>
+        </file>
+        <file path="site.js" custom="0">
+            <description locale="en_US">Base js of Design with taste PRO</description>
+            <description locale="ru_RU">Базовые скрипты Дизайн со вкусом PRO</description>
+        </file>
+        <file path="site.min.js" custom="0">
+            <description locale="en_US">Base js of Design with taste PRO (minified)</description>
+            <description locale="ru_RU">Базовые скрипты Дизайн со вкусом PRO (минимизирован)</description>
+        </file>
+    </files>
+    <about locale="en_US"><![CDATA[
+<p>Tasteful Design: <b>Professional Edition</b> is a multi-purpose design solution, developed for selling any kind of goods and services. Contemporary-looking and smart interface will attract new customers to your store. Our design theme will make your online store utterly unique. An uncontestable advantage of the theme is its flexibility. Your customers may browse the website and shop online using versatile devices. The elegant and intuitive interface will turn shopping into a pleasure. This design theme is developed for the basic webasyst applications (shop, website, photos, blog, mailer).</p>
+]]></about>
+    <about locale="ru_RU"><![CDATA[
+<p>Дизайн со вкусом: <b>Professional Edition</b> – это универсальная тема дизайна, которая подойдет для продажи любых видов товаров и услуг. Красивый и современный дизайн, привлечет в ваш магазин новых покупателей. Наша тема дизайна позволит вам создавать уникальный интернет-магазин не похожим на других!   Тема дизайна адаптивна, что позволит вашим покупателям совершать покупки с любых устройств. А простой и интуитивно понятный интерфейс позволит с легкостью совершать покупки. Тема дизайна спроектирована под основные приложения webasyst (магазин, сайт, фото, блог, рассылки).</p>
+]]></about>
+    <settings>
+        <setting var="divider_contents" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id='settings_contents'></div>
+                Usefull links
+                <ul class='usefull-links'>
+                    <li><a href='http://designsovkusom.pro/docs/' target='_blank'><i class='icon16 script-php'></i> Docs</a></li>
+                    <li><a href='mailto:support@designsovkusom.ru'><i class='icon16 email'></i> support@designsovkusom.ru</a></li>
+                    <li><a href='skype:tdmitriiv?chat'><i class='icon16 skype'></i> tdmitriiv</a></li>
+                    <li><a href='https://vk.me/designsovkusom' target='_blank'><i class='icon16 vkontakte'></i> Vkontakte</a></li>
+                </ul>
+                Contents
+                <ul class='contents'>
+                    <li>
+                        <span data-scroll='#settings_site'>1. Site</span>
+                        <ul>
+                            <li><span data-scroll='#settings_site_logo'>1.1. Logo</span></li>
+                            <li>
+                                <span data-scroll='#settings_site_header'>1.2. Header</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_site_banner'>1.2.1. Header banner</span></li>
+                                </ul>
+                            </li>
+                            <li><span data-scroll='#settings_site_bg'>1.3. Background</span></li>
+                            <li><span data-scroll='#settings_site_colors'>1.4. Colors</span></li>
+                            <li>
+                                <span data-scroll='#settings_site_sidebar'>1.5. Sidebar</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_site_sb_blocks'>1.5.1. Blocks</span></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <span data-scroll='#settings_site_social'>1.6. Social networks</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_site_social_vk'>1.6.1. Vkontakte</span></li>
+                                    <li><span data-scroll='#settings_site_social_fb'>1.6.2. Facebook</span></li>
+                                    <li><span data-scroll='#settings_site_social_ok'>1.6.3. Odnoklassniki</span></li>
+                                    <li><span data-scroll='#settings_site_social_tt'>1.6.4. Twitter</span></li>
+                                    <li><span data-scroll='#settings_site_social_ig'>1.6.5. Instagram</span></li>
+                                </ul>
+                            </li>
+                            <li><span data-scroll='#settings_site_payment'>1.7. Payment icons</span></li>
+                            <li><span data-scroll='#settings_site_common'>1.8. Other settings</span></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <span data-scroll='#settings_shop'>2. Shop</span>
+                        <ul>
+                            <li><span data-scroll='#settings_shop_sidebar'>2.1. Sidebar</span></li>
+                            <li>
+                                <span data-scroll='#settings_shop_home'>2.2. Homepage</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_shop_services'>2.2.1. Services</span></li>
+                                    <li><span data-scroll='#settings_shop_slider'>2.2.2. Slider</span></li>
+                                    <li><span data-scroll='#settings_shop_brands'>2.2.3. Brands</span></li>
+                                    <li><span data-scroll='#settings_shop_callback'>2.2.4. Callback</span></li>
+                                    <li><span data-scroll='#settings_shop_map'>2.2.5. Map</span></li>
+                                </ul>
+                            </li>
+                            <li><span data-scroll='#settings_shop_category'>2.3. Categories</span></li>
+                            <li><span data-scroll='#settings_shop_filters'>2.4. Filters</span></li>
+                            <li>
+                                <span data-scroll='#settings_shop_product'>2.5. Product</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_shop_product_vk'>2.5.1. Vkontakte comments</span></li>
+                                    <li><span data-scroll='#settings_shop_product_fb'>2.5.2. Facebook comments</span></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <script>
+                    $(function(){
+                        $('span[data-scroll]').on('click', function() {
+                            var target = $(this.dataset.scroll);
+                            if( target.length ) {
+                                $('html, body').stop().animate({
+                                    scrollTop: target.offset().top
+                                }, 1000);
+                            }
+                        });
+                    });
+                </script>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id='settings_contents'></div>
+                Полезные ссылки
+                <ul class='usefull-links'>
+                    <li><a href='http://designsovkusom.pro/docs/' target='_blank'><i class='icon16 script-php'></i> Документация</a></li>
+                    <li><a href='mailto:support@designsovkusom.ru'><i class='icon16 email'></i> support@designsovkusom.ru</a></li>
+                    <li><a href='skype:tdmitriiv?chat'><i class='icon16 skype'></i> tdmitriiv</a></li>
+                    <li><a href='https://vk.me/designsovkusom' target='_blank'><i class='icon16 vkontakte'></i> Вконтакте</a></li>
+                </ul>
+                Содержание
+                <ul class='contents'>
+                    <li>
+                        <span data-scroll='#settings_site'>1. Сайт</span>
+                        <ul>
+                            <li><span data-scroll='#settings_site_logo'>1.1. Лого</span></li>
+                            <li>
+                                <span data-scroll='#settings_site_header'>1.2. Шапка</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_site_banner'>1.2.1. Баннер в шапке</span></li>
+                                </ul>
+                            </li>
+                            <li><span data-scroll='#settings_site_bg'>1.3. Фон</span></li>
+                            <li><span data-scroll='#settings_site_colors'>1.4. Цвета</span></li>
+                            <li>
+                                <span data-scroll='#settings_site_sidebar'>1.5. Боковая панель</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_site_sb_blocks'>1.5.1. Блоки</span></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <span data-scroll='#settings_site_social'>1.6. Социальные сети</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_site_social_vk'>1.6.1. Вконтакте</span></li>
+                                    <li><span data-scroll='#settings_site_social_fb'>1.6.2. Facebook</span></li>
+                                    <li><span data-scroll='#settings_site_social_ok'>1.6.3. Одноклассники</span></li>
+                                    <li><span data-scroll='#settings_site_social_tt'>1.6.4. Twitter</span></li>
+                                    <li><span data-scroll='#settings_site_social_ig'>1.6.5. Instagram</span></li>
+                                </ul>
+                            </li>
+                            <li><span data-scroll='#settings_site_payment'>1.7. Иконки оплаты</span></li>
+                            <li><span data-scroll='#settings_site_common'>1.8. Прочие настройки</span></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <span data-scroll='#settings_shop'>2. Магазин</span>
+                        <ul>
+                            <li><span data-scroll='#settings_shop_sidebar'>2.1. Боковая панель</span></li>
+                            <li>
+                                <span data-scroll='#settings_shop_home'>2.2. Главная</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_shop_services'>2.2.1. Услуги</span></li>
+                                    <li><span data-scroll='#settings_shop_slider'>2.2.2. Слайдер</span></li>
+                                    <li><span data-scroll='#settings_shop_brands'>2.2.3. Бренды</span></li>
+                                    <li><span data-scroll='#settings_shop_callback'>2.2.4. Обратный звонок</span></li>
+                                    <li><span data-scroll='#settings_shop_map'>2.2.5. Карта</span></li>
+                                </ul>
+                            </li>
+                            <li><span data-scroll='#settings_shop_category'>2.3. Категория</span></li>
+                            <li><span data-scroll='#settings_shop_filters'>2.4. Фильтрация</span></li>
+                            <li>
+                                <span data-scroll='#settings_shop_product'>2.5. Продукт</span>
+                                <ul>
+                                    <li><span data-scroll='#settings_shop_product_vk'>2.5.1. Комментарии Вконтакте</span></li>
+                                    <li><span data-scroll='#settings_shop_product_fb'>2.5.2. Комментарии Facebook</span></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <script>
+                    $(function(){
+                        $('span[data-scroll]').on('click', function() {
+                            var target = $(this.dataset.scroll);
+                            if( target.length ) {
+                                $('html, body').stop().animate({
+                                    scrollTop: target.offset().top
+                                }, 1000);
+                            }
+                        });
+                    });
+                </script>
+            ]]></name>
+        </setting>
+        <setting var="divider_site" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site"></div>
+                1. Site <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site"></div>
+                1. Сайт <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="layout" control_type="select">
+            <value>wide</value>
+            <name locale="en_US">Layout</name>
+            <name locale="ru_RU">Макет</name>
+            <options>
+                <option value="boxed">
+                    <name locale="ru_RU">Ограничен</name>
+                    <name locale="en_US">Boxed</name>
+                </option>
+                <option value="wide">
+                    <name locale="ru_RU">На всю ширину</name>
+                    <name locale="en_US">Wide</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="divider_logo" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_logo"></div>
+                1.1. Logo <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_logo"></div>
+                1.1. Лого <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="logo" control_type="image">
+            <value/>
+            <filename>img/mylogo.*</filename>
+            <name locale="en_US">Logo</name>
+            <name locale="ru_RU">Логотип</name>
+            <description locale="en_US"><![CDATA[
+                <style>
+                    #theme-settings .heading {
+                        color: #002654;
+                        font-size: 24px;
+                        margin: 30px 0 5px;
+                        text-transform: none;
+                    }
+
+                    #theme-settings .heading > span {
+                        font-size: 12px;
+                        color: #aaa;
+                    }
+                    #theme-settings .heading br { display: none; }
+                    #theme-settings .field .name { width: 230px; }
+                    #theme-settings .field .value { margin-left: 240px; }
+                    #theme-settings .field .hint { margin-top: 4px; }
+
+                    #theme-settings input[type="text"],
+                    #theme-settings select,
+                    #theme-settings textarea {
+                        background: #fff none;
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+                        box-sizing: border-box;
+                        font-size: 14px;
+                        line-height: 1.25;
+                        min-width: 300px;
+                        max-width: 100%;
+                        padding: 8px 12px;
+                        transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+
+                        -webkit-border-radius: 3px;
+                        -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+                        -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+                    }
+
+                    #theme-settings input[type="text"]:focus {
+                    #theme-settings select:focus {
+                    #theme-settings textarea:focus {
+                        border-color: #7fbbe6;
+                        outline: 0;
+
+                        -webkit-box-shadow: inset 2px 2px 6px rgba(0,0,0,0.15);
+                        box-shadow: inset 2px 2px 6px rgba(0,0,0,0.15);
+                    }
+                </style>
+            ]]></description>
+        </setting>
+        <setting var="logo_affix" control_type="image">
+            <value/>
+            <filename>img/myaffixlogo.*</filename>
+            <name locale="en_US">Logo (fix header)</name>
+            <name locale="ru_RU">Логотип (фиксированная шапка)</name>
+            <description locale="en_US">max height 35px</description>
+            <description locale="ru_RU">максимальная высота 35px</description>
+        </setting>
+        <setting var="logo_mobile" control_type="image">
+            <value/>
+            <filename>img/mymobilelogo.*</filename>
+            <name locale="en_US">Logo (mobile version)</name>
+            <name locale="ru_RU">Логотип (мобильная версия)</name>
+            <description locale="ru_RU"><![CDATA[
+                <style>
+                    .hint a { color: #007dc6; }
+                    .setting__description { font-size: 12px; }
+                    .setting__description p { margin-bottom: .5em; }
+                    #theme-settings ul,
+                    #theme-settings ul a {
+                        color: #444;
+                        font-size: 14px;
+                    }
+
+                    .contents,
+                    .contents ul,
+                    .usefull-links { list-style: none; }
+                    .contents,
+                    .usefull-links { padding: 0; }
+                    .contents ul { margin: 0; }
+                    .usefull-links a { text-transform: none; }
+                    .usefull-links i { margin: 0 !important; vertical-align: middle !important; }
+                </style>
+                Если настройка не указана, берется обычный логотип
+            ]]></description>
+        </setting>
+        <setting var="logo_error" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Show logo at error page</name>
+            <name locale="ru_RU">Отображать лого на странице ошибки</name>
+        </setting>
+        <setting var="logo_checkout" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Show logo at checkout page</name>
+            <name locale="ru_RU">Отображать лого на странице оформления</name>
+        </setting>
+        <setting var="divider_header" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_header"></div>
+                1.2. Header <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_header"></div>
+                1.2. Шапка <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="slogan" control_type="text">
+            <value>Теперь все по новому</value>
+            <name locale="en_US">Tagline</name>
+            <name locale="ru_RU">Слоган</name>
+            <description locale="en_US">Show in shop description</description>
+            <description locale="ru_RU">Выводится в описании магазина</description>
+        </setting>
+        <setting var="header" control_type="select">
+            <value>theme_el</value>
+            <name locale="ru_RU">Шапка</name>
+            <name locale="en_US">Header</name>
+            <options>
+                <option value="theme_ua">
+                    <name locale="ru_RU">Шапка 1</name>
+                    <name locale="en_US">Header 1</name>
+                </option>
+                <option value="theme_am">
+                    <name locale="ru_RU">Шапка 2</name>
+                    <name locale="en_US">Header 2</name>
+                </option>
+                <option value="theme_wm">
+                    <name locale="ru_RU">Шапка 3</name>
+                    <name locale="en_US">Header 3</name>
+                </option>
+                <option value="theme_el">
+                    <name locale="ru_RU">Шапка 4</name>
+                    <name locale="en_US">Header 4</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="header_msg" control_type="text">
+            <value>Сообщение в навигации</value>
+            <name locale="en_US">Header message</name>
+            <name locale="ru_RU">Сообщение в шапке</name>
+            <description locale="en_US">Header 2, 3, 4</description>
+            <description locale="ru_RU">Шапка 2, 3, 4</description>
+        </setting>
+        <setting var="header_msg_link" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Header message link</name>
+            <name locale="ru_RU">Ссылка сообщения в шапке</name>
+            <description locale="en_US">Header 2 , 3, 4</description>
+            <description locale="ru_RU">Шапка 2, 3, 4</description>
+        </setting>
+        <setting var="header_links" control_type="select">
+            <value>shop-pages</value>
+            <name locale="ru_RU">Ссылки в верхнем меню</name>
+            <name locale="en_US">Header links</name>
+            <description locale="ru_RU">Ссылки верхнего меню навигации информационным страницами выбранного приложения</description>
+            <description locale="en_US">Top header menu links will be displayed according to the site core structure (as defined in the Site app &gt; Settings &gt; {$wa-&gt;apps()}) or the list of selected app info pages</description>
+            <options>
+                <option value="site-pages">
+                    <name locale="ru_RU">Страницы приложения «Сайт»</name>
+                    <name locale="en_US">Site app pages</name>
+                </option>
+                <option value="shop-pages">
+                    <name locale="ru_RU">Страницы приложения «Магазин»</name>
+                    <name locale="en_US">Shop app pages</name>
+                </option>
+                <option value="blog-pages">
+                    <name locale="ru_RU">Страницы приложения «Блог»</name>
+                    <name locale="en_US">Blog app pages</name>
+                </option>
+                <option value="photos-pages">
+                    <name locale="ru_RU">Страницы приложения «Фото»</name>
+                    <name locale="en_US">Photos app pages</name>
+                </option>
+                <option value="hub-pages">
+                    <name locale="ru_RU">Страницы приложения «Хаб»</name>
+                    <name locale="en_US">Hub app pages</name>
+                </option>
+                <option value="none">
+                    <name locale="ru_RU">Не показывать</name>
+                    <name locale="en_US">None</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="header_mobile_affix" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Fix mobile header on scroll</name>
+            <name locale="ru_RU">Фиксировать мобильную шапку</name>
+        </setting>
+        <setting var="header_popup_cart" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Header popup cart</name>
+            <name locale="ru_RU">Всплывающая корзина</name>
+        </setting>
+        <setting var="category" control_type="text">
+            <value/>
+            <name locale="en_US">Parent category</name>
+            <name locale="ru_RU">Родительская категория</name>
+            <description locale="en_US">Parent category for catalog</description>
+            <description locale="ru_RU">Параметр задает родительскую категорию каталога</description>
+        </setting>
+        <setting var="catalog_icons" control_type="radio">
+            <value>params</value>
+            <name locale="ru_RU">Иконки категорий в меню</name>
+            <name locale="en_US">Categories icons</name>
+            <options>
+                <option value="none">
+                    <name locale="ru_RU">Без изображения</name>
+                    <name locale="en_US">Without image</name>
+                    <description locale="ru_RU">Скрывает изображение подкатегории</description>
+                    <description locale="en_US">Disable image</description>
+                </option>
+                <option value="params">
+                    <name locale="ru_RU">Параметр icon</name>
+                    <name locale="en_US">Param icon</name>
+                    <description locale="ru_RU">Изображение категории берется из дополнительных параметров. Параметр icon=путь к изображению</description>
+                    <description locale="en_US">Category image load from custom parameter "icon=file url"</description>
+                </option>
+                <option value="categoryimages">
+                    <name locale="ru_RU">плагин "Логотип категории"</name>
+                    <name locale="en_US">plugin "Category logo"</name>
+                    <description locale="ru_RU">Требуется приобритение плагина</description>
+                    <description locale="en_US">required plugin</description>
+                </option>
+                <option value="categoryimage">
+                    <name locale="ru_RU">плагин "Картинки для категорий"</name>
+                    <name locale="en_US">plugin "Category images"</name>
+                    <description locale="ru_RU">Требуется приобритение плагина</description>
+                    <description locale="en_US">required plugin</description>
+                </option>
+                <option value="wmimage">
+                    <name locale="ru_RU">плагин "Иконка, изображение и баннер для категории"</name>
+                    <name locale="en_US">plugin "Icon, image and banner for category"</name>
+                    <description locale="ru_RU">Требуется приобритение плагина</description>
+                    <description locale="en_US">required plugin</description>
+                </option>
+            </options>
+        </setting>
+        <setting var="divider_banner" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_banner"></div>
+                1.2.1. Header banner <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_banner"></div>
+                1.2.1. Баннер в шапке <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="banner" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Show banner</name>
+            <name locale="ru_RU">Отобразить баннер</name>
+        </setting>
+        <setting var="banner_link" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Banner link</name>
+            <name locale="ru_RU">Ссылка баннера</name>
+        </setting>
+        <setting var="banner_link_blank" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Open link in new tab</name>
+            <name locale="ru_RU">Открыть ссылку в новой вкладке</name>
+        </setting>
+        <setting var="banner_bg" control_type="image">
+            <value/>
+            <filename>img/custom_banner.*</filename>
+            <name locale="en_US">Banner background (1400x50)</name>
+            <name locale="ru_RU">Изображение баннера (1400x50)</name>
+        </setting>
+        <setting var="divider_background" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_bg"></div>
+                1.3. Background <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_bg"></div>
+                1.3. Фон <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="bg_type" control_type="radio">
+            <value>none</value>
+            <name locale="en_US">Background</name>
+            <name locale="ru_RU">Фон</name>
+            <options>
+                <option value="none">
+                    <name locale="en_US">without background</name>
+                    <name locale="ru_RU">без фона</name>
+                </option>
+                <option value="texture">
+                    <name locale="en_US">texture</name>
+                    <name locale="ru_RU">текстура</name>
+                </option>
+                <option value="image">
+                    <name locale="en_US">image</name>
+                    <name locale="ru_RU">изображение</name>
+                </option>
+                <option value="custom">
+                    <name locale="en_US">custom background</name>
+                    <name locale="ru_RU">свой фон</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="bg_texture" control_type="select">
+            <value>none</value>
+            <name locale="en_US">Texture</name>
+            <name locale="ru_RU">Текстура</name>
+            <description locale="en_US"><![CDATA[
+                Preview <a href='http://designsovkusom.pro/oformlenie/tekstury/' target='_blank'>examples</a>
+            ]]></description>
+            <description locale="ru_RU"><![CDATA[
+                Предпросмотр <a href='http://designsovkusom.pro/oformlenie/tekstury/' target='_blank'>текстур</a>
+            ]]></description>
+            <options>
+                <option value="none">
+                    <name locale="en_US">without texture</name>
+                    <name locale="ru_RU">без текстуры</name>
+                </option>
+                <option value="back_pattern">
+                    <name locale="en_US">back_pattern</name>
+                </option>
+                <option value="black_lozenge">
+                    <name locale="en_US">black_lozenge</name>
+                </option>
+                <option value="blizzard">
+                    <name locale="en_US">blizzard</name>
+                </option>
+                <option value="brickwall">
+                    <name locale="en_US">brickwall</name>
+                </option>
+                <option value="carbon_fibre">
+                    <name locale="en_US">carbon_fibre</name>
+                </option>
+                <option value="crossword">
+                    <name locale="en_US">crossword</name>
+                </option>
+                <option value="dark_fish_skin">
+                    <name locale="en_US">dark_fish_skin</name>
+                </option>
+                <option value="embossed_paper">
+                    <name locale="en_US">embossed_paper</name>
+                </option>
+                <option value="first_aid_kit">
+                    <name locale="en_US">first_aid_kit</name>
+                </option>
+                <option value="foggy_birds">
+                    <name locale="en_US">foggy_birds</name>
+                </option>
+                <option value="food">
+                    <name locale="en_US">food</name>
+                </option>
+                <option value="geometry">
+                    <name locale="en_US">geometry</name>
+                </option>
+                <option value="geometry2">
+                    <name locale="en_US">geometry2</name>
+                </option>
+                <option value="giftly">
+                    <name locale="en_US">giftly</name>
+                </option>
+                <option value="green_gobbler">
+                    <name locale="en_US">green_gobbler</name>
+                </option>
+                <option value="grey">
+                    <name locale="en_US">grey</name>
+                </option>
+                <option value="halftone">
+                    <name locale="en_US">halftone</name>
+                </option>
+                <option value="honey_im_subtle">
+                    <name locale="en_US">honey_im_subtle</name>
+                </option>
+                <option value="light_wool">
+                    <name locale="en_US">light_wool</name>
+                </option>
+                <option value="lil_fiber">
+                    <name locale="en_US">lil_fiber</name>
+                </option>
+                <option value="notebook">
+                    <name locale="en_US">notebook</name>
+                </option>
+                <option value="photography">
+                    <name locale="en_US">photography</name>
+                </option>
+                <option value="pixel_weave">
+                    <name locale="en_US">pixel_weave</name>
+                </option>
+                <option value="plaid">
+                    <name locale="en_US">plaid</name>
+                </option>
+                <option value="polaroid">
+                    <name locale="en_US">polaroid</name>
+                </option>
+                <option value="rebel">
+                    <name locale="en_US">rebel</name>
+                </option>
+                <option value="retina_wood">
+                    <name locale="en_US">retina_wood</name>
+                </option>
+                <option value="ricepaper">
+                    <name locale="en_US">ricepaper</name>
+                </option>
+                <option value="sandpaper">
+                    <name locale="en_US">sandpaper</name>
+                </option>
+                <option value="sativa">
+                    <name locale="en_US">sativa</name>
+                </option>
+                <option value="shinecaro">
+                    <name locale="en_US">shinecaro</name>
+                </option>
+                <option value="simple_dashed">
+                    <name locale="en_US">simple_dashed</name>
+                </option>
+                <option value="sneaker_mesh_fabric">
+                    <name locale="en_US">sneaker_mesh_fabric</name>
+                </option>
+                <option value="sos">
+                    <name locale="en_US">sos</name>
+                </option>
+                <option value="sprinkles">
+                    <name locale="en_US">sprinkles</name>
+                </option>
+                <option value="squared_metal">
+                    <name locale="en_US">squared_metal</name>
+                </option>
+                <option value="stardust">
+                    <name locale="en_US">stardust</name>
+                </option>
+                <option value="subtle_carbon">
+                    <name locale="en_US">subtle_carbon</name>
+                </option>
+                <option value="subtle_dots">
+                    <name locale="en_US">subtle_dots</name>
+                </option>
+                <option value="subtlenet2">
+                    <name locale="en_US">subtlenet2</name>
+                </option>
+                <option value="tapestry_pattern">
+                    <name locale="en_US">tapestry_pattern</name>
+                </option>
+                <option value="tex2res3">
+                    <name locale="en_US">tex2res3</name>
+                </option>
+                <option value="tex2res4">
+                    <name locale="en_US">tex2res4</name>
+                </option>
+                <option value="tex2res5">
+                    <name locale="en_US">tex2res5</name>
+                </option>
+                <option value="tileable_wood_texture">
+                    <name locale="en_US">tileable_wood_texture</name>
+                </option>
+                <option value="triangles_pattern">
+                    <name locale="en_US">triangles_pattern</name>
+                </option>
+                <option value="tweed">
+                    <name locale="en_US">tweed</name>
+                </option>
+                <option value="wavegrid">
+                    <name locale="en_US">wavegrid</name>
+                </option>
+                <option value="wild_oliva">
+                    <name locale="en_US">wild_oliva</name>
+                </option>
+                <option value="worn_dots">
+                    <name locale="en_US">worn_dots</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="bg_image" control_type="select">
+            <value>none</value>
+            <name locale="en_US">Image</name>
+            <name locale="ru_RU">Изображение</name>
+            <options>
+                <option value="none">
+                    <name locale="en_US">without image</name>
+                    <name locale="ru_RU">без изображения</name>
+                </option>
+                <option value="img1">
+                    <name locale="en_US">image 1</name>
+                    <name locale="ru_RU">изображение 1</name>
+                </option>
+                <option value="img2">
+                    <name locale="en_US">image 2</name>
+                    <name locale="ru_RU">изображение 2</name>
+                </option>
+                <option value="img3">
+                    <name locale="en_US">image 3</name>
+                    <name locale="ru_RU">изображение 3</name>
+                </option>
+                <option value="img4">
+                    <name locale="en_US">image 4</name>
+                    <name locale="ru_RU">изображение 4</name>
+                </option>
+                <option value="img5">
+                    <name locale="en_US">image 5</name>
+                    <name locale="ru_RU">изображение 5</name>
+                </option>
+                <option value="img6">
+                    <name locale="en_US">image 6</name>
+                    <name locale="ru_RU">изображение 6</name>
+                </option>
+                <option value="img7">
+                    <name locale="en_US">image 7</name>
+                    <name locale="ru_RU">изображение 7</name>
+                </option>
+                <option value="img8">
+                    <name locale="en_US">image 8</name>
+                    <name locale="ru_RU">изображение 8</name>
+                </option>
+                <option value="img9">
+                    <name locale="en_US">image 9</name>
+                    <name locale="ru_RU">изображение 9</name>
+                </option>
+                <option value="img10">
+                    <name locale="en_US">image 10</name>
+                    <name locale="ru_RU">изображение 10</name>
+                </option>
+                <option value="img11">
+                    <name locale="en_US">winter 1</name>
+                    <name locale="ru_RU">зима 1</name>
+                </option>
+                <option value="img12">
+                    <name locale="en_US">winter 2</name>
+                    <name locale="ru_RU">зима 2</name>
+                </option>
+                <option value="img13">
+                    <name locale="en_US">winter 3</name>
+                    <name locale="ru_RU">зима 3</name>
+                </option>
+                <option value="img14">
+                    <name locale="en_US">winter 4</name>
+                    <name locale="ru_RU">зима 4</name>
+                </option>
+                <option value="img15">
+                    <name locale="en_US">winter 5</name>
+                    <name locale="ru_RU">зима 5</name>
+                </option>
+                <option value="img16">
+                    <name locale="en_US">winter 6</name>
+                    <name locale="ru_RU">зима 6</name>
+                </option>
+                <option value="img17">
+                    <name locale="en_US">winter 7</name>
+                    <name locale="ru_RU">зима 7</name>
+                </option>
+                <option value="img18">
+                    <name locale="en_US">New year</name>
+                    <name locale="ru_RU">Новогодняя</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="bg_custom" control_type="image">
+            <value/>
+            <filename>img/custom_background.*</filename>
+            <name locale="en_US">Custom background</name>
+            <name locale="ru_RU">Свой фон</name>
+        </setting>
+        <setting var="bg_color" control_type="color">
+            <value/>
+            <name locale="en_US">Color</name>
+            <name locale="ru_RU">Цвет</name>
+        </setting>
+        <setting var="bg_attachment" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Fixed background</name>
+            <name locale="ru_RU">Зафиксировать фон</name>
+        </setting>
+        <setting var="bg_size" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Cover background</name>
+            <name locale="ru_RU">Растянуть фон</name>
+        </setting>
+        <setting var="bg_position" control_type="select">
+            <value>top</value>
+            <name locale="en_US">Background position</name>
+            <name locale="ru_RU">Положение фона</name>
+            <options>
+                <option value="top left">
+                    <name locale="en_US">top left</name>
+                    <name locale="ru_RU">в левом верхнем углу</name>
+                </option>
+                <option value="top">
+                    <name locale="en_US">top</name>
+                    <name locale="ru_RU">по центру вверху</name>
+                </option>
+                <option value="top right">
+                    <name locale="en_US">top right</name>
+                    <name locale="ru_RU">в правом верхнем углу</name>
+                </option>
+                <option value="left">
+                    <name locale="en_US">left</name>
+                    <name locale="ru_RU">по левому краю и по центру</name>
+                </option>
+                <option value="center">
+                    <name locale="en_US">center</name>
+                    <name locale="ru_RU">по центру</name>
+                </option>
+                <option value="right">
+                    <name locale="en_US">right</name>
+                    <name locale="ru_RU">по правому краю и по центру</name>
+                </option>
+                <option value="bottom left">
+                    <name locale="en_US">bottom left</name>
+                    <name locale="ru_RU">в левом нижнем углу</name>
+                </option>
+                <option value="bottom">
+                    <name locale="en_US">bottom</name>
+                    <name locale="ru_RU">по центру внизу</name>
+                </option>
+                <option value="bottom right">
+                    <name locale="en_US">bottom right</name>
+                    <name locale="ru_RU">в правом нижнем углу</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="divider_preset" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_colors"></div>
+                1.4. Colors <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_colors"></div>
+                1.4. Цвета <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="preset" control_type="radio">
+            <value>default</value>
+            <name locale="en_US">Colors preset</name>
+            <name locale="ru_RU">Цветовая схема</name>
+            <options>
+                <option value="default">
+                    <name locale="en_US">default</name>
+                    <name locale="ru_RU">по умолчанию</name>
+                    <description locale="en_US">Default colors in presets/default.html of Site's app</description>
+                    <description locale="ru_RU">Цвета по умолчанию в presets/default.html приложения Сайт</description>
+                </option>
+                <option value="custom">
+                    <name locale="en_US">custom</name>
+                    <name locale="ru_RU">свои цвета</name>
+                    <description locale="en_US">Custom colors in presets/custom.html of Site's app</description>
+                    <description locale="ru_RU">Свои цвета задавать presets/custom.html приложения Сайт</description>
+                </option>
+                <option value="newyear">
+                    <name locale="en_US">newyear</name>
+                    <name locale="ru_RU">новогодний</name>
+                    <description locale="en_US">Newyear styles in presets/newyear.html of Site's app</description>
+                    <description locale="ru_RU">Новогодние стили в presets/newyear.html приложения Сайт</description>
+                </option>
+            </options>
+        </setting>
+        <setting var="color_primary" control_type="color">
+            <value/>
+            <name locale="en_US">Primary color</name>
+            <name locale="ru_RU">Основной цвет</name>
+            <description locale="en_US">Default: #007dc6</description>
+            <description locale="ru_RU">По умолчанию: #007dc6</description>
+        </setting>
+        <setting var="color_link" control_type="color">
+            <value/>
+            <name locale="en_US">Link color</name>
+            <name locale="ru_RU">Цвет ссылки</name>
+            <description locale="en_US">Default: #007dc6</description>
+            <description locale="ru_RU">По умолчанию: #007dc6</description>
+        </setting>
+        <setting var="color_link_hover" control_type="color">
+            <value/>
+            <name locale="en_US">Link hover color</name>
+            <name locale="ru_RU">Цвет ссылки наведения</name>
+            <description locale="en_US">Default: #1292ed</description>
+            <description locale="ru_RU">По умолчанию: #1292ed</description>
+        </setting>
+        <setting var="color_blue_btn" control_type="color">
+            <value/>
+            <name locale="en_US">Blue btn color</name>
+            <name locale="ru_RU">Цвет синей кнопки</name>
+            <description locale="en_US">Default: #007dc6</description>
+            <description locale="ru_RU">По умолчанию: #007dc6</description>
+        </setting>
+        <setting var="color_blue_btn_hover" control_type="color">
+            <value/>
+            <name locale="en_US">Blue btn hover color</name>
+            <name locale="ru_RU">Цвет синей кнопки наведения</name>
+            <description locale="en_US">Default: #005d93</description>
+            <description locale="ru_RU">По умолчанию: #005d93</description>
+        </setting>
+        <setting var="color_blue_btn_text" control_type="color">
+            <value/>
+            <name locale="en_US">Blue btn text color</name>
+            <name locale="ru_RU">Цвет текста синей кнопки</name>
+            <description locale="en_US">Default: #fff</description>
+            <description locale="ru_RU">По умолчанию: #fff</description>
+        </setting>
+        <setting var="color_red_btn" control_type="color">
+            <value/>
+            <name locale="en_US">Red btn color</name>
+            <name locale="ru_RU">Цвет красной кнопки</name>
+            <description locale="en_US">Default: #e70033</description>
+            <description locale="ru_RU">По умолчанию: #e70033</description>
+        </setting>
+        <setting var="color_red_btn_hover" control_type="color">
+            <value/>
+            <name locale="en_US">Red btn hover color</name>
+            <name locale="ru_RU">Цвет красной кнопки наведения</name>
+            <description locale="en_US">Default: #900020</description>
+            <description locale="ru_RU">По умолчанию: #900020</description>
+        </setting>
+        <setting var="color_red_btn_text" control_type="color">
+            <value/>
+            <name locale="en_US">Red btn text color</name>
+            <name locale="ru_RU">Цвет текста красной кнопки</name>
+            <description locale="en_US">Default: #fff</description>
+            <description locale="ru_RU">По умолчанию: #fff</description>
+        </setting>
+        <setting var="color_btn_darkblue_brd" control_type="color">
+            <value/>
+            <name locale="en_US">Dark blue buttons text color</name>
+            <name locale="ru_RU">Цвет текста кнопкок с синем текстом</name>
+            <description locale="en_US">Go to shopping cart, Continue shopping. Default: #002654</description>
+            <description locale="ru_RU">Перейти в корзину, Продолжить покупки. По умолчанию: #002654</description>
+        </setting>
+        <setting var="color_green_selection" control_type="color">
+            <value/>
+            <name locale="en_US">Color of green elements</name>
+            <name locale="ru_RU">Цвет зеленых элементов</name>
+            <description locale="en_US">Default: #76c143</description>
+            <description locale="ru_RU">По умолчанию: #76c143</description>
+        </setting>
+        <setting var="catalog_image_bg" control_type="color">
+            <value/>
+            <name locale="en_US">Category product image background color</name>
+            <name locale="ru_RU">Фоновый цвет изображений товаров в категории</name>
+        </setting>
+        <setting var="divider_sidebar_app" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_sidebar"></div>
+                1.5 Sidebar <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_sidebar"></div>
+                1.5. Боковая панель <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="sidebar_site" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Site</name>
+            <name locale="ru_RU">Сайт</name>
+        </setting>
+        <setting var="sidebar_shop" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Shop</name>
+            <name locale="ru_RU">Магазин</name>
+        </setting>
+        <setting var="sidebar_blog" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Blog</name>
+            <name locale="ru_RU">Блог</name>
+        </setting>
+        <setting var="sidebar_photos" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Photos</name>
+            <name locale="ru_RU">Фото</name>
+        </setting>
+        <setting var="divider_sidebar_blocks" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_sb_blocks"></div>
+                1.5.1. Blocks <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_sb_blocks"></div>
+                1.5.1. Блоки <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="sidebar_nav" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Navigation</name>
+            <name locale="ru_RU">Навигация</name>
+        </setting>
+        <setting var="sidebar_promos" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Promo cards</name>
+            <name locale="ru_RU">Промо карточки</name>
+        </setting>
+        <setting var="sidebar_related" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Related products</name>
+            <name locale="ru_RU">Рекомендуемые товары</name>
+        </setting>
+        <setting var="sidebar_posts" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Blog posts</name>
+            <name locale="ru_RU">Посты блога</name>
+        </setting>
+        <setting var="sidebar_tags" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Shop tags</name>
+            <name locale="ru_RU">Теги магазина</name>
+        </setting>
+        <setting var="sidebar_latestphotos" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Latest photos</name>
+            <name locale="ru_RU">Последние фото</name>
+        </setting>
+        <setting var="divider_socials" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_social"></div>
+                1.6. Social networks <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_social"></div>
+                1.6. Социальные сети <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="community_vk" control_type="text">
+            <value>#</value>
+            <name locale="en_US">VK</name>
+            <name locale="ru_RU">Вконтакте</name>
+            <description locale="en_US">Example: http://vk.com/webasyst_ru</description>
+            <description locale="ru_RU">Например: http://vk.com/webasyst_ru</description>
+        </setting>
+        <setting var="community_fb" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Facebook</name>
+            <description locale="en_US">Example: https://www.facebook.com/Webasyst.RU</description>
+            <description locale="ru_RU">Например: https://www.facebook.com/Webasyst.RU</description>
+        </setting>
+        <setting var="community_tt" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Twitter</name>
+            <description locale="en_US">Example: https://twitter.com/webasyst_ru</description>
+            <description locale="ru_RU">Например: https://twitter.com/webasyst_ru</description>
+        </setting>
+        <setting var="community_ig" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Instagram</name>
+            <description locale="en_US">Example: https://www.instagram.com/username/</description>
+            <description locale="ru_RU">Например: https://www.instagram.com/username/</description>
+        </setting>
+        <setting var="community_yt" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Youtube</name>
+            <description locale="en_US">Example: http://www.youtube.com/user/username/</description>
+            <description locale="ru_RU">Например: http://www.youtube.com/user/username/</description>
+        </setting>
+        <setting var="community_sk" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Skype</name>
+        </setting>
+        <setting var="community_ok" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Odnoklassniki</name>
+            <name locale="ru_RU">Одноклассники</name>
+            <description locale="en_US">Example: https://ok.ru/mylink</description>
+            <description locale="ru_RU">Например: https://ok.ru/mylink</description>
+        </setting>
+        <setting var="community_gp" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Google plus</name>
+            <description locale="en_US">Example: https://plus.google.com/116636673175550063887/</description>
+            <description locale="ru_RU">Например: https://plus.google.com/116636673175550063887/</description>
+        </setting>
+        <setting var="community_pt" control_type="text">
+            <value>#</value>
+            <name locale="en_US">Pinterest</name>
+            <description locale="en_US">Example: https://www.pinterest.com/username/</description>
+            <description locale="ru_RU">Например: https://www.pinterest.com/username/</description>
+        </setting>
+        <setting var="divider_vkontakte" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_social_vk"></div>
+                1.6.1. Vkontakte <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_social_vk"></div>
+                1.6.1. Вконтакте <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="vk_id" control_type="text">
+            <value/>
+            <name locale="en_US">VK community id</name>
+            <name locale="ru_RU">Идентификатор сообщества</name>
+            <description locale="en_US">Example: 21415010</description>
+            <description locale="ru_RU">Например: 21415010</description>
+        </setting>
+        <setting var="vk_mode" control_type="select">
+            <value/>
+            <name locale="en_US">Widget mode</name>
+            <name locale="ru_RU">Вид виджета</name>
+            <options>
+                <option value="0">
+                    <name locale="ru_RU">Участники сообщества</name>
+                    <name locale="en_US">Community members</name>
+                </option>
+                <option value="1">
+                    <name locale="ru_RU">Только название</name>
+                    <name locale="en_US">Only name</name>
+                </option>
+                <option value="2">
+                    <name locale="ru_RU">Новости</name>
+                    <name locale="en_US">News</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="vk_wide" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Wide mode for news</name>
+            <name locale="ru_RU">Расширенный режим для новостей</name>
+        </setting>
+        <setting var="vk_height" control_type="text">
+            <value>300</value>
+            <name locale="en_US">VK community height</name>
+            <name locale="ru_RU">Высота виджета</name>
+            <description locale="en_US">Example: 400</description>
+            <description locale="ru_RU">Например: 400</description>
+        </setting>
+        <setting var="vk_color1" control_type="color">
+            <value/>
+            <name locale="en_US">Background color</name>
+            <name locale="ru_RU">Цвет фона</name>
+            <description locale="en_US">Example: #000000</description>
+            <description locale="ru_RU">Например: #000000</description>
+        </setting>
+        <setting var="vk_color2" control_type="color">
+            <value/>
+            <name locale="en_US">Font color</name>
+            <name locale="ru_RU">Цвет текста</name>
+            <description locale="en_US">Example: #000000</description>
+            <description locale="ru_RU">Например: #000000</description>
+        </setting>
+        <setting var="vk_color3" control_type="color">
+            <value/>
+            <name locale="en_US">Button color</name>
+            <name locale="ru_RU">Цвет кнопок</name>
+            <description locale="en_US">Example: #000000</description>
+            <description locale="ru_RU">Например: #000000</description>
+        </setting>
+        <setting var="divider_widget_fb" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_social_fb"></div>
+                1.6.2. Facebook community plugin <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_social_fb"></div>
+                1.6.2. Плагин сообщества Facebook <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="fb_href" control_type="text">
+            <value/>
+            <name locale="en_US">Community page link</name>
+            <name locale="ru_RU">Ссылка на страницу сообщества</name>
+            <description locale="en_US">Example: https://www.facebook.com/FacebookDevelopers</description>
+            <description locale="ru_RU">Например: https://www.facebook.com/FacebookDevelopers</description>
+        </setting>
+        <setting var="fb_height" control_type="text">
+            <value>300</value>
+            <name locale="en_US">FB community height</name>
+            <name locale="ru_RU">Высота виджета</name>
+            <description locale="en_US">Example: 400</description>
+            <description locale="ru_RU">Например: 400</description>
+        </setting>
+        <setting var="fb_cover" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Hide Cover Photo</name>
+            <name locale="ru_RU">Скрыть фоновое изображение</name>
+        </setting>
+        <setting var="fb_faces" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Show Friends Faces</name>
+            <name locale="ru_RU">Показать лица друзей</name>
+        </setting>
+        <setting var="fb_header" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Use Small Header</name>
+            <name locale="ru_RU">Использовать маленький заголовок</name>
+        </setting>
+        <setting var="fb_stream" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Show Page Posts</name>
+            <name locale="ru_RU">Показать посты страницы</name>
+        </setting>
+        <setting var="divider_widget_ok" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_social_ok"></div>
+                1.6.3. Odnoklassniki community <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_social_ok"></div>
+                1.6.3. Сообщество Одноклассники <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="ok_id" control_type="text">
+            <value/>
+            <name locale="en_US">Community id</name>
+            <name locale="ru_RU">Идентификатор сообщества</name>
+            <description locale="en_US">Example: 50582132228315</description>
+            <description locale="ru_RU">Например: 50582132228315</description>
+        </setting>
+        <setting var="ok_width" control_type="text">
+            <value/>
+            <name locale="en_US">OK community width</name>
+            <name locale="ru_RU">Ширина сообщества ОК</name>
+        </setting>
+        <setting var="ok_height" control_type="text">
+            <value/>
+            <name locale="en_US">OK community height</name>
+            <name locale="ru_RU">Высота сообщества ОК</name>
+        </setting>
+        <setting var="divider_widget_tt" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_social_tt"></div>
+                1.6.4. Twitter community <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_social_tt"></div>
+                1.6.4. Сообщество Twitter <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="tt_username" control_type="text">
+            <value/>
+            <name locale="en_US">Twitter username</name>
+            <name locale="ru_RU">Имя пользователя Twitter</name>
+            <description locale="en_US">Example: twitter</description>
+            <description locale="ru_RU">Например: twitter</description>
+        </setting>
+        <setting var="tt_widget_id" control_type="text">
+            <value/>
+            <name locale="en_US">Twitter widget id</name>
+            <name locale="ru_RU">Идентификатор виджета Twitter</name>
+            <description locale="en_US">Example: 679660853021569024</description>
+            <description locale="ru_RU">Например: 679660853021569024</description>
+        </setting>
+        <setting var="tt_width" control_type="text">
+            <value/>
+            <name locale="en_US">Widget width</name>
+            <name locale="ru_RU">Ширина виджета</name>
+            <description locale="en_US">Default: 300</description>
+            <description locale="ru_RU">По умолчанию: 300</description>
+        </setting>
+        <setting var="tt_height" control_type="text">
+            <value/>
+            <name locale="en_US">Widget height</name>
+            <name locale="ru_RU">Высота виджета</name>
+            <description locale="en_US">Default: 300</description>
+            <description locale="ru_RU">По умолчанию: 300</description>
+        </setting>
+        <setting var="tt_theme" control_type="select">
+            <value>light</value>
+            <name locale="en_US">Widget theme</name>
+            <name locale="ru_RU">Тема виджета</name>
+            <options>
+                <option value="light">
+                    <name locale="ru_RU">Светлая</name>
+                    <name locale="en_US">Light</name>
+                </option>
+                <option value="dark">
+                    <name locale="ru_RU">Тёмная</name>
+                    <name locale="en_US">Dark</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="tt_color" control_type="color">
+            <value/>
+            <name locale="en_US">Links color</name>
+            <name locale="ru_RU">Цвет ссылок</name>
+            <description locale="en_US">Example: #000000</description>
+            <description locale="ru_RU">Например: #000000</description>
+        </setting>
+        <setting var="tt_limit" control_type="text">
+            <value/>
+            <name locale="en_US">Limit tweets</name>
+            <name locale="ru_RU">Количество твитов</name>
+            <description locale="en_US">Default: 3</description>
+            <description locale="ru_RU">По умолчанию: 3</description>
+        </setting>
+        <setting var="divider_widget_ig" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_social_ig"></div>
+                1.6.5. Instagram community <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_social_ig"></div>
+                1.6.5. Сообщество Instagram <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="ig_clientid" control_type="text">
+            <value/>
+            <name locale="en_US">CLIENT ID</name>
+            <description locale="en_US">Example: 0d85474db00d489b835a5c4c74f1264d</description>
+            <description locale="ru_RU">По умолчанию: 0d85474db00d489b835a5c4c74f1264d</description>
+        </setting>
+        <setting var="ig_accesstoken" control_type="text">
+            <value/>
+            <name locale="en_US">access token</name>
+        </setting>
+        <setting var="ig_userid" control_type="text">
+            <value/>
+            <name locale="en_US">user id</name>
+            <name locale="ru_RU">идентификатор пользователя</name>
+        </setting>
+        <setting var="ig_limit" control_type="text">
+            <value/>
+            <name locale="en_US">limit</name>
+            <name locale="ru_RU">лимит</name>
+            <description locale="en_US">Default: 9</description>
+            <description locale="ru_RU">По умолчанию: 9</description>
+        </setting>
+        <setting var="divider_payments" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_payment"></div>
+                1.7. Payment icons <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_payment"></div>
+                1.7. Иконки оплаты <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="payment_qiwi" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Qiwi</name>
+        </setting>
+        <setting var="payment_mastercard" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Master card</name>
+        </setting>
+        <setting var="payment_visa" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Visa</name>
+        </setting>
+        <setting var="payment_paypal" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Paypal</name>
+        </setting>
+        <setting var="payment_webmoney" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Webmoney</name>
+        </setting>
+        <setting var="payment_yandex" control_type="checkbox">
+            <value>1</value>
+            <name locale="ru_RU">Яндекс деньги</name>
+        </setting>
+        <setting var="divider_common" control_type="group_divider">
+            <value/>
+            <name locale="en_US"><![CDATA[
+                <div id="settings_site_common"></div>
+                1.8. Other settings <span data-scroll='#settings_contents'>to contents</span>
+            ]]></name>
+            <name locale="ru_RU"><![CDATA[
+                <div id="settings_site_common"></div>
+                1.8. Прочие настройки <span data-scroll='#settings_contents'>к содержанию</span>
+            ]]></name>
+        </setting>
+        <setting var="breadcrumbs_home" control_type="checkbox">
+            <value/>
+            <name locale="en_US">Breadcrumb Homepage</name>
+            <name locale="ru_RU">Хлебная крошка Главная</name>
+        </setting>
+        <setting var="catalog_name_height" control_type="select">
+            <value>none</value>
+            <name locale="ru_RU">Высота названия товара в каталоге</name>
+            <name locale="en_US">Catalog product name height</name>
+            <options>
+                <option value="none">
+                    <name locale="ru_RU">без ограничения</name>
+                    <name locale="en_US">without limit</name>
+                </option>
+                <option value="24">
+                    <name locale="ru_RU">1 строчка</name>
+                    <name locale="en_US">1 line</name>
+                </option>
+                <option value="48">
+                    <name locale="ru_RU">2 строчки</name>
+                    <name locale="en_US">2 lines</name>
+                </option>
+                <option value="72">
+                    <name locale="ru_RU">3 строчки</name>
+                    <name locale="en_US">3 lines</name>
+                </option>
+            </options>
+        </setting>
+        <setting var="catalog_skus" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Catalog product skus count</name>
+            <name locale="ru_RU">Количество артикулов товара</name>
+        </setting>
+        <setting var="poweredby" control_type="checkbox">
+            <value>1</value>
+            <name locale="en_US">Show Webasyst icon</name>
+            <name locale="ru_RU">Показать иконку Webasyst</name>
+        </setting>
+        <setting var="messages" control_type="checkbox">
+            <value>0</value>
+            <name locale="en_US">Show popup messages</name>
+            <name locale="ru_RU">Показать всплывающие сообщение</name>
+            <description locale="ru_RU">Сообщения выводятся при добавлении товара в корзину, сравнение, избранное</description>
+        </setting>
+    </settings>
+    <locales>
+        <locale>
+            <msgid>Account</msgid>
+            <msgstr locale="ru_RU">Кабинет</msgstr>
+        </locale>
+        <locale>
+            <msgid>Add to</msgid>
+            <msgstr locale="ru_RU">Добавлен в</msgstr>
+        </locale>
+        <locale>
+            <msgid>All rights reserved</msgid>
+            <msgstr locale="ru_RU">Все права защищены</msgstr>
+        </locale>
+        <locale>
+            <msgid>Be first</msgid>
+            <msgstr locale="ru_RU">Будь первым</msgstr>
+        </locale>
+        <locale>
+            <msgid>Boxed</msgid>
+            <msgstr locale="ru_RU">Ограничен</msgstr>
+        </locale>
+        <locale>
+            <msgid>cancel</msgid>
+            <msgstr locale="ru_RU">отмена</msgstr>
+        </locale>
+        <locale>
+            <msgid>Cart</msgid>
+            <msgstr locale="ru_RU">Корзина</msgstr>
+        </locale>
+        <locale>
+            <msgid>cart</msgid>
+            <msgstr locale="ru_RU">корзину</msgstr>
+        </locale>
+        <locale>
+            <msgid>Catalog</msgid>
+            <msgstr locale="ru_RU">Каталог</msgstr>
+        </locale>
+        <locale>
+            <msgid>Contacts</msgid>
+            <msgstr locale="ru_RU">Контакты</msgstr>
+        </locale>
+        <locale>
+            <msgid>Customer Service</msgid>
+            <msgstr locale="ru_RU">Обслуживание клиентов</msgstr>
+        </locale>
+        <locale>
+            <msgid>Compare</msgid>
+            <msgstr locale="ru_RU">Сравнение</msgstr>
+        </locale>
+        <locale>
+            <msgid>Design with taste PRO</msgid>
+            <msgstr locale="ru_RU">Дизайн со вкусом PRO</msgstr>
+        </locale>
+        <locale>
+            <msgid>Favourite</msgid>
+            <msgstr locale="ru_RU">Избранное</msgstr>
+        </locale>
+        <locale>
+            <msgid>Feedback</msgid>
+            <msgstr locale="ru_RU">Обратная связь</msgstr>
+        </locale>
+        <locale>
+            <msgid>Follow us</msgid>
+            <msgstr locale="ru_RU">Подписывайтесь на нас</msgstr>
+        </locale>
+        <locale>
+            <msgid>Get to Know Us</msgid>
+            <msgstr locale="ru_RU">Узнайте о нас</msgstr>
+        </locale>
+        <locale>
+            <msgid>Header</msgid>
+            <msgstr locale="ru_RU">Шапка</msgstr>
+        </locale>
+        <locale>
+            <msgid>Hello</msgid>
+            <msgstr locale="ru_RU">Привет</msgstr>
+        </locale>
+        <locale>
+            <msgid>Homepage</msgid>
+            <msgstr locale="ru_RU">Главная</msgstr>
+        </locale>
+        <locale>
+            <msgid>Latest photos</msgid>
+            <msgstr locale="ru_RU">Последние фотографии</msgstr>
+        </locale>
+        <locale>
+            <msgid>Layout</msgid>
+            <msgstr locale="ru_RU">Макет</msgstr>
+        </locale>
+        <locale>
+            <msgid>More</msgid>
+            <msgstr locale="ru_RU">Ещё</msgstr>
+        </locale>
+        <locale>
+            <msgid>My orders</msgid>
+            <msgstr locale="ru_RU">Мои заказы</msgstr>
+        </locale>
+        <locale>
+            <msgid>My requests</msgid>
+            <msgstr locale="ru_RU">Мои запросы</msgstr>
+        </locale>
+        <locale>
+            <msgid>My subscriptions</msgid>
+            <msgstr locale="ru_RU">Мои подписки</msgstr>
+        </locale>
+        <locale>
+            <msgid>News</msgid>
+            <msgstr locale="ru_RU">Новости</msgstr>
+        </locale>
+        <locale>
+            <msgid>Payment</msgid>
+            <msgstr locale="ru_RU">Оплата</msgstr>
+        </locale>
+        <locale>
+            <msgid>Privacy policy</msgid>
+            <msgstr locale="ru_RU">Политика конфиденциальности</msgstr>
+        </locale>
+        <locale>
+            <msgid>Product catalog</msgid>
+            <msgstr locale="ru_RU">Каталог товаров</msgstr>
+        </locale>
+        <locale>
+            <msgid>Recommended</msgid>
+            <msgstr locale="ru_RU">Рекомендуем</msgstr>
+        </locale>
+        <locale>
+            <msgid>Sidebar</msgid>
+            <msgstr locale="ru_RU">Боковая панель</msgstr>
+        </locale>
+        <locale>
+            <msgid>Shipping</msgid>
+            <msgstr locale="ru_RU">Доставка</msgstr>
+        </locale>
+        <locale>
+            <msgid>Tags</msgid>
+            <msgstr locale="ru_RU">Теги</msgstr>
+        </locale>
+        <locale>
+            <msgid>Total</msgid>
+            <msgstr locale="ru_RU">Всего</msgstr>
+        </locale>
+        <locale>
+            <msgid>To home page</msgid>
+            <msgstr locale="ru_RU">На главную страницу</msgstr>
+        </locale>
+        <locale>
+            <msgid>Viewed</msgid>
+            <msgstr locale="ru_RU">Просмотренное</msgstr>
+        </locale>
+        <locale>
+            <msgid>Welcome</msgid>
+            <msgstr locale="ru_RU">Добро пожаловать</msgstr>
+        </locale>
+        <locale>
+            <msgid>We are using Webasyst</msgid>
+            <msgstr locale="ru_RU">Мы используем Webasyst</msgstr>
+        </locale>
+        <locale>
+            <msgid>Wide</msgid>
+            <msgstr locale="ru_RU">Во всю ширину</msgstr>
+        </locale>
+        <locale>
+            <msgid>Your orders</msgid>
+            <msgstr locale="ru_RU">Ваши заказы</msgstr>
+        </locale>
+    </locales>
+</theme>

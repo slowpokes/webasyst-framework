@@ -1,0 +1,25 @@
+{strip}
+{if !empty($theme_settings.vk_id)}
+    <div class="sidebar__block mb-20">
+        <div id="vk_groups"></div>
+    </div>
+    <script>
+        $(function () {
+            var script = "//vk.com/js/api/openapi.js?146",
+                params = {
+                    mode: {if empty($theme_settings.vk_mode)}0{else}{$theme_settings.vk_mode}{/if},
+                    {if $theme_settings.vk_mode==2}wide: {$theme_settings.vk_wide|default:0},{/if}
+                    width: "auto",
+                    height: "{$theme_settings.vk_height|default:400}",
+                    color1: "{$theme_settings.vk_color1|default:'#FFFFFF'}",
+                    color2: "{$theme_settings.vk_color2|default:'#2B587A'}",
+                    color3: "{$theme_settings.vk_color3|default:'#5B7FA6'}"
+                };
+
+            $.getScript(script, function () {
+                VK.Widgets.Group("vk_groups", params, {$theme_settings.vk_id});
+            });
+        });
+    </script>
+{/if}
+{/strip}

@@ -1,0 +1,21 @@
+{strip}
+{**
+* @param int $limit - count of brands (10)
+* @param string $mytitle - slider title ([`Tags`])
+*}
+{if $wa->shop}
+    {$tags = $wa->shop->tags($limit|default:null)}
+    {if count($tags) > 0}
+        <div class="sidebar__block mb-40">
+            <div class="sbHeading">[`Tags`]</div>
+            <ul class="sbTags list-unstyled">
+                {foreach $tags as $tag}
+                    <li class="sbTags__item">
+                        <a class="sbTags__tag" href="{$wa->getUrl('shop/frontend')}tag/{$tag.uri_name}/">{$tag.name|escape}</a>
+                    </li>
+                {/foreach}
+            </ul>
+        </div>
+    {/if}
+{/if}
+{/strip}

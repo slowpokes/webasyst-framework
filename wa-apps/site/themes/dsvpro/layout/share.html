@@ -1,0 +1,30 @@
+{strip}
+{**
+* @param string $mytitle
+* @param array $array ['vk','fb','tt']
+*}
+{$communities = []}
+{if $theme_settings.community_vk}{$communities[] = ["name" => "vk","url" => $theme_settings.community_vk,"icon" => "vkontakte","title" => "Вконтакте"]}{/if}
+{if $theme_settings.community_fb}{$communities[] = ["name" => "fb","url" => $theme_settings.community_fb,"icon" => "facebook","title" => "Facebook"]}{/if}
+{if $theme_settings.community_tt}{$communities[] = ["name" => "tt","url" => $theme_settings.community_tt,"icon" => "twitter","title" => "Twitter"]}{/if}
+{if $theme_settings.community_ig}{$communities[] = ["name" => "ig","url" => $theme_settings.community_ig,"icon" => "instagram","title" => "Instagram"]}{/if}
+{if $theme_settings.community_yt}{$communities[] = ["name" => "yt","url" => $theme_settings.community_yt,"icon" => "youtube","title" => "Youtube"]}{/if}
+{if $theme_settings.community_ok}{$communities[] = ["name" => "ok","url" => $theme_settings.community_ok,"icon" => "odnoklassniki","title" => "Одноклассники"]}{/if}
+{if $theme_settings.community_sk}{$communities[] = ["name" => "sk","url" => "skype:`$theme_settings.community_sk`?chat","icon" => "skype","title" => "Skype"]}{/if}
+{if $theme_settings.community_gp}{$communities[] = ["name" => "gp","url" => $theme_settings.community_gp,"icon" => "gplus","title" => "Google Plus"]}{/if}
+{if $theme_settings.community_pt}{$communities[] = ["name" => "pt","url" => $theme_settings.community_pt,"icon" => "pinterest","title" => "Pinterest"]}{/if}
+
+{if count($communities)}
+    <ul class="list-unstyled list-inline communities">
+        <li class="subscribe__heading">{$mytitle|default:"[`Follow us`]"}</li>
+        {foreach $communities as $c}
+            {if isset($array) && !in_array($c.name,$array)}{continue}{/if}
+            <li>
+                <a class="{$c.name} rounded-md text-center" href="{$c.url}" title="{$wa->accountName()} {$c.title}" rel="nofollow" target="_blank">
+                    <i class="icon-{$c.icon}"></i>
+                </a>
+            </li>
+        {/foreach}
+    </ul>
+{/if}
+{/strip}

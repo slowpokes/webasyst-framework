@@ -1,0 +1,38 @@
+{strip}
+{$wa->globals("crumb","[`My profile`]")}
+{if $wa->get("mynav")}
+    <div class="my">
+        <h1>[`Welcome`]{if $wa->user("firstname")}, {$wa->user("firstname")}{/if}</h1>
+        {$wa->myNav("myNav myNav__icon")}
+    </div>
+{else}
+    <div class="my myProfile">
+        <h1>[`My account`]<a href="{$wa->getUrl('/frontend/myProfile')}?mynav=1">[`Back`]</a></h1>
+        <div class="tab-content">
+            <div class="tab-pane fade in active" role="tabpanel" id="profileInfo">
+                <ul class="list-unstyled">
+                    {foreach $user_info as $id => $info}
+                        <li>{$info.name}: <span class="fw-5">{$info.value}</span></li>
+                    {/foreach}
+                </ul>
+                <a class="btn btn-primary" href="#profileForm" data-toggle="tab">[`Edit`]</a>
+            </div>
+            <div class="tab-pane fade" role="tabpanel" id="profileForm">
+                <form action="" enctype="multipart/form-data" method="post">
+                    <div class="form formProfile">
+
+                        {$form->html()}
+
+                        <div class="wa-field">
+                            <div class="wa-value">
+                                <input type="submit" value="[s`Save`]" class="btn">
+                                <a class="btn btn-default btn-lg" href="#profileInfo" data-toggle="tab">Отмена</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{/if}
+{/strip}

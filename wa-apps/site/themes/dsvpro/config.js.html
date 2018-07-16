@@ -1,0 +1,39 @@
+{$isRetina = $wa->globals("isRetina")}
+{$isMobile = $wa->isMobile() || $wa->userAgent('device') == 'ipad' || $wa->userAgent('device') == 'android'}
+
+{if $wa->shop}
+    {$currency_info = $wa->shop->currency(true)}
+    {if !isset($currency_info.sign_delim)}{$currency_info.sign_delim = " "}{/if}
+    {if !isset($currency_info.sign_position)}{$currency_info.sign_position = 1}{/if}
+    {if !isset($currency_info.sign_html)}{$currency_info.sign_html = $currency_info.sign}{/if}
+    {if !isset($currency_info.decimal_point)}{$currency_info.decimal_point = ','}{/if}
+    {if !isset($currency_info.frac_digits)}{$currency_info.frac_digits = 2}{/if}
+    {if !isset($currency_info.thousands_sep)}{$currency_info.thousands_sep = ' '}{/if}
+    <script>
+        (function (WA_THEME) {
+            WA_THEME.currency = {json_encode($currency_info)}
+        }(window.WA_THEME = window.WA_THEME || {}))
+    </script>
+{/if}
+<div id="config"
+      data-locale='{
+         "theme":"[`Design with taste PRO`]",
+         "compare":"[`Compare`]",
+         "compare_add":"[`Add to comparison table`]",
+         "compare_remove":"[`Remove from comparison table`]",
+         "favourite":"[`Favourite`]",
+         "favourite_add":"[`Add to favourites`]",
+         "favourite_remove":"[`Remove from favourites`]",
+         "cart":"[`cart`]",
+         "addto":"[`Add to`]",
+         "more":"[`More`]"
+     }'
+     data-version="{$wa->version(true)}"
+     data-themeversion="{$wa_theme_version}"
+     data-staticurl="{$wa_static_url}"
+     data-activeurl="{$wa_active_theme_url}"
+     data-parenturl="{if $wa_app == 'site'}{$wa_active_theme_url}{else}{$wa_parent_theme_url}{/if}"
+     data-mobile="{$isMobile}"
+     {if !empty($isRetina)} data-retina=true{/if}
+     {if $wa->shop} data-search="{$wa->getUrl('shop/frontend/search')}" data-compare="{$wa->getUrl('shop/frontend/compare')}" data-checkout="{$wa->getUrl('/frontend/checkout')}" data-cart="{$wa->getUrl('shop/frontend/cart')}"{/if}>
+</div>

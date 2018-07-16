@@ -1,0 +1,11 @@
+{$header = $wa->cookie("header")|default:$theme_settings.header}
+{$default_logo = "img/logo-dark.png"}
+{if ($header == "theme_wm" || $header == "theme_am") && !$wa->isMobile()}
+    {$default_logo = "img/logo-light.png"}
+{/if}
+<a href="{$wa_url}" class="logo logo_{$header}">
+    {if !empty($theme_settings.logo_affix)}
+        <img src="{$wa_theme_url}{$theme_settings.logo_affix}?v{$wa_theme_version}" class="logo__affix" alt="{$wa->accountName()}">
+    {/if}
+    <img src="{$wa_theme_url}{$theme_settings.logo|default:$default_logo}?v{$wa_theme_version}" alt="{$wa->accountName()}">
+</a>

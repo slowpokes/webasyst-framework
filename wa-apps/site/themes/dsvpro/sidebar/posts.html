@@ -1,0 +1,26 @@
+{strip}
+{**
+* @param string $id - blog id (null)
+* @param int $limit - count of posts (3)
+* @param string $mytitle - heading ([`News`])
+*}
+{if $wa->blog}
+    {$posts = $wa->blog->posts($id|default:null,$limit|default:3)}
+    {if count($posts)}
+        <div class="sidebar__block mb-40">
+            <div class="sbHeading">[`News`]</div>
+            <ul class="sbPosts list-unstyled">
+                {foreach $posts as $post}
+                    <li class="sbPosts__item">
+                        <a class="sbPosts__name" href="{$post.link}">{$post.title}</a>
+                        <div class="sbPosts__info">
+                            <span class="sbPosts__date">{$post.datetime|wa_datetime:"humandate"}</span>
+                            <span class="sbPosts__comments"> / <i class="mi mi-forum sbPosts__icon"></i> {$post.comment_count}</span>
+                        </div>
+                    </li>
+                {/foreach}
+            </ul>
+        </div>
+    {/if}
+{/if}
+{/strip}

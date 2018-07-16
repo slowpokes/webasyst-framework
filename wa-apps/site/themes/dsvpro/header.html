@@ -1,0 +1,240 @@
+{strip}
+{* VARS *}
+{$selected_page = $wa->globals("page")|default:null}
+
+{if $wa->shop}
+    {$shop_compare = $wa->shop->inComparison()}
+
+    {if $wa->cookie("shop_wishlist")}
+        {$shop_wishlist = ","|explode:$wa->cookie("shop_wishlist")}
+    {else}
+        {$shop_wishlist = []}
+    {/if}
+
+    {if $wa->cookie("shop_viewed")}
+        {$shop_viewed = ","|explode:$wa->cookie("shop_viewed")}
+    {else}
+        {$shop_viewed = []}
+    {/if}
+{/if}
+
+{* FUNCTIONS *}
+{function name="page_item" item=[]}
+    {if isset($item.childs)}
+        {if empty($item.parent_id)}
+            {$class = "dropdown"}
+        {else}
+            {$class = "dropdown-submenu"}
+        {/if}
+        <li class="{$class}{if $item.id === $selected_page} active{/if}">
+            <a href="{$item.url}">{$item.name}</a>
+            <ul class="dropdown-menu">
+                {foreach $item.childs as $ic}
+                    {if isset($ic.hidden)}{continue}{/if}
+                    {page_item item=$ic}
+                {/foreach}
+            </ul>
+        </li>
+    {else}
+        <li{if $item.id === $selected_page} class="active"{/if}><a href="{$item.url}">{$item.name}</a></li>
+    {/if}
+{/function}
+
+{function name="catalog_icon" item=[] class="catalog-icon"}
+    {$image_url = ""}
+    {if $theme_settings.catalog_icons == 'params' && isset($item.params.icon)}
+        {$image_url = $item.params.icon}
+    {elseif $theme_settings.catalog_icons == 'categoryimages' && class_exists('shopCategoryimagesPlugin')}
+        {$image_url = shopCategoryImagesPlugin::getCategoryLittleThumbUrl($item.id)}
+    {elseif $theme_settings.catalog_icons == 'categoryimage' && class_exists('shopCategoryimagePlugin') && isset($item.image)}
+        {$image_url = "{$wa_url}wa-data/public/shop/categories/{$item.id}/{$item.id}.36{$item.image}"}
+    {elseif $theme_settings.catalog_icons == 'wmimage' && class_exists('shopWmimageincatPlugin')}
+        {$image_url = shopWmimageincatPlugin::getCategoryImage($item.id,'icon')}
+    {/if}
+    {if !empty($image_url)}
+        <img src="{$image_url}" alt="{$item.name|escape}" class="{$class}">
+    {/if}
+{/function}
+
+{function name="megamenu" item=[] depth=2}
+{strip}
+    <div class="dropdown-menu">
+        <div class="container-fluid">
+            <div class="megaMenu__header"></div>
+            <div class="megaMenu__body">
+                <div class="row">
+                    {foreach $item.childs as $ic}
+                        {$col=2}
+                        {$split = 0}
+
+                        {if isset($ic.params.col)}
+                            {$col=$ic.params.col}
+                        {/if}
+
+                        {if isset($ic.params.split)}
+                            {$split = $ic.params.split}
+                            {* количество элементов в колонке *}
+                            {$subcat_count=(count($ic.childs)/$split)|ceil}
+                        {/if}
+
+                        {$item_depth = $ic.depth - $level}
+
+                        <div class="col-xs-{$col}">
+                            <a href="{$ic.url}" class="megaMenu__heading" data-icon-id="{$ic.id}">
+                                {if $theme_settings.catalog_icons != "none"}
+                                    {catalog_icon item=$ic class="megaMenu__image"}
+                                {/if}
+                                <span>{$ic.name}</span>
+                            </a>
+                            <ul class="megaMenu__list">
+                                {if count($ic.childs) && $item_depth < $depth}
+                                    {foreach $ic.childs as $icc}
+                                        <li>
+                                            <a href="{$icc.url}">
+                                                {if $theme_settings.catalog_icons != "none"}
+                                                    {catalog_icon item=$icc class="catalog-icon megaMenu__icon"}
+                                                {/if}
+                                                <span>{$icc.name}</span>
+                                            </a>
+                                        </li>
+                                        {if $split> 0 && $subcat_count>1 && $icc@iteration is div by $subcat_count}
+                                                </ul>
+                                            </div>
+
+                                            {if !$icc@last}
+                                                <div class="col-xs-{$col}">
+                                                    <ul class="megaMenu__list">
+                                                        <li class="empty">&nbsp;</li>
+                                            {else}
+                                                <div class="col-xs-12" style="display: none">
+                                                    <ul class="megaMenu__list">
+                                                        <li></li>
+                                            {/if}
+                                        {/if}
+                                    {/foreach}
+                                {/if}
+                            </ul>
+                        </div>
+                    {/foreach}
+                </div>
+            </div>
+            <div class="megaMenu__footer"></div>
+        </div>
+    </div>
+{/strip}
+{/function}
+
+{function name="amamenu" item=[] col=2}
+{strip}
+    <div class="dropdown-menu amaMenu amaMenu-col{$col}">
+        {if isset($item.params.promo)}
+            <img class="amaMenu__promo" alt="{$item.name}" src="{$item.params.promo}">
+        {/if}
+        <div class="amaMenu__header"></div>
+        <div class="amaMenu__body">
+            <ul class="list-unstyled">
+                {foreach $item.childs as $ic}
+                    <li class="amaMenu__item">
+                        <a href="{$ic.url}" data-icon-id="{$item.id}" class="amaMenu__heading td-none">{$ic.name}</a>
+                        {if count($ic.childs)}
+                            <ul class="list-unstyled">
+                                {foreach $ic.childs as $icc}
+                                    <li>
+                                        <a href="{$icc.url}" data-icon-id="{$icc.id}" class="td-none">{$icc.name}</a>
+                                    </li>
+                                {/foreach}
+                            </ul>
+                        {/if}
+                    </li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+{/strip}
+{/function}
+
+{function name="multicolumn" item=[] col=2 depth=2 level=0}
+{strip}
+    <div class="dropdown-menu multiColumnMenu multiColumnMenu-col{$col}">
+        <div class="multiColumnMenu__col">
+            {$current_cols = 1}
+            {foreach $item.childs as $ic}
+                {$item_depth = $ic.depth - $level}
+                <a href="{$ic.url}" class="multiColumnMenu__heading color-secondary td-none">
+                    {if $theme_settings.catalog_icons != "none"}
+                        {catalog_icon item=$ic class="multiColumnMenu__image"}
+                    {/if}
+                    <span>{$ic.name}</span>
+                </a>
+                {if count($ic.childs)  && $item_depth < $depth}
+                    <ul class="list-unstyled mb-20">
+                        {foreach $ic.childs as $icc}
+                        <li>
+                            <a href="{$icc.url}" data-icon-id="{$icc.id}" class="td-none">
+                                {if $theme_settings.catalog_icons != "none"}
+                                    {catalog_icon item=$icc class="catalog-icon multiColumnMenu__icon"}
+                                {/if}
+                                <span>{$icc.name}</span>
+                            </a>
+                        </li>
+                        {/foreach}
+                    </ul>
+                {/if}
+                {if isset($ic.params.endcol) && $current_cols < $col}
+                    </div>
+                    <div class="multiColumnMenu__col">
+                    {$current_cols = $current_cols + 1}
+                {/if}
+            {/foreach}
+        </div>
+    </div>
+{/strip}
+{/function}
+
+
+{function name="catalog_item" item=[] depth=2 level=0}
+{strip}
+    {if isset($item.params.depth)}
+        {$depth = $item.params.depth}
+    {/if}
+    {$item_depth = $item.depth - $level}
+    {if count($item.childs) && $item_depth < $depth}
+        {if $item.depth > $level}
+            {$class = "dropdown-submenu"}
+        {else}
+            {$class = "dropdown"}
+        {/if}
+        <li class="{$class}{if $selected_category == $item.id} active{/if}{if $item.depth == $level && isset($item.params.col)} megaMenu{/if}">
+            <a href="{$item.url}" data-icon-id="{$item.id}">
+                {if $theme_settings.catalog_icons != "none"}
+                    {catalog_icon item=$item class="catalog-icon catalog-image-ua"}
+                {/if}
+                <span>{$item.name}</span>
+            </a>
+            {if $item.depth == $level && isset($item.params.col)}
+                {megamenu item=$item depth=$depth level=$level}
+            {else}
+                <ul class="dropdown-menu">
+                    {foreach $item.childs as $ic}
+                        {catalog_item item=$ic level=$level depth=$depth}
+                    {/foreach}
+                </ul>
+            {/if}
+        </li>
+    {else}
+        <li{if $selected_category == $item.id} class="active"{/if}>
+            {if isset($item.params.badge) && isset($item.params.badgeclass) && $item.depth>0}
+                <span class="badge badge-{$item.params.badgeclass}">{$item.params.badge}</span>
+                <a href="{$item.url}" data-icon-id="{$item.id}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {else}
+                <a href="{$item.url}" data-icon-id="{$item.id}">{if isset($item.params.fa)}<i class="fa fa-{$item.params.fa} fa-fw"></i>{/if} {$item.name}</a>
+            {/if}
+        </li>
+    {/if}
+{/strip}
+{/function}
+
+{include file="header_{$wa->cookie("header",$theme_settings.header)}.html" inline}
+
+{include file="header-mobile.html" inline}
+{/strip}

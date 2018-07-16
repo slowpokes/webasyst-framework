@@ -1,0 +1,21 @@
+{if !empty($theme_settings.ok_id)}
+    <div class="sidebar__block mb-20">
+        <div id="ok_group_widget"></div>
+    </div>
+    <script>
+        !function (d, id, did, st) {
+            var js = d.createElement("script");
+            js.src = "https://connect.ok.ru/connect.js";
+            js.onload = js.onreadystatechange = function () {
+                if (!this.readyState || this.readyState == "loaded" || this.readyState == "complete") {
+                    if (!this.executed) {
+                        this.executed = true;
+                        setTimeout(function () {
+                            OK.CONNECT.insertGroupWidget(id,did,st);
+                        }, 0);
+                    }
+                }}
+            d.documentElement.appendChild(js);
+        }(document,"ok_group_widget","{$theme_settings.ok_id}","{ width:{$theme_settings.ok_width|default:230},height:{$theme_settings.ok_height|default:335} }");
+    </script>
+{/if}
