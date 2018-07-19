@@ -306,6 +306,24 @@
     {if $wa->block("body_after")}
         {$wa->block("body_after")}
     {/if}
+    <div id="city-modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <div class="title">Укажите свой город</div>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <input id="city-modal-input" class="form-control" placeholder="Начните вводить свой город" autocomplete="off" type="text">
+                        <span class="input-group-btn">
+                        <button class="btn btn-primary">ОК</button>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 {/strip}

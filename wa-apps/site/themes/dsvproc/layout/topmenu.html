@@ -51,11 +51,18 @@
                 {/foreach}
             {/if}
         </ul>
-
-        <ul class="topMenu__user list-inline list-unstyled">
+        <ul style="width: 100%" class="topMenu__user list-inline list-unstyled">
             {if $wa->shop}
-                {********* СРАВНЕНИЕ / COMPARE ********}
                 <li>
+                    <div class="header-city topMenu__link">
+                        <span {if shopCustomercityPlugin::getCityType() != 'г'}style="display: none"{/if} class="city-hint">Ваш город: </span>
+                        <a class="handler-city city-name" href="#">{shopCustomercityPlugin::getCity(false, true)}</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="/dostavka-po-rossii/">Доставка</a>
+                    </div>
+                </li>
+                {********* СРАВНЕНИЕ / COMPARE ********}
+                <li class="float-right">
                     <a class="topMenu__link js-compare{if count($shop_compare)} full{/if}" href="{if count($shop_compare)}{$wa->getUrl('shop/frontend/compare', ['id' => implode(',', $shop_compare)])}{else}javascript:void(0);{/if}">
                         <i class="mi mi-filter-none topMenu__icon"></i>
                         <span class="topMenu__label">[`Compare`]</span>
@@ -64,7 +71,7 @@
                 </li>
 
                 {********* ИЗБРАННОЕ / FAVOURITE ******}
-                <li>
+                <li class="float-right">
                     <a class="topMenu__link js-favorite{if count($shop_wishlist)} full{/if}" href="{$wa->getUrl('shop/frontend/search')}?func=wishlist" rel="nofollow">
                         <i class="mi mi-favorite-border topMenu__icon"></i>
                         <span class="topMenu__label">[`Favourite`]</span>
@@ -73,7 +80,7 @@
                 </li>
 
                 {********* ПРОСМОТРЕННЫЕ / VIEWED *****}
-                <li>
+                <li class="float-right">
                     <a class="topMenu__link js-viewed{if count($shop_viewed)} full{/if}" href="{$wa->getUrl('shop/frontend/search')}?func=viewed" rel="nofollow">
                         <i class="mi mi-access-time topMenu__icon"></i>
                         <span class="topMenu__label">[`Viewed`]</span>
@@ -112,3 +119,8 @@
     </div>
 </div>
 {/strip}
+<style>
+    .float-right{
+        float: right;
+    }
+</style>
