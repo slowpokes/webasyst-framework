@@ -91,7 +91,7 @@
 
             {********* АВТОРИЗАЦИЯ / AUTH *********}
             {if $wa->isAuthEnabled() && $wa->cookie("header", $theme_settings.header) == "theme_el"}
-                <li class="dropdown dropdown-right">
+                <li class="dropdown dropdown-right float-right">
                     <a href="{$wa->getUrl('/frontend/myProfile')}?mynav=1">
                         <i class="mi mi-person topMenu__icon"></i> Кабинет
                     </a>
