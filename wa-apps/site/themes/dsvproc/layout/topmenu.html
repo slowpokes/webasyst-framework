@@ -1,0 +1,114 @@
+{strip}
+<div class="topMenu topMenu_{$theme} affix-hidden">
+    <div class="container-fluid">
+        {if $wa_app == "shop" && count($currencies) > 1}
+            {$currency = $wa->shop->currency()}
+            {$country = [
+                "RUB" => "rus",
+                "USD" => "usa",
+                "EUR" => "deu",
+                "BYN" => "blr",
+                "UAH" => "ukr",
+                "KZT" => "kaz"
+            ]}
+            <ul class="topMenu__crcy list-inline">
+                <li class="dropdown">
+                    {if in_array($currency, array_keys($country))}
+                        <img src="{$wa_url}wa-content/img/country/{$country[$currency]}.gif" alt="{$currency}">
+                    {/if}
+                    <a href="javascript:void(0)">{$currency}</a>
+                    <ul class="dropdown-menu">
+                        {foreach $currencies as $c_code => $c}
+                            <li{if $c_code == $currency} class="active"{/if}>
+                                <a href="javascript:void(0)" data-crcy="{$c_code}">
+                                    {if in_array($c_code, array_keys($country))}
+                                        <img src="{$wa_url}wa-content/img/country/{$country[$c_code]}.gif" alt="{$c_code}">
+                                    {/if}
+                                    {$c.title}
+                                </a>
+                            </li>
+                        {/foreach}
+                    </ul>
+                </li>
+            </ul>
+        {/if}
+        <ul class="topMenu__pages list-inline">
+            {if $theme === "theme_ua"}
+                {if $wa->block("site.contacts")}
+                    {$wa->block("site.contacts")}
+                {else}
+                    <li>24/7 Поддержка</li>
+                    {if $wa->shop}
+                        <li><a href="tel:{$wa->shop->settings('phone')|regex_replace:'/[^0-9\+]/':''}">{$wa->shop->settings("phone")}</a></li>
+                    {/if}
+                {/if}
+            {/if}
+            {********* СТРАНИЦЫ / PAGES ***********}
+            {if count($pages)}
+                {foreach $pages as $item}
+                    {if isset($item.hidden)}{continue}{/if}
+                    {page_item item=$item}
+                {/foreach}
+            {/if}
+        </ul>
+
+        <ul class="topMenu__user list-inline list-unstyled">
+            {if $wa->shop}
+                {********* СРАВНЕНИЕ / COMPARE ********}
+                <li>
+                    <a class="topMenu__link js-compare{if count($shop_compare)} full{/if}" href="{if count($shop_compare)}{$wa->getUrl('shop/frontend/compare', ['id' => implode(',', $shop_compare)])}{else}javascript:void(0);{/if}">
+                        <i class="mi mi-filter-none topMenu__icon"></i>
+                        <span class="topMenu__label">[`Compare`]</span>
+                        <span class="badge topMenu__badge js-compare-count">{count($shop_compare)}</span>
+                    </a>
+                </li>
+
+                {********* ИЗБРАННОЕ / FAVOURITE ******}
+                <li>
+                    <a class="topMenu__link js-favorite{if count($shop_wishlist)} full{/if}" href="{$wa->getUrl('shop/frontend/search')}?func=wishlist" rel="nofollow">
+                        <i class="mi mi-favorite-border topMenu__icon"></i>
+                        <span class="topMenu__label">[`Favourite`]</span>
+                        <span class="badge topMenu__badge js-favorite-count">{count($shop_wishlist)}</span>
+                    </a>
+                </li>
+
+                {********* ПРОСМОТРЕННЫЕ / VIEWED *****}
+                <li>
+                    <a class="topMenu__link js-viewed{if count($shop_viewed)} full{/if}" href="{$wa->getUrl('shop/frontend/search')}?func=viewed" rel="nofollow">
+                        <i class="mi mi-access-time topMenu__icon"></i>
+                        <span class="topMenu__label">[`Viewed`]</span>
+                        <span class="badge topMenu__badge js-viewed-count">{count($shop_viewed)}</span>
+                    </a>
+                </li>
+            {/if}
+
+            {********* АВТОРИЗАЦИЯ / AUTH *********}
+            {if $wa->isAuthEnabled() && $wa->cookie("header", $theme_settings.header) == "theme_el"}
+                <li class="dropdown dropdown-right">
+                    <a href="{$wa->getUrl('/frontend/myProfile')}?mynav=1">
+                        <i class="mi mi-person topMenu__icon"></i> Кабинет
+                    </a>
+                    <ul class="dropdown-menu">
+                        {if $wa->user()->isAuth()}
+                            <li><a href="{$wa->getUrl('/frontend/myProfile')}?mynav=1">[s`My profile`]</a></li>
+                            {if $wa->shop}
+                                <li><a href="{$wa->getUrl('shop/frontend/myOrders')}">[`My orders`]</a></li>
+                                {if shopAffiliate::isEnabled()}
+                                    <li><a href="{$wa->getUrl('shop/frontend/myAffiliate')}">[`Affiliate program`]</a></li>
+                                {/if}
+                            {/if}
+                            {if $wa->mailer}
+                                <li><a href="{$wa->getUrl('mailer/frontend/mySubscriptions')}">[`My subscriptions`]</a></li>
+                            {/if}
+                            <li><a href="?logout">[s`Log out`]</a></li>
+                        {else}
+                            <li><a href="{$wa->loginUrl()}">[s`Log in`]</a></li>
+                            <li><a href="{$wa->signupUrl()}">[s`Sign up`]</a></li>
+                        {/if}
+                    </ul>
+                </li>
+            {/if}
+        </ul>
+    </div>
+</div>
+{/strip}

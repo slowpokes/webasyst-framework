@@ -1,0 +1,34 @@
+{strip}
+{**
+* @param string $condition - search condition (set/promo)
+* @param int $limit - count of products (4)
+* @param string $mytitle - slider title ([`Recommended`])
+*}
+{if $wa->shop}
+    {$products = $wa->shop->products($condition|default:"set/promo", null, $limit|default:4)}
+    {$size = "72x72"}
+    {if count($products) > 0}
+        <div class="sidebar__block mb-40">
+            <div class="sbHeading">{$mytitle|default:"[`Recommended`]"}</div>
+            <ul class="sbRelated list-unstyled">
+                {foreach $products as $p}
+                    <li class="sbRelated__item clearfix">
+                        <a class="sbRelated__link td-none" href="{$p.frontend_url}">
+                            <img class="sbRelated__image lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-original="{$wa->shop->productImgUrl($p, $size)}" alt="{$p.name}">
+                            <div class="sbRelated__info">
+                                <div class="sbRelated__name gray">{$p.name}</div>
+                                <div class="sbRelated__prices">
+                                    <span class="sbRelated__price">{shop_currency_html($p.price)}</span>
+                                    {if $p.compare_price > 0}
+                                        <span class="sbRelated__compare">{shop_currency_html($p.compare_price)}</span>
+                                    {/if}
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {/foreach}
+            </ul>
+        </div>
+    {/if}
+{/if}
+{/strip}

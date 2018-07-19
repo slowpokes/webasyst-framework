@@ -1,0 +1,25 @@
+{strip}
+{if !empty($theme_settings.ig_clientid) && !empty($theme_settings.ig_accesstoken) && !empty($theme_settings.ig_userid)}
+    <script type="text/javascript">
+        (function($) {
+            function initInstagram() {
+                var userFeed = new Instafeed({
+                    get:"user",
+                    clientId:"{$theme_settings.ig_clientid}",
+                    accessToken:"{$theme_settings.ig_accesstoken}",
+                    userId:"{$theme_settings.ig_userid}",
+                    limit:"{$theme_settings.ig_limit|default:9}",
+                    {literal}template:'<a href="{{link}}" class="rounded-sm" rel="nofollow"><img src="{{image}}" alt="{{caption}}" /></a>'{/literal}
+                });
+                userFeed.run();
+            }
+            $.getScript("{$wa_theme_url}js/instafeed.min.js?v{$wa_theme_version}", function() {
+                initInstagram();
+            });
+        })(jQuery);
+    </script>
+    <div class="sidebar__block mb-20">
+        <div id="instafeed" class="instafeed"></div>
+    </div>
+{/if}
+{/strip}

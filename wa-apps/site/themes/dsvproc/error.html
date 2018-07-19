@@ -1,0 +1,32 @@
+{strip}
+<style>
+    .header,
+    .headerMobile,
+    .header-wrapper,
+    .footer,
+    .subscribe,
+    .breadcrumb { display: none !important; }
+    .onePage { height: 90vh; }
+    .copyright {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
+</style>
+<div class="onePage vertical-align">
+    <div class="container-fluid text-center ">
+        {if $theme_settings.logo_error}
+            <div class="mb-10">
+                {include file="layout/logo.html" inline}
+            </div>
+        {/if}
+        <h1>
+            {if $error_code}{$error_code}. {/if}
+            {if $error_message}{$error_message}{else}[s`Error`]{/if}
+        </h1>
+        <div class="mb-20">[s`The requested resource is not available.`]</div>
+        <a href="{$wa_static_url}" class="btn btn-primary btn-lg">[`To home page`]</a>
+    </div>
+</div>
+{/strip}

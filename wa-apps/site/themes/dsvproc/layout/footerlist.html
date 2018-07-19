@@ -1,0 +1,26 @@
+{strip}
+{**
+* @param int $sm
+* @param int $xs
+* @param string $mytitle
+* @param array $array
+* @param string $hide
+*}
+<div class="col-sm-{$sm|default:3} col-xs-{$xs|default:6}">
+    <div class="footer__heading">{$mytitle|default:''}</div>
+    {if count($array)}
+        <ul class="footer__list">
+            {if !empty($hide)}
+                {foreach $array as $item}
+                    {if isset($item.{$hide})}{continue}{/if}
+                    <li><a href="{$item.url}">{$item.name}</a></li>
+                {/foreach}
+            {else}
+                {foreach $array as $item}
+                    <li><a href="{$item.url}">{$item.name}</a></li>
+                {/foreach}
+            {/if}
+        </ul>
+    {/if}
+</div>
+{/strip}

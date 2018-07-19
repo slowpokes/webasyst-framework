@@ -1,0 +1,13 @@
+{function name="pluralform" n=1 onlytext=false f1="" f2="" f3=""}
+    {$n = abs($n)}
+    {$n1 = $n % 10}
+    {$n2 = $n % 100}
+    {if !$onlytext}{$n}{/if}
+    {if $n1 == 1 && $n2 != 11}
+        {$f1}
+    {elseif $n1 >= 2 && $n1 <= 4 && ($n2 < 10 || $n2 >= 20)}
+        {$f2}
+    {else}
+        {$f3}
+    {/if}
+{/function}

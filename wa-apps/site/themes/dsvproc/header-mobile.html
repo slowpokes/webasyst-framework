@@ -1,0 +1,223 @@
+{strip}
+{* FUNCTIONS *}
+{function menu_mobile_item item=[] selected=0 depth=2 list="menu"}
+    <li class="list-group-item list-toggle{if $item.id === $selected} active{/if}">
+        <a href="{$item.url}">{$item.name}</a>
+        {$item_childs = $item.childs|default : []}
+        {$item_depth = $item.depth|default : 0}
+        {if $item_depth < $depth && count($item_childs)}
+            <a href="#{$list}_{$item.id}" data-toggle="collapse" data-parent="#{$list}" class="collapsed mobileMenu__toggle"></a>
+            <ul id="{$list}_{$item.id}" class="collapse">
+                {foreach $item.childs as $ic}
+                    {menu_mobile_item item=$ic selected=$selected list=$list}
+                {/foreach}
+            </ul>
+        {/if}
+    </li>
+{/function}
+
+{* MOBILE HEADER *}
+<div class="headerMobile visible-xs visible-sm"{if $theme_settings.header_mobile_affix} id="headerMobile"{/if}>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="headerMobile__logo">
+                    {********* ЛОГОТИП / LOGO *************}
+                    {if empty($theme_settings.logo_mobile)}
+                        {include file="layout/logo.html"}
+                    {else}
+                        <a href="{$wa_url}" class="logo">
+                            <img src="{$wa_theme_url}{$theme_settings.logo_mobile|default:$default_logo}?v{$wa_theme_version}" alt="{$wa->accountName()}">
+                        </a>
+                    {/if}
+                </div>
+                <div class="headerMobile__left">
+                    <ul class="headerMobile__list">
+                        {********* МЕНЮ / MENU ****************}
+                        <li>
+                            <a href="javascript:void(0)" id="toggleMobileMenu">
+                                <i class="mi mi-menu mi-24"></i>
+                            </a>
+                        </li>
+
+                        {********* ПОИСК / SEARCH *************}
+                        <li>
+                            <a href="#mobileSearch" data-toggle="collapse">
+                                <i class="mi mi-search mi-24"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="headerMobile__right">
+                    <ul class="headerMobile__list">
+                        {********* АВТОРИЗАЦИЯ / AUTH *********}
+                        {if $wa->isAuthEnabled()}
+                            <li>
+                                <a href="{if $wa->user()->isAuth()}{$wa->getUrl('/frontend/myProfile')}?mynav=1{else}{$wa->loginUrl()}{/if}">
+                                    <i class="mi mi-person mi-24"></i>
+                                </a>
+                            </li>
+                        {/if}
+
+                        {********* КОРЗИНА / CART *************}
+                        {if $wa->shop}
+                            {$cart_count = $wa->shop->cart->count()}
+                            <li>
+                                <a href="{$wa->getUrl('shop/frontend/cart')}" class="js-cart{if $cart_count > 0} full{/if}">
+                                    <span class="mi-icon-badge js-cart-count" data-badge="{$cart_count}">
+                                        <i class="mi mi-24{if $theme_settings.preset == 'newyear'} mi-shopping-basket{else} mi-shopping-cart{/if}"></i>
+                                    </span>
+                                </a>
+                            </li>
+                        {/if}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="collapse" id="mobileSearch">
+                    {if in_array($wa_app,['site','shop','photos','mailer'])}
+                        {include file="layout/searchform.html" inline}
+                    {else}
+                        {include file="`$wa_active_theme_path`/layout/searchform.html" inline}
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* MOBILE MENU *}
+<div class="mobileMenu">
+    <div class="mobileMenu_inner">
+        {********* АВТОРИЗАЦИЯ / AUTH *********}
+        {if $wa->isAuthEnabled()}
+            <div class="mobileMenu__block">
+                {if $wa->user()->isAuth()}
+                    <a href="?logout" class="pull-right">[s`Log out`]</a>
+                    <a href="{if $wa->myUrl()}{$wa->myUrl()}{else}javascript:void(0){/if}">
+                        <i class="mi mi-person-pin mi-24 mobileMenu__user"></i>
+                        {$wa->user('firstname')|default:'[`My account`]'}
+                    </a>
+                {else}
+                    <a href="{$wa->signupUrl()}" class="pull-right">[s`Sign up`]</a>
+                    <a href="{$wa->loginUrl()}">[s`Log in`]</a>
+                {/if}
+            </div>
+        {/if}
+
+        {********* КАТЕГОРИИ / CATEGORIES *****}
+        {if $wa->shop && count($categories)}
+            <ul class="list-group mobileMenu__group" id="mCats">
+                {foreach $categories as $item}
+                    {if isset($item.params.hidden)}{continue}{/if}
+                    {menu_mobile_item item=$item selected=$selected_category list="mCats"}
+                {/foreach}
+
+                {if $wa->block("shop.nav")}
+                    {$wa->block("shop.nav")}
+                {/if}
+            </ul>
+        {/if}
+
+        {********* КОНТАКТЫ / CONTACTS ********}
+        <div class="mobileMenu__block">
+            <ul class="list-unstyled mobileMenu__contacts">
+                {if $wa->block("site.contacts") || $wa->block("site.contacts2")}
+                    {$wa->block("site.contacts")}
+                    {$wa->block("site.contacts2")}
+                {else}
+                    {if $wa->shop}
+                        <li>
+                            <a href="tel:{$wa->shop->settings('phone')|regex_replace:'/[^0-9\+]/':''}" class="text-nowrap">
+                                <i class="mi mi-phone mi-18"></i>
+                                {$wa->shop->settings("phone")}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:{$wa->shop->settings('email')}" class="text-nowrap">
+                                <i class="mi mi-email mi-18"></i>
+                                {$wa->shop->settings("email")}
+                            </a>
+                        </li>
+                        {if $wh = $wa->shop->settings("workhours")}
+                            <li>
+                                <i class="mi mi-access-time mi-18"></i>
+                                {$wh.days_from_to}{if $wh.hours_from && $wh.hours_to} {$wh.hours_from}—{$wh.hours_to}{/if}
+                            </li>
+                        {/if}
+                    {/if}
+                {/if}
+            </ul>
+        </div>
+
+
+        <ul class="list-group mobileMenu__group mobileMenu__links">
+            <li class="list-group-item">
+                {if $wa_app === "shop" && count($currencies) > 1}
+                    <span>{$wa->shop->currency()}</span>
+                {/if}
+                <a href="{$wa_url}">
+                    <i class="mi mi-home mi-24"></i>[`Homepage`]
+                </a>
+            </li>
+            {if $wa->shop}
+                {********* СРАВНЕНИЕ / COMPARE ********}
+                <li class="list-group-item{if !count($shop_compare)} is-empty{/if}">
+                    <span class="badge js-compare-count">{count($shop_compare)}</span>
+                    <a href="{if count($shop_compare)}{$wa->getUrl('shop/frontend/compare', ['id' => implode(',', $shop_compare)])}{else}javascript:void(0);{/if}" class="js-compare">
+                        <i class="mi mi-filter-none mi-24"></i>[`Compare`]
+                    </a>
+                </li>
+
+                {********* ИЗБРАННОЕ / FAVOURITE ******}
+                <li class="list-group-item{if !count($shop_wishlist)} is-empty{/if}">
+                    <span class="badge js-favorite-count">{count($shop_wishlist)}</span>
+                    <a href="{$wa->getUrl('shop/frontend/search')}?func=wishlist" class="js-favorite">
+                        <i class="mi mi-favorite-border mi-24"></i>
+                        [`Favourite`]
+                    </a>
+                </li>
+
+                {********* ПРОСМОТРЕННЫЕ / VIEWED *****}
+                <li class="list-group-item{if !count($shop_viewed)} is-empty{/if}">
+                    <span class="badge js-viewed-count">{count($shop_viewed)}</span>
+                    <a href="{$wa->getUrl('shop/frontend/search')}?func=viewed" class="js-viewed">
+                        <i class="mi mi-access-time mi-24"></i>
+                        [`Viewed`]
+                    </a>
+                </li>
+            {/if}
+
+            {********* ОБРАТНАЯ СВЯЗЬ / FEEDBACK **}
+            <li class="list-group-item">
+                <a href="{$wa_url}feedback/">
+                    <i class="mi mi-email mi-24"></i>
+                    [`Feedback`]
+                </a>
+            </li>
+        </ul>
+
+        {********* СТРАНИЦЫ / PAGES ***********}
+        {if count($pages)}
+            <ul class="list-group mobileMenu__group mobileMenu__pages">
+                {foreach $pages as $item}
+                    {if isset($item.hidden)}{continue}{/if}
+                    {menu_mobile_item item=$item selected=$selected_page list="mPages"}
+                {/foreach}
+            </ul>
+        {/if}
+
+        {********* ПРИЛОЖЕНИЯ / APPS **********}
+        {if count($apps)}
+            <ul class="list-group mobileMenu__group mobileMenu__apps">
+                <li class="list-group-item">[`Apps`]</li>
+                {foreach $apps as $a}
+                    <li class="list-group-item"><a href="{$a.url}">{$a.name}</a></li>
+                {/foreach}
+            </ul>
+        {/if}
+    </div>
+</div>
+{/strip}

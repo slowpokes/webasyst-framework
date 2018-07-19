@@ -1,0 +1,36 @@
+{strip}
+<style>
+    .header,
+    .headerMobile,
+    .header-wrapper,
+    .footer,
+    .subscribe,
+    .copyright,
+    .breadcrumb,
+    .sales { display: none !important; }
+</style>
+<div class="login">
+    <div class="text-center mb-30">
+        {include file="layout/logo.html"}
+    </div>
+    {if !empty($confirmed_email)}
+        <h1>[s`Thank you!`]</h1>
+        <p>[s`You have successfully confirmed your email.`]</p>
+    {else if !empty($contact)}
+        <h1>[s`Thank you!`]</h1>
+        <p>[s`You have successfully signed up.`]</p>
+        {if !empty($email_confirmation_hash)}
+            <p><em>[s`A confirmation link has been sent to you by email. Please click this link to confirm your signup and to sign in.`]</em></p>
+        {/if}
+    {else}
+        <div class="form auth">
+            <div class="text-center mb-25">
+                <h3>[s`Sign up`]</h3>
+            </div>
+            {$wa->authAdapters()}
+            {$wa->signupForm($errors)}
+        </div>
+    {/if}
+</div>
+{$wa->globals("auth",1)}
+{/strip}

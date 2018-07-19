@@ -1,0 +1,7 @@
+{strip}
+{if !empty($theme_settings.fb_href)}
+    <div class="sidebar__block mb-20">
+        <div class="fb-page" data-href="{$theme_settings.fb_href}" data-width="230" data-height="{$theme_settings.fb_height|default:400}" data-small-header="{if $theme_settings.fb_header}true{else}false{/if}" data-adapt-container-width="false" data-hide-cover="{if $theme_settings.fb_cover}true{else}false{/if}" data-show-facepile="{if $theme_settings.fb_faces}true{else}false{/if}" data-show-posts="{if $theme_settings.fb_stream}true{else}false{/if}"></div>
+    </div>
+{/if}
+{/strip}

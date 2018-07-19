@@ -1,0 +1,20 @@
+{if $theme_settings.sidebar_nav}
+    {include file="sidebar/nav.html"}
+{/if}
+{if $theme_settings.sidebar_promos}
+    {include file="sidebar/promos.html"}
+{/if}
+{if $theme_settings.sidebar_related}
+    {include file="sidebar/related.html"}
+{/if}
+{if $theme_settings.sidebar_posts}
+    {include file="sidebar/posts.html"}
+{/if}
+{if $theme_settings.sidebar_tags}
+    {include file="sidebar/tags.html" limit=20}
+{/if}
+{if $theme_settings.sidebar_latestphotos}
+    {include file="sidebar/photos.html"}
+{/if}
+{include file="social/vkontakte.html"}
+{include file="social/facebook.html"}

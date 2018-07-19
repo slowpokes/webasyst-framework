@@ -1,0 +1,24 @@
+{strip}
+{if !empty($theme_settings.tt_username) && !empty($theme_settings.tt_widget_id)}
+    <div class="sidebar__block mb-20">
+        <a class="twitter-timeline" href="https://twitter.com/{$theme_settings.tt_username}" data-widget-id="{$theme_settings.tt_widget_id}"{if !empty($theme_settings.tt_width)} width="{$theme_settings.tt_width}"{/if}{if !empty($theme_settings.tt_height)} height="{$theme_settings.tt_height}"{/if} data-theme="{$theme_settings.tt_theme}" data-link-color="{$theme_settings.tt_color|default:'#3b94d9'}" data-tweet-limit="{$theme_settings.tt_limit|default:1}">[`Tweets by`] @{$theme_settings.tt_username}</a>
+    </div>
+{literal}<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;
+    js.src=p+"://platform.twitter.com/widgets.js";
+    js.setAttribute('onload', "twttr.events.bind('rendered',function(e) {responsiveTwitterWidget()});");
+    fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+    function responsiveTwitterWidget(){
+        var widget = $("#twitter-widget-0");
+        var frame_style = widget.attr('style');
+        widget.attr('style', frame_style + ' max-width:none !important; width:100%');
+        if(widget) {
+            var head = widget.contents().find("head")
+            if (head.length) {
+                head.append('<style>.timeline { max-width: 100% !important; width: 100% !important; } .timeline .stream { max-width: none !important; width: 100% !important; }</style>');
+            }
+            widget.append($('<div class=timeline>'));
+        }
+    }
+</script>{/literal}
+{/if}
+{/strip}

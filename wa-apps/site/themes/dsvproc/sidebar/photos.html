@@ -1,0 +1,49 @@
+{strip}
+{**
+* @param string $condition - search condition (null)
+* @param bool $auto - auto scroll slider (0)
+* @param int $interval - auto scroll interval (3000)
+* @param int $limit - count of brands (10)
+* @param string $mytitle - slider title ([`Latest photos`])
+*}
+{if $wa->photos}
+    {$size = "320x0"}
+    {$photos = $wa->photos->photos($condition|default:null, $size, null, $limit|default:10)}
+    {if count($photos) > 0}
+        {$exclude_ids = []}
+        {if !empty($theme_settings.slider_album)}
+            {$banners = $wa->photos->photos("album/`$theme_settings.slider_album`")}
+            {if count($banners)}
+                {foreach $banners as $banner}
+                    {$exclude_ids[] = $banner.id}
+                {/foreach}
+            {/if}
+        {/if}
+        {if isset($theme_settings.brands_album) && !empty($theme_settings.brands_album)}
+            {$brands = $wa->photos->photos("album/`$theme_settings.brands_album`")}
+            {if count($brands)}
+                {foreach $brands as $brand}
+                    {$exclude_ids[] = $brand.id}
+                {/foreach}
+            {/if}
+        {/if}
+        <div class="sidebar__block">
+            <div class="sbHeading">[`Latest photos`]</div>
+            <ul class="sbPhotos list-unstyled slick-sb dataSlider" data-slick='{ "dots":true, "fade":true, "autoplay": {$auto|default:0}, "autoplaySpeed": {$interval|default:3000}, "adaptiveHeight": true }'>
+                {foreach $photos as $photo}
+                    {if in_array($photo.id, $exclude_ids)}{continue}{/if}
+                    <li>
+                        <a href="{$photo.frontend_link|default:'#'}">
+                            {if $photo@first}
+                                <img src="{$photo['thumb_'|cat:$size].url}" class="img-responsive" alt="{$photo.name}">
+                            {else}
+                                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-lazy="{$photo['thumb_'|cat:$size].url}" class="img-responsive" alt="{$photo.name}">
+                            {/if}
+                        </a>
+                    </li>
+                {/foreach}
+            </ul>
+        </div>
+    {/if}
+{/if}
+{/strip}

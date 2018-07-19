@@ -1,0 +1,63 @@
+{if $wa->shop}
+    {function name="catalog_side_subitem" item=[] depth=3 level=0}
+        {if count($item.childs) && $item.depth < $depth}
+            {if $item.depth > $level}
+                {$class = "dropdown-submenu"}
+            {else}
+                {$class = "dropdown"}
+            {/if}
+            <li class="{$class}{if $selected_category == $item.id} active{/if}">
+                {if isset($item.params.badge) && isset($item.params.badgeclass) && $item.depth>0}
+                    <span class="badge {$item.params.badgeclass} sbNav__badge">{$item.params.badge}</span>
+                {/if}
+                <a href="{$item.url}" data-icon-id="{$item.id}">{$item.name}</a>
+                <ul class="dropdown-menu">
+                    {foreach $item.childs as $ic}
+                        {catalog_side_subitem item=$ic level=$level}
+                    {/foreach}
+                </ul>
+            </li>
+        {else}
+            <li{if $selected_category == $item.id} class="active"{/if}>
+                {if isset($item.params.badge) && isset($item.params.badgeclass) && $item.depth>0}
+                    <span class="badge {$item.params.badgeclass} sbNav__badge">{$item.params.badge}</span>
+                {/if}
+                <a href="{$item.url}" data-icon-id="{$item.id}">{$item.name}</a>
+            </li>
+        {/if}
+    {/function}
+
+    {function name="catalog_side_item" item=[] depth=2 level=0}
+        {if count($item.childs) && $item.depth < $depth}
+            <li class="list-group-item list-toggle sbNav__li sbNav__hover{if $selected_category == $item.id} active{/if}">
+                {if isset($item.params.badge) && isset($item.params.badgeclass) && $item.depth>0}
+                    <span class="badge {$item.params.badgeclass} sbNav__badge">{$item.params.badge}</span>
+                {/if}
+                <a href="{$item.url}" class="sbNav__link" data-icon-id="{$item.id}">{$item.name}</a>
+                <ul class="dropdown-menu">
+                    {foreach $item.childs as $ic}
+                        {catalog_side_subitem item=$ic level=$level}
+                    {/foreach}
+                </ul>
+            </li>
+        {else}
+            <li class="list-group-item list-toggle sbNav__li{if $selected_category == $item.id} active{/if}">
+                {if isset($item.params.badge) && isset($item.params.badgeclass) && $item.depth>0}
+                    <span class="badge {$item.params.badgeclass} sbNav__badge">{$item.params.badge}</span>
+                {/if}
+                <a href="{$item.url}" data-icon-id="{$item.id}" class="sbNav__link">{$item.name}</a>
+            </li>
+        {/if}
+    {/function}
+
+    <div class="sbNav sidebar__block mb-40">
+        {if count($categories) > 0}
+            <a class="sbNav__header" href="#sidebarNav" data-toggle="collapse">[`Product catalog`]</a>
+            <ul class="list-group collapse in" id="sidebarNav">
+                {foreach $categories as $item}
+                    {catalog_side_item item=$item level=$item.depth}
+                {/foreach}
+            </ul>
+        {/if}
+    </div>
+{/if}

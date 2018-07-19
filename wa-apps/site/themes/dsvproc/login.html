@@ -1,0 +1,31 @@
+{strip}
+{if empty($without_form)}
+    <style>
+        .header,
+        .headerMobile,
+        .header-wrapper,
+        .footer,
+        .subscribe,
+        .copyright,
+        .breadcrumb,
+        .sales { display: none !important; }
+    </style>
+    <div class="login">
+        <div class="text-center mb-30">
+            {include file="layout/logo.html"}
+        </div>
+        <div class="form auth">
+            <div class="text-center mb-25">
+                <h3>[s`Login`]</h3>
+            </div>
+            {$wa->authAdapters()}
+            {$wa->loginForm($error, empty($without_form))}
+        </div>
+    </div>
+{else}
+    <div class="form auth">
+        {$wa->loginForm($error, empty($without_form))}
+    </div>
+{/if}
+{$wa->globals("auth",1)}
+{/strip}

@@ -1,0 +1,57 @@
+{strip}
+{$_breadcrumbs = []}
+
+{$_is_main_page = ( $wa->currentUrl() == $wa_url )}
+{$_is_personal_area = ( $wa->currentUrl() == $wa->getUrl('/frontend/my') )}
+{$_main_page = ["url" => $wa_url, "name" =>  "[`Homepage`]"]}
+
+{if !($_is_main_page || $_is_personal_area)}
+    {if $theme_settings.breadcrumbs_home}
+        {$_breadcrumbs[] = $_main_page}
+    {/if}
+
+    {if $wa_app_url != $wa_url && $wa->currentUrl() != $wa_app_url}
+        {$_breadcrumbs[] = ["url" => $wa_app_url, "name" =>  $wa->appName()]}
+    {/if}
+    {if !empty($breadcrumbs)}
+        {$_breadcrumbs = array_merge($_breadcrumbs,$breadcrumbs)}
+    {/if}
+{/if}
+{if !empty($_breadcrumbs)}
+    {$myUrl=""}
+    {if $wa->shop}{$myUrl = $wa->getUrl('/frontend/my')}{/if}
+    <div class="container-fluid main__breadcrumbs">
+        <ol class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+            {foreach $_breadcrumbs as $breadcrumb}
+                {if !empty($breadcrumb)}
+                    <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                        <a href="{if $breadcrumb.url == $myUrl}{$wa->getUrl('/frontend/myProfile')}?mynav=1{else}{$breadcrumb.url}{/if}" itemprop="item">
+                            <span itemprop="name">{$breadcrumb.name|escape}</span>
+                        </a>
+                        <meta itemprop="position" content="{$breadcrumb@iteration}" />
+                    </li>
+                {/if}
+            {/foreach}
+            {$last_pos_inc = 1}
+            {if $wa_app == "hub" && isset($author)}
+                <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                    <a href="{$wa_app_url}authors/" itemprop="item">
+                        <span itemprop="name">[`All authors`]</span>
+                    </a>
+                    <meta itemprop="position" content="{count($_breadcrumbs)+$last_pos_inc}" />
+                </li>
+                {$last_pos_inc = $last_pos_inc + 1}
+            {/if}
+            {$crumb = $wa->globals("crumb")}
+            {if !empty($crumb)}
+                <li class="active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                    <span itemprop="item">
+                        <span itemprop="name">{$crumb}</span>
+                    </span>
+                    <meta itemprop="position" content="{count($_breadcrumbs)+$last_pos_inc}" />
+                </li>
+            {/if}
+        </ol>
+    </div>
+{/if}
+{/strip}
