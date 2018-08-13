@@ -183,6 +183,12 @@ class waTheme implements ArrayAccess
             //theme not found
         }
 
+        //VADIM CODE START
+        $this->path_custom = $this->path_original;
+        $this->type = self::OVERRIDDEN;
+        $this->path = $this->path_original;
+        //VADIM CODE END
+
         if (!$force && !in_array($force, array(self::ORIGINAL), true)) {
             $this->check();
         }
@@ -1280,6 +1286,7 @@ HTACCESS;
                 case self::CUSTOM:
                 case self::OVERRIDDEN:
                     $this->url = wa()->getDataUrl('themes', true, wa()->replaceName($this->app)).'/'.$this->id.'/';// VADIM CODE
+                    $this->url = wa()->getAppStaticUrl($this->app).'themes/'.$this->id.'/';// VADIM CODE
                     break;
                 case self::ORIGINAL:
                     $this->url = wa()->getAppStaticUrl($this->app).'themes/'.$this->id.'/';
