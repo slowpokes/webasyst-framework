@@ -1556,7 +1556,7 @@ class waSystem
         $app_id_real = wa()->getAppName($app_id);//VADIM CODE
         $theme_paths = array(
             'original' => $this->getAppPath('themes', $app_id_real),
-            'custom'   => $this->getDataPath('themes', true, $app_id, false),
+            //'custom'   => $this->getDataPath('themes', true, $app_id, false),
         );
 
         $theme_ids = array();
