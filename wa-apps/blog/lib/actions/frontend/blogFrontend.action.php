@@ -97,6 +97,7 @@ class blogFrontendAction extends blogViewAction
         $stream_title = false;
 
         if (isset($this->search_params['contact_id'])) {
+            throw new waException(_w('Blog not found'), 404);//VADIM CODE
             if (count($posts)) {
                 reset($posts);
                 $post = current($posts);
