@@ -45,6 +45,7 @@ class blogFrontController extends waFrontController
                 } elseif (is_array($params['blog_url_type'])) {
                     if ($blog = $blog_model->select('id, name, url')->where("`id` IN('" . implode("', '", $params['blog_url_type']) . "')")->fetchAll('id')) {
                         $blogs = $blog;
+                        $main_page = true;//VADIM CODE
                     }
                 } else {
                     $blogs = blogHelper::getAvailable();
