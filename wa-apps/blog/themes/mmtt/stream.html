@@ -46,8 +46,14 @@
     <div class="products_navigation products_navigation_bottom">
         <div class="paginator">
             <ul>
+                {$url = $smarty.server.REQUEST_URI}
+                {$url = str_replace("?page={$page}", '', $url)}
                 {for $p=1 to $pages}
-                    <li{if $p eq $page} class="selected"{/if}><a href="{if $p eq $page}#page_{$page}{else}?page={$p}{/if}">{$p}</a></li>
+                    {if $p==1}
+                        <li{if $p eq $page} class="selected"{/if}><a href="{$url}">{$p}</a></li>
+                    {else}
+                        <li{if $p eq $page} class="selected"{/if}><a href="{if $p eq $page}#top{else}{$url}?page={$p}{/if}">{$p}</a></li>
+                    {/if}
                 {/for}
             </ul>
         </div>
