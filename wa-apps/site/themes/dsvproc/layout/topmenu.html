@@ -52,10 +52,9 @@
                         <span {if shopCustomercityPlugin::getCityType() != 'г'}style="display: none"{/if} class="city-hint">Ваш город: </span>
                         <a class="handler-city city-name" href="#">{shopCustomercityPlugin::getCity(false, true)}</a>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <a href="/dostavka-po-rossii/">Доставка</a>
-                        {********* СТРАНИЦЫ / PAGES ***********}
                     </div>
                 </li>
+                {********* СТРАНИЦЫ / PAGES ***********}
                 {if count($pages)}
                     {foreach $pages as $item}
                         {if isset($item.hidden)}{continue}{/if}
