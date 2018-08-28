@@ -43,13 +43,7 @@
                     {/if}
                 {/if}
             {/if}
-            {********* СТРАНИЦЫ / PAGES ***********}
-            {if count($pages)}
-                {foreach $pages as $item}
-                    {if isset($item.hidden)}{continue}{/if}
-                    {page_item item=$item}
-                {/foreach}
-            {/if}
+
         </ul>
         <ul style="width: 100%" class="topMenu__user list-inline list-unstyled">
             {if $wa->shop}
@@ -59,8 +53,16 @@
                         <a class="handler-city city-name" href="#">{shopCustomercityPlugin::getCity(false, true)}</a>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <a href="/dostavka-po-rossii/">Доставка</a>
+                        {********* СТРАНИЦЫ / PAGES ***********}
                     </div>
                 </li>
+                {if count($pages)}
+                    {foreach $pages as $item}
+                        {if isset($item.hidden)}{continue}{/if}
+                        <li><a href="{$item.url}">{$item.name}</a></li>
+                        {*{page_item item=$item}*}
+                    {/foreach}
+                {/if}
                 {********* СРАВНЕНИЕ / COMPARE ********}
                 <li class="float-right">
                     <a class="topMenu__link js-compare{if count($shop_compare)} full{/if}" href="{if count($shop_compare)}{$wa->getUrl('shop/frontend/compare', ['id' => implode(',', $shop_compare)])}{else}javascript:void(0);{/if}">
