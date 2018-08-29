@@ -234,8 +234,10 @@ class waRequest
                 } else {
                     waSystem::getInstance()->getStorage()->remove('nomobile');
                 }
+                waSystem::getInstance()->getResponse()->redirect('/');//VADIM CODE
             } elseif (self::get('mobile')) {
                 waSystem::getInstance()->getStorage()->remove('nomobile');
+                waSystem::getInstance()->getResponse()->redirect('/');//VADIM CODE
             }
             if (waSystem::getInstance()->getStorage()->read('nomobile')) {
                 return false;
