@@ -51,6 +51,9 @@ class blogImagesPlugin extends blogPlugin
     private static function downloadImage($url, $to_folder){
         $ext = pathinfo($url, PATHINFO_EXTENSION);
         $ext = strtolower($ext);
+        if($ext==''){
+            $ext = 'jpg';
+        }
         $new_filename = time().'_'.mt_rand(0, 1000000).'.'.$ext;
         $path = $to_folder.$new_filename;
         $ch = curl_init ($url);
