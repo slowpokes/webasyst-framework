@@ -4,7 +4,7 @@
     {$t = "{$t}, страница {$page}"}
 {/if}
 {$wa->title($t)}
-{$wa->meta('description', "Только самые полезные статьи в блоге на сайте компании - 1mmtt.ru discount shop. Откройте для себя все секреты парфюмерии вместе с нами.")}
+{$wa->meta('description', "Только самые полезные статьи в блоге на сайте компании - 1mmtt.ru discount shop. Откройте для себя все секреты парфюмерии вместе с нами{if $page > 1}, страница {$page}{/if}")}
 {include 'sidebar.html' inline}
 <div class="content_small">
 
