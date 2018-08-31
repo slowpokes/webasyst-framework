@@ -23,12 +23,6 @@
     {* CANONICAL URLS *}
     {if !empty($canonical)}<link rel="canonical" href="{$canonical}"/>{/if}
 
-    {* RSS *}
-    {if $wa->blog}
-        {$rss=$wa->blog->rssUrl()}
-        {if $rss}<link rel="alternate" type="application/rss+xml" title="{$wa->accountName()}" href="{$rss}">{/if}
-    {/if}
-
     {* CSS *}
     {* <link type="text/css" rel="stylesheet" media="all" href="//fonts.googleapis.com/icon?family=Material+Icons"/> *}
 
