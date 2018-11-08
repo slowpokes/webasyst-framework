@@ -3,14 +3,22 @@
 class mapShipping extends waShipping
 {
 
-    private function getPoints($city)
+    private function getPoints($city, $kladr_id = 0)
     {
         $uniq_id = $this->uniq_id;
         $model = new waModel();
         $where = "";
         if ($city!='all') {
-            $where = " AND city = '{$city}' ";
+            if($this->kladr){
+                $kladr_id = $model->escape($kladr_id);
+                $where = " AND kladr_id = '{$kladr_id}' ";
+            }
+            else {
+                $city = $model->escape($city);
+                $where = " AND city = '{$city}' ";
+            }
         }
+
         $sql = "SELECT * FROM shop_point_shipping WHERE uniq = '{$uniq_id}' $where ORDER BY sort, name";
         $points = $model->query($sql)->fetchAll();
         return $points;
@@ -19,24 +27,63 @@ class mapShipping extends waShipping
     public function calculate()
     {
         $city = $this->getAddress('city');
+        $kladr_id = $this->getAddress('kladr_id');
 
-        if(is_array($this->closed_cities) && isset($this->closed_cities[$city])){
-            return null;
-        }
-
-        $points = $this->getPoints($city);
+        $points = $this->getPoints($city, $kladr_id);
         if (count($points) == 0) {
             return null;
         }
 
         $order_price = $this->getTotalPrice();
+        $prepayment = false;
+        if($this->getPackageProperty('prepayment')){
+            $prepayment = true;
+        }
+        $shipping_params = ($this->getPackageProperty('shipping_params'));
+        if(isset($shipping_params['prepayment']) && $shipping_params['prepayment']){
+            $prepayment = true;
+        }
+
+        $price = 0;
+        $price_prepayment = 0;
+        if($this->free_shipping && $order_price >= $this->free_shipping){
+            $price_prepayment = 0;
+        }
+        else{
+            if($this->insurance_price){
+                $p = $order_price * $this->insurance_price/100;
+                $price += $p;
+                $price_prepayment += $p;
+            }
+            if($this->box_price){
+                $p = $this->box_price;
+                $price += $p;
+                $price_prepayment += $p;
+            }
+            if($this->np_price && !$prepayment){
+                $p = ($order_price * $this->np_price) / (100 - $this->np_price);
+                $price += $p;
+            }
+            if($this->total_comission){
+                $p = ($order_price * $this->total_comission) / (100 - $this->total_comission);
+                $price += $p;
+                $price_prepayment += $p;
+            }
+        }
 
         $result = array();
         foreach ($points as $point) {
             $point_number = substr($point['point_key'], strpos($point['point_key'], "_") + 1);
+            $point_price = $price + $point['price'];
+            $point_price_prepayment = $price_prepayment + $point['price'];
+
+
+            $point_price = ceil($point_price/10)*10;
+            $point_price_prepayment = ceil($point_price_prepayment/10)*10;
+
             $result['point_' . $point_number] = array(
                 'currency' => 'RUB',
-                'rate' => $order_price >= $this->free_shipping ? 0 : $point['price'],
+                'rate' => $point_price,
                 'name' => $point['name'] . " (" . $point['address'] . ")",
                 'comment' => $point['name'] . " (" . $point['address'] . ")",
                 'force_subrates' => true,
@@ -48,7 +95,7 @@ class mapShipping extends waShipping
                     'lat' => str_replace(',', '.', $point['lat']),
                     'lon' => str_replace(',', '.', $point['lon']),
                     'shipment_type' => $this->shipment_type,
-                    'commission' => $this->getSettings('commission')
+                    'price_prepayment' => $point_price_prepayment,
                 ),
             );
         }

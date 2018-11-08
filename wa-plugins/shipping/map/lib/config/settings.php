@@ -17,20 +17,34 @@ return array(
         'control_type' => waHtmlControl::SELECT,
         'options'      => waShipping::getTypes(),
     ),
-    'show_description'  => array(
-        'value'        => '',
-        'title'        => 'Показывать описание',
-        'control_type' => waHtmlControl::CHECKBOX,
-    ),
-    'commission'  => array(
-        'value'        => '0',
-        'title'        => 'Надбавочная стомость от стоимости заказа',
+    'insurance_price' => array(
+        'value' => '',
+        'title' => 'Страхование',
+        'description' => 'Процент, который прибавляется к сумме товаров (объявленной стоимости)',
         'control_type' => waHtmlControl::INPUT,
-        'description'  => 'Укажите процентную ставку, которая будет дополнительно прибавляться к сумме доставки в зависимости от суммы заказа (только наложенный платеж)',
     ),
-    'closed_cities' => array(
-        'title' => 'Отключенные города',
-        'control_type' => waHtmlControl::CUSTOM.' '.'mapShipping::settingClosedCitiesControl',
+    'box_price' => array(
+        'value' => '',
+        'title' => 'Упаковка',
+        'description' => 'Фикс сумма, которая прибавляется к итоговой сумме заказа',
+        'control_type' => waHtmlControl::INPUT,
+    ),
+    'np_price' => array(
+        'value' => '',
+        'title' => 'Комиссия за наложенный платеж',
+        'description' => 'Процент, который прибавляется к итоговой сумме заказа. Отменяется при предоплате',
+        'control_type' => waHtmlControl::INPUT,
+    ),
+    'total_comission' => array(
+        'value' => '',
+        'title' => 'Дополнительная комиссия',
+        'description' => 'Процент, который прибавляется к итоговой сумме заказа',
+        'control_type' => waHtmlControl::INPUT,
+    ),
+    'kladr' => array(
+        'value' => '',
+        'title' => 'Использовать КЛАДР',
+        'control_type' => waHtmlControl::CHECKBOX,
     ),
 );
 

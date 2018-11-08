@@ -1,49 +1,62 @@
 <?php
 return array(
-    'free_shipping'  => array(
-        'value'        => '10000000',
-        'title'        => 'Сумма для бесплатной доставки',
-        'description'  => 'Укажите сумму начиная с которой начинается бесплатная доставка',
+    'free_shipping' => array(
+        'value' => '10000000',
+        'title' => 'Сумма для бесплатной доставки',
+        'description' => 'Укажите сумму начиная с которой начинается бесплатная доставка',
         'control_type' => waHtmlControl::INPUT,
     ),
-    'free_shipping_amount'  => array(
-        'value'        => '0',
-        'title'        => 'Максимальная сумма скидки',
-        'description'  => 'Укажите сумму, которая будет вычитаться вместо бесплатной доставки',
+    'free_shipping_amount' => array(
+        'value' => '0',
+        'title' => 'Максимальная сумма скидки',
+        'description' => 'Укажите сумму, которая будет вычитаться вместо бесплатной доставки',
         'control_type' => waHtmlControl::INPUT,
     ),
-    'require_zip'  => array(
-        'value'        => '',
-        'title'        => 'Запрашивать индекс',
+    'require_zip' => array(
+        'value' => '',
+        'title' => 'Запрашивать индекс',
         'control_type' => waHtmlControl::CHECKBOX,
     ),
-    'show_description'  => array(
-        'value'        => '',
-        'title'        => 'Показывать описание',
-        'control_type' => waHtmlControl::CHECKBOX,
-    ),
-    'commission'  => array(
-        'value'        => '0',
-        'title'        => 'Надбавочная стомость от стоимости заказа',
-        'control_type' => waHtmlControl::INPUT,
-        'description'  => 'Укажите процентную ставку, которая будет дополнительно прибавляться к сумме доставки в зависимости от суммы заказа (только наложенный платеж)',
-    ),
-    'uniq_id'  => array(
-        'value'        => '',
-        'title'        => 'ID',
+    'uniq_id' => array(
+        'value' => '',
+        'title' => 'ID',
         'control_type' => waHtmlControl::INPUT,
     ),
-    'shipment_type'  => array(
-        'value'        => '',
-        'title'        => 'Тип доставки',
+    'shipment_type' => array(
+        'value' => '',
+        'title' => 'Тип доставки',
         'control_type' => waHtmlControl::SELECT,
-        'options'      => waShipping::getTypes(),
+        'options' => waShipping::getTypes(),
     ),
-    'closed_cities' => array(
-        'title' => 'Отключенные города',
-        'control_type' => waHtmlControl::CUSTOM.' '.'cityShipping::settingClosedCitiesControl',
+    'insurance_price' => array(
+        'value' => '',
+        'title' => 'Страхование',
+        'description' => 'Процент, который прибавляется к сумме товаров (объявленной стоимости)',
+        'control_type' => waHtmlControl::INPUT,
     ),
-
+    'box_price' => array(
+        'value' => '',
+        'title' => 'Упаковка',
+        'description' => 'Фикс сумма, которая прибавляется к итоговой сумме заказа',
+        'control_type' => waHtmlControl::INPUT,
+    ),
+    'np_price' => array(
+        'value' => '',
+        'title' => 'Комиссия за наложенный платеж',
+        'description' => 'Процент, который прибавляется к итоговой сумме заказа. Отменяется при предоплате',
+        'control_type' => waHtmlControl::INPUT,
+    ),
+    'total_comission' => array(
+        'value' => '',
+        'title' => 'Дополнительная комиссия',
+        'description' => 'Процент, который прибавляется к итоговой сумме заказа',
+        'control_type' => waHtmlControl::INPUT,
+    ),
+    'kladr' => array(
+        'value' => '',
+        'title' => 'Использовать КЛАДР',
+        'control_type' => waHtmlControl::CHECKBOX,
+    ),
 );
 
 //EOF

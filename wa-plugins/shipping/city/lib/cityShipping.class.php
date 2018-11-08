@@ -6,28 +6,68 @@ class cityShipping extends waShipping
     public function calculate()
     {
         $city = $this->getAddress('city');
-
-        if(is_array($this->closed_cities) && isset($this->closed_cities[$city])){
-            return null;
-        }
+        $kladr_id = $this->getAddress('kladr_id');
 
         $uniq_id = $this->uniq_id;
         $model = new waModel();
-        $city = $model->escape($city);
-        $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city = '{$city}' LIMIT 1";
+        if($this->kladr){
+            $kladr_id = $model->escape($kladr_id);
+            $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND kladr_id = '{$kladr_id}' LIMIT 1";
+        }
+        else {
+            $city = $model->escape($city);
+            $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city = '{$city}' LIMIT 1";
+        }
         $data = $model->query($sql)->fetch();
 
         $order_price = $this->getTotalPrice();
+        $prepayment = false;
+        if($this->getPackageProperty('prepayment')){
+            $prepayment = true;
+        }
+        $shipping_params = ($this->getPackageProperty('shipping_params'));
+        if(isset($shipping_params['prepayment']) && $shipping_params['prepayment']){
+            $prepayment = true;
+        }
 
         if ($data) {
+            if($this->free_shipping && $order_price >= $this->free_shipping){
+                $price = 0;
+                $price_prepayment = 0;
+            }
+            else{
+                $price = $data['price'];
+                $price_prepayment = $data['price'];
+                if($this->insurance_price){
+                    $p = $order_price * $this->insurance_price/100;
+                    $price += $p;
+                    $price_prepayment += $p;
+                }
+                if($this->box_price){
+                    $p = $this->box_price;
+                    $price += $p;
+                    $price_prepayment += $p;
+                }
+                if($this->np_price && !$prepayment){
+                    $p = ($order_price * $this->np_price) / (100 - $this->np_price);
+                    $price += $p;
+                }
+                if($this->total_comission){
+                    $p = ($order_price * $this->total_comission) / (100 - $this->total_comission);
+                    $price += $p;
+                    $price_prepayment += $p;
+                }
+            }
+            $price = ceil($price/10)*10;
+            $price_prepayment = ceil($price_prepayment/10)*10;
             return array(
                 'delivery' => array(
                     'est_delivery' => $data['time'],
                     'currency' => 'RUB',
-                    'rate' => $order_price >= $this->free_shipping ? 0 : $data['price'],
+                    'rate' => $price,
                     'params' => array(
                         'shipment_type' => $this->shipment_type,
-                        'commission' => $this->getSettings('commission')
+                        'price_prepayment' => $price_prepayment,
                     ),
                 ),
             );
