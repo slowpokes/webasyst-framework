@@ -44,6 +44,10 @@ class mapShipping extends waShipping
             $prepayment = true;
         }
 
+        if(waRequest::param('prepayment')){
+            $prepayment = true;
+        }
+
         $price = 0;
         $price_prepayment = 0;
         if($this->free_shipping && $order_price >= $this->free_shipping){
@@ -80,6 +84,8 @@ class mapShipping extends waShipping
 
             $point_price = ceil($point_price/10)*10;
             $point_price_prepayment = ceil($point_price_prepayment/10)*10;
+
+            waRequest::setParam('prepayment_rate', $point_price_prepayment);
 
             $result['point_' . $point_number] = array(
                 'currency' => 'RUB',

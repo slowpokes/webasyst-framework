@@ -30,6 +30,10 @@ class cityShipping extends waShipping
             $prepayment = true;
         }
 
+        if(waRequest::param('prepayment')){
+            $prepayment = true;
+        }
+
         if ($data) {
             if($this->free_shipping && $order_price >= $this->free_shipping){
                 $price = 0;
@@ -60,6 +64,7 @@ class cityShipping extends waShipping
             }
             $price = ceil($price/10)*10;
             $price_prepayment = ceil($price_prepayment/10)*10;
+            waRequest::setParam('prepayment_rate', $price_prepayment);
             return array(
                 'delivery' => array(
                     'est_delivery' => $data['time'],
