@@ -30,16 +30,17 @@ return array(
         'description'  => 'Укажите размер комиссии в процентах. Например, укажите 4, если с каждого рубля взимается 4 копейки.',
         'control_type' => waHtmlControl::INPUT,
     ),
+    'box_price' => array(
+        'value' => '',
+        'title' => 'Упаковка',
+        'description' => 'Фикс сумма, которая прибавляется к итоговой сумме заказа',
+        'control_type' => waHtmlControl::INPUT,
+    ),
     'shipment_type'  => array(
         'value'        => '',
         'title'        => 'Тип доставки',
         'control_type' => waHtmlControl::SELECT,
         'options'      => waShipping::getTypes(),
-    ),
-    'show_description'  => array(
-        'value'        => '',
-        'title'        => 'Показывать описание',
-        'control_type' => waHtmlControl::CHECKBOX,
     ),
     'regions' => array(
         'title' => 'Регионы',

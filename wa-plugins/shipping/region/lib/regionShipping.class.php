@@ -12,6 +12,9 @@ class regionShipping extends waShipping
                 if($price>0){
                     //мы доставляем в этот регион
                     $rate = $price;
+                    if($this->box_price){
+                        $rate += $this->box_price;
+                    }
                     $order_price = $this->getTotalPrice();
                     if($order_price>=$this->free_shipping){
                         if($this->free_shipping_amount > 0){
@@ -24,9 +27,7 @@ class regionShipping extends waShipping
                             $rate = 0;
                         }
                     }
-
                     $rate += $order_price * ($this->commission / 100);
-
                     return array(
                         'delivery' => array(
                             'est_delivery' => $time,
@@ -86,12 +87,14 @@ class regionShipping extends waShipping
                     $c_params['value'] = $values['price'][$region['code']];
                 }
                 $c_params['namespace'] = $name."[price]";
+                $c_params['readonly'] = 'readonly';
                 $price = waHtmlControl::getControl(waHtmlControl::INPUT, $region['code'], $c_params);
 
                 $c_params['value'] = '';
                 if(isset($values['time'][$region['code']])){
                     $c_params['value'] = $values['time'][$region['code']];
                 }
+                $c_params['readonly'] = null;
                 $c_params['namespace'] = $name."[time]";
                 $time = waHtmlControl::getControl(waHtmlControl::INPUT, $region['code'], $c_params);
                 $control .= sprintf($string, $title, $price, $time);
