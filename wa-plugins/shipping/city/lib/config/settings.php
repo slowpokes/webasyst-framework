@@ -57,6 +57,11 @@ return array(
         'title' => 'Использовать КЛАДР',
         'control_type' => waHtmlControl::CHECKBOX,
     ),
+    'prepayment_only' => array(
+        'value' => '',
+        'title' => 'Только по предоплате',
+        'control_type' => waHtmlControl::CHECKBOX,
+    ),
 );
 
 //EOF

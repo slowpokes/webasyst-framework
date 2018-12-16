@@ -34,6 +34,12 @@ class cityShipping extends waShipping
             $prepayment = true;
         }
 
+        if($this->prepayment_only){
+            if($prepayment==false){
+                return null;
+            }
+        }
+
         if ($data) {
             if($this->free_shipping && $order_price >= $this->free_shipping){
                 $price = 0;
