@@ -34,9 +34,11 @@ class cityShipping extends waShipping
             $prepayment = true;
         }
 
-        if($this->prepayment_only){
-            if($prepayment==false){
-                return null;
+        if(isset($shipping_params['estimate']) && $shipping_params['estimate']){
+            if($this->prepayment_only){
+                if($prepayment==false){
+                    return null;
+                }
             }
         }
 
