@@ -12,22 +12,29 @@ class regionShipping extends waShipping
                 if($price>0){
                     //мы доставляем в этот регион
                     $rate = $price;
+
                     if($this->box_price){
                         $rate += $this->box_price;
                     }
                     $order_price = $this->getTotalPrice();
-                    if($order_price>=$this->free_shipping){
-                        if($this->free_shipping_amount > 0){
-                            $rate =  $price - $this->free_shipping_amount;
-                            if($rate < 0){
-                                $rate = 0;
+                    $rate += $order_price * ($this->commission / 100);
+                    $rate = round($rate/10)*10;
+
+                    if($this->coeff){
+                        $postal_code = $this->getAddress('zip');
+                        if($postal_code) {
+                            $postal_code = intval($postal_code);
+                            $model = new waModel();
+                            $data = $model->query("SELECT * FROM shop_post_restriction WHERE code = '{$postal_code}'")->fetch();
+                            if($data && isset($data['coef'])){
+                                if($data['coef']==0){
+                                    return null;
+                                }
+                                $rate = $rate * $data['coef'];
                             }
                         }
-                        else {
-                            $rate = 0;
-                        }
                     }
-                    $rate += $order_price * ($this->commission / 100);
+
                     return array(
                         'delivery' => array(
                             'est_delivery' => $time,
