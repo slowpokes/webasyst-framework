@@ -36,6 +36,11 @@ return array(
         'description' => 'Фикс сумма, которая прибавляется к итоговой сумме заказа',
         'control_type' => waHtmlControl::INPUT,
     ),
+    'coeff' =>array(
+        'value'        => false,
+        'title'        => 'Использовать наценку для труднодоступных регионов',
+        'control_type' => waHtmlControl::CHECKBOX,
+    ),
     'shipment_type'  => array(
         'value'        => '',
         'title'        => 'Тип доставки',
