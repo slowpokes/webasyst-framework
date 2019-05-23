@@ -19,7 +19,7 @@ class mapShipping extends waShipping
             }
         }
 
-        $sql = "SELECT * FROM shop_point_shipping WHERE uniq = '{$uniq_id}' $where ORDER BY sort, name";
+        $sql = "SELECT * FROM shop_point_shipping WHERE uniq = '{$uniq_id}' $where ORDER BY sort, address, name";
         $points = $model->query($sql)->fetchAll();
         return $points;
     }
@@ -64,9 +64,15 @@ class mapShipping extends waShipping
                 $price += $p;
                 $price_prepayment += $p;
             }
-            if($this->np_price && !$prepayment){
-                $p = ($order_price * $this->np_price) / (100 - $this->np_price);
-                $price += $p;
+            if($this->np_price && !$prepayment) {
+                $np_order_price = $order_price;
+                if (waRequest::param('order_prepayment_amount')) {
+                    $np_order_price = $order_price - waRequest::param('order_prepayment_amount');
+                }
+                if ($np_order_price > 0) {
+                    $p = ($np_order_price * $this->np_price) / (100 - $this->np_price);
+                    $price += $p;
+                }
             }
             if($this->total_comission){
                 $p = ($order_price * $this->total_comission) / (100 - $this->total_comission);
@@ -81,6 +87,10 @@ class mapShipping extends waShipping
             $point_price = $price + $point['price'];
             $point_price_prepayment = $price_prepayment + $point['price'];
 
+            $small_address = $point['address'];
+            if($point['sub_region'] && $point['city'] && $point['sub_region']!=$point['city']){
+                $small_address = $point['city'].", ".$point['address'];
+            }
 
             $point_price = ceil($point_price/10)*10;
             $point_price_prepayment = ceil($point_price_prepayment/10)*10;
@@ -90,13 +100,13 @@ class mapShipping extends waShipping
             $result['point_' . $point_number] = array(
                 'currency' => 'RUB',
                 'rate' => $point_price,
-                'name' => $point['name'] . " (" . $point['address'] . ")",
-                'comment' => $point['name'] . " (" . $point['address'] . ")",
+                'name' => $point['name'] . " (" . $small_address . ")",
+                'comment' => $point['name'] . " (" . $small_address . ")",
                 'force_subrates' => true,
                 'est_delivery' => $point['time'],
                 'params' => array(
                     'id' => $point['id'],
-                    'address' => $point['city'] . ', ' . $point['address'],
+                    'address' => $point['city'] . ', ' . $small_address,
                     'comment' => $point['comment'],
                     'lat' => str_replace(',', '.', $point['lat']),
                     'lon' => str_replace(',', '.', $point['lon']),
