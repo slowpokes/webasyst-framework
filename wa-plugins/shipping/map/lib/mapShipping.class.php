@@ -17,6 +17,13 @@ class mapShipping extends waShipping
                 $city = $model->escape($city);
                 $where = " AND city = '{$city}' ";
             }
+
+            if($kladr_id=='') {
+                if ($this->getPackageProperty('real_price')) {
+                    $city = $model->escape($city);
+                    $where = " AND city = '{$city}' ";
+                }
+            }
         }
 
         $sql = "SELECT * FROM shop_point_shipping WHERE uniq = '{$uniq_id}' $where ORDER BY sort, address, name";
@@ -48,9 +55,17 @@ class mapShipping extends waShipping
             $prepayment = true;
         }
 
+        $free_shipping = false;
+        if($this->free_shipping && $order_price >= $this->free_shipping){
+            $free_shipping = true;
+        }
+        if($this->getPackageProperty('real_price')){
+            $free_shipping = false;
+        }
+
         $price = 0;
         $price_prepayment = 0;
-        if($this->free_shipping && $order_price >= $this->free_shipping){
+        if($free_shipping){
             $price_prepayment = 0;
         }
         else{

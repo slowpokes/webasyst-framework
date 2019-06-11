@@ -13,6 +13,13 @@ class cityShipping extends waShipping
         if($this->kladr){
             $kladr_id = $model->escape($kladr_id);
             $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND kladr_id = '{$kladr_id}' LIMIT 1";
+
+            if($kladr_id=='') {
+                if ($this->getPackageProperty('real_price')) {
+                    $city = $model->escape($city);
+                    $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city = '{$city}' LIMIT 1";
+                }
+            }
         }
         else {
             $city = $model->escape($city);
@@ -44,8 +51,17 @@ class cityShipping extends waShipping
             }
         }
 
+        $free_shipping = false;
+        if($this->free_shipping && $order_price >= $this->free_shipping){
+            $free_shipping = true;
+        }
+        if($this->getPackageProperty('real_price')){
+            $free_shipping = false;
+        }
+
+
         if ($data) {
-            if($this->free_shipping && $order_price >= $this->free_shipping){
+            if($free_shipping){
                 $price = 0;
                 $price_prepayment = 0;
             }

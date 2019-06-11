@@ -4,7 +4,7 @@ class fixShipping extends waShipping
 {
 
     public function calculate(){
-        if (wa()->getEnv() == 'backend') {
+        if (wa()->getEnv() == 'backend' || wa()->getEnv() == 'cli') {
             $rate = 0;
             if(isset($this->rate))$rate = $this->rate;
             $result['delivery'] = array(
