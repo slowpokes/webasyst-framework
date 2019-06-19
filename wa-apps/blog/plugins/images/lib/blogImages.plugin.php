@@ -13,6 +13,7 @@ class blogImagesPlugin extends blogPlugin
         $images_folder = wa()->getDataPath("images/$post_id/", true);
         $images_url = wa()->getDataUrl("images/$post_id/", true);
         $images_url = str_replace("cli.php", '/', $images_url);
+        $images_url = str_replace(" /home/bd9/bd9.ru/", '/', $images_url);
         $updated = false;
         foreach ($tags as $tag) {
             $url = $tag->getAttribute('src');
