@@ -1,0 +1,28 @@
+<div class="sidebar">
+    <div class="sidebar-links">
+        {if isset($post)}
+            {$latest_posts = $wa->blog->posts($post.blog_id, 5)}
+        {else}
+            {$latest_posts = $wa->blog->posts(2, 5)}
+        {/if}
+        {if !empty($latest_posts)}<!-- latest posts-->
+            <div class="tree one-level">
+                <div class="title">Последние статьи</div>
+                <ul>
+                    {foreach $latest_posts as $p}
+                        <li>
+                            <a href="{$p.link}">
+                                <div class="sidebar-date">{$p.datetime|wa_datetime:"date"}</div>
+                                {$p.title}
+                            </a>
+                        </li>
+                    {/foreach}
+                </ul>
+            </div>
+            <div class="link">
+                <a class="btn btn-primary btn-xs" href="/blog/">смотреть все</a>
+            </div>
+        {/if}
+    </div>
+
+</div>
