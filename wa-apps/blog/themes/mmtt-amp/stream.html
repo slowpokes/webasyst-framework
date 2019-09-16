@@ -1,0 +1,33 @@
+{* post list: view mode depends on the context: either "stream_search.html" or "stream_posts.html" *}
+{$t = 'Полезные статьи на сайте 1mmtt.ru discount shop'}
+{if $page > 1}
+    {$t = "{$t}, страница {$page}"}
+{/if}
+{$wa->title($t)}
+{$wa->meta('description', "Только самые полезные статьи в блоге на сайте компании - 1mmtt.ru discount shop. Откройте для себя все секреты парфюмерии вместе с нами{if $page > 1}, страница {$page}{/if}")}
+
+<h1>
+    Полезные статьи о парфюмерии{if $page > 1}, страница {$page}{/if}
+</h1>
+
+<div class="blog" id="post-stream" role="main" {if $wa->param('blog_url')}itemscope itemtype="http://schema.org/Blog"{/if}>
+    <a name="page_{$page}"></a>
+    {if $is_search}
+        {include file="stream_search.html" inline}
+    {else}
+        {include file="stream_posts.html" inline}
+    {/if}
+</div>
+<div class="paginator-container">
+    <ul class="pagination">
+        {$url = $smarty.server.REQUEST_URI}
+        {$url = str_replace("?page={$page}", '', $url)}
+        {for $p=1 to $pages}
+            {if $p==1}
+                <li{if $p eq $page} class="selected"{/if}><a href="{$url}">{$p}</a></li>
+            {else}
+                <li{if $p eq $page} class="selected"{/if}><a href="{if $p eq $page}#top{else}{$url}?page={$p}{/if}">{$p}</a></li>
+            {/if}
+        {/for}
+    </ul>
+</div>

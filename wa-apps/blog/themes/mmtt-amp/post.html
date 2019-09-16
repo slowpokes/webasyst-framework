@@ -1,0 +1,81 @@
+{* dedicated post page *}
+<div class="blog" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post" role="main" id="post-{$post.id}">
+
+        {$posts = $wa->blog->posts($post.blog_id, 10)}
+        {$prev = ''}
+        {$next = ''}
+        {$post_found = false}
+        {foreach $posts as $p}
+            {if $post_found}
+                {if $next==''}
+                    {$next = $p.link}
+                {/if}
+            {else}
+                {if $p.id != $post.id}
+                    {$prev = $p.link}
+                {/if}
+            {/if}
+            {if $p.id == $post.id}
+                {$post_found = true}
+            {/if}
+        {/foreach}
+
+        <div class="posts-navigation">
+            {if $prev}
+                <a href="{$prev}">&larr; предыдущая новость</a>
+            {/if}
+            &nbsp;
+            {if $next}
+                <a style="float: right" href="{$next}">следующая новость &rarr;</a>
+            {/if}
+        </div>
+
+        <h1 itemprop="name">
+            {$post.title}
+
+            {* @event prepare_posts_frontend.%plugin_id%.post_title *}
+            {if !empty($post.plugins.post_title)}
+                {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
+            {/if}
+        </h1>
+
+        <div class="credentials">
+            <meta itemprop="datePublished" content="{$post.datetime|date_format:'Y-m-d\TH:i'}">
+            <span class="hint date" title="{$post.datetime|wa_datetime}">{$post.datetime|wa_datetime:"humandate"}</span>
+        </div>
+
+        {* @event prepare_posts_frontend.%plugin_id%.before *}
+        {if !empty($post.plugins.before)}
+            <div class="text-before">
+                {foreach $post.plugins.before as $plugin => $output}{$output}{/foreach}
+            </div>
+        {/if}
+
+
+
+        <div class="text text-plain" itemprop="articleBody">
+            {$amp_text}
+        </div>
+
+        {* @event prepare_posts_frontend.%plugin_id%.after *}
+        {if !empty($post.plugins.after)}
+            <div class="text-after">
+                {foreach $post.plugins.after as $plugin => $output}{$output}{/foreach}
+            </div>
+        {/if}
+
+        <div class="posts-navigation">
+            {if $prev}
+                <a href="{$prev}">&larr; предыдущая новость</a>
+            {/if}
+            &nbsp;
+            {if $next}
+                <a style="float: right" href="{$next}">следующая новость &rarr;</a>
+            {/if}
+        </div>
+
+    </div>
+
+</div>

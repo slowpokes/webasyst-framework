@@ -196,6 +196,13 @@ class blogFrontendPostAction extends blogViewAction
         }
 
         $this->view->assign('post', $post);
+        //VADIM CODE START
+        $text = $post['text'];
+        $text = strip_tags($text, '<p><a><img><div><br><h2><h3><ul><li>');
+        $text = preg_replace('/alt=\"(.*)\"/', '', $text);
+        $text = preg_replace('/<img src="([^"]*)"\s*\/?>/', '<div class="fixed-container"><amp-img layout="fill" class="contain" src="$1"></amp-img></div>', $text);
+        $this->view->assign('amp_text', $text);
+        //VADIM CODE END
     }
 
     /**
