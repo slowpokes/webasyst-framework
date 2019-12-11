@@ -12,12 +12,36 @@ class cityShipping extends waShipping
         $model = new waModel();
         if($this->kladr){
             $kladr_id = $model->escape($kladr_id);
-            $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND kladr_id = '{$kladr_id}' LIMIT 1";
+            $kladr_ids = array($kladr_id);
+
+            $data = array();
+            $sql = "SELECT * FROM shop_kladr_corrections WHERE kladr_id = '{$kladr_id}'";
+            try{
+                $data = $model->query($sql)->fetchAll();
+            }
+            catch (Exception $e) {
+                $data = array();
+            }
+            if($data){
+                foreach ($data as $row){
+                    $kladr_ids[] = $row['corrected_kladr_id'];
+                }
+            }
+
+            $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND kladr_id IN('".implode("', '", $kladr_ids)."') LIMIT 1";
 
             if($kladr_id=='') {
                 if ($this->getPackageProperty('real_price')) {
                     $city = $model->escape($city);
                     $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city = '{$city}' LIMIT 1";
+                    $data = $model->query($sql)->fetch();
+                    if(!$data){
+                        $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND sub_region = '{$city}' LIMIT 1";
+                        $data = $model->query($sql)->fetch();
+                        if(!$data){
+                            $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city LIKE '{$city}%' LIMIT 1";
+                        }
+                    }
                 }
             }
         }
@@ -79,8 +103,14 @@ class cityShipping extends waShipping
                     $price_prepayment += $p;
                 }
                 if($this->np_price && !$prepayment){
-                    $p = ($order_price * $this->np_price) / (100 - $this->np_price);
-                    $price += $p;
+                    $np_order_price = $order_price;
+                    if(waRequest::param('order_prepayment_amount')){
+                        $np_order_price = $order_price - waRequest::param('order_prepayment_amount');
+                    }
+                    if($np_order_price > 0) {
+                        $p = ($np_order_price * $this->np_price) / (100 - $this->np_price);
+                        $price += $p;
+                    }
                 }
                 if($this->total_comission){
                     $p = ($order_price * $this->total_comission) / (100 - $this->total_comission);

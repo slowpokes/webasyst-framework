@@ -11,7 +11,23 @@ class mapShipping extends waShipping
         if ($city!='all') {
             if($this->kladr){
                 $kladr_id = $model->escape($kladr_id);
-                $where = " AND kladr_id = '{$kladr_id}' ";
+                $kladr_ids = array($kladr_id);
+
+                $data = array();
+                $sql = "SELECT * FROM shop_kladr_corrections WHERE kladr_id = '{$kladr_id}'";
+                try{
+                    $data = $model->query($sql)->fetchAll();
+                }
+                catch (Exception $e) {
+                    $data = array();
+                }
+                if($data){
+                    foreach ($data as $row){
+                        $kladr_ids[] = $row['corrected_kladr_id'];
+                    }
+                }
+                $where = " AND kladr_id IN('".implode("', '", $kladr_ids)."') ";
+
             }
             else {
                 $city = $model->escape($city);
