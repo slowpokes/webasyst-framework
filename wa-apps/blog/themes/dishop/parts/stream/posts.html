@@ -1,0 +1,33 @@
+<div>
+{foreach $posts as $p}
+    {if $p@iteration%3==1}
+        </div>
+        <div class="row">
+    {/if}
+        <div class="col-4">
+            <div class="post-small">
+                {if $p.image|default:''}
+                    <div class="image">
+                        <a href="{$p.link}">
+                            <img src="/wa-data/public/blog/plugins/logopost/images/{$p.image}">
+                        </a>
+                    </div>
+                {/if}
+                <div class="post-title">
+                    <a href="{$p.link}">
+                        {$p.title}
+                    </a>
+                </div>
+
+                <div class="text-plain">
+                    {$p.text|strip_tags|truncate:100}
+                </div>
+
+                <div class="badge-date">
+                    <span class="post-badge">Новости</span>
+                    <span class="date">{$p.datetime|wa_datetime:"date"}</span>
+                </div>
+            </div>
+        </div>
+{/foreach}
+</div>

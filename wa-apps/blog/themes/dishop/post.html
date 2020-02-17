@@ -1,0 +1,82 @@
+
+{include file="../../../shop/themes/dishop/parts/index/breadcrumbs.html" final=$post.title}
+
+<div class="row no-gutters">
+    <div class="col-dishop-20">
+        {include './parts/index/sidebar.html'}
+    </div>
+    <div class="col-dishop-80">
+
+        <div class="post">
+
+            {$posts = $wa->blog->posts($post.blog_id, 6)}
+            {$prev = ''}
+            {$next = ''}
+            {$post_found = false}
+            {foreach $posts as $p}
+                {if $post_found}
+                    {if $next==''}
+                        {$next = $p.link}
+                    {/if}
+                {else}
+                    {if $p.id != $post.id}
+                        {$prev = $p.link}
+                    {/if}
+                {/if}
+                {if $p.id == $post.id}
+                    {$post_found = true}
+                {/if}
+            {/foreach}
+
+            <div class="posts-navigation">
+                {if $prev}
+                    <a href="{$prev}">&larr; предыдущая новость</a>
+                {/if}
+                &nbsp;
+                {if $next}
+                    <a style="float: right" href="{$next}">следующая новость &rarr;</a>
+                {/if}
+            </div>
+
+            <h1>
+                {$post.title}
+
+                {* @event prepare_posts_frontend.%plugin_id%.post_title *}
+                {if !empty($post.plugins.post_title)}
+                    {foreach $post.plugins.post_title as $plugin => $output}{$output}{/foreach}
+                {/if}
+            </h1>
+
+            <div class="date">
+                Дата: {$post.datetime|wa_datetime:"humandate"}
+            </div>
+
+            {* @event prepare_posts_frontend.%plugin_id%.before *}
+            {if !empty($post.plugins.before)}
+                <div class="text-before">
+                    {foreach $post.plugins.before as $plugin => $output}{$output}{/foreach}
+                </div>
+                </div>
+            {/if}
+
+
+
+            <div class="text text-plain">
+                {$post.text}
+            </div>
+
+            {* @event prepare_posts_frontend.%plugin_id%.after *}
+            {if !empty($post.plugins.after)}
+                <div class="text-after">
+                    {foreach $post.plugins.after as $plugin => $output}{$output}{/foreach}
+                </div>
+            {/if}
+        </div>
+
+        {* @event frontend_post.%plugin_id%.footer *}
+        {foreach $frontend_post as $plugin => $output}
+            {if !empty($output.footer)}{$output.footer}{/if}
+        {/foreach}
+    </div>
+</div>
+

@@ -1,0 +1,61 @@
+<div class="sidebar">
+    <div class="sidebar-block">
+        <div class="title">Категории</div>
+        <div class="line"></div>
+        <ul class="categories">
+            {$latest_posts = $wa->blog->posts(6, 100)}
+            <li>
+                <a href="/blog/">Все статьи</a>
+                <span class="count">{count($latest_posts)}</span>
+            </li>
+            <li>
+                <a href="/blog/">Новости</a>
+                <span class="count">{count($latest_posts)}</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="sidebar-block subscribe">
+        <div class="title">Подпишись на нас !</div>
+        <div class="line"></div>
+        <div class="text">
+            Будьте в курсе о наших скидках и акциях !
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Введите E-Mail">
+            <div class="input-group-append">
+                <button class="btn btn-primary" style="padding: 6px 12px" type="submit"><i class="fal fa-envelope"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-block">
+        <div class="title">Популярные статьи</div>
+        <div class="line"></div>
+        <div class="sidebar-posts">
+            {$latest_posts = $wa->blog->posts(6, 3)}
+            {if !empty($latest_posts)}
+            {foreach $latest_posts as $p}
+                <div class="sidebar-post post-small">
+                    {if $p.image|default:''}
+                        <div class="image">
+                            <a href="{$p.link}">
+                                <img src="/wa-data/public/blog/plugins/logopost/images/{$p.image}">
+                            </a>
+                        </div>
+                    {/if}
+                    <div class="badge-date">
+                        <span class="post-badge">Новости</span>
+                        <span class="date">{$p.datetime|wa_datetime:"date"}</span>
+                    </div>
+                    <div class="post-title">
+                        <a href="{$p.link}">
+                            {$p.title}
+                        </a>
+                    </div>
+                </div>
+            {/foreach}
+            {/if}
+        </div>
+    </div>
+</div>
