@@ -1,0 +1,36 @@
+{$t = ''}
+{if $page > 1}
+    {$t = "{$t}, страница {$page}"}
+{/if}
+{* $wa->title($t) *}
+{* $wa->meta('description', "{if $page > 1}, страница {$page}{/if}") *}
+
+{*
+<h1>
+    Полезные статьи о парфюмерии{if $page > 1}, страница {$page}{/if}
+</h1>
+*}
+
+{include file="../../../shop/themes/dishop/parts/index/breadcrumbs.html" final='Список новостей'}
+
+<div>
+    {if $is_search}
+        {include file="../dishop/parts/stream/search.html" inline}
+    {else}
+        {include file="../dishop/parts/stream/posts.html" inline}
+    {/if}
+</div>
+
+<div class="paginator-container">
+    <ul class="pagination">
+        {$url = $smarty.server.REQUEST_URI}
+        {$url = str_replace("?page={$page}", '', $url)}
+        {for $p=1 to $pages}
+            {if $p==1}
+                <li{if $p eq $page} class="selected"{/if}><a href="{$url}">{$p}</a></li>
+            {else}
+                <li{if $p eq $page} class="selected"{/if}><a href="{if $p eq $page}#top{else}{$url}?page={$p}{/if}">{$p}</a></li>
+            {/if}
+        {/for}
+    </ul>
+</div>
