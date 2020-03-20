@@ -26,6 +26,8 @@ abstract class waController
         // nothing to do.. can be redefined in subclasses
     }
 
+    protected function preExecute2(){}//VADIM CODE
+
     /**
      *
      * @return waAuthUser
