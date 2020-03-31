@@ -301,8 +301,8 @@ HTML;
 
     public function accountName($escape = true)
     {
-        $app = wa()->getAppFake();//VADIM CODE
-        return $app['title'];//VADIM CODE
+        $app = wa()->getAppInfo(wa()->getAppFake());//VADIM CODE
+        return $app['name'];//VADIM CODE
         $name = wa()->getSetting('name', 'Webasyst', 'webasyst');
         return $escape ? htmlspecialchars($name) : $name;
     }
