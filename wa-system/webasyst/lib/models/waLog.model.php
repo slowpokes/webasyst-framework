@@ -28,7 +28,7 @@ class waLogModel extends waModel
             if ($actions[$action] === false) {
                 return false;
             }
-            $app_id = $system->getApp();
+            $app_id = $system->getAppFake();
         } else {
             $app_id = 'wa-system';
         }
