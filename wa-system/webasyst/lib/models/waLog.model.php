@@ -28,7 +28,8 @@ class waLogModel extends waModel
             if ($actions[$action] === false) {
                 return false;
             }
-            $app_id = $system->getAppFake();
+            $app_id = $system->getApp();
+            $app_id = wa()->replaceName($app_id);// VADIM CODE
         } else {
             $app_id = 'wa-system';
         }
