@@ -312,7 +312,7 @@ class waContactForm
      * @param string $field_id
      * @param boolean $with_errors whether to add class="error" and error text next to form fields
      */
-    public function html($field_id = null, $with_errors = true, $placeholders = false)
+    public function html($field_id = null, $with_errors = true, $placeholders = true)
     {
         $this->validateFields();
 
