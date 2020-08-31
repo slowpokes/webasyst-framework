@@ -7,13 +7,14 @@ class mapShipping extends waShipping
     {
         $uniq_id = $this->uniq_id;
         $model = new waModel();
-        $where = "";
+        $points = array();
+
         if ($city!='all') {
             if($this->kladr){
+                $where = "";
                 $kladr_id = $model->escape($kladr_id);
                 $kladr_ids = array($kladr_id);
 
-                $data = array();
                 $sql = "SELECT * FROM shop_kladr_corrections WHERE kladr_id = '{$kladr_id}'";
                 try{
                     $data = $model->query($sql)->fetchAll();
@@ -27,23 +28,24 @@ class mapShipping extends waShipping
                     }
                 }
                 $where = " AND kladr_id IN('".implode("', '", $kladr_ids)."') ";
-
-            }
-            else {
-                $city = $model->escape($city);
-                $where = " AND city = '{$city}' ";
+                $sql = "SELECT * FROM shop_point_shipping WHERE uniq = '{$uniq_id}' $where ORDER BY sort, address, name";
+                $points = $model->query($sql)->fetchAll();
             }
 
-            if($kladr_id=='') {
-                if ($this->getPackageProperty('real_price')) {
+            if(!$points) {
+                $region_id = $this->getAddress('region');
+                if ($region_id > 0) {
                     $city = $model->escape($city);
-                    $where = " AND city = '{$city}' ";
+                    $sql = "SELECT * FROM shop_point_shipping WHERE uniq = '{$uniq_id}' AND city = '{$city}' AND region_id = '{$region_id}'  ORDER BY sort, address, name";
+                    $points = $model->query($sql)->fetchAll();
                 }
             }
         }
+        else{
+            $sql = "SELECT * FROM shop_point_shipping WHERE uniq = '{$uniq_id}' ORDER BY sort, address, name";
+            $points = $model->query($sql)->fetchAll();
+        }
 
-        $sql = "SELECT * FROM shop_point_shipping WHERE uniq = '{$uniq_id}' $where ORDER BY sort, address, name";
-        $points = $model->query($sql)->fetchAll();
         return $points;
     }
 

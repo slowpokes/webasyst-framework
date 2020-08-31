@@ -1,0 +1,10 @@
+{
+  "name": "bd9",
+  "version": "1.0.0",
+  "main": "Gruntfile.js",
+  "devDependencies": {
+    "grunt": "",
+    "grunt-cache-bust": "",
+    "grunt-contrib-concat": ""
+  }
+}

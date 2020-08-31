@@ -7,14 +7,16 @@ class cityShipping extends waShipping
     {
         $city = $this->getAddress('city');
         $kladr_id = $this->getAddress('kladr_id');
+        $region_id = $this->getAddress('region');
 
         $uniq_id = $this->uniq_id;
+        $regular_region_ids = $this->regular_region_ids;
         $model = new waModel();
+        $data = array();
         if($this->kladr){
             $kladr_id = $model->escape($kladr_id);
             $kladr_ids = array($kladr_id);
 
-            $data = array();
             $sql = "SELECT * FROM shop_kladr_corrections WHERE kladr_id = '{$kladr_id}'";
             try{
                 $data = $model->query($sql)->fetchAll();
@@ -29,27 +31,15 @@ class cityShipping extends waShipping
             }
 
             $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND kladr_id IN('".implode("', '", $kladr_ids)."') LIMIT 1";
-
-            if($kladr_id=='') {
-                if ($this->getPackageProperty('real_price')) {
-                    $city = $model->escape($city);
-                    $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city = '{$city}' LIMIT 1";
-                    $data = $model->query($sql)->fetch();
-                    if(!$data){
-                        $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND sub_region = '{$city}' LIMIT 1";
-                        $data = $model->query($sql)->fetch();
-                        if(!$data){
-                            $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city LIKE '{$city}%' LIMIT 1";
-                        }
-                    }
-                }
+            $data = $model->query($sql)->fetch();
+        }
+        if(!$data) {
+            if ($region_id > 0) {
+                $city = $model->escape($city);
+                $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city = '{$city}' AND region_id = '{$region_id}' LIMIT 1";
+                $data = $model->query($sql)->fetch();
             }
         }
-        else {
-            $city = $model->escape($city);
-            $sql = "SELECT * FROM shop_city_shipping WHERE uniq = '{$uniq_id}' AND city = '{$city}' LIMIT 1";
-        }
-        $data = $model->query($sql)->fetch();
 
         $order_price = $this->getTotalPrice();
         $prepayment = false;
