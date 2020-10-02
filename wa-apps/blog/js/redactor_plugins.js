@@ -20,3 +20,24 @@ RedactorPlugins.cut = function() {
         this.insert.html(html);
     }
 }
+
+RedactorPlugins.product = function() {
+    return {
+        init: function() {
+            this.button.addCallback(this.button.add('wa_post_product', 'Вставить товар'), this.product.show);
+        },
+        show: function () {
+            var url = prompt("Укажите ссылку на товар на сайте");
+            if (url!=null) {
+                this.product.insert(url);
+            }
+        },
+        insert: function (url) {
+            var html = '<div class="embed-product" data-url="'+url+'"><a href="'+url+'">'+url+'</div>';
+            this.selection.restore();
+            var b = this.selection.getBlock() || this.selection.getCurrent();
+            b ? $(b).after(html) : this.insert.html(html);
+            this.code.sync()
+        }
+    };
+}

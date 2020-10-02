@@ -1308,7 +1308,7 @@
                             buttons: ['html', 'formatting', 'bold', 'italic', 'underline', 'deleted', 'unorderedlist', 'orderedlist',
                                 'outdent', 'indent', 'image', 'video', 'file', 'table', 'link', 'alignment', '|',
                                 'horizontalrule'],
-                            plugins: ['fontcolor', 'fontsize', 'fontfamily', 'table', 'video', 'cut'],
+                            plugins: ['fontcolor', 'fontsize', 'fontfamily', 'table', 'video', 'cut', 'product'],
                             lang: wa_lang,
                             imageUpload: '?action=upload&filelink=1&absolute=1',
                             uploadImageFields: textarea.data('uploadFields'),
