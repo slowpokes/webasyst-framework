@@ -12,6 +12,7 @@
  * @package wa-system
  * @subpackage webasyst
  */
+
 class waAppSettingsModel extends waModel
 {
     protected static $settings = array();
@@ -54,9 +55,8 @@ class waAppSettingsModel extends waModel
         }
 
         if (is_null($name)) {
-            return  isset(self::$settings[$key]) ? self::$settings[$key] : array();
-        }
-        else {
+            return isset(self::$settings[$key]) ? self::$settings[$key] : array();
+        } else {
             return isset(self::$settings[$key][$name]) ? self::$settings[$key][$name] : $default;
         }
     }
@@ -71,7 +71,7 @@ class waAppSettingsModel extends waModel
     {
         $app_id = wa()->replaceName($app_id);// VADIM CODE
         $key = $this->getCacheKey($app_id);
-        $this->getCache($app_id)->delete();
+        $this->clearCache($app_id, true);
         if ($this->getByField(array('app_id' => $key, 'name' => $name))) {
             $this->updateByField(array('app_id' => $key, 'name' => $name), array('value' => $value));
         } else {
@@ -88,7 +88,7 @@ class waAppSettingsModel extends waModel
     {
         $app_id = wa()->replaceName($app_id);// VADIM CODE
         $key = $this->getCacheKey($app_id);
-        $this->getCache($app_id)->delete();
+        $this->clearCache($app_id, true);
         $params = array('app_id' => $key);
         if ($name === null) {
             if (isset(self::$settings[$key])) {
@@ -101,5 +101,27 @@ class waAppSettingsModel extends waModel
             $params['name'] = $name;
         }
         return $this->deleteByField($params);
+    }
+
+    public function clearCache($app_id, $only_file = false)
+    {
+        $this->getCache($app_id)->delete();
+        if (!$only_file) {
+            self::$settings = array();
+        }
+    }
+
+    public function describe($table = null, $keys = false)
+    {
+        try {
+            return parent::describe($table, $keys);
+        } catch (waDbException $e) {
+            if ($e->getCode() == 1146) {
+                // Framework not installed?.. Initialize app to create all tables.
+                wa('webasyst');
+                return parent::describe($table, $keys);
+            }
+            throw $e;
+        }
     }
 }

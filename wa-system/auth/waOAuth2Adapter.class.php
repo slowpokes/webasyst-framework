@@ -30,10 +30,15 @@ abstract class waOAuth2Adapter extends waAuthAdapter
             wa()->getResponse()->redirect($url);
         }
 
-        if ($this->check_state && waRequest::get('state') != wa()->getStorage()->get('auth_state')) {
-            // @todo: error
-            return array();
+        if ($this->check_state) {
+            $state = waRequest::get('state');
+            $auth_state = wa()->getStorage()->get('auth_state');
+            if (!$state || !$auth_state || $state !== wa()->getStorage()->get('auth_state')) {
+                // @todo: error
+                return array();
+            }
         }
+
         // close session
         wa()->getStorage()->close();
         // get token
@@ -44,6 +49,11 @@ abstract class waOAuth2Adapter extends waAuthAdapter
         return array();
     }
 
+    /**
+     * URL of auth provider endpoint (to where user will be redirected from webasyst)
+     * It is not redirect_uri URL of OAuth protocol
+     * @return string
+     */
     abstract public function getRedirectUri();
 
     public function getCode()
@@ -51,8 +61,18 @@ abstract class waOAuth2Adapter extends waAuthAdapter
         return waRequest::get('code');
     }
 
+    /**
+     * This where we call OAuth service again with code to get access token
+     * @param $code
+     * @return mixed
+     */
     abstract public function getAccessToken($code);
 
+    /**
+     * Get user data from OAuth provider
+     * @param $token
+     * @return mixed
+     */
     abstract public function getUserData($token);
 
 }

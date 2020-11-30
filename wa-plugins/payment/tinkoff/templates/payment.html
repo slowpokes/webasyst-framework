@@ -1,0 +1,14 @@
+<form id="payment-form" action="{$form_url}" method="get" target="_top">
+
+{if $auto_submit}
+    <i class="icon16 loading"></i>
+    <em>{$plugin->_w('Redirecting to «Tinkoff Bank» site for payment...')}</em>
+    <br /><br />
+    <script type="text/javascript">
+    setTimeout(function () {
+        document.getElementById('payment-form').submit();
+    }, 3000);
+    </script>
+{/if}
+    <input type="submit" value="{$plugin->_w('Pay for your order on «Tinkoff Bank» site')}" />
+</form>

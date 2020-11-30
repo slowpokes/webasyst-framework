@@ -6,6 +6,13 @@
  */
 class waContactBranchField extends waContactSelectField
 {
+    public function getInfo()
+    {
+        $data = parent::getInfo();
+        $data['branch_hide'] = ifempty($this->options, 'hide', array());
+        return $data;
+    }
+
     public function getHtmlOne($params = array(), $attrs = '')
     {
         //
@@ -15,7 +22,7 @@ class waContactBranchField extends waContactSelectField
         $html = '';
         $radios_name = $this->getHTMLName($params);
         foreach ($this->getOptions() as $k => $v) {
-            $html .= '<label><input type="radio"'.($k == $value ? ' checked="checked"' : '').' name="'.$radios_name.'" value="'.htmlspecialchars($k).'"> '.htmlspecialchars($v).'</label>';
+            $html .= '<label><input type="radio"'.(strlen($value) > 0 && $k == $value ? ' checked="checked"' : '').' name="'.$radios_name.'" value="'.htmlspecialchars($k).'"> '.htmlspecialchars($v).'</label>';
         }
 
         //
@@ -28,6 +35,10 @@ class waContactBranchField extends waContactSelectField
         $all_fields = waContactFields::getAll('enabled');
 
         foreach(ifempty($this->options['hide'], array()) as $option_id => $field_ids) {
+            // Fool proofing (some app or plugin can write incorrect data in config)
+            if (!is_array($field_ids)) {
+                continue;
+            }
             $hide_data[$option_id] = array_fill_keys($field_ids, 1);
             $hide_by_default += $hide_data[$option_id];
             foreach($field_ids as $fid) {
@@ -52,6 +63,7 @@ class waContactBranchField extends waContactSelectField
         $js = <<<EOF
 <span id="{$uniqid}"></span>
 <script>if ($) { $(function() { "use strict";
+
     var hide_data = {$hide_data};
     var radios_parent = $('#$uniqid').parent();
     var field_names = {$field_names};
@@ -86,9 +98,6 @@ class waContactBranchField extends waContactSelectField
         if (hide_data[option_id]) {
             for (var field_id in hide_data[option_id]) {
                 if (!hide_data[option_id].hasOwnProperty(field_id)) {
-                    continue;
-                }
-                if (hide_data[previous_selection] && hide_data[previous_selection][field_id]) {
                     continue;
                 }
                 if (!field_names[field_id]) {

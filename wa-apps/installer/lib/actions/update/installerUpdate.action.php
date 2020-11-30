@@ -36,18 +36,21 @@ class installerUpdateAction extends waViewAction
             };
 
         } catch (Exception $ex) {
-            $messages[] = array('text' => $ex->getMessage(), 'result' => 'fail');
+            // Save the error in the log and add to the common array
+            installerHelper::handleException($ex, $messages);
         }
 
         installerHelper::checkUpdates($messages);
+
         if (!waRequest::get('_')) {
-            $this->setLayout(new installerBackendLayout());
+            $this->setLayout(new installerBackendStoreLayout());
+            // If we get the messages in action - override the messages from the layout?
             if ($messages) {
                 $this->getLayout()->assign('messages', $messages);
             }
             $this->getLayout()->assign('update_counter', $counter['total']);
             $this->getLayout()->assign('no_ajax', true);
-        } else {
+        } elseif ($messages) {
             $this->view->assign('messages', $messages);
         }
 

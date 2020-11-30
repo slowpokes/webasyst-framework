@@ -39,12 +39,15 @@ abstract class installerExtrasRemoveAction extends waViewAction
             switch ($this->extras_type) {
                 case 'themes':
                     $msg = _w("Unable to delete application's themes (developer version is on)");
+                    $msg .= "\n"._w("A .git or .svn directory has been detected. To ignore the developer mode, add option 'installer_in_developer_mode' => true to wa-config/config.php file.");
                     break;
                 case 'plugins':
                     $msg = _w("Unable to delete application's plugins (developer version is on)");
+                    $msg .= "\n"._w("A .git or .svn directory has been detected. To ignore the developer mode, add option 'installer_in_developer_mode' => true to wa-config/config.php file.");
                     break;
                 case 'widgets':
                     $msg = _w("Unable to delete application's widgets (developer version is on)");
+                    $msg .= "\n"._w("A .git or .svn directory has been detected. To ignore the developer mode, add option 'installer_in_developer_mode' => true to wa-config/config.php file.");
                     break;
                 default:
                     $msg = '???';
@@ -52,7 +55,7 @@ abstract class installerExtrasRemoveAction extends waViewAction
             }
 
             $msg = installerMessage::getInstance()->raiseMessage($msg, installerMessage::R_FAIL);
-            $this->redirect('?msg='.$msg.'#/'.$this->extras_type.'/');
+            $this->redirect('?msg='.$msg);
         }
     }
 
@@ -124,9 +127,10 @@ abstract class installerExtrasRemoveAction extends waViewAction
                                 throw new waException(sprintf(_w($message), _wd($slug, isset($info['name']) ? $info['name'] : '???')));
                             }
                             $queue[] = array(
-                                'app_slug' => $app_id,
-                                'ext_id'   => $installed['id'],
-                                'name'     => sprintf("%s (%s)", _wd($slug, $installed['installed']['name']), _wd($app_id, $app['name'])),
+                                'real_slug' => $slug,
+                                'app_slug'  => $app_id,
+                                'ext_id'    => $installed['id'],
+                                'name'      => sprintf("%s (%s)", _wd($slug, $installed['installed']['name']), _wd($app_id, $app['name'])),
                             );
                             unset($extras_ids[$slug]);
                         } else {
@@ -138,11 +142,26 @@ abstract class installerExtrasRemoveAction extends waViewAction
                     }
                 }
             }
-            $deleted_extras = array();
+            $deleted_extras = $deleted_extras_slug = array();
+            $ip = waRequest::getIp();
             foreach ($queue as $q) {
                 if ($this->removeExtras($q['app_slug'], $q['ext_id'])) {
+
+                    $params = array(
+                        'type' => $this->extras_type,
+                        'id'   => sprintf('%s/%s', $q['app_slug'], $q['ext_id']),
+                        'name' => $q['name'],
+                        'ip'   => $ip,
+                    );
+
+                    $this->logAction('item_uninstall', $params);
                     $deleted_extras[] = $q['name'];
+                    $deleted_extras_slug[] = $q['real_slug'];
                 }
+            }
+
+            if ($deleted_extras_slug) {
+                $this->updateFactProducts($deleted_extras_slug);
             }
 
             if (!$deleted_extras) {
@@ -158,12 +177,24 @@ abstract class installerExtrasRemoveAction extends waViewAction
             $message_plural = sprintf('Applications %a %%s have been deleted', $this->extras_type);
             $message = sprintf(_w($message_singular, $message_plural, count($deleted_extras), false), implode(', ', $deleted_extras));
             $msg = installerMessage::getInstance()->raiseMessage($message);
-            $this->redirect('?msg='.$msg.'#/'.$this->extras_type.'/');
+            $this->redirect('?msg='.$msg);
         } catch (Exception $ex) {
             waLog::log($ex->getMessage(), 'installer/remove.log');
             $msg = installerMessage::getInstance()->raiseMessage($ex->getMessage(), installerMessage::R_FAIL);
-            $this->redirect('?msg='.$msg.'#/'.$this->extras_type.'/');
+            $this->redirect('?msg='.$msg);
         }
 
+    }
+
+    /**
+     * Informs the remote update server about changes to the installation package
+     * @param $list
+     */
+    private function updateFactProducts($list)
+    {
+        if (!empty($list)) {
+            $sender = new installerUpdateFact(installerUpdateFact::ACTION_DEL, $list);
+            $sender->query();
+        }
     }
 }

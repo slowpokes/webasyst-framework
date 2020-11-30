@@ -3,12 +3,14 @@ return array(
     'name'        => 'Installer',
     'description' => 'Install new apps from the Webasyst Store',
     'icon'        => array(
-        48 => 'img/installer.png',
-        96 => 'img/installer96.png',
+        24 => 'img/installer-24.png',
+        48 => 'img/installer-48.png',
+        96 => 'img/installer-96.png',
     ),
     'mobile'      => false,
-    'version'     => '1.5.13',
-    'critical'    => '1.5.13',
+    'version'     => '1.14.9',
+    'critical'    => '1.14.9',
     'system'      => true,
     'vendor'      => 'webasyst',
+    'csrf'        => true,
 );

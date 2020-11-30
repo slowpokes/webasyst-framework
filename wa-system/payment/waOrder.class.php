@@ -15,8 +15,10 @@
  * @property double $shipping shipping price
  * @property string $shipping_name
  * @property string $payment_name
+ * @property bool $tax_included
  *
- * @property bool $recurrent 
+ * @property bool $recurrent
+ * @property bool $save_card
  *
  * @property string description
  * @property string description_en
@@ -24,6 +26,14 @@
  * @property string $datetime
  * @property string $update_datetime
  * @property string $paid_datetime
+ *
+ * @property mixed[] $shipping_params
+ * @property string[] $shipping_data
+ * @property string $shipping_rate_id
+ * @property string $shipping_plugin Plugin string id usps,dhl
+ * @property float $shipping_tax_rate
+ * @property float $shipping_tax_included
+ *
  *
  * @property array $shipping_address
  * @property array[string]string $shipping_address['name']
@@ -37,6 +47,9 @@
  * @property array[string]string $shipping_address['country']
  * @property array[string]string $shipping_address['country_name']
  * @property array[string]string $shipping_address['address']
+ *
+ * @property mixed[] $billing_params
+ * @property string[] $billing_data
  *
  * @property array $billing_address
  * @property array[string]string $billing_address['name']
@@ -56,19 +69,39 @@
  * @property array[][string]string  $items[]['id']
  * @property array[][string]string  $items[]['name']
  * @property array[][string]string  $items[]['description']
- * @todo add img property
  * @property array[][string]string  $items[]['img']
  * @property array[][string]double  $items[]['price']
- * @property array[][string]int  $items[]['quantity']
+ * @property array[][string]double  $items[]['height']
+ * @property array[][string]double  $items[]['width']
+ * @property array[][string]double  $items[]['length']
+ * @property array[][string]double  $items[]['weight']
+ * @property array[][string]int     $items[]['quantity']
+ * @property array[][string]double  $items[]['discount']
+ * @property array[][string]double  $items[]['total_discount']
  * @property array[][string]double  $items[]['total']
+ * @property array[][string]double  $items[]['tax_rate'] Tax rate in percent
+ * @property array[][string]boolean $items[]['tax_included'] Tax is included into price
+ * @property array[][int][]         $items[]['product_codes'] - product code array <id:int> => <product_code_record:array>
+ *      Product code item format:
+ *          int      'id'
+ *          string   'code'
+ *          string   'name' [optional]
+ *          string   'icon' [optional]
+ *          string   'logo' [optional]
+ *          string[] 'values' - one or more values, possibly for each instance of product item if provided
+ *
+ *
  *
  * @property int $total_quantity
  *
  * @property mixed $contact_%field%
+ * @property-read string $contact_email
+ * @property-read string $contact_name
  *
  * @property string $comment
  * @property array $params
  * @property array[string]mixed $params[]
+ * @property string $card_native_id
  *
  *
  */
@@ -99,6 +132,12 @@ class waOrder implements ArrayAccess
 
     public function __construct($data = array())
     {
+        $this->data['billing_params'] = array();
+        $this->data['billing_data'] = array();
+
+        $this->data['shipping_params'] = array();
+        $this->data['shipping_data'] = array();
+
         $this->alias = array(
             'order_id'            => 'id',
             'order_id_str'        => 'id_str',
@@ -110,10 +149,53 @@ class waOrder implements ArrayAccess
         );
         if (!empty($data)) {
             foreach ($data as $field => $value) {
-                if (($field == 'contact') && ($value instanceof waContact)) {
-                    $this->contact = $value;
-                    $field = 'contact_id';
-                    $value = $this->contact->getId();
+                switch ($field) {
+                    case 'contact':
+                        if ($value instanceof waContact) {
+                            $this->contact = $value;
+                            $field = 'contact_id';
+                            $value = $this->contact->getId();
+                        }
+                        break;
+                    case 'params':
+                        foreach ($value as $sub_field => $sub_value) {
+                            if (preg_match('@^(shipping|payment|billing)_(params|data)_(.+)$@', $sub_field, $matches)) {
+                                switch ($matches[1]) {
+                                    case 'shipping':
+                                        $this->data['shipping_'.$matches[2]][$matches[3]] = $sub_value;
+                                        break;
+                                    case 'payment':
+                                    case 'billing':
+                                        $this->data['billing_'.$matches[2]][$matches[3]] = $sub_value;
+                                        break;
+                                }
+                            } elseif (preg_match('@^shipping_(rate_id|plugin|name)$@', $sub_field, $matches)) {
+                                $this->data[$sub_field] = $sub_value;
+                            }
+                        }
+                        break;
+                    case 'items':
+                        foreach ($value as &$item) {
+                            $item += array(
+                                'id'          => null,
+                                'name'        => null,
+                                'description' => null,
+                                'img'         => null,
+                                'price'       => null,
+                                'height'      => null,
+                                'width'       => null,
+                                'length'      => null,
+                                'weight'      => null,
+                                'quantity'    => 1,
+                                'product_codes' => [],
+                            );
+                            $item += array(
+                                'total' => $item['price'] * $item['quantity'],
+                            );
+                            unset($item);
+                        }
+
+                        break;
                 }
 
                 $this->data[$field] = $value;
@@ -124,7 +206,16 @@ class waOrder implements ArrayAccess
                 }
             }
         }
-        $this->subtotal = 0.0 + $this->total - $this->tax + $this->discount - $this->shipping;
+
+        $subtotal = 0.0 + $this->total;
+        if ($this->tax_included !== true) {
+            $subtotal -= $this->tax;
+        }
+
+        $subtotal += $this->discount;
+        $subtotal -= $this->shipping;
+
+        $this->subtotal = $subtotal;
         $this->init();
     }
 
@@ -136,6 +227,43 @@ class waOrder implements ArrayAccess
     public function __set($name, $value)
     {
         return $this->offsetSet($name, $value);
+    }
+
+    /**
+     * var_dump handler
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return array(
+            'contact_id'      => $this->contact_id,
+            'id'              => $this->id,
+            'currency'        => $this->currency,
+            'total'           => $this->total,
+            'shipping'        => $this->shipping,
+            'subtotal'        => $this->subtotal,
+            'discount'        => $this->discount,
+            'items'           => $this->items,
+            'shipping_params' => $this->shipping_params,
+            'shipping_data'   => $this->shipping_data,
+            'billing_params'  => $this->billing_params,
+            'billing_data'    => $this->billing_data,
+            'data'            => $this->data,
+        );
+    }
+
+    /**
+     * @param array $an_array
+     * @return waOrder
+     */
+    public static function __set_state($an_array)
+    {
+        $data = array();
+        if (is_array($an_array) && isset($an_array['data'])) {
+            $data = $an_array['data'];
+        }
+
+        return new self($data);
     }
 
     /**
@@ -162,8 +290,7 @@ class waOrder implements ArrayAccess
             $offset = $this->alias[$offset];
         }
         if (!isset($this->data[$offset])) {
-            $method = 'get'.preg_replace_callback('/(^|_)([\w])/', create_function('$c', 'return strtoupper($c[2]);'), $offset);
-            if (method_exists($this, $method)) {
+            if ($method = $this->methodName($offset)) {
                 if (!in_array($offset, $this->fields)) {
                     $this->fields[] = $offset;
                 }
@@ -177,10 +304,16 @@ class waOrder implements ArrayAccess
         }
     }
 
+    private function methodName($offset)
+    {
+        $method = 'get'.preg_replace_callback('/(^|_)([\w])/', wa_lambda('$c', 'return strtoupper($c[2]);'), $offset);
+        return method_exists($this, $method) ? $method : null;
+    }
+
     /**
      * @param $offset
      * @param $value
-     * @return mixed|void
+     * @return mixed
      */
     public function offsetSet($offset, $value)
     {
@@ -256,7 +389,10 @@ class waOrder implements ArrayAccess
             }
             $address['address'] = implode(', ', $chunks);
 
-            if (preg_match('/^(.{1,119}),\s+(.*)$/', $address['address'], $matches)) {
+            $address_length = 119;
+            $pattern = sprintf('/^(.{1,%d}),\s+(.*?)$/u', $address_length);
+
+            if ((mb_strlen($address['address']) > $address_length) && preg_match($pattern, $address['address'], $matches)) {
                 $address['address_1'] = $matches[1];
                 $address['address_2'] = $matches[2];
             } else {
@@ -287,6 +423,8 @@ class waOrder implements ArrayAccess
                 $this->contact = new waContact($this->contact_id);
             }
             return $this->contact;
+        } elseif ($this->contact instanceof waContact) {
+            return $this->contact;
         }
         return null;
     }
@@ -299,6 +437,16 @@ class waOrder implements ArrayAccess
             $quantity += $item['quantity'];
         }
         return $quantity;
+    }
+
+    public function getTotalDiscount()
+    {
+        $items = ifempty($this->data['items'], array());
+        $discount = 0;
+        foreach ($items as $item) {
+            $discount += isset($item['total_discount']) ? $item['total_discount'] : $item['discount'] * $item['quantity'];
+        }
+        return $discount;
     }
 
     public function getContactField($field, $format = null)

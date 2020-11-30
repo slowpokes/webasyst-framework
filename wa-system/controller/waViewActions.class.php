@@ -91,10 +91,7 @@ abstract class waViewActions extends waController
         $this->execute($this->action);
         $this->postExecute();
 
-        //if ($this->action == $action) {
         $this->display();
-        //}
-
     }
 
     protected function getTemplate()
@@ -150,6 +147,7 @@ abstract class waViewActions extends waController
      * Return current theme
      *
      * @return waTheme
+     * @throws waException
      */
     public function getTheme()
     {

@@ -4,7 +4,6 @@ require_once realpath(dirname(__FILE__).'/../').'/vendors/swift/swift_required.p
 
 class waMail extends Swift_Mailer
 {
-
     protected static $wa_config = array();
     private $wa_set_transport = false;
 
@@ -25,23 +24,79 @@ class waMail extends Swift_Mailer
                 $message->setFrom($from);
             }
         }
+
         if ($this->wa_set_transport) {
             $this->_transport = self::getTransportByEmail(key($message->getFrom()));
         }
+
+        // Add DKIM Signature
+        if (!$message->getHeaders()->get('DKIM-Signature')) {
+            $mail_config = $this->readConfigFile();
+            $sender_email = key($message->getFrom());
+            $e = explode('@', ifset($sender_email));
+            $domain_name = end($e);
+            $mail_data = false;
+
+            // Find email:
+            if (isset($mail_config[$sender_email])) {
+                $mail_data = $mail_config[$sender_email];
+                // Find domain:
+            } elseif (isset($mail_config[$domain_name])) {
+                $mail_data = $mail_config[$domain_name];
+            }
+
+            if ($mail_data && ifset($mail_data['dkim']) == 1) {
+                $dkim_signer = new Swift_Signers_DKIMSigner(
+                    ifset($mail_data['dkim_pvt_key']), $domain_name, ifset($mail_data['dkim_selector'])
+                );
+                $dkim_signer->ignoreHeader('Return-Path');
+                $dkim_signer->ignoreHeader('Bcc');
+                $message->attachSigner($dkim_signer);
+            }
+        }
+
+        /**
+         * Run before send notification
+         * @param Swift_Mime_Message $message
+         *
+         * @event mail_send.before
+         */
+
+        $params = [
+            'message' => $message,
+        ];
+
+        wa('webasyst')->event('mail_send.before', $params);
+
+        $result = false;
         try {
-            return parent::send($message, $failedRecipients);
+            $result = parent::send($message, $failedRecipients);
+            $params['result'] = $result;
         } catch (Exception $e) {
-            $log = array();
+            $log = [];
             $log[] = sprintf('Error sending email from "%s" to "%s" with subject "%s"',
-                join('", "', array_keys($message->getFrom())),
-                join('", "', array_keys($message->getTo())),
-                $message->getSubject()
+                     implode('", "', array_keys($message->getFrom())),
+                     implode('", "', array_keys($message->getTo())),
+                     $message->getSubject()
             );
             $log[] = $e->getMessage();
             $log[] = $e->getTraceAsString();
-            waLog::log(join("\n", $log), 'mail.log');
-            return false;
+            waLog::log(implode("\n", $log), 'mail.log');
+            $params['exception'] = $e->getMessage();
         }
+
+        /**
+         * Run after send notification
+         *
+         * @param Swift_Mime_Message message
+         * @param int|bool result
+         * @param exception exception
+         * @event mail_send.after
+         */
+
+        wa('webasyst')->event('mail_send.after', $params);
+
+        return $result;
     }
 
     /**
@@ -71,6 +126,9 @@ class waMail extends Swift_Mailer
             return Swift_MailTransport::newInstance();
         }
         if ($config['type'] == 'smtp') {
+            if (empty($config['port'])) {
+                $config['port'] = 25;
+            }
             $transport = Swift_SmtpTransport::newInstance($config['host'], $config['port']);
             if (isset($config['login'])) {
                 $transport->setUsername($config['login']);
@@ -108,5 +166,15 @@ class waMail extends Swift_Mailer
             }
         }
         return self::$wa_config['from'];
+    }
+
+    public function readConfigFile()
+    {
+        return wa()->getConfig()->getConfigFile('mail', array());
+    }
+
+    public function saveConfigFile($data)
+    {
+        waUtils::varExportToFile($data, wa()->getConfig()->getPath('config', 'mail'));
     }
 }

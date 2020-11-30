@@ -112,12 +112,16 @@ class waInstallerLocale
         $string = current($args);
         $string = isset(self::$strings[$this->locale][$string]) ? self::$strings[$this->locale][$string] : $string;
         if (count($args)) {
-            $args[0] = $string;
-            $formatted = @call_user_func_array('sprintf', $args);
-            if ($formatted) {
-                $string = $formatted;
+            $format = $string;
+            $string = implode(', ', $args);
+            array_shift($args);
+            if (count($args)) {
+                $formatted = @vsprintf($format, $args);
+                if ($formatted !== false) {
+                    $string = $formatted;
+                }
             } else {
-                $string = implode(', ', $args);
+                $string = $format;
             }
         }
         return $string;

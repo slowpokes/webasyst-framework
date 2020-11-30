@@ -23,9 +23,10 @@ class waDateValidator extends waValidator
     /**
      *
      * @param array|string $value
-     * @return type
+     * @param bool $more_current
+     * @return bool
      */
-    public function isValid($value)
+    public function isValid($value, $more_current = true)
     {
         parent::isValid($value);
         if (is_array($value)) {
@@ -33,7 +34,7 @@ class waDateValidator extends waValidator
             $year = null;
             if (!empty($value['year'])) {
                 $year = $value['year'];
-                if ($year < 1 || $year > date('Y') || !is_numeric($year) || floor($year) != $year) {
+                if ($year < 1 || ($more_current && $year > date('Y')) || !is_numeric($year) || floor($year) != $year) {
                     $error = $this->getMessage('incorrect_date');
                 }
             };
@@ -55,7 +56,7 @@ class waDateValidator extends waValidator
             };
 
             if ($day && $month) {
-                // Febrary
+                // February
                 if ($month == '2') {
                     if (!$year) {
                         $leap = true;
@@ -84,7 +85,12 @@ class waDateValidator extends waValidator
             }
 
         } else {
-            $time = strtotime($value);
+            $value = is_scalar($value) ? (string)$value : '';
+            if (strlen($value) <= 0) {
+                return false;
+            }
+
+            $time = strtotime($value . ' 00:00:00');
             if (!$time) {
                 $this->setError($this->getMessage('incorrect_date'));
             } else {
@@ -93,7 +99,8 @@ class waDateValidator extends waValidator
                         "year" => date("Y", $time),
                         "month" => date("m", $time),
                         "day" => date("d", $time)
-                    )
+                    ),
+                    $more_current
                 );
             }
         }

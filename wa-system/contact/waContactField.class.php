@@ -12,6 +12,7 @@
  * @package wa-system
  * @subpackage contact
  */
+
 abstract class waContactField
 {
     protected $id;
@@ -22,7 +23,7 @@ abstract class waContactField
      *     'export' => bool,      // !!! never used?..
      *     'sort' => bool,        // ?..
      *     'pa_hidden' => bool,   // do not show in personal account
-     *     'pa_readonly' => bool, // show as read-only in personal acccount
+     *     'pa_readonly' => bool, // show as read-only in personal account
      *     'unique' => bool,      // only allows unique values
      *     'required' => bool,    // is required in visual contact editor
      *     'search' => bool,      // ?..
@@ -94,11 +95,11 @@ abstract class waContactField
     public function getInfo()
     {
         $info = array(
-            'id' => $this->id,
-            'name' => $this->getName(),
-            'multi' => $this->isMulti(),
-            'type' => $this->getType(),
-            'unique' => $this->isUnique(),
+            'id'       => $this->id,
+            'name'     => $this->getName(),
+            'multi'    => $this->isMulti(),
+            'type'     => $this->getType(),
+            'unique'   => $this->isUnique(),
             'required' => $this->isRequired(),
         );
         if ($this->isMulti() && isset($this->options['ext'])) {
@@ -114,6 +115,7 @@ abstract class waContactField
      * Returns name of the field
      *
      * @param string $locale - locale
+     * @param bool $escape
      * @return string
      */
     public function getName($locale = null, $escape = false)
@@ -122,10 +124,9 @@ abstract class waContactField
             $locale = waSystem::getInstance()->getLocale();
         }
 
-        $name = '';
         if (isset($this->name[$locale])) {
             $name = $this->name[$locale];
-        } else if (isset($this->name['en_US'])) {
+        } elseif (isset($this->name['en_US'])) {
             if ($locale == waSystem::getInstance()->getLocale() && wa()->getEnv() == 'backend') {
                 $name = _ws($this->name['en_US']);
             } else {
@@ -134,7 +135,7 @@ abstract class waContactField
         } else {
             $name = reset($this->name); // reset() returns the first value
         }
-        return $escape ? htmlspecialchars($name, ENT_QUOTES) : $name;
+        return $escape ? htmlspecialchars($name, ENT_QUOTES, 'utf-8') : $name;
     }
 
     public function isMulti()
@@ -153,9 +154,35 @@ abstract class waContactField
     }
 
 
+    /**
+     * @deprecated since 1.10.10, see $this->hasExt()
+     */
     public function isExt()
     {
+        return $this->hasExt();
+    }
+
+    /**
+     * Whether extension ('ext') is supported by this field (i.e. billing/shipping address)
+     * @since 1.10.10
+     */
+    public function hasExt()
+    {
         return $this->isMulti() && isset($this->options['ext']);
+    }
+
+    /**
+     * Whether 'status' is supported by this field (i.e. confirmed/unconfirmed emails and phones)
+     * @since 1.10.10
+     */
+    public function hasStatus()
+    {
+        return in_array($this->getStorage(true), array('data', 'email', 'waContactDataStorage', 'waContactEmailStorage'));
+    }
+
+    public function isHidden()
+    {
+        return !empty($this->options['hidden']);
     }
 
     /**
@@ -217,7 +244,7 @@ abstract class waContactField
      *      }
      *
      * For non-multi fields ->set() returns string or array(value=>string, ext=>string).
-     * For multi fields ->set() returns list of arrays(value=>string, ext=>string); ext is optional, see $this->isExt()
+     * For multi fields ->set() returns list of arrays(value=>string, ext=>string); ext is optional, see $this->hasExt()
      *
      * @param waContact $contact
      * @param mixed $value can be a string, an array(value=>..., ext=>...) or list of these.
@@ -230,23 +257,24 @@ abstract class waContactField
         if ($this->isMulti()) {
             //
             // This scary chunk of code brings $value into common form for multi fields:
-            // list of arrays (value => string, ext => string)
-            // 'ext' is only present if enabled, see $this->isExt().
+            // list of arrays (value => string, ext => string, 'status' => string)
+            // 'ext' is only present if enabled, see $this->hasExt().
+            // 'status' is only present if enabled, see $this->hasStatus().
             // 'value' is passed through $this->setValue() for preparation.
             //
-            $is_ext = $this->isExt();
+            $has_ext = $this->hasExt();
             $ext = isset($params['ext']) ? $params['ext'] : '';
             if (!is_array($value)) {
                 $value = array('value' => $value);
-                if ($is_ext) {
+                if ($has_ext) {
                     $value['ext'] = $ext;
                 }
                 $value = array($this->setValue($value));
             } elseif (isset($value['value'])) {
-                if ($is_ext && !isset($value['ext'])) {
+                if ($has_ext && !isset($value['ext'])) {
                     $value['ext'] = $ext;
                 }
-                if (!$is_ext && isset($value['ext'])) {
+                if (!$has_ext && isset($value['ext'])) {
                     unset($value['ext']);
                 }
                 $value['value'] = $this->setValue($value['value']);
@@ -255,14 +283,14 @@ abstract class waContactField
                 foreach ($value as &$v) {
                     if (!is_array($v)) {
                         $v = array('value' => $this->setValue($v));
-                        if ($is_ext) {
+                        if ($has_ext) {
                             $v['ext'] = $ext;
                         }
                     } else {
-                        if (!$is_ext && isset($v['ext'])) {
+                        if (!$has_ext && isset($v['ext'])) {
                             unset($v['ext']);
                         }
-                        if ($is_ext && !isset($v['ext'])) {
+                        if ($has_ext && !isset($v['ext'])) {
                             $v['ext'] = $ext;
                         }
                         $v['value'] = $this->setValue(ifset($v['value'], ''));
@@ -270,6 +298,25 @@ abstract class waContactField
                 }
                 unset($v);
             }
+
+            // When existing phone or email is saved to the same contact
+            // without specifying its status, use status already saved in contact
+            if ($this->hasStatus()) {
+                $old_values = $this->getStorage()->get($contact, $this->getId(), true);
+                foreach ($value as &$v) {
+                    if (isset($v['status']) || empty($v['value'])) {
+                        continue;
+                    }
+                    foreach(ifempty($old_values, array()) as $ov) {
+                        if (isset($ov['status']) && isset($ov['value']) && $v['value'] == $ov['value']) {
+                            $v['status'] = $ov['status'];
+                            break;
+                        }
+                    }
+                }
+                unset($v);
+            }
+
             if ($add) {
                 $data = $contact->get($this->id);
                 foreach ($value as $v) {
@@ -277,7 +324,7 @@ abstract class waContactField
                 }
                 return $data;
             } else {
-                if ($is_ext && $ext) {
+                if ($has_ext && $ext) {
                     $data = $contact->get($this->id);
                     foreach ($data as $sort => $row) {
                         if ($row['ext'] == $ext) {
@@ -331,9 +378,10 @@ abstract class waContactField
      *
      * @param $data
      * @param int $contactId
-     * @return array|string|null Validation errors (array for multi fields, string for simple fields) or null if everything is ok.
+     * @return array|null|string Validation errors (array for multi fields, string for simple fields) or null if everything is ok.
+     * @throws waException
      */
-    public function validateUnique($data, $contactId=null)
+    public function validateUnique($data, $contactId = null)
     {
         if (!$this->getParameter('unique')) {
             return null;
@@ -346,53 +394,55 @@ abstract class waContactField
         // array of plain string values
         $values = array();
         if (is_array($data)) {
-            foreach($data as $sort => $value) {
+            foreach ($data as $sort => $value) {
                 $value = $this->format($value, 'value');
                 if ($value || $value === 0) { // do not check empty values to be unique
                     $values[$sort] = $value;
                 }
             }
-        } else if ($data !== null) {
-            return array(_ws('Data must be an array.'));
+        } else {
+            if ($data !== null) {
+                return array(_ws('Data must be an array.'));
+            }
         }
 
         // array of duplicates $sort => contact_id
-        $dupl = array();
+        $duplicates = array();
 
         // Check if there are duplicates among $values
         $flipped = array_flip($values);
         if (count($values) != count($flipped)) {
             // keys that disappeared after array_flip are duplicates, find them
-            foreach(array_diff(array_keys($values), array_values($flipped)) as $key) {
-                $dupl[$key] = $contactId;
+            foreach (array_diff(array_keys($values), array_values($flipped)) as $key) {
+                $duplicates[$key] = $contactId;
 
                 // there's another key that is not missing, but still is a duplicate since it's a copy of a missing key
-                $dupl[$flipped[$values[$key]]] = $contactId;
+                $duplicates[$flipped[$values[$key]]] = $contactId;
             }
         }
 
 
         // Check if there are duplicates in database
         $rows = $this->getStorage()->findDuplicatesFor($this, array_keys($flipped), $contactId ? array($contactId) : array());
-        foreach($rows as $value => $cid) {
+        foreach ($rows as $value => $cid) {
             if (isset($flipped[$value])) {
-                $dupl[$flipped[$value]] = $cid;
+                $duplicates[$flipped[$value]] = $cid;
             } else {
                 // Must be a duplicate in case-insensitive search
-                foreach($flipped as $v => $i) {
+                foreach ($flipped as $v => $i) {
                     if (mb_strtolower($v) == mb_strtolower($value)) {
-                        $dupl[$i] = $cid;
+                        $duplicates[$i] = $cid;
                         break;
                     }
                 }
-                if (!$dupl) {
+                if (!$duplicates) {
                     // Sanity check for debugging purposes
                     throw new waException("Unable to find duplicate value $value among flipped: ".print_r($flipped, true));
                 }
             }
         }
 
-        if (!$dupl) {
+        if (!$duplicates) {
             return null;
         }
 
@@ -403,15 +453,15 @@ abstract class waContactField
         $errStrNoRights = _ws('This field must be unique. The value entered is already set for another contact.');
         $rights_model = null;
         $userId = null;
-        foreach($dupl as $sort => $cid) {
+        foreach ($duplicates as $sort => $cid) {
             if ($cid === $contactId) {
                 $errors[$sort] = $errStrSelf;
                 continue;
             }
 
             // Check if current user can view $cid profile.
-            if (!$rights_model && class_exists('ContactsRightsModel')) {
-                $rights_model = new ContactsRightsModel();
+            if (!$rights_model && class_exists('contactsRightsModel')) {
+                $rights_model = new contactsRightsModel();
                 $userId = waSystem::getInstance()->getUser()->getId();
             }
             if ($rights_model && $rights_model->getRight($userId, $cid)) {
@@ -428,12 +478,12 @@ abstract class waContactField
     }
 
     /**
-     * Validate field value and returns errors or null if value is valud
+     * Validate field value and returns errors or null if value is valid
      * @param mixed $data
      * @param int $contact_id
      * @return array|string|null
      */
-    public function validate($data, $contact_id=null)
+    public function validate($data, $contact_id = null)
     {
         if (!isset($this->options['validators'])) {
             $this->options['validators'] = array();
@@ -471,22 +521,26 @@ abstract class waContactField
                                     $errors[$sort] = implode("<br />", $validator->getErrors());
                                 }
                             }
-                        } else if ($data !== null) {
-                            return array(_ws('Data must be an array.'));
+                        } else {
+                            if ($data !== null) {
+                                return array(_ws('Data must be an array.'));
+                            }
                         }
 
                         if ($this->getParameter('required') && $allEmpty) {
                             if (!isset($errors[0])) {
                                 $errors[0] = '';
                             }
-                            $errors[0] = _ws('This field is required') . ($errors[0] ? '<br>'.$errors[0] : '');
+                            $errors[0] = _ws('This field is required').($errors[0] ? '<br>'.$errors[0] : '');
                         }
                     } else {
                         $value = $this->format($data, 'value');
                         if (!$validator->isValid($value)) {
                             $errors = implode("<br />", $validator->getErrors());
-                        } else if ($this->getParameter('required') && empty($value) && $value !== '0') {
-                            $errors = _ws('This field is required');
+                        } else {
+                            if ($this->getParameter('required') && empty($value) && $value !== '0') {
+                                $errors = _ws('This field is required');
+                            }
                         }
                     }
                 }
@@ -512,10 +566,10 @@ abstract class waContactField
         foreach ($format as $f) {
 
             if (strpos($f, ',')) {
-                // when formats are delimeted by comma, use the first one that exists
+                // when formats are delimited by comma, use the first one that exists
                 $found = false;
-                foreach(explode(',', $f) as $f) {
-                    if ($f == 'value' || $f == 'html' || $this->getFormatter($f)) {
+                foreach (explode(',', $f) as $f) {
+                    if ($f == 'value' || $f == 'html' || $f == 'js' || $this->getFormatter($f)) {
                         $found = true;
                         break;
                     }
@@ -527,45 +581,54 @@ abstract class waContactField
             }
 
             if ($formatter = $this->getFormatter($f)) {
-                $data = $formatter->format($data);
-                continue;
-            }
-
-            if ($f == 'value') {
-                if (is_array($data) && isset($data['value'])) {
-                    $k = array_keys($data);
-                    $data = $data['value'];
-                    sort($k);
-                    if ($k == array('ext', 'value')) {
-                        $data = htmlspecialchars($data);
-                    }
-                } else if (!is_array($data)) {
-                    $data = htmlspecialchars($data);
-                } else {
-                    $data = '';
+                try {
+                    $data = $formatter->format($data);
+                    continue;
+                } catch (waException $e) {
                 }
-                continue;
             }
 
-            if ($f == 'html') {
-                if ($this->isMulti()) {
-                    if (is_array($data)) {
-                        $result = htmlspecialchars($data['value']);
-                        if (isset($data['ext']) && $data['ext']) {
-                            $ext = $data['ext'];
-                            if (isset($this->options['ext'][$ext])) {
-                                $ext = _ws($this->options['ext'][$ext]);
-                            }
-                            $result .= ' <em class="hint">'.htmlspecialchars($ext).'</em>';
+            switch ($f) {
+                case 'value':
+                    if (is_array($data) && isset($data['value'])) {
+                        $k = array_keys($data);
+                        $data = $data['value'];
+                        sort($k);
+                        if ($k == array('ext', 'value')) {
+                            $data = htmlspecialchars($data);
                         }
-                        $data = $result;
+                    } else {
+                        if (!is_array($data)) {
+                            $data = htmlspecialchars($data);
+                        } else {
+                            $data = '';
+                        }
                     }
-                } else {
-                    if (!is_array($data) || isset($data['value'])) {
-                        $data = htmlspecialchars(is_array($data) ? $data['value'] : $data);
+                    break;
+                case 'html':
+                    if ($this->isMulti()) {
+                        if (is_array($data)) {
+                            $result = htmlspecialchars($data['value']);
+                            if (isset($data['ext']) && $data['ext']) {
+                                $ext = $data['ext'];
+                                if (isset($this->options['ext'][$ext])) {
+                                    $ext = _ws($this->options['ext'][$ext]);
+                                }
+                                $result .= ' <em class="hint">'.htmlspecialchars($ext).'</em>';
+                            }
+                            $data = $result;
+                        }
+                    } else {
+                        if (!is_array($data) || isset($data['value'])) {
+                            $data = htmlspecialchars(is_array($data) ? $data['value'] : $data);
+                        }
                     }
-                }
-                continue;
+                    break;
+                case 'js':
+                    if (is_array($data)) {
+                        unset($data['status']);
+                    }
+                    break;
             }
         }
         return $data;
@@ -663,9 +726,9 @@ abstract class waContactField
     public function setParameters($param)
     {
         if (!is_array($param)) {
-            throw new waException('$param must be an array: '.print_r($param, TRUE));
+            throw new waException('$param must be an array: '.print_r($param, true));
         }
-        foreach($param as $p => $val) {
+        foreach ($param as $p => $val) {
             $this->setParameter($p, $val);
         }
     }
@@ -705,11 +768,11 @@ abstract class waContactField
     public function getHtmlOne($params = array(), $attrs = '')
     {
         $value = isset($params['value']) ? $params['value'] : '';
-        $ext = null;
-
+        $status = $ext = null;
         if (is_array($value)) {
             $ext = $this->getParameter('force_single') ? null : ifset($value['ext'], '');
-            $value = ifset($value['value'], '');
+            $status = ifset($value, 'status', '');
+            $value = ifset($value, 'value', '');
         }
 
         $name_input = $name = $this->getHTMLName($params);
@@ -722,7 +785,15 @@ abstract class waContactField
             $disabled = 'disabled="disabled"';
         }
 
-        $result = '<input '.$attrs.' '.$disabled.' type="text" name="'.htmlspecialchars($name_input).'" value="'.htmlspecialchars($value).'">';
+        $name = $this->getName(null, true);
+        if (!empty($params['placeholder'])) {
+            $attrs .= ' placeholder="'.$name.'"';
+        }
+        if ($status && wa()->getEnv() == 'backend') {
+            $attrs .= ' data-status="'.htmlspecialchars($status).'"';
+        }
+
+        $result = '<input '.$attrs.' title="'.$name.'" '.$disabled.' type="text" name="'.htmlspecialchars($name_input).'" value="'.htmlspecialchars($value).'">';
         if ($ext) {
             // !!! add a proper <select>?
             $result .= '<input type="hidden" '.$disabled.' name="'.htmlspecialchars($name.'[ext]').'" value="'.htmlspecialchars($ext).'">';
@@ -737,9 +808,9 @@ abstract class waContactField
         $errors_html = '';
         if (!empty($errors)) {
             if (!is_array($errors)) {
-                $errors = array((string) $errors);
+                $errors = array((string)$errors);
             }
-            foreach($errors as $error_msg) {
+            foreach ($errors as $error_msg) {
                 if (is_array($error_msg)) {
                     $error_msg = implode("<br>\n", $error_msg);
                 }
@@ -750,10 +821,6 @@ abstract class waContactField
             if (false === strpos($attrs, 'class="error')) {
                 $attrs .= ' class="error"';
             }
-        }
-
-        if (!empty($params['placeholder'])) {
-            $attrs .= ' placeholder="'.$this->getName(null, true).'"';
         }
 
         return $this->getHtmlOne($params, $attrs).$errors_html;
@@ -810,9 +877,13 @@ abstract class waContactField
     {
     }
 
+    /**
+     * @param $state
+     * @return waContactField
+     */
     public static function __set_state($state)
     {
-         return new $state['_type']($state['id'], $state['name'], $state['options']);
+        return new $state['_type']($state['id'], $state['name'], $state['options']);
     }
 
     public function prepareSave($value, waContact $contact = null)
@@ -820,4 +891,3 @@ abstract class waContactField
         return $value;
     }
 }
-

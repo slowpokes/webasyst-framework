@@ -17,17 +17,17 @@ class waLocale
     protected static $locale;
     protected static $domain;
     /**
-     * @var waLocaleAdapter
+     * @var waiLocaleAdapter
      */
     public static $adapter;
 
-    protected static $loaded = array();
+    protected static $loaded = [];
 
-    protected static $locale_info = array();
+    protected static $locale_info = [];
 
     protected static $init = false;
 
-    protected static $strings = array();
+    protected static $strings = [];
 
     protected function __construct() {}
     protected function __clone() {}
@@ -38,10 +38,12 @@ class waLocale
             self::$init = true;
             // Alias to gettext
 
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' || !function_exists('gettext')) {
+            if ($adapter) {
+                self::$adapter = $adapter;
+            } else if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' || !function_exists('gettext')) {
                 self::$adapter = new waLocalePHPAdapter();
             } else {
-                self::$adapter = $adapter ? $adapter :  new waLocaleAdapter();
+                self::$adapter = new waLocaleAdapter();
             }
         }
     }
@@ -67,8 +69,9 @@ class waLocale
      * @param string $domain
      * @param string $locale
      * @param string $msgid
-     * @deprecated
      * @return string translated string $msgid
+     * @throws waException
+     * @deprecated
      */
     public static function translate($domain, $locale, $msgid)
     {
@@ -82,11 +85,17 @@ class waLocale
         // load old locale
         if ($old_locale) {
             self::$locale = $old_locale;
+            //unset(self::$loaded[$old_locale][$domain]);
             self::loadByDomain($domain, $old_locale);
         }
         return $result;
     }
 
+    /**
+     * @param $domain
+     * @param null $locale
+     * @throws waException
+     */
     public static function loadByDomain($domain, $locale = null)
     {
         if ($locale === null) {
@@ -99,8 +108,7 @@ class waLocale
             $locale_path = waSystem::getInstance()->getAppPath('locale', $domain);
         }
         if (isset(self::$loaded[$locale][$domain])) {
-//            todo: do something
-//            return;
+            return;
         }
         if (file_exists($locale_path)) {
             self::load($locale, $locale_path, $domain, false);
@@ -110,13 +118,19 @@ class waLocale
     /**
      * Returns locale adapter
      *
-     * @return waLocaleAdapter|waLocalePHPAdapter
+     * @return waiLocaleAdapter
      */
     public static function getAdapter()
     {
         return self::$adapter;
     }
 
+    /**
+     * @param $locale
+     * @param $locale_path
+     * @param $domain
+     * @param bool $textdomain
+     */
     public static function load($locale, $locale_path, $domain, $textdomain = true)
     {
         if (!self::$locale || $textdomain) {
@@ -134,6 +148,11 @@ class waLocale
         return self::$domain;
     }
 
+    /**
+     * @param null $locale
+     * @return int|mixed
+     * @throws waException
+     */
     public static function getFirstDay($locale = null)
     {
         if (!$locale) {
@@ -143,6 +162,11 @@ class waLocale
         return isset($locale['first_day']) ? $locale['first_day'] : 1;
     }
 
+    /**
+     * @param $locale
+     * @return mixed|null
+     * @throws waException
+     */
     public static function getInfo($locale)
     {
         if (!isset(self::$locale_info[$locale])) {
@@ -159,6 +183,13 @@ class waLocale
         return self::$locale_info[$locale];
     }
 
+    /**
+     * @param $n
+     * @param null $decimals
+     * @param null $locale
+     * @return string
+     * @throws waException
+     */
     public static function format($n, $decimals = null, $locale = null)
     {
         if ($locale === null) {
@@ -177,7 +208,7 @@ class waLocale
             $decimals = $locale_info['frac_digits'];
         }
 
-        return number_format($n, $decimals, $locale_info['decimal_point'], $locale_info['thousands_sep']);
+        return number_format($n, $decimals, ifset($locale_info, 'decimal_point', '.'), ifset($locale_info, 'thousands_sep', ''));
     }
 
     /**
@@ -255,6 +286,11 @@ class waLocale
         return $data;
     }
 
+    /**
+     * @param $iso3
+     * @return string|null
+     * @throws waException
+     */
     public static function getByISO3($iso3)
     {
         switch ($iso3) {
@@ -284,6 +320,7 @@ class waLocale
      * @param array|string $arr strings in different locales, locale => string
      * @param string $locale defaults to current active locale
      * @return string
+     * @throws waException
      */
     public static function fromArray($arr, $locale=null)
     {
@@ -313,6 +350,7 @@ class waLocale
      * @param string|array $value
      * @param string $locale defaults to current system locale
      * @return string|array transliterated $value
+     * @throws waException
      */
     public static function transliterate($value, $locale=null)
     {
@@ -367,7 +405,10 @@ function _w($msgid1, $msgid2 = null, $n = null, $sprintf = true)
     }
 }
 
-/** Copy of sprintf() with the first (string) argument passed to _wp() beforehand. */
+/**
+ * Copy of sprintf() with the first (string) argument passed to _wp() beforehand.
+ * @throws waException
+ */
 function sprintf_wp()
 {
     $args = func_get_args();
@@ -383,6 +424,7 @@ function sprintf_wp()
  * @param int $n
  * @param bool $sprintf
  * @return string
+ * @throws waException
  */
 function _ws($msgid1, $msgid2 = null, $n = null, $sprintf = true)
 {
@@ -398,12 +440,17 @@ function _ws($msgid1, $msgid2 = null, $n = null, $sprintf = true)
  * @param int $n
  * @param bool $sprintf
  * @return string
+ * @throws waException
  */
 function _wd($domain, $msgid1, $msgid2 = null, $n = null, $sprintf = true)
 {
     if ($msgid1 === '' || $msgid1 === null) {
         return $msgid1;
     }
+
+    // load by domain already optimized - so just call it
+    waLocale::loadByDomain($domain);
+
     if ($msgid2 === null) {
         return waLocale::$adapter->dgettext($domain, $msgid1);
     } else {
@@ -424,12 +471,33 @@ function _wd($domain, $msgid1, $msgid2 = null, $n = null, $sprintf = true)
  * @param int $n
  * @param bool $sprintf
  * @return string
+ * @throws waException
  */
 function _wp($msgid1, $msgid2 = null, $n = null, $sprintf = true)
 {
-    if ($domain = wa()->getActiveLocaleDomain()) {
-        return _wd($domain, $msgid1, $msgid2, $n, $sprintf);
-    } else {
-        return _w($msgid1, $msgid2, $n, $sprintf);
+    $result = $msgid1;
+    $domain = null;
+
+    //get by themes
+    $themes = wa()->getActiveThemes();
+    while ($themes && $result === $msgid1) {
+        $domain = array_pop($themes);
+        $result = _wd($domain, $msgid1, $msgid2, $n, $sprintf);
     }
+
+    // Get by plugins
+    if ($result === $msgid1 && $domain = wa()->getActiveLocaleDomain()) {
+        $result = _wd($domain, $msgid1, $msgid2, $n, $sprintf);
+    }
+
+    // Get by apps
+    if (!$domain || $result === $msgid1) {
+        $result = _w($msgid1, $msgid2, $n, $sprintf);
+    }
+
+    // Get by system
+    if ($result === $msgid1) {
+        $result = _ws($msgid1, $msgid2, $n, $sprintf);
+    }
+    return $result;
 }

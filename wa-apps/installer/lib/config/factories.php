@@ -1,5 +1,6 @@
 <?php
 
 return array(
-    'view' => array('waSmarty3View'),
+    'front_controller' => 'installerFrontController',
+    'view'             => array('waSmarty3View'),
 );

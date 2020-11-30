@@ -1,0 +1,39 @@
+{if !empty($form_url)}
+{* Redirect *}
+<form id="paymentForm" action="{$form_url}" method="get" target="_top">
+    {foreach $hidden_fields as $name => $value}
+        <input type="hidden" name="{$name}" value="{$value|escape}"/>
+    {/foreach}
+    {if $auto_submit}
+        <i class="icon16 loading"></i>
+        <em>Перенаправление на сайт «Яндекс.Кассы» для оплаты...</em>
+        <br/>
+        <br/>
+    {/if}
+    <script type="text/javascript">
+        (function () {
+            var form = document.getElementById('paymentForm');
+            var timer = null;
+            {if $auto_submit}
+            timer = setTimeout(function () {
+                document.getElementById('paymentFormSubmit').setAttribute('disabled', 'disabled');
+                form.submit();
+            }, 3000);
+            {/if}
+            form.addEventListener("submit", function () {
+                document.getElementById('paymentFormSubmit').setAttribute('disabled', 'disabled');
+                if (timer) {
+                    clearTimeout(timer);
+                }
+            });
+        })();
+    </script>
+
+    <input id="paymentFormSubmit" type="submit" value="Оплатить заказ на сайте «Яндекс.Кассы»"/>
+</form>
+{elseif !empty($instruction)}
+{* External *}
+<p>{$instruction}
+    {else}
+    {* Direct *}
+    {/if}

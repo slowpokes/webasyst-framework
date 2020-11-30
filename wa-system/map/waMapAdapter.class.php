@@ -13,21 +13,43 @@ abstract class waMapAdapter
     /**
      * @param string|array $address - string or array(LAT, LNG)
      * @param array $options - map options
-     *             'width' => '50%',
-     *             'height' => '200px',
-     *             'zoom' => 12
+     *    int|string $option['width'] [optional] - width of map html dom element, for example '50%',
+     *    int|string $option['height'] [optional] - height of map html dom element, for example '200px',
+     *    int $option['zoom'] [optional] - zoom of map, for example 12
+     *
+     *
+     *   string  $options['on_error'] [optional] - What to do on error (for now supports only by yandex map adapter)
+     *     - 'show' - show error as it right on map html block
+     *     - 'function(e) { ... }' - anonymous js function
+     *     - any other NOT EMPTY string that is javascript function name in global scope (for example, console.log)
+     *     - <empty> - not handle map error
+     *
      * @return string
      */
     public function getHTML($address, $options = array())
     {
-        if (!$address) {
-            return '';
+        if ($address) {
+            if (is_string($address)) {
+                return $this->getByAddress($address, $options);
+            } elseif (is_array($address) && isset($address[0]) && isset($address[1])) {
+                return $this->getByLatLng($address[0], $address[1], $options);
+            }
         }
-        if (is_string($address)) {
-            return $this->getByAddress($address, $options);
-        } elseif (is_array($address) && isset($address[0]) && isset($address[1])) {
-            return $this->getByLatLng($address[0], $address[1], $options);
-        }
+        return '';
+    }
+
+    /**
+     * @param $address
+     * @return array <pre>
+     * array(
+     *  'lat'=>float,
+     *  'lng'=>float,
+     * )
+     * </pre>
+     */
+    public function geocode($address)
+    {
+        return array();
     }
 
     abstract public function getJs($html = true);
@@ -99,6 +121,23 @@ abstract class waMapAdapter
     protected function getSettingsKey()
     {
         return sprintf('map_adapter_%s', $this->getId());
+    }
+
+    protected function geocodingAllowed($allowed = null)
+    {
+        $sm = self::getSettingsModel();
+        $app_id = 'webasyst';
+        $name = 'geocoding.'.$this->getId();
+        if ($allowed === null) {
+            $last_geocoding = $sm->get($app_id, $name, 0);
+            return ((time() - $last_geocoding) >= 3600);
+        } elseif ($allowed) {
+            $sm->del($app_id, $name);
+            return true;
+        } else {
+            $sm->set($app_id, $name, time());
+            return false;
+        }
     }
 
     /**

@@ -11,7 +11,7 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: .\n"
 "Language: en_US\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 2.0.6\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: .\n"
 
@@ -26,29 +26,27 @@ msgid ""
 msgstr ""
 
 #: //wa-plugins/shipping/courier/lib/config/settings.php:23
-msgid "Estimated delivery time"
-msgstr ""
-
-#: //wa-plugins/shipping/courier/lib/config/settings.php:24
-msgid ""
-"Average order transit time. Estimated delivery date will be calculated "
-"automatically and shown to customer.<br><br>"
+msgid "Delivery time"
 msgstr ""
 
 #: //wa-plugins/shipping/courier/lib/config/settings.php:27
-msgid "Same day"
+msgid "Same workday, with the order ready time taken into account"
 msgstr ""
 
 #: //wa-plugins/shipping/courier/lib/config/settings.php:28
-msgid "Next day"
+msgid "Add one day to the order ready time"
 msgstr ""
 
 #: //wa-plugins/shipping/courier/lib/config/settings.php:29
-msgid "2-3 days"
+msgid "Add 2–3 days to the order ready time"
+msgstr ""
+
+#: //wa-plugins/shipping/courier/lib/config/settings.php
+msgid "Add 1–2 days to the order ready time"
 msgstr ""
 
 #: //wa-plugins/shipping/courier/lib/config/settings.php:30
-msgid "1 week"
+msgid "Add 7 days to the order ready time"
 msgstr ""
 
 #: //wa-plugins/shipping/courier/lib/config/settings.php:31
@@ -94,16 +92,11 @@ msgid "Shipping will be restricted to the selected region."
 msgstr ""
 
 #: //wa-plugins/shipping/courier/templates/settings.html:39
-msgid "City name"
+msgid "Locality name"
 msgstr ""
 
 #: //wa-plugins/shipping/courier/templates/settings.html:40
-msgid ""
-"If courier shipping is provided only within specific cities, enter the city "
-"names separated by comma so that customer is not be prompted to enter city "
-"name when this shipping option is selected; a city name will be "
-"automatically fetched as you specify it here. If this field is left blank, a "
-"customer will be prompted to enter a city name."
+msgid "If courier shipping is provided only within specific localities, enter the locality names separated by comma so that customer is not be prompted to enter a locality name when this shipping option is selected; a locality name will be automatically fetched as you specify it here. If this field is left blank, a customer will be prompted to enter a locality name."
 msgstr ""
 
 #: //wa-plugins/shipping/courier/templates/settings.html:46
@@ -171,4 +164,13 @@ msgid ""
 "Enter shipping rate as a flat rate, as a percent of cart total, or as a sum "
 "of both. Example: <b>20+10%%</b> will calculate shipping rate as 20 %s + 10%"
 "% of cart total."
+msgstr ""
+
+#: /wa-plugins/shipping/courier/lib/config/settings.php:38
+#: /wa-plugins/shipping/courier/lib/courierShipping.class.php:216
+msgid "Preferred delivery time"
+msgstr ""
+
+#: /wa-plugins/shipping/courier/templates/settings.html:106
+msgid "Enter shipping rate as a flat rate, as a percent of cart total, or as a sum of both. Example: <b>20+10%%</b> will calculate shipping rate as 20 %s + 10%% of cart total."
 msgstr ""

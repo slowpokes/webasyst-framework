@@ -56,7 +56,7 @@ class webasystGenerateDbCli extends waCliController
     private function printHelp()
     {
         if (preg_match('/^webasyst(\w+)Cli$/', __CLASS__, $matches)) {
-            $callback = create_function('$m', 'return strtolower($m[1]);');
+            $callback = wa_lambda('$m', 'return strtolower($m[1]);');
             $action = preg_replace_callback('/^([\w]{1})/', $callback, $matches[1]);
         } else {
             $action = '';
@@ -158,9 +158,6 @@ HELP;
                         }
                     }
                 } elseif ($app_id) {
-                    if (strpos($app_id, '/*') !== false) {
-                        //TODO
-                    }
                     $this->generateSchema($app_id, $tables);
                 }
             } catch (waDbException $ex) {
@@ -183,8 +180,15 @@ HELP;
     {
         $plugin_id = false;
         if (strpos($app_id, '/') !== false) {
-            list($app_id, $plugin_id) = explode('/', $app_id, 2);
-            $path = wa()->getConfig()->getAppsPath($app_id, 'plugins/'.$plugin_id.'/lib/config/db.php');
+            if (preg_match('@^(wa-plugins/)(shipping|payment)/(.+)$@', $app_id, $matches)) {
+                $type = $matches[2];
+                $app_id = $matches[1].$matches[2];
+                $plugin_id = $matches[3];
+                $path = wa()->getConfig()->getPath('plugins', $type.'/'.$plugin_id.'/lib/config/db.php');
+            } else {
+                list($app_id, $plugin_id) = explode('/', $app_id, 2);
+                $path = wa()->getConfig()->getAppsPath($app_id, 'plugins/'.$plugin_id.'/lib/config/db.php');
+            }
         } else {
             $path = wa()->getConfig()->getAppsPath($app_id, 'lib/config/db.php');
         }
@@ -218,6 +222,7 @@ HELP;
             } else {
                 $prefix = $app_id;
                 if ($plugin_id) {
+                    $prefix = preg_replace('@wa-plugins/(shipping|payment)@', 'wa_$1', $prefix);
                     $prefix .= '_'.$plugin_id;
                 } else {
 
@@ -244,7 +249,6 @@ HELP;
                     }
                 }
             }
-
             $tables = $this->getTables($prefix);
             $tables = array_diff($tables, $exclude);
         }
@@ -290,7 +294,10 @@ HELP;
                     $fields = ifset($compare['r']['FIELDS']);
                     $keys = ifset($compare['r']['KEYS']);
                     if (is_array($fields) || is_array($keys)) {
-                        $n = max(count($fields), count($keys));
+                        $n = max(
+                            is_array($fields) ? count($fields) : 0,
+                            is_array($keys) ? count($keys) : 0
+                        );
                         for ($i = 0; $i < $n; $i++) {
                             $this->printLine(
                                 $format,
@@ -298,8 +305,8 @@ HELP;
                                 $i ? ' ' : $compare['s'],
                                 $i ? '' : $t,
                                 $i ? '' : $compare['c'],
-                                ifset($fields[$i]),
-                                ifset($keys[$i])
+                                is_array($fields) ? ifset($fields[$i]) : '',
+                                is_array($keys) ? ifset($keys[$i]) : ''
                             );
                         }
                     } else {
@@ -343,7 +350,6 @@ HELP;
 
     private function getPlugins($app_id)
     {
-        $plugins = array();
         if (SystemConfig::isDebug()) {
             $plugins = waFiles::listdir(wa()->getConfig()->getAppsPath($app_id, 'plugins/'));
             foreach ($plugins as $_id => $_plugin_id) {
@@ -383,8 +389,7 @@ HELP;
         $format .= "\n";
 
         if ($data) {
-            array_unshift($data, $format);
-            $print = call_user_func_array('sprintf', $data);
+            $print = vsprintf($format, $data);
         } else {
             $print = preg_replace_callback('@%\-?(\d*)s@', array($this, 'lineCallback'), $format);
         }

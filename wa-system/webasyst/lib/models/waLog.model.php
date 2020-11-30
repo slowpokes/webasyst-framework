@@ -44,7 +44,7 @@ class waLogModel extends waModel
 
         if ($params !== null) {
             if (is_array($params)) {
-                $params = json_encode($params);
+                $params = waUtils::jsonEncode($params);
             }
             $data['params'] = $params;
         }
@@ -53,7 +53,7 @@ class waLogModel extends waModel
 
     public function getLogs($where = array())
     {
-        $where_string = "l.action != 'login' AND l.action != 'logout'";
+        $where_string = "l.action != 'login' AND l.action != 'logout' AND l.action != 'login_failed'";
         if (!empty($where['max_id'])) {
             $where_string .= ' AND l.id < ' . (int)$where['max_id'];
             unset($where['max_id']);
@@ -67,8 +67,8 @@ class waLogModel extends waModel
             $where_string .= ' AND (' . $this->getWhereByField($where) . ')';
         }
         $sql = "SELECT l.*, c.name contact_name, c.photo contact_photo, c.firstname, c.lastname, c.middlename,
-c.company, c.is_company, c.is_user
-                FROM " . $this->table . " l
+c.company, c.is_company, c.is_user, c.login
+                FROM ".$this->table." l
                 LEFT JOIN wa_contact c ON l.contact_id = c.id
                 WHERE " . $where_string . "
                 ORDER BY l.id DESC

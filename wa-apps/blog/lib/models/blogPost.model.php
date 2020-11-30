@@ -37,7 +37,7 @@ SQL;
             $where[] = $this->getWhereByField('status', self::STATUS_PUBLISHED);
             if ($blogs !== false) {
                 $where[] = $this->getWhereByField('blog_id', $blogs);
-                if (count($blogs) > 1) {
+                if (count((array)$blogs) > 1) {
                     $use_blog_id = false;
                 }
             } else {
@@ -339,6 +339,10 @@ SQL;
                         if (!isset($this->sql_params[$properties])) {
                             $this->sql_params[$properties] = $values;
                         } else {
+                            if (!is_array($this->sql_params[$properties])) {
+                                $this->sql_params[$properties] = array($this->sql_params[$properties]);
+                            }
+
                             $this->sql_params[$properties] = array_merge($this->sql_params[$properties], $values);
                         }
                     }
@@ -651,6 +655,8 @@ SQL;
                     break;
             }
         }
+
+        $data['update_datetime'] = date("Y-m-d H:i:s");
 
         if (!$id && (!isset($data['contact_id']) || !$data['contact_id'])) {
             $data['contact_id'] = wa()->getUser()->getId();

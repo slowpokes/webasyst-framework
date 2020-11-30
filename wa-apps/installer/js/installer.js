@@ -74,20 +74,37 @@ String.prototype.translate = function () {
     }
 })();
 
+
+/**
+ * @typedef {object} installerState
+ * @property {string} stage_status,
+ * @property {number} timestamp
+ */
+/**
+ * @typedef {object} installerStateData
+ * @property {installerState[]} state,
+ * @property {installerState} current_state
+ */
+
+
 (function ($) {
     $.installer = {
         options: {
+            cache_url: '?module=settings&action=clearCache',
             redirect_url: null,
             redirect_timeout: 3000, /*ms*/
             updateStateInterval: 2000, /* ms */
             updateStateErrorInterval: 6000, /* ms */
             queue: [],
             install: false,
+            trial: false,
+            trial_dir: null,
             logMode: 'raw', /* raw|apps */
             timestamp: null,
             end: null
         },
         timeout: {
+            /** @var int|null **/
             state: null
         },
         counter: 0,
@@ -125,11 +142,6 @@ String.prototype.translate = function () {
             $(window).resize(function () {
                 self.onResize();
             });
-
-            //if count autosubmit && app_id
-            if (this.options.auto_submit) {
-                console.log('It go to update!', $(':input[name^="app_id\["]').length);
-            }
         },
 
         helper: {
@@ -159,11 +171,16 @@ String.prototype.translate = function () {
              * @returns {string}
              */
             subject: function (target) {
-                var matches;
-                var subject = 'generic';
-                if (target.match(/^wa-apps/)) {
+                var matches,
+                    subject = 'generic',
+                    trial_dir = ($.installer.options.trial_dir) ? $.installer.options.trial_dir.replace(/\//g,"\\\/") : null,
+                    trial_regexp = (trial_dir) ? new RegExp('^' + trial_dir +'\\\w+\/(\\\w+)') : null;
 
+                if (target.match(/^wa-apps/) || (trial_dir && target.match(trial_regexp))) {
                     if (matches = target.match(/^wa-apps\/\w+\/(\w+)/)) {
+                        subject = 'app_' + matches[1];
+                        /* it's extras */
+                    } else if (matches = target.match(trial_regexp)) {
                         subject = 'app_' + matches[1];
                         /* it's extras */
                     } else {
@@ -247,7 +264,8 @@ String.prototype.translate = function () {
                 thread_id: this.thread_id,
                 app_id: apps,
                 mode: this.options.logMode,
-                install: this.options.install ? '1' : '0'
+                install: this.options.install ? '1' : '0',
+                trial: this.options.trial ? '1' : '0'
             };
             var self = this;
             this.sendRequest(url, params, function (data) {
@@ -292,7 +310,7 @@ String.prototype.translate = function () {
                 for (var id in data.sources) {
                     if (data.sources.hasOwnProperty(id)) {
                         subject = this.helper.subject(data.sources[id].target);
-                        if (subject != 'generic') {
+                        if (subject !== 'generic') {
                             if (!complete_result[subject]) {
                                 complete_result[subject] = {
                                     success: 0,
@@ -330,7 +348,7 @@ String.prototype.translate = function () {
                 setTimeout(function () {
                     var targetOffset = $('div.i-app-update-screen :last').offset().top;
                     $('div.i-app-update-screen').scrollTop(targetOffset);
-                    self.redirectOnComplete();
+                    self.redirectOnComplete(data);
                     self.animateOnInstall();
                 }, 500);
             }, 500);
@@ -345,13 +363,7 @@ String.prototype.translate = function () {
 
         /**
          *
-         * @param {
-         *      {
-         *          {string}stage_status,
-         *          {number}timestamp
-         *      }current_state,
-         *      {Array}state
-         *  } data
+         * @param {installerStateData} data
          */
         updateStateHandler: function (data) {
             this.trace('stateHandler', data);
@@ -361,28 +373,27 @@ String.prototype.translate = function () {
             var self = this;
             try {
                 if (this.complete) {
-                    this.redirectOnComplete();
+                    this.redirectOnComplete(data);
                 } else {
                     /* update/add stage info */
-                    /* (parseInt(data.current_state.stage_elapsed_time) > 3)*/
                     var draw = false;
                     var date = new Date();
                     var interval = data.current_state ? Math.abs(this.offset - (date.getTime() / 1000 - parseInt(data.current_state.timestamp))) : null;
                     var state_is_actual = data.current_state && (interval < 15);
                     if (state_is_actual) {
-                        if (data.current_state.stage_status == 'error') {
+                        if (data.current_state.stage_status === 'error') {
                             draw = true;
-                        } else if ((data.current_state.stage_status == 'complete') && (data.current_state.stage_name == 'update')) {
+                        } else if ((data.current_state.stage_status === 'complete') && (data.current_state.stage_name === 'update')) {
                             draw = true;
                         }
                     }
                     if (draw) {
-                        this.drawStateInfo(data.state, (data.current_state.stage_status == 'error') ? 'no' : 'yes');
+                        this.drawStateInfo(data.state, (data.current_state.stage_status === 'error') ? 'no' : 'yes');
                         $.tmpl('application-update-result', {
                             current_state: data.current_state,
                             result: null
                         }).appendTo('#update-raw');
-                    } else if (state_is_actual && data.state && (data.current_state.stage_status != 'none')) {
+                    } else if (state_is_actual && data.state && (data.current_state.stage_status !== 'none')) {
                         this.drawStateInfo(data.state);
 
                         this.timeout.state = setTimeout(function () {
@@ -421,6 +432,11 @@ String.prototype.translate = function () {
             }, this.options.updateStateErrorInterval);
         },
 
+        /**
+         *
+         * @param {installerState[]} state
+         * @param state_class
+         */
         drawStateInfo: function (state, state_class) {
             /**
              * @todo check timestamp
@@ -484,12 +500,18 @@ String.prototype.translate = function () {
             }, 100);
         },
 
-        redirectOnComplete: function () {
+        redirectOnComplete: function (data) {
             /* @todo verify that there no fails */
+            this.clearCache();
+
+            var redirect_url = (data['design_redirect'] || null);
             if (this.options.redirect_url) {
-                var self = this;
+                redirect_url = this.options.redirect_url;
+            }
+
+            if (redirect_url) {
                 setTimeout(function () {
-                    window.location = self.options.redirect_url;
+                    window.location = redirect_url;
                 }, this.options.redirect_timeout);
             }
         },
@@ -520,35 +542,25 @@ String.prototype.translate = function () {
                 var animate_params = {
                     left: target.left,
                     top: target.top
-                    /*
-                     * , 'width':$(this).find('img').width()+'px', 'height':$(this).find('img').height()+'px'
-                     */
-
                 };
                 var css_params = {
                     top: position.top,
                     left: position.left,
                     position: 'absolute',
-                    display: 'inline-block'/*
-                     * 'width':'0px', 'height':'0px', 'overflow':'hidden', 'color':'transparent'
-                     */
+                    display: 'inline-block'
                 };
                 var css_params_complete = {
                     top: 0,
                     left: 0,
                     position: 'relative',
-                    display: 'inline-block'/*
-                     * , 'width':$(this).width()+'px', 'height':$(this).height()+'px' 'color':$(this).css('color')
-                     */
+                    display: 'inline-block'
                 };
 
                 $this.css(css_params);
-                /* $(this).find('a').css('color','transparent'); */
                 var $element = $this;
                 $this.animate(animate_params, 700, function () {
 
                     $element.css(css_params_complete);
-                    /* element.find('a').css('color',null); */
                     if ($item_edition.length) {
                         $item_edition.replaceWith($element);
                     } else {
@@ -556,7 +568,6 @@ String.prototype.translate = function () {
                             $element.appendTo($app_menu);
                         } else {
                             $element.prependTo($app_menu);
-                            /* .effect('highlight',{},10000); */
                         }
                     }
                     $(window).resize();
@@ -570,9 +581,6 @@ String.prototype.translate = function () {
          * @param {*=} data
          */
         trace: function (stage, data) {
-            /*
-             * TODO
-             */
         },
 
         sendRequest: function (url, request_data, success_handler, error_handler, before_send_handler) {
@@ -586,12 +594,12 @@ String.prototype.translate = function () {
                 success: function (data, textStatus) {
                     try {
                         try {
-                            if (typeof(data) != 'object') {
+                            if (typeof(data) !== 'object') {
                                 data = $.parseJSON(data);
                             }
                         } catch (e) {
                             console.error('Invalid server JSON response', e);
-                            if (typeof(error_handler) == 'function') {
+                            if (typeof(error_handler) === 'function') {
                                 error_handler();
                             }
                             throw e;
@@ -600,32 +608,32 @@ String.prototype.translate = function () {
                             switch (data.status) {
                                 case 'fail' :
                                     self.displayMessage(data.errors.error || data.errors, 'error');
-                                    if (typeof(error_handler) == 'function') {
+                                    if (typeof(error_handler) === 'function') {
                                         error_handler(data);
                                     }
                                     break;
                                 case 'ok' :
-                                    if (typeof(success_handler) == 'function') {
+                                    if (typeof(success_handler) === 'function') {
                                         success_handler(data.data);
                                     }
                                     break;
                                 default :
                                     console.error('unknown status response', data.status);
-                                    if (typeof(error_handler) == 'function') {
+                                    if (typeof(error_handler) === 'function') {
                                         error_handler(data);
                                     }
                                     break;
                             }
                         } else {
                             console.error('empty response', textStatus);
-                            if (typeof(error_handler) == 'function') {
+                            if (typeof(error_handler) === 'function') {
                                 error_handler();
                             }
                             self.displayMessage('Empty server response', 'warning');
                         }
                     } catch (e) {
                         console.error('Error handling server response ', e);
-                        if (typeof(error_handler) == 'function') {
+                        if (typeof(error_handler) === 'function') {
                             error_handler(data);
                         }
                         self.displayMessage('Invalid server response' + '<br>' + e.description, 'error');
@@ -634,7 +642,7 @@ String.prototype.translate = function () {
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     console.error('AJAX request error', [textStatus, errorThrown]);
-                    if (typeof(error_handler) == 'function') {
+                    if (typeof(error_handler) === 'function') {
                         error_handler();
                     }
                     self.displayMessage('AJAX request error', 'warning');
@@ -643,6 +651,29 @@ String.prototype.translate = function () {
             });
         },
         displayMessage: function (message, type) {
+
+        },
+
+        clearCache: function () {
+            if (this.options.cache_url) {
+                $.ajax({
+                    url: this.options.cache_url,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: this.responseHandler
+                });
+            }
+        },
+        responseHandler: function (data) {
+            var self = $.installer;
+            try {
+                if (data.status !== 'ok') {
+                    setTimeout(function () {
+                        self.clearCache()
+                    }, 3000);
+                }
+            } catch (e) {
+            }
 
         }
     }

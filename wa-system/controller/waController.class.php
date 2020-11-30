@@ -19,6 +19,7 @@ abstract class waController
     {
         $this->preExecute();
         $this->execute();
+        $this->afterExecute();
     }
 
     protected function preExecute()
@@ -27,6 +28,10 @@ abstract class waController
     }
 
     protected function preExecute2(){}//VADIM CODE
+    protected function afterExecute()
+    {
+        // nothing to do.. can be redefined in subclasses
+    }
 
     /**
      *
@@ -158,14 +163,22 @@ abstract class waController
 
     public function redirect($params = array(), $code = null)
     {
+        $url = $this->unpackRedirectParams($params);
+        wa()->getResponse()->redirect($url, $code);
+    }
+
+    protected function unpackRedirectParams($params = array())
+    {
         if ((!is_array($params) && $params)) {
             $params = array(
                 'url' => $params
             );
         }
+
         if (isset($params['url']) && $params['url']) {
-            wa()->getResponse()->redirect($params['url'], $code);
+            return $params['url'];
         }
+
         if ($params) {
             $url = waSystem::getInstance()->getUrl();
             $i = 0;
@@ -175,9 +188,9 @@ abstract class waController
         } else {
             $url = waSystem::getInstance()->getConfig()->getCurrentUrl();
         }
-        wa()->getResponse()->redirect($url, $code);
-    }
 
+        return $url;
+    }
 
     public function appSettings($name, $default = '')
     {

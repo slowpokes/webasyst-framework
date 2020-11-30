@@ -1,9 +1,11 @@
 <?php
 return array(
-    'name'        => 'WebMoney',
-    'description' => 'Прием платежей через платежную систему <a href="http://www.webmoney.ru">WebMoney</a>',
-    'icon'        => 'img/webmoney16.png',
-    'logo'        => 'img/webmoney.png',
-    'vendor'      => 'webasyst',
-    'version'     => '1.0.1',
+    'name'           => 'PayMaster (WebMoney)',
+    'description'    => 'Прием платежей через платежную систему <a href="http://www.paymaster.ru">PayMaster (WebMoney)</a>',
+    'icon'           => 'img/paymaster16.png',
+    'logo'           => 'img/paymaster.png',
+    'vendor'         => 'webasyst',
+    'version'        => '2.1.2',
+    'partial_refund' => true,
+    'type'           => waPayment::TYPE_ONLINE,
 );

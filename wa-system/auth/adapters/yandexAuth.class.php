@@ -9,6 +9,8 @@
 
 class yandexAuth extends waOAuth2Adapter
 {
+    protected $check_state = true;
+
     public function getRedirectUri()
     {
         return "https://oauth.yandex.ru/authorize?response_type=code&client_id=".$this->app_id;
@@ -17,8 +19,8 @@ class yandexAuth extends waOAuth2Adapter
     public function getControls()
     {
         return array(
-            'app_id' => 'Id приложения',
-            'app_secret' => 'Пароль приложения'
+            'app_id'     => _ws('Yandex app ID'),
+            'app_secret' => _ws('Yandex app secret'),
         );
     }
 

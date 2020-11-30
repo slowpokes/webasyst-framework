@@ -10,6 +10,10 @@ class siteDomainsSaveController extends waJsonController
             return;
         }
 
+        $name = trim($name);
+        $original_name = $name; // as was input before any idn encoding
+
+
         $domain_model = new siteDomainModel();
         $data = array();
         if (!preg_match('!^[a-z0-9/\._-]+$!i', $name)) {
@@ -20,7 +24,8 @@ class siteDomainsSaveController extends waJsonController
         $data['name'] = $name;
 
         if ($domain_model->getByName($name)) {
-            $this->errors = sprintf(_w("Website with a domain name %s is already registered in this Webasyst installation. Delete %s website (Site app > Settings > %s) to be able to use it's domain name for another website."), $name, $name, $name);
+            $error_txt = _w("Website with a domain name %s is already registered in this Webasyst installation. Delete %s website (Site app > Settings > %s) to be able to use it's domain name for another website.");
+            $this->errors = sprintf($error_txt, $original_name, $original_name, $original_name);
             return;
         }
 

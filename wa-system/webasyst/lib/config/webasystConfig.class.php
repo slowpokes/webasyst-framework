@@ -12,6 +12,31 @@ class webasystConfig extends waAppConfig
         return $this->getRootPath()."/wa-widgets/".$widget_id;
     }
 
+    public function getLogActions($full = false, $ignore_system = false)
+    {
+        $result = array(
+            'contact_edit' => array(
+                'name' => _ws('edited contact')
+            ),
+        );
+        if (!$ignore_system) {
+            $result = array_merge($result, $this->getSystemLogActions());
+        }
+        return $result;
+    }
+
+    public function onCount()
+    {
+        wa('webasyst');
+        webasystHelper::backgroundClearCache();
+
+        $n = array(
+            //'settings' => 1,
+        );
+
+        return $n;
+    }
+
     public function initUserWidgets($force = false, waContact $contact = null)
     {
         if (!$contact) {
@@ -115,6 +140,167 @@ class webasystConfig extends waAppConfig
             }
         }
         return array();
+    }
+
+    public function throwFrontControllerDispatchException()
+    {
+        // see waFrontController
+        // When route is not found in backend routing, usually app throws exception.
+        // But since internal webasyst app is also responsible for dashboard,
+        // we skip here to use defaults. Complicated.
+    }
+
+    /**
+     * CheatSheet help for webasyst/webasyst/settings/email/template/ pages
+     * @return array
+     */
+    public function getEmailChannelTemplatesHelp()
+    {
+        // Here will be vars for each Email template
+        $email_template_vars = array();
+
+        // "Empty" Email channel, need to extract template names
+        $email_channel = waVerificationChannel::factory(waVerificationChannelModel::TYPE_EMAIL);
+
+        // List of templates: template_id => localized template name
+        $template_list = $email_channel->getTemplatesList();
+
+        // Name of vars tabs
+        $vars_tab_names = array();
+
+        foreach ($template_list as $template_name => $loc_template_name) {
+
+            // template vars
+            $vars = $email_channel->getTemplateVars($template_name, true);
+
+            // each var name need to prefix with $
+            // for it separate keys and values, prefix each key with $ and than combine arrays back
+            $var_names = array_keys($vars);
+            $var_values = array_values($vars);
+            $var_names = array_map(wa_lambda('$name', 'return \'$\' . $name;'), $var_names);
+            $vars = array_combine($var_names, $var_values);
+
+            // vars for each email template put into own section
+            $email_template_vars[ 'email_template_' . $template_name ] = $vars;
+
+            // name of tab where this vars enumerated
+            $vars_tab_names[ 'email_template_' . $template_name ] = $loc_template_name;
+        }
+
+
+        // If you need to add new vars not related with Email templates merge they with $email_template_vars
+        return array(
+            'vars_tab_names' => $vars_tab_names,
+            'vars' => $email_template_vars
+        );
+    }
+
+    /**
+     * CheatSheet help for webasyst/webasyst/settings/sms/template/ pages
+     * @return array
+     */
+    public function getSMSChannelTemplatesHelp()
+    {
+        // Here will be vars for each SMS template
+        $sms_template_vars = array();
+
+        // "Empty" SMS channel, need to extract template names
+        $sms_channel = waVerificationChannel::factory(waVerificationChannelModel::TYPE_SMS);
+
+        // List of templates: template_id => localized template name
+        $template_list = $sms_channel->getTemplatesList();
+
+        foreach ($template_list as $template_name => $loc_template_name) {
+
+            // template vars
+            $vars = $sms_channel->getTemplateVars($template_name, true);
+
+            // each var name need to prefix with $
+            // for it separate keys and values, prefix each key with $ and than combine arrays back
+            $var_names = array_keys($vars);
+            $var_values = array_values($vars);
+            $var_names = array_map(wa_lambda('$name', 'return \'$\' . $name;'), $var_names);
+            $vars = array_combine($var_names, $var_values);
+
+            // merge all vars
+            foreach ($vars as $var => $description) {
+                if (!isset($sms_template_vars['sms_templates'][$var])) {
+                    $sms_template_vars['sms_templates'][$var] = array();
+                }
+                $sms_template_vars['sms_templates'][$var][] = sprintf(_ws('<strong>%s</strong> in <strong>%s</strong> template.'), $description, $loc_template_name);
+            }
+        }
+
+        // join descriptions into strings
+        foreach ($sms_template_vars['sms_templates'] as $var => &$descriptions) {
+            $descriptions = join("<br>", $descriptions);
+        }
+        unset($descriptions);
+
+        // If you need to add new vars not related with Email templates merge they with $email_template_vars
+        return array(
+            'vars_tab_names' => array('sms_templates' => _ws('SMS templates')),
+            'vars' => $sms_template_vars
+        );
+    }
+
+    /**
+     * CheatSheet help for webasyst/webasyst/settings/email/template/ pages
+     *   +
+     * CheatSheet help for webasyst/webasyst/settings/sms/template/ pages
+     *
+     * @return array
+     */
+    public function getAllChannelTemplatesHelp()
+    {
+        $email_templates_help = $this->getEmailChannelTemplatesHelp();
+        $sms_templates_help = $this->getSMSChannelTemplatesHelp();
+        return array(
+            'vars_tab_names' => $email_templates_help['vars_tab_names'] + $sms_templates_help['vars_tab_names'],
+            'vars' => $email_templates_help['vars'] + $sms_templates_help['vars']
+        );
+
+    }
+
+    /**
+     * Get identity hash (aka installation hash)
+     * @return string
+     */
+    public function getIdentityHash()
+    {
+        $value = $this->getSystemOption('identity_hash');
+        if (is_scalar($value)) {
+            return strval($value);
+        }
+        return '';
+    }
+
+    public function dispatchAppToken($data)
+    {
+        $app_tokens_model = new waAppTokensModel();
+
+        // Unknown token type?
+        if ($data['type'] != 'webasyst_id_invite') {
+            $app_tokens_model->deleteById($data['token']);
+            throw new waException("Page not found", 404);
+        }
+
+        // Make sure contact is still ok
+        $contact = new waContact($data['contact_id']);
+        if (!$contact->exists() || $contact['is_user'] < 0) {
+            $app_tokens_model->deleteById($data['token']);
+            throw new waException("Page not found", 404);
+        }
+
+        $auth = wa()->getAuth();
+        $auth->auth(['id' => $contact->getId()]);
+
+        $webasyst_id_auth = new waWebasystIDWAAuth();
+
+        // bind webasyst id
+        $url = $webasyst_id_auth->getUrl();
+        wa()->getResponse()->redirect($url);
+
     }
 }
 

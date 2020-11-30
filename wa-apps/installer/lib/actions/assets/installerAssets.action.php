@@ -16,26 +16,15 @@ class installerAssetsAction extends waViewAction
 {
     public function execute()
     {
-        $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
-        if (!waRequest::get('_')) {
-            $this->setLayout(new installerBackendLayout());
-            if ($messages) {
-                $this->getLayout()->assign('messages', $messages);
-            }
-        } else {
-            $this->view->assign('messages', $messages);
-        }
-
+        $messages = array();
 
         try {
-            $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
-
             $options = array(
-                'installed'    => true, //list all local apps
-                'requirements' => true, //check system requirements
-                'action'       => true,//strict checking requirements
-                'system'       => true, //include system plugins
-                'status'       => false,//check app status at app.php
+                'installed'    => true,  // list all local apps
+                'requirements' => true,  // check system requirements
+                'action'       => true,  // strict checking requirements
+                'system'       => true,  // include system plugins
+                'status'       => false, // check app status at app.php
 
                 'filter' => (array)waRequest::get('filter'),
             );
@@ -63,7 +52,7 @@ class installerAssetsAction extends waViewAction
             $types_options = array(
                 'plugins' => array(
                     'system' => true,
-                )
+                ),
             );
 
             $extras_options = array(
@@ -89,13 +78,23 @@ class installerAssetsAction extends waViewAction
                     }
                 }
             }
+
             $this->view->assign('items', $items);
 
-
         } catch (Exception $ex) {
+            // Save the error in the log and add to the common array
             installerHelper::handleException($ex, $messages);
         }
-        $this->view->assign('messages', $messages);
+
+        if (!waRequest::get('_')) {
+            $this->setLayout(new installerBackendStoreLayout());
+            // If we get the messages in action - override the messages from the layout?
+            if ($messages) {
+                $this->getLayout()->assign('messages', $messages);
+            }
+        } elseif ($messages) {
+            $this->view->assign('messages', $messages);
+        }
 
         $this->view->assign('title', _w('Assets'));
     }

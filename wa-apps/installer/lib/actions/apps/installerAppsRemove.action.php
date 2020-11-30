@@ -29,7 +29,8 @@ class installerAppsRemoveAction extends waViewAction
         $app_ids = waRequest::request('app_id');
         try {
             if (installerHelper::isDeveloper()) {
-                throw new waException(_w('Unable to delete application (developer version is on)'));
+                throw new waException(_w('Unable to delete the app (developer mode is on).').
+                    "\n"._w("A .git or .svn directory has been detected. To ignore the developer mode, add option 'installer_in_developer_mode' => true to wa-config/config.php file."));
             }
 
             if (!$app_ids || !is_array($app_ids)) {
@@ -82,28 +83,27 @@ class installerAppsRemoveAction extends waViewAction
 
     private function deleteApp($app_id)
     {
+        // app_id and app plugins
+        $deleted_extras_slug = array($app_id);
+
         //remove db tables and etc
 
         $paths = array();
 
-        /**
-         * @var waAppConfig
-         */
-
+        /** @var waAppConfig */
         $system = wa($app_id);
         $system->setActive($app_id);
         $app = SystemConfig::getAppConfig($app_id);
         $info = $app->getInfo();
         $name = _wd($app_id, $info['name']);
-        /**
-         * @var waAppConfig $config ;
-         */
+        /** @var waAppConfig $config */
         $config = $system->getConfig();
 
         if (!empty($info['plugins'])) {
             $plugins = $config->getPlugins();
             foreach ($plugins as $plugin => $enabled) {
                 try {
+                    $system->setActive($app_id);
                     if ($enabled && ($plugin_instance = $system->getPlugin($plugin))) {
                         $plugin_instance->uninstall();
                     }
@@ -114,15 +114,36 @@ class installerAppsRemoveAction extends waViewAction
 
                 //wa-apps/$app_id/plugins/$slug
                 $paths[] = wa()->getAppPath("plugins/".$plugin, $app_id);
+                $deleted_extras_slug[] = $app_id.'/plugins/'.$plugin;
                 while ($paths) {
                     waFiles::delete(array_shift($paths), true);
                 }
                 $paths = array();
+
+                $params = array(
+                    'type' => 'plugins',
+                    'id'   => sprintf('%s/%s', $app_id, $plugin),
+                    'ip'   => waRequest::getIp(),
+                );
+
+                $system->setActive('installer');
+                $this->logAction('item_uninstall', $params);
             }
         }
 
         $config->uninstall();
         $this->cleanupApp($app_id);
+
+        $system->setActive('installer');
+
+        $params = array(
+            'type' => 'apps',
+            'id'   => $app_id,
+            'ip'   => waRequest::getIp(),
+        );
+
+        $this->logAction('item_uninstall', $params);
+        $this->updateFactProducts($deleted_extras_slug);
         return $name;
     }
 
@@ -165,5 +186,17 @@ class installerAppsRemoveAction extends waViewAction
             }
         }
         return $app_id;
+    }
+
+    /**
+     * Informs the remote update server about changes to the installation package
+     * @param $list
+     */
+    private function updateFactProducts($list)
+    {
+        if (!empty($list)) {
+            $sender = new installerUpdateFact(installerUpdateFact::ACTION_DEL, $list);
+            $sender->query();
+        }
     }
 }

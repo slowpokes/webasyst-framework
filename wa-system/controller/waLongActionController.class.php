@@ -74,6 +74,8 @@
  * @property array $data
  * @property-read resource $fd
  * @property-read boolean $newProcess
+ * @property-read int $current_exec_time    since 1.8.2
+ * @property-read int $remaining_exec_time  since 1.8.2
  * @property-read int $max_exec_time
  * @property-read int $isRunner
  */
@@ -227,6 +229,14 @@ abstract class waLongActionController extends waController
     );
 
     /**
+     * Contains microtime of start of current script run.
+     * Used to calculate $this->current_exec_time and $this->remaining_exec_time
+     * @since 1.8.2
+     * @var float
+     */
+    private $_start_time = 0.0;
+
+    /**
      * Contains microtime and resets on start of the Runner and on each save() that writes to disk.
      * Used to measure total time of the process.
      * @var float
@@ -240,6 +250,9 @@ abstract class waLongActionController extends waController
      */
     protected $_read_attempt_limit = 5;
 
+    /**
+     * @throws waException
+     */
     public function execute()
     {
         $this->initEnv();
@@ -796,6 +809,12 @@ abstract class waLongActionController extends waController
             case 'max_exec_time':
                 $np = $this->_max_exec_time;
                 return $np; // not by reference
+            case 'current_exec_time':
+                $np = microtime(true) - $this->_start_time;
+                return $np; // not by reference
+            case 'remaining_exec_time':
+                $np = $this->_max_exec_time - (microtime(true) - $this->_start_time);
+                return $np; // not by reference
             default:
                 throw new waException('Unknown property: '.$field);
         }
@@ -835,13 +854,14 @@ abstract class waLongActionController extends waController
         $retry = 5;
         while (true) {
             $retry--;
-            $success = file_put_contents($filename, $data);
+            $success = @file_put_contents($filename, $data);
             if ($success !== false) {
                 return $success;
-            } else if ($retry <= 0) {
+            } elseif ($retry <= 0) {
                 return false;
             } else {
                 sleep(1);
+                waFiles::create(dirname($filename), true);
             }
         }
     }
@@ -849,7 +869,7 @@ abstract class waLongActionController extends waController
     protected function get($filename)
     {
         $retry = 5;
-        while (($res = file_get_contents($filename)) === false) {
+        while (($res = @file_get_contents($filename)) === false) {
             if (!$retry--) {
                 break;
             }
@@ -868,22 +888,21 @@ abstract class waLongActionController extends waController
 
     protected function initEnv()
     {
+        $this->_start_time = microtime(true);
+
+        // We'll try to increase execution time limit.
+        // It doesn't always work, but it doesn't hurt either.
+        // (Less than 5 minutes - common timeout for nginx)
+        @set_time_limit(287);
+
         // How much time we can safely run?
         $this->_max_exec_time = ini_get('max_execution_time');
         if ($this->_max_exec_time <= 0) {
-            $this->_max_exec_time = false;
+            $this->_max_exec_time = 300;
         }
-
-        // We'll try to disable execution time limit.
-        // It doesn't always work, but it doesn't hurt either.
-        @set_time_limit(900);
 
         // Depending on total time limit, determine how often we'd like to write data to file.
-        if ($this->_max_exec_time) {
-            $this->_chunk_time = min(10, $this->_max_exec_time / 6);
-        } else {
-            $this->_chunk_time = 7;
-        }
+        $this->_chunk_time = min(9, $this->_max_exec_time / 6);
     }
 }
 

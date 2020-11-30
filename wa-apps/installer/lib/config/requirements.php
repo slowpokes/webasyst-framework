@@ -15,7 +15,7 @@
 return array(
     'php'                                                                                            => array(
         'strict'  => true,
-        'version' => '>5.2',
+        'version' => '>=5.6.25',
     ),
     'php.curl'                                                                                       => array(
         'description' => 'Get updates information from update servers',
@@ -42,4 +42,3 @@ return array(
     ),
 
 );
-//EOF

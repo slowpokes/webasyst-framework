@@ -9,10 +9,14 @@ class waPluginsActions extends waActions
     public function defaultAction()
     {
         $template = $this->getTemplatePath();
+
+        $installer_available = wa()->appExists('installer') && $this->getUser()->getRights('installer', 'backend');
+        $installer_available = $installer_available && is_readable(wa()->getConfig()->getRootPath().'/wa-installer/lib/config/sources.php');
+
         $this->display(array(
             'plugins_hash' => $this->plugins_hash,
             'plugins'      => $this->getConfig()->getPlugins(),
-            'installer'    => $this->getUser()->getRights('installer', 'backend'),
+            'installer'    => $installer_available,
             'is_ajax'      => $this->is_ajax,
             'shadowed'     => $this->shadowed,
         ), $template);
@@ -59,6 +63,8 @@ class waPluginsActions extends waActions
         }
         $template = $this->getTemplatePath('settings');
         $vars['plugins_count'] = $plugins_count;
+        $vars['app_id'] = $this->getAppId();
+        $vars['need_show_review_widget'] = wa()->appExists('installer');
         $this->display($vars, $template);
 
     }
@@ -84,17 +90,8 @@ class waPluginsActions extends waActions
         $settings = (array)$this->getRequest()->post($namespace);
         try {
             $files = waRequest::file($namespace);
-            $settings_definitions = $plugin->getSettings();
             foreach ($files as $name => $file) {
-                if (true
-                    || #TODO use this check in future
-                    (isset($settings_definitions[$name])
-                        && !empty($settings_definitions[$name]['control_type'])
-                        && ($settings_definitions[$name]['control_type'] == waHtmlControl::FILE)
-                    )
-                ) {
-                    $settings[$name] = $file;
-                }
+                $settings[$name] = $file;
             }
             $response = (array)$plugin->saveSettings($settings);
             $response['message'] = _w('Saved');

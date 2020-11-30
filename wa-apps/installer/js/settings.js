@@ -1,6 +1,3 @@
-/**
- *
- */
 (function ($) {
     $.installer_settings = {
         options: {
@@ -15,24 +12,6 @@
             $('input[name="clear_cache"]').click(function (eventObject) {
                 return self.clear_cache.apply(self, [this, eventObject]);
             });
-            var $templates = $('.i-image-select');
-            var $input = $('input[name="auth_form_background_thumb"]');
-            var $checkbox = $('input[name="auth_form_background_stretch"]');
-
-            $templates.on('click', 'li > a', function () {
-                $templates.find('.selected').removeClass('selected');
-                var $this = $(this);
-                $this.parents('li').addClass('selected');
-                var value = $this.data('value');
-                $input.val(value);
-                if (value.match(/^stock:/)) {
-                    $checkbox.attr('disabled', true);
-                } else {
-                    $checkbox.attr('disabled', null);
-                }
-
-                return false;
-            })
         },
         clear_cache: function () {
             $.ajax({

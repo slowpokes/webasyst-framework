@@ -18,21 +18,26 @@ class installerUpdateManagerAction extends waViewAction
     private $vendors = array();
     private $module = 'update';
 
-
+    private $is_install = false;
+    private $is_trial = false;
     private $urls;
 
     private function init()
     {
+        $this->is_install = (bool)waRequest::request('install', false);
+        $this->is_trial = (bool)waRequest::request('trial', false);
         $url = parse_url($r = waRequest::server('HTTP_REFERER'), PHP_URL_QUERY);
         if (preg_match('/(^|&)module=(update|apps|plugins|widgets)($|&)/', $url, $matches)) {
             $this->module = $matches[2];
         }
+
         if (installerHelper::isDeveloper()) {
-            if (waRequest::request('install')) {
-                $msg = _w('Unable to install application (developer version is on)');
+            if ($this->is_install) {
+                $msg = _w('Unable to install the product (developer mode is on).');
             } else {
-                $msg = _w('Unable to install application (developer version is on)');
+                $msg = _w('Unable to update the product (developer mode is on).');
             }
+            $msg .= "\n"._w("A .git or .svn directory has been detected. To ignore the developer mode, add option 'installer_in_developer_mode' => true to wa-config/config.php file.");
             $this->redirect(array(
                 'module' => $this->module,
                 'msg'    => installerMessage::getInstance()->raiseMessage($msg, 'fail'),
@@ -43,11 +48,13 @@ class installerUpdateManagerAction extends waViewAction
     public function execute()
     {
         $this->init();
+        $trial_dir = waTheme::getTrialUrl();
 
         try {
             $updater = new waInstaller(waInstaller::LOG_TRACE);
             $state = $updater->getState();
             if (!isset($state['stage_status'])
+                || $state['stage_status'] == waInstaller::STATE_COMPLETE
                 || (
                     ($state['stage_name'] != waInstaller::STAGE_NONE)
                     && ($state['heartbeat'] > (waInstaller::TIMEOUT_RESUME + 5))
@@ -79,7 +86,10 @@ class installerUpdateManagerAction extends waViewAction
                 );
 
                 foreach ($items as $app_id => $info) {
-                    if (!empty($info['download_url']) && in_array($info['action'], $execute_actions)) {
+                    if (!empty($info['download_url'])
+                        && !empty($info['applicable'])
+                        && in_array($info['action'], $execute_actions)
+                    ) {
                         $info['subject'] = 'app';
                         if ($app_id == 'installer') {
                             foreach ($info['download_url'] as $target => $url) {
@@ -100,9 +110,13 @@ class installerUpdateManagerAction extends waViewAction
                     foreach (array('themes', 'plugins', 'widgets') as $type) {
                         if (!empty($info[$type]) && is_array($info[$type])) {
                             foreach ($info[$type] as $extra_id => $extras_info) {
-                                if (!empty($extras_info['download_url']) && in_array($extras_info['action'], $execute_actions)) {
+                                if (!empty($extras_info['download_url'])
+                                    && !empty($extras_info['applicable'])
+                                    && in_array($extras_info['action'], $execute_actions)
+                                ) {
                                     $extras_info['subject'] = 'app_'.$type;
                                     if (($type == 'themes') && is_array($extras_info['download_url'])) {
+                                        waFiles::delete(waTheme::getTrialPath(), true);
                                         foreach ($extras_info['download_url'] as $target => $url) {
                                             $__info = $extras_info;
                                             $__info['download_url'] = $url;
@@ -117,6 +131,9 @@ class installerUpdateManagerAction extends waViewAction
                                                         $__info['name'] .= " ({$app_info['name']})";
                                                     } else {
                                                         $__info['name'] .= " ({$__info['app']})";
+                                                    }
+                                                    if ($this->is_trial) {
+                                                        $target = $trial_dir.$__info['slug'];
                                                     }
                                                     $this->add($target, $__info);
                                                     $queue_apps[$target] = $__info;
@@ -134,6 +151,9 @@ class installerUpdateManagerAction extends waViewAction
                                             $target = 'wa-widgets/'.$extra_id;
                                         } elseif (($app_id == 'wa-widgets')) {
                                             $target = 'wa-widgets/'.$extra_id;
+                                        } elseif ($type == 'themes' && $this->is_trial) {
+                                            waFiles::delete(waTheme::getTrialPath(), true);
+                                            $target = $trial_dir.$app_id.'/'.$type.'/'.$extra_id;
                                         } else {
                                             $target = 'wa-apps/'.$app_id.'/'.$type.'/'.$extra_id;
                                         }
@@ -153,14 +173,14 @@ class installerUpdateManagerAction extends waViewAction
                 }
 
                 if (!waRequest::get('_')) {
-                    $this->setLayout(new installerBackendLayout());
+                    $this->setLayout(new installerBackendStoreLayout());
                     $this->getLayout()->assign('no_ajax', true);
                 }
 
                 $this->view->assign('action', 'update');
                 $this->view->assign('queue_apps', $queue_apps);
-                $install = waRequest::request('install');
-                $this->view->assign('install', !empty($install) ? 'install' : '');
+                $this->view->assign('install', !empty($this->is_install) ? 'install' : '');
+                $this->view->assign('trial', !empty($this->is_trial) ? 'trial' : '');
                 $this->view->assign('title', _w('Updates'));
                 $this->view->assign('thread_id', $state['thread_id']);
 
@@ -220,21 +240,27 @@ class installerUpdateManagerAction extends waViewAction
     protected function add($target, $info, $item_id = null)
     {
         $this->urls[$target] = array(
-            'source' => $info['download_url'],
-            'target' => $target,
-            'slug'   => $target,
-            'md5'    => !empty($info['md5']) ? $info['md5'] : null,
+            'source'    => $info['download_url'],
+            'target'    => $target,
+            'slug'      => $target,
+            'real_slug' => $info['slug'],
+            'md5'       => !empty($info['md5']) ? $info['md5'] : null,
         );
+
+        if ($this->is_trial) {
+            $this->urls[$target]['source'] .= '&trial=1';
+        }
 
         if ($item_id) {
             $this->urls[$target] = array_merge($this->urls[$target], array(
-                'slug'    => $item_id,
-                'pass'    => false && ($this->getAppId() != $item_id),
-                'name'    => $info['name'],
-                'icon'    => $info['icon'],
-                'update'  => !empty($info['installed']),
-                'subject' => empty($info['subject']) ? 'system' : $info['subject'],
-                'edition' => empty($info['edition']) ? true : $info['edition'],
+                'slug'      => $item_id,
+                'real_slug' => $info['slug'],
+                'pass'      => false && ($this->getAppId() != $item_id),
+                'name'      => $info['name'],
+                'icon'      => $info['icon'],
+                'update'    => !empty($info['installed']),
+                'subject'   => empty($info['subject']) ? 'system' : $info['subject'],
+                'edition'   => empty($info['edition']) ? true : $info['edition'],
             ));
         }
     }

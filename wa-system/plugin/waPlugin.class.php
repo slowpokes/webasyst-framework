@@ -41,11 +41,29 @@ class waPlugin
         $this->checkUpdates();
     }
 
+    /**
+     * Returns plugin ID.
+     * @return string
+     * @since 1.8.2
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Returns localized plugin name.
+     * @return string
+     */
     public function getName()
     {
         return $this->info['name'];
     }
 
+    /**
+     * Returns plugin's version number.
+     * @return string
+     */
     public function getVersion()
     {
         $version = isset($this->info['version']) ? $this->info['version'] : '0.0.1';
@@ -105,6 +123,9 @@ class waPlugin
                     $cache->set($time ? $time : 1);
                 }
             }
+            $is_from_template = waConfig::get('is_template');
+            waConfig::set('is_template', null);
+            waConfig::get('disable_exception_log', true);
             foreach ($files as $t => $file) {
                 try {
                     if (!$ignore_all) {
@@ -121,6 +142,8 @@ class waPlugin
                     break;
                 }
             }
+            waConfig::get('disable_exception_log', false);
+            waConfig::set('is_template', $is_from_template);
         } else {
             $t = 1;
         }
@@ -138,6 +161,24 @@ class waPlugin
      */
     private function includeUpdate($file)
     {
+        /**
+         * @var waPlugin $this
+         */
+        include($file);
+    }
+
+    private function includeConfig($file)
+    {
+        return include($file);
+    }
+
+    private function includeCode($file)
+    {
+        $app_id = $this->app_id;
+        /**
+         * @var string $app_id
+         * @var waPlugin $this
+         */
         include($file);
     }
 
@@ -146,18 +187,14 @@ class waPlugin
 
         $file_db = $this->path.'/lib/config/db.php';
         if (file_exists($file_db)) {
-            $schema = include($file_db);
+            $schema = $this->includeConfig($file_db);
             $model = new waModel();
             $model->createSchema($schema);
         }
         // check install.php
         $file = $this->path.'/lib/config/install.php';
         if (file_exists($file)) {
-            $app_id = $this->app_id;
-            /**
-             * @var string $app_id
-             */
-            include($file);
+            $this->includeCode($file);
             // clear db scheme cache, see waModel::getMetadata
             try {
                 // remove files
@@ -175,10 +212,9 @@ class waPlugin
     {
         // check uninstall.php
         $file = $this->path.'/lib/config/uninstall.php';
-        if (file_exists($file) && ($force === true)) {
+        if (file_exists($file)) {
             try {
-                include($file);
-
+                $this->includeCode($file);
             } catch (Exception $ex) {
                 if ($force) {
                     waLog::log(sprintf("Error while uninstall %s at %s: %s", $this->id, $this->app_id, $ex->getMessage(), 'installer.log'));
@@ -190,7 +226,7 @@ class waPlugin
 
         $file_db = $this->path.'/lib/config/db.php';
         if (file_exists($file_db)) {
-            $schema = include($file_db);
+            $schema = $this->includeConfig($file_db);
             $model = new waModel();
             foreach ($schema as $table => $fields) {
                 $sql = "DROP TABLE IF EXISTS ".$table;
@@ -216,7 +252,11 @@ class waPlugin
         waFiles::delete(wa()->getAppCachePath('', $this->app_id));
     }
 
-
+    /**
+     * Returns URL of plugin's root directory.
+     * @param bool $absolute Whether abolsute URL must be returned.
+     * @return string
+     */
     public function getPluginStaticUrl($absolute = false)
     {
         return wa()->getAppStaticUrl($this->app_id, $absolute).'plugins/'.$this->id.'/';
@@ -245,13 +285,37 @@ class waPlugin
         }
     }
 
+    /**
+     * Adds a JavaScript file URL to the array returned by {$wa->js()}.
+     * @param string $url JavaScript file URL, relative or absolute, depending on $is_plugin parameter value.
+     * @param bool $is_plugin Whether a relative or absolute file URL must be conitained in $url parameter.
+     * @return null
+     */
     protected function addJs($url, $is_plugin = true)
     {
+        if (false === strpos($url, '?')) {
+            $url .= '?'.$this->getVersion();
+            if (waSystemConfig::isDebug()) {
+                $url .= '.'.time();
+            }
+        }
         waSystem::getInstance()->getResponse()->addJs($this->getUrl($url, $is_plugin), $this->app_id);
     }
 
+    /**
+     * Adds a CSS file URL to the array returned by {$wa->css()}.
+     * @param string $url CSS file URL, relative or absolute, depending on $is_plugin parameter value.
+     * @param bool $is_plugin Whether a relative or absolute file URL must be conitained in $url parameter.
+     * @return null
+     */
     protected function addCss($url, $is_plugin = true)
     {
+        if (false === strpos($url, '?')) {
+            $url .= '?'.$this->getVersion();
+            if (waSystemConfig::isDebug()) {
+                $url .= '.'.time();
+            }
+        }
         waSystem::getInstance()->getResponse()->addCss($this->getUrl($url, $is_plugin), $this->app_id);
     }
 
@@ -294,8 +358,9 @@ class waPlugin
     }
 
     /**
-     * @param null $name
-     * @return array|mixed|null|string
+     * Returns plugin's settings values.
+     * @param string|null $name Optional key to return one setting's value. If empty, all settings' values are returned.
+     * @return mixed
      */
     public function getSettings($name = null)
     {
@@ -357,17 +422,50 @@ class waPlugin
         $settings_config = $this->getSettingsConfig();
         foreach ($settings_config as $name => $row) {
             if (!isset($settings[$name])) {
+
                 if ((ifset($row['control_type']) == waHtmlControl::CHECKBOX) && !empty($row['value'])) {
                     $settings[$name] = false;
+
                 } elseif ((ifset($row['control_type']) == waHtmlControl::GROUPBOX) && !empty($row['value'])) {
                     $settings[$name] = array();
+
+                } elseif ((ifset($row['control_type']) == waHtmlControl::FILE)) {
+                    $settings[$name] = $this->getSettings($name);
+
                 } elseif (!empty($row['control_type']) || isset($row['value'])) {
                     $this->settings[$name] = isset($row['value']) ? $row['value'] : null;
                     self::getSettingsModel()->del($this->getSettingsKey(), $name);
+
                 }
+
             }
         }
+
         foreach ($settings as $name => $value) {
+            $type_is_file = ifset($settings_config, $name, 'control_type', null) == waHtmlControl::FILE;
+            $value_is_file = $value instanceof waRequestFile;
+            if ($type_is_file && $value_is_file) {
+
+                /**
+                 * @var waRequestFile $file
+                 */
+                $file = $value;
+                if ($file->uploaded()) {
+
+                    $path = wa()->getDataPath(sprintf('plugins/%s/', $this->id), true, $this->app_id);
+                    $time = time();
+                    $file_name = "{$name}.{$time}.{$file->extension}";
+                    if (!file_exists($path) || !is_writable($path)) {
+                        $message = _wp('File could not be saved due to the insufficient file write permissions for the %s folder.');
+                        throw new waException(sprintf($message, 'wa-data/public/'.$this->app_id.'/data/'));
+                    } elseif (!$file->moveTo($path, $file_name)) {
+                        throw new waException(_wp('Failed to upload file.'));
+                    }
+                    $value = $file_name;
+                }
+
+            }
+
             $this->settings[$name] = $value;
             // save to db
             self::getSettingsModel()->set($this->getSettingsKey(), $name, is_array($value) ? json_encode($value) : $value);

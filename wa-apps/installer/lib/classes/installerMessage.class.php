@@ -19,13 +19,17 @@ class installerMessage
     private static $instance = null;
     private $storage = null;
     private $messages = array();
+    public static $static_messages = array();
 
     /**
-     *
      * @return installerMessage
+     * @throws waException
      */
     public static function getInstance()
     {
+        if (waConfig::get('is_template')) {
+            throw new waException('installerMessage::getInstance() is not allowed in template context');
+        }
         if (!self::$instance) {
             self::$instance = new self();
         }
@@ -68,20 +72,25 @@ class installerMessage
     }
 
     /**
-     *
      * @param $message_id string|array
      * @return array
      */
     public function handle($message_id)
     {
         $messages = array();
-        foreach ((array)$message_id as $id) {
-            if (isset($this->messages[$id])) {
-                $messages[$id] = $this->messages[$id];
-                unset($this->messages[$id]);
+
+        if ($message_id) {
+            foreach ((array)$message_id as $id) {
+                if (isset($this->messages[$id])) {
+                    $messages[$id] = $this->messages[$id];
+                    unset($this->messages[$id]);
+                }
             }
+            $this->store();
+        } elseif (self::$static_messages) {
+            $messages = self::$static_messages;
         }
-        $this->store();
+
         foreach ($messages as &$message) {
             $message['text'] = preg_replace_callback('/\[?`([^`]+)`\]?/', array($this, 'translate'), $message['text']);
             unset($message);

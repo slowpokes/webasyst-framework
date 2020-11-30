@@ -54,4 +54,34 @@ abstract class waAppShipping implements waiPluginApp
     {
         return false;
     }
+
+    /**
+     * @param $name string
+     * @return mixed
+     */
+    public function getAppProperties($name = null)
+    {
+        $info = wa()->getAppInfo($this->app_id);
+        $properties = ifset($info['shipping_plugins']);
+        if (!is_array($properties)) {
+            $properties = array();
+        }
+        return $name ? ifset($properties[$name]) : $properties;
+    }
+
+    /**
+     * @return array string[string] array of available units with their names
+     */
+    public function getAvailableLinearUnits()
+    {
+        return array(
+            'm'  => 'm',
+            'ft' => 'ft',
+        );
+    }
+
+    public function uninstall($plugin_id)
+    {
+        ;
+    }
 }

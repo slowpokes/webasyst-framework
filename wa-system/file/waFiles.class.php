@@ -27,11 +27,12 @@ class waFiles
     }
 
     /**
-     * Creates a new file or directory.
+     * Creates specified directory, or parent directory for specified file.
      *
-     * @param string $path Path for the new file or directory
-     * @param bool $is_dir Flag requiring to create a directory rather than a file. By default (false), a file is created.
-     * @return string|bool Specified $path value on success, or false on failure
+     * @param string $path Path to a file or a directory.
+     * @param bool $is_dir Flag explicitly denoting that path to a directory is specified.
+     *      With false (default choice), method attempts to "guess" whether $path contains a path to a file or a directory.
+     * @return string|bool Specified $path value on success, or false on failure.
      */
     public static function create($path, $is_dir = false)
     {
@@ -88,7 +89,7 @@ class waFiles
                                 }
                                 self::copy($source, $destination, $skip_pattern);
                             } else {
-                                throw new Exception("Not found {$source_path}/{$path}");
+                                throw new waException("Not found {$source_path}/{$path}");
                             }
                         }
                     }
@@ -108,7 +109,7 @@ class waFiles
                 if (file_exists($source_path) && file_exists($target_path) && (filesize($source_path) === 0)) {
                     /*It's ok - it's windows*/
                 } else {
-                    throw new Exception(sprintf(_ws("Error copying file from %s to %s"), $source_path, $target_path));
+                    throw new waException(sprintf(_ws("Error copying file from %s to %s"), $source_path, $target_path));
                 }
             }
         }
@@ -351,46 +352,88 @@ class waFiles
      */
     public static function convert($file, $from, $to = 'UTF-8', $target = null)
     {
-        if ($src = @fopen($file, 'rb')) {
-            $filter = sprintf('convert.iconv.%s/%s//IGNORE', $from, $to);
-            if (!@stream_filter_prepend($src, $filter)) {
-                throw new waException("error while register file filter");
-            }
-            if ($target === null) {
-                $extension = pathinfo($file, PATHINFO_EXTENSION);
-                if ($extension) {
-                    $extension = '.'.$extension;
-                }
-                $target = preg_replace('@\.[^\.]+$@', '', $file).'_'.$to.$extension;
-            }
-            if ($dst = @fopen($target, 'wb')) {
-                stream_copy_to_stream($src, $dst);
-                fclose($src);
-                fclose($dst);
-            } else {
-                fclose($src);
-                throw new waException("Error while convert file encoding");
-            }
-            return $target;
-        } else {
+        // Open source
+        $src = @fopen($file, 'rb');
+        if (!$src) {
             return false;
         }
+
+        // Set up stream filter for source
+        $filter = sprintf('convert.iconv.%s/%s//IGNORE', $from, $to);
+        if (!@stream_filter_prepend($src, $filter)) {
+            fclose($src);
+            throw new waException("error while register file filter");
+        }
+
+        // default destination filename
+        if ($target === null) {
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+            if ($extension) {
+                $extension = '.'.$extension;
+            }
+            $target = preg_replace('@\.[^\.]+$@', '', $file).'_'.$to.$extension;
+        }
+
+        // Make sure destination exists for realpath() to work
+        if (!file_exists($target)) {
+            if (!@touch($target)) {
+                fclose($src);
+                return false;
+            }
+        }
+
+        // Make sure we don't overwrite $file if it's the same as $target
+        $file = realpath($file);
+        $target = realpath($target);
+        if (!$target) {
+            fclose($src);
+            return false;
+        }
+        $tmp_target = $target;
+        if ($target === $file) {
+            $tmp_target = tempnam(dirname($target), basename($target));
+            $perms = @octdec(substr(decoct(fileperms($file)), 3));
+            if ($perms) {
+                @chmod($tmp_target, $perms);
+            }
+        }
+
+        // Open destination
+        $dst = @fopen($tmp_target, 'wb');
+        if (!$dst) {
+            fclose($src);
+            return false;
+        }
+
+        // Copy from source to destination
+        stream_copy_to_stream($src, $dst);
+        fclose($src);
+        fclose($dst);
+
+        // Move to real destination if $file was the same as $target
+        if ($target !== $tmp_target) {
+            if (!waFiles::move($tmp_target, $target)) {
+                return false;
+            }
+        }
+
+        return $target;
     }
 
-    private static function curlInit($url, $curl_options = array())
+    private static function curlInit($url, $options)
     {
         $ch = null;
         if (extension_loaded('curl') && function_exists('curl_init')) {
 
             if (!($ch = curl_init())) {
-                throw new Exception(("Error init curl"));
+                throw new waException(("Error init curl"));
             }
 
             if (curl_errno($ch) != 0) {
-                throw new Exception(sprintf("Error init curl %d: %s", curl_errno($ch), curl_error($ch)));
+                throw new waException(sprintf("Error init curl %d: %s", curl_errno($ch), curl_error($ch)));
             }
 
-            $curl_default_options = array(
+            $curl_options = array(
                 CURLOPT_HEADER            => 0,
                 CURLOPT_RETURNTRANSFER    => 1,
                 CURLOPT_TIMEOUT           => 10,
@@ -402,28 +445,41 @@ class waFiles
             );
 
             if ((version_compare(PHP_VERSION, '5.4', '>=') || !ini_get('safe_mode')) && !ini_get('open_basedir')) {
-                $curl_default_options[CURLOPT_FOLLOWLOCATION] = true;
+                $curl_options[CURLOPT_FOLLOWLOCATION] = true;
             }
 
-            foreach ($curl_default_options as $option => $value) {
-                if (!isset($curl_options[$option])) {
-                    $curl_options[$option] = $value;
-                }
-            }
             $curl_options[CURLOPT_URL] = $url;
-            //TODO read proxy settings from generic config
-            $options = array();
 
-            if (!empty($options['host'])) {
+
+            $options += self::getDefaultOptions();
+            if ($options['verify']) {
+
+                $curl_options[CURLOPT_SSL_VERIFYHOST] = 2;
+                $curl_options[CURLOPT_SSL_VERIFYPEER] = true;
+                if (is_string($options['verify'])) {
+                    if (!file_exists($options['verify'])) {
+                        throw new InvalidArgumentException(
+                            "SSL CA bundle not found: {$options['verify']}"
+                        );
+                    }
+                    $curl_options[CURLOPT_CAINFO] = $options['verify'];
+
+                }
+            } else {
+                $curl_options[CURLOPT_SSL_VERIFYHOST] = 0;
+                $curl_options[CURLOPT_SSL_VERIFYPEER] = false;
+            }
+
+            if (!empty($options['proxy_host'])) {
                 $curl_options[CURLOPT_HTTPPROXYTUNNEL] = true;
                 $curl_options[CURLOPT_PROXY] = sprintf(
                     "%s%s",
-                    $options['host'],
-                    !empty($options['port']) ? ':'.$options['port'] : ''
+                    $options['proxy_host'],
+                    !empty($options['proxy_port']) ? ':'.$options['proxy_port'] : ''
                 );
 
-                if (!empty($options['user'])) {
-                    $curl_options[CURLOPT_PROXYUSERPWD] = sprintf("%s:%s", $options['user'], $options['password']);
+                if (!empty($options['proxy_user'])) {
+                    $curl_options[CURLOPT_PROXYUSERPWD] = sprintf("%s:%s", $options['proxy_user'], $options['proxy_password']);
                 }
             }
             foreach ($curl_options as $param => $option) {
@@ -448,26 +504,119 @@ class waFiles
             $size = fwrite(self::$fp, $chunk);
             self::$size += $size;
         } else {
-            throw new Exception('Invalid write stream');
+            throw new waException('Invalid write stream');
         }
         return $size;
+    }
+
+    private static function getDefaultOptions()
+    {
+        static $options;
+        if (empty($options)) {
+            $config = wa()->getConfigPath().'/net.php';
+            $options = array();
+            if (file_exists($config)) {
+                $options = include($config);
+            }
+            if (!is_array($options)) {
+                $options = array();
+            }
+
+            $options += array(
+                'timeout'    => 15,
+                'user_agent' => sprintf('Webasyst-Framework/%s', wa()->getVersion('webasyst')),
+            );
+        }
+
+        return $options;
+    }
+
+    private static function getStreamContext($options)
+    {
+        static $context;
+        if (empty($context)) {
+            $options += self::getDefaultOptions();
+            $context_params = array(
+                'ignore_errors' => true,//PHP >= 5.2.10
+                'timeout'       => $options['timeout'],
+                'user_agent'    => $options['user_agent'],
+            );
+
+            $headers = array();
+            if (isset($options['proxy_host']) && strlen($options['proxy_host'])) {
+                $proxy = $options['proxy_host'];
+                if (isset($options['proxy_port']) && intval($options['proxy_port'])) {
+                    $proxy .= ':'.intval($options['proxy_port']);
+                }
+                $context_params['proxy'] = $proxy;
+
+                if (!empty($options['proxy_user'])) {
+                    $auth = base64_encode(sprintf('%s:%s', $options['proxy_user'], $options['proxy_password']));
+                    $headers[] = "Proxy-Authorization: Basic $auth";
+                }
+            }
+            if ($headers) {
+                $context_params['header'] = implode("\r\n", $headers); //5.2.10 array support
+            }
+
+            $context_params += array(
+                'follow_location' => true,//PHP >= 5.3.4
+                'max_redirects'   => 5,
+            );
+
+            //SSL
+            if (!empty($options['verify'])) {
+                $context_params['ssl']['verify_peer'] = true;
+                $context_params['ssl']['verify_peer_name'] = true;
+                $context_params['ssl']['allow_self_signed'] = false;
+                if (is_string($options['verify'])) {
+                    if (!file_exists($options['verify'])) {
+                        throw new RuntimeException("SSL CA bundle not found: {$options['verify']}");
+                    }
+                    $context_params['ssl']['cafile'] = $options['verify'];
+
+                } else {
+                    // PHP 5.6 or greater will find the system cert by default. When
+                    // < 5.6, try load it
+                    if (PHP_VERSION_ID < 50600) {
+                        //TODO try default system path with ca files
+                        //$context_params['ssl']['cafile'] = '';
+                    }
+                }
+            } else {
+                $context_params['ssl']['verify_peer'] = false;
+                $context_params['ssl']['verify_peer_name'] = false;
+            }
+
+            $context = stream_context_create(array('http' => $context_params,));
+        }
+        return $context;
     }
 
     /**
      * Uploads a file from specified URL to a server directory.
      *
-     * @param string $url URL from which a file must be retrieved
+     * @param string $url  URL from which a file must be retrieved
      * @param string $path Path for saving the downloaded file
+     * @param array  $options
      * @return int
-     * @throws Exception
      * @throws waException
      */
-    public static function upload($url, $path)
+    public static function upload($url, $path, $options = array())
     {
         $s = parse_url($url, PHP_URL_SCHEME);
+        $host = parse_url($url, PHP_URL_HOST);
+        $encoded_host = waIdna::enc($host);
+        if ($encoded_host != $host) {
+            $url = preg_replace('@^(\w+://)[^/]+/@', '$1'.$encoded_host.'/', $url);
+        }
+        if (!is_array($options)) {
+            $options = array();
+        }
         $w = stream_get_wrappers();
         if (in_array($s, $w) && ini_get('allow_url_fopen')) {
-            if ($fp = @fopen($url, 'rb')) {
+            $context = self::getStreamContext($options);
+            if ($fp = @fopen($url, 'rb', null, $context)) {
                 try {
                     if (self::$fp = @fopen($path, 'wb')) {
                         self::$size = stream_copy_to_stream($fp, self::$fp);
@@ -482,11 +631,17 @@ class waFiles
                         }
 
                         $header_matches = null;
-                        //check server response codes (500/404/403/302/301/etc)
+                        //check server response codes (500/404/403/etc)
                         foreach ($headers as $header) {
+                            if (strtolower(substr($header, 0, 10)) == 'location: ') {
+                                self::$size = self::upload(substr($header, 10), $path, $options);
+                            }
                             if (preg_match('@http/\d+\.\d+\s+(\d+)\s+(.+)$@i', $header, $header_matches)) {
                                 $response_code = intval($header_matches[1]);
                                 $status_description = trim($header_matches[2]);
+                                if ($response_code == 301 || $response_code == 302 ) {
+                                    continue;
+                                }
                                 if ($response_code != 200) {
                                     throw new waException("Invalid server response with code {$response_code} ($status_description) while request {$url}");
                                 }
@@ -506,7 +661,7 @@ class waFiles
             } else {
                 throw new waException("Error while open source file {$url}");
             }
-        } elseif ($ch = self::curlInit($url)) {
+        } elseif ($ch = self::curlInit($url, $options)) {
             if (self::$fp = @fopen($path, 'wb')) {
                 self::$size = 0;
                 wa()->getStorage()->close();
@@ -556,7 +711,6 @@ class waFiles
             if ($attach !== null) {
                 $send_as = str_replace('"', '\"', is_string($attach) ? $attach : basename($file));
                 $send_as = preg_replace('~[\n\r]+~', ' ', $send_as);
-
 
 
                 /**
@@ -633,7 +787,11 @@ class waFiles
                     }
                     $response->addHeader("Content-type", "{$file_type}");
                     $response->addHeader("Content-Disposition", "attachment; filename=\"{$send_as}\"");
-                    $response->addHeader("Last-Modified", filemtime($file));
+
+                    // wanna has possibility set own value of this header from outside (for example by update_datetime in DB record)
+                    if (!$response->getHeader("Last-Modified")) {
+                        $response->addHeader("Last-Modified", filemtime($file));
+                    }
 
                     $response->addHeader("Accept-Ranges", "bytes");
                     $response->addHeader("Connection", "close");

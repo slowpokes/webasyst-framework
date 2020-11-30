@@ -95,7 +95,7 @@ return array(
     => 'Завершение',
 
     'Please install updates for the proper verification requirements'
-    => 'Загрузите последнюю версию Вебасиста с сайта webasyst.com для корректной проверки системных требований',
+    => 'Загрузите последнюю версию Вебасиста с сайта webasyst.ru для корректной проверки системных требований',
     'Unknown requirement case %s'
     => 'Неизвестное системное требование "%s"',
 
@@ -110,8 +110,8 @@ return array(
     => 'Требуется версия расширения %1$s %3$s%4$s, текущая версия %2$s',
     'extension %s has %s version but recommended is %s %s'
     => 'Рекомендуется версия расширения %1$s %3$s%4$s, текущая версия %2$s',
-    'extension %s not loaded'
-    => 'расширение %s не загружено',
+    'PHP extension %s is required'
+    => 'Требуется расширение %s для PHP',
     'curl'
     => 'cURL',
 

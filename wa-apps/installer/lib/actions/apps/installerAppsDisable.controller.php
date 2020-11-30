@@ -37,6 +37,14 @@ class installerAppsDisableController extends waJsonController
                     foreach ($paths as $path) {
                         waFiles::delete($path, true);
                     }
+
+                    $params = array(
+                        'type' => 'apps',
+                        'id'   => $app_id,
+                        'ip'   => waRequest::getIp(),
+                    );
+
+                    $this->logAction('item_disable', $params);
                 }
             }
 

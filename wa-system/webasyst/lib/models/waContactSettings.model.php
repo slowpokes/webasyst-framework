@@ -17,6 +17,11 @@ class waContactSettingsModel extends waModel
 
     public function getOne($contact_id, $app_id, $name)
     {
+        // Use cache in current user's waContact if possible
+        if ($contact_id == wa()->getUser()->getId()) {
+            return wa()->getUser()->getSettings($app_id, $name);
+        }
+
         $data = $this->getByField(array(
             'contact_id' => $contact_id,
             'app_id' => $app_id,
@@ -66,5 +71,28 @@ class waContactSettingsModel extends waModel
         return $this->exec($sql, array(
             'contact_id' => $contact_id, 'app_id' => $app_id, 'name' => $name
         ));
+    }
+
+    /**
+     * Clear facts about closed webasyst ID announcement for all contacts
+     */
+    public function clearAllWebasystAnnouncementCloseFacts()
+    {
+        $this->deleteByField([
+            'app_id' => 'webasyst',
+            'name' => 'webasyst_id_announcement_close'
+        ]);
+    }
+
+    /**
+     * Clear facts about closed webasyst ID announcement for all contacts
+     */
+    public function clearWebasystAnnouncementCloseFacts(array $contact_ids)
+    {
+        $this->deleteByField([
+            'contact_id' => $contact_ids,
+            'app_id' => 'webasyst',
+            'name' => 'webasyst_id_announcement_close'
+        ]);
     }
 }

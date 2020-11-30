@@ -8,15 +8,15 @@ class webasystCreatePluginCli extends webasystCreateCliController
     {
         echo <<<HELP
 Usage: php wa.php createPlugin [app_id] [plugin_id] [parameters]
-    app_id - App id (string in lower case)
-    plugin_id - Plugin id (string in lower case)
+    app_id - App ID (string in lower case)
+    plugin_id - Plugin ID (string in lower case)
 Optional parameters:
-    -name (Plugin name; if comprised of several words, enclose in quotes; e.g., 'My plugin')
-    -version (Plugin version; e.g., 1.0.0)
-    -vendor (Numerical vendor id)
+    -name (plugin name; if comprised of several words, enclose in quotes; e.g., 'My plugin')
+    -version (plugin version; e.g., 1.0.0)
+    -vendor (numerical vendor ID)
     -frontend (Has frontend)
-    -settings (Implements custom settings screen)
-    -disable (1|true) not enable plugin at wa-config/apps/app_id/plugins.php
+    -settings (implements custom settings screen)
+    -disable (1|true) not enable plugin in wa-config/apps/app_id/plugins.php
 Example: php wa.php createPlugin someapp myplugin -name 'My plugin' -version 1.0.0 -vendor 123456 -frontend -settings
 HELP;
         parent::showHelp();
@@ -70,7 +70,7 @@ HELP;
     {
         $config = array(
             'name'     => empty($params['name']) ? ucfirst($this->plugin_id) : $params['name'],
-            'icon'     => 'img/'.$this->plugin_id.'.gif',
+            'img'     => 'img/'.$this->plugin_id.'.gif',
             'version'  => ifempty($params['version'], $this->getDefaults('version')),
             'vendor'   => ifempty($params['vendor'], $this->getDefaults('vendor')),
             'handlers' => array(),//TODO optional include some demo handlers
@@ -90,10 +90,10 @@ HELP;
         );
 
         if (isset($params['db'])) {
-            array_push($paths, array('lib/models/'));
+            array_push($paths, 'lib/models/');
         }
         if (isset($params['locale'])) {
-            array_push($paths, array('locale/'));
+            array_push($paths, 'locale/');
         }
 
         if (isset($params['frontend'])) {
@@ -101,12 +101,10 @@ HELP;
 
             array_push(
                 $paths,
-                array(
-                    'lib/actions/frontend/',
-                    'templates/actions/frontend/',
-                )
+                'lib/actions/frontend/',
+                'templates/actions/frontend/'
             );
-            $paths['lib/config/routing.php'] = array('*' => 'frontend');
+            $paths['lib/config/routing.php'] = array($this->plugin_id.'/*' => 'frontend/');
 
         }
 
@@ -121,7 +119,7 @@ HELP;
             'templates/',
         );
         if (isset($params['locale'])) {
-            array_push($protected_paths, array('locale/'));
+            array_push($protected_paths, 'locale/');
         }
 
         $this->createStructure($paths);
@@ -158,7 +156,7 @@ PHP;
         return $code;
     }
 
-    protected function showReport($data = array())
+    protected function showReport($data = array(), $params = array())
     {
         echo <<<REPORT
 Plugin with id "$this->plugin_id" created!
@@ -168,7 +166,7 @@ Useful commands:
     php wa.php generateDb $this->app_id/$this->plugin_id table1 table2 table3
 
     #generate plugin's locale files
-    php wa-system/locale/locale.php $this->app_id/plugins/$this->plugin_id
+    php wa.php locale $this->app_id/plugins/$this->plugin_id
 REPORT;
     }
 

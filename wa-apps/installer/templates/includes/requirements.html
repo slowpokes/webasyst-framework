@@ -3,15 +3,17 @@ Requirements list
 @todo adjust requirements level
 *}
 {if !empty($item.requirements)}
-    {capture name='warning'}
-        {assign var=warning_meets value=false}
-        {if !isset($class)}{assign var=class value="small red"}{/if}
-        {if !isset($icon)}{assign var=icon value=false}{/if}
+    {$_warning_meets = false}
+
+    {capture assign='_warning'}
+        {if !isset($class)}{$class = "small red"}{/if}
+        {if !isset($icon)}{$icon = false}{/if}
         <ul class="menu-v">
             {foreach $item.requirements as $subject => $requirement}
-                {if ($requirement.warning && !$requirement.passed)} {assign var=warning_meets value=true}
+                {if ($requirement.warning && !$requirement.passed)}
+                    {$_warning_meets = true}
                     <li>
-                        <span class="{if strstr($subject,'app.')==$subject}hint{else}{$class}{/if}" title="{$requirement.name|escape}">
+                        <span class="{if strstr($subject,'app.') == $subject}hint{else}{$class}{/if}" title="{$requirement.name|escape}">
                             {if $icon}<i class="icon10 no{if $requirement.passed}-bw{/if}"></i>{/if}
                             {$requirement.warning|default:$requirement.note|escape}
                         </span>
@@ -20,7 +22,7 @@ Requirements list
             {/foreach}
         </ul>
     {/capture}
-    {if $warning_meets && $smarty.capture.warning}
-        {$smarty.capture.warning}
+    {if $_warning_meets && $_warning}
+        {$_warning}
     {/if}
 {/if}

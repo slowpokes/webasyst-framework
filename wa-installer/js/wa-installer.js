@@ -2,20 +2,20 @@
     var global = this;
     var wai = global.wai = {
         options: {
-            'refresh_timeout': 500,// ms
-            'redirect_timeout': 5000,// ms
-            'submit_id': 'wa-installer-submit',
-            'locale_id': 'wa-installer-locale-select',
-            'container_id': 'content-wrapper',
-            'scroll_id': 'content-wrapper',
-            'form_id': 'install_form',
-            'complete_id': 'install_form_complete',
-            'progress_id': 'i-progress-step-',
-            'mod_rewrite_id': 'input_mod_rewrite',
-            'redirect_url_id': 'redirect_url',
-            'redirect_message_id': 'redirect_message',
-            'lang': null,
-            'end': true
+            refresh_timeout: 1000,// ms
+            redirect_timeout: 5000,// ms
+            submit_id: 'wa-installer-submit',
+            locale_id: 'wa-installer-locale-select',
+            container_id: 'content-wrapper',
+            scroll_id: 'content-wrapper',
+            form_id: 'install_form',
+            complete_id: 'install_form_complete',
+            progress_id: 'i-progress-step-',
+            mod_rewrite_id: 'input_mod_rewrite',
+            redirect_url_id: 'redirect_url',
+            redirect_message_id: 'redirect_message',
+            lang: null,
+            end: true
         },
         form: null,
         xmlReq: null,
@@ -72,7 +72,12 @@
                 wai.xmlReq = wai.createRequestObject();
                 if (wai.xmlReq) {
                     wai.xmlReq.onreadystatechange = wai.onGetState;
-                    var url = "install.php?action=getstate&source=ajax&req_time=" + wai.date.getTime();
+                    var url = 'install.php';
+                    var query = [];
+                    query[query.length] = 'action=getstate';
+                    query[query.length] = 'source=ajax';
+                    query[query.length] = 'req_time=' + wai.date.getTime();
+                    url = url + '?' + query.join('&');
                     if (wai.options.lang) {
                         url += '&lang=' + wai.options.lang;
                     }
@@ -80,16 +85,12 @@
                     wai.xmlReq.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
                     wai.xmlReq.send(null);
                 }
-            } catch (e) {
-                alert(e.message);
-            }
         },
         checkModRewrite: function () {
             var input = document.getElementById(wai.options.mod_rewrite_id);
             if (input && (parseInt(input.value) || true)) {
                 try {
                     wai.xmlReqRewrite = wai.createRequestObject();
-                    if (wai.xmlReqRewrite) {
                         wai.xmlReqRewrite.onreadystatechange = wai.oncheckModRewrite;
                         var url = "./non/exists/url/?mod_rewrite=1";
                         wai.xmlReqRewrite.open("GET", url, true);
@@ -127,13 +128,11 @@
             } catch (e) {
             }
         },
-
         start: function () {
             wai.showProgress();
             setTimeout(wai.getState, wai.options.refresh_timeout * 1.5);
             return false;
         },
-
         extract: function () {
 
         },
@@ -151,13 +150,8 @@
                 }
                 obj = document.getElementById(wai.options.progress_id + step);
                 if (obj) {
-                    obj.className = (obj.className).replace(/\b(current|passed|next)\b/, '') + 'current';
-                }
-            } catch (e) {
-            }
         },
-        onProgress: function (progress, description)// intVal
-        {
+        onProgress: function (progress, description) {// intVal
             try {
                 var obj = document.getElementById(wai.options.container_id);
                 if (obj) {
@@ -187,13 +181,11 @@
             }
             return null;
         },
-        onRestart: function ()// RESTART
-        {
+        onRestart: function () {// RESTART
             try {
                 var curDate = new Date();
                 var curTime = curDate.getTime();
-                if ((wai.hasRestartTime == null)
-                    || ((curTime - wai.hasRestartTime) > 10000)) {
+                if (wai.hasRestartTime == null || (curTime - wai.hasRestartTime) > 10000) {
                     wai.hasRestartTime = curTime;
                     wai.xmlReqExtract = wai.createRequestObject();
                     var url = "install.php";
@@ -225,8 +217,7 @@
                 return true;
             }
         },
-        onComplete: function ()// ANOTHER
-        {
+        onComplete: function () {// ANOTHER
             wai.lookup = false;
             setTimeout(function () {
                 if (wai.form) {
@@ -234,14 +225,12 @@
                 }
             }, 1000);
         },
-
         redirect: function () {
             var href = document.getElementById(wai.options.redirect_url_id);
             if (href && href.href) {
                 window.location.replace(href.href);
             }
         },
-
         getStep: function () {
             var step = null;
             var form = document.forms[0];
@@ -269,7 +258,6 @@
         },
         onGetState: function () {
             try {
-
                 if (wai.xmlReq.readyState == 4) {// 4 = "loaded"
                     if (wai.xmlReq.status == 200) {// 200 = OK
                         var response = wai.xmlReq.responseText.match(/^([^:]+):/g);
@@ -282,7 +270,7 @@
                             switch (response) {// ...our code here...
                                 case 'RESTART' :
                                     wai.onRestart();
-                                    extra_time = 100 - wai.options.refresh_timeout;//500;
+                                    extra_time = 1500 - wai.options.refresh_timeout;//500;
                                     break;
                                 case 'COMPLETE' :
                                     wai.lookup = false;

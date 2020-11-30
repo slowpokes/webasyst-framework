@@ -38,6 +38,20 @@ class waAPIController
 
     public function dispatch()
     {
+        // Make sure API is enabled
+        if (wa('webasyst')->getConfig()->getOption('disable_api')) {
+            $msg = wa('webasyst')->getConfig()->getOption('disable_api_message');
+            throw new waAPIException('disabled', ifempty($msg, 'API is disabled'), 404);
+        }
+
+        // Redirect to HTTPS if set up in domain params
+        if (!waRequest::isHttps() && waRouting::getDomainConfig('ssl_all')) {
+            $domain = wa()->getRouting()->getDomain(null, true);
+            $url = 'https://'.wa()->getRouting()->getDomainUrl($domain).'/'.wa()->getConfig()->getRequestUrl();
+            wa()->getResponse()->redirect($url, 301);
+            return;
+        }
+
         $request_url = trim(wa()->getConfig()->getRequestUrl(true, true), '/');
         if ($request_url === 'api.php/auth') {
             $user = wa()->getUser();
@@ -62,6 +76,8 @@ class waAPIController
         } elseif ($request_url == 'api.php/revoke') {
             $this->checkToken();
             wa()->getFrontController()->execute(null, 'api', 'revoke');
+        } elseif ($request_url == 'api.php/token-headless') {
+            wa()->getFrontController()->execute(null, 'api', 'tokenHeadless');
         } elseif ($request_url === 'api.php') {
             $this->execute(waRequest::get('app'), waRequest::get('method'));
         } else {
@@ -96,7 +112,12 @@ class waAPIController
 
         // check app access
         if (!waSystem::getInstance()->appExists($app)) {
-            throw new waAPIException('invalid_request', 'Application '.$app.' not exists');
+            throw new waAPIException('app_not_installed', 'App is not installed ('.$app.')', 400, [
+                'app' => $app
+            ]);
+        }
+        if (wa()->getUser()->getRights($app, 'backend') <= 0) {
+            throw new waAPIException('access_denied', 403);
         }
 
         // check scope
@@ -124,20 +145,38 @@ class waAPIController
 
     protected function checkToken()
     {
-        $token = waRequest::request('access_token');
-        if ($token) {
-            $tokens_model = new waApiTokensModel();
-            $data = $tokens_model->getById($token);
-            if ($data) {
-                if ($data['expires'] && (strtotime($data['expires']) < time())) {
-                    throw new waAPIException('invalid_token', 'Access token has expired', 401);
-                }
-                // auth user
-                wa()->setUser(new waUser($data['contact_id']));
-                return $data;
+        $token = waRequest::request('access_token', null, 'string');
+        if (!$token) {
+            if (function_exists('getallheaders')) {
+                $headers = getallheaders();
+                $token = ifset($headers, 'Authorization', null);
             }
+            if (!$token) {
+                $token = waRequest::server('HTTP_AUTHORIZATION', null, 'string');
+            }
+            if ($token) {
+                $token = preg_replace('~^(Bearer\s)~ui', '', $token);
+            }
+        }
+        if (!$token) {
+            throw new waAPIException('invalid_request', 'Required parameter is missing: access_token', 400);
+        }
+
+        $tokens_model = new waApiTokensModel();
+        $data = $tokens_model->getById($token);
+        if (!$data) {
             throw new waAPIException('invalid_token', 'Invalid access token', 401);
         }
-        throw new waAPIException('invalid_request', 'Required parameter is missing: access_token', 400);
+        if ($data['expires'] && (strtotime($data['expires']) < time())) {
+            throw new waAPIException('invalid_token', 'Access token has expired', 401);
+        }
+
+        // remember token usage time
+        $tokens_model->updateLastUseDatetime($token);
+
+        // auth user
+        wa()->setUser(new waApiAuthUser($data['contact_id']));
+
+        return $data;
     }
 }

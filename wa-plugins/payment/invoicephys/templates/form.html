@@ -13,77 +13,6 @@
 </head>
 <body style="padding: 0; margin: 0; font-family: Verdana, Arial, sans-serif; font-size: 7pt; line-height: 1; color: #000;">
 
-<<<<<<< HEAD
-<div align=center>
-    <br>
-    <table cellspacing=0 cellpadding=4 width=680 border=1>
-        <tbody>
-            <tr>
-                <td valign=bottom width="30%">
-                    <p align=right>Извещение</p>
-                    <p align=right>&nbsp;</p>
-                    <p align=right>&nbsp;</p>
-                    <p align=right>&nbsp;</p>
-                    <p align=right>&nbsp;</p>
-                    <p align=right>&nbsp;</p>
-                    <p align=right>&nbsp;</p>
-                    <p align=right>Кассир</p>
-                </td>
-                <td width="70%">
-                    {capture name='row'}
-                    <table cellspacing=0 cellpadding=2 width="100%" border=0>
-                        <tbody>
-                            <tr>
-                                <td colspan=3><strong>Получатель платежа</strong></td>
-                            </tr>
-                            <tr>
-                                <td colspan=3>Наименование:&nbsp;{$settings.company_name}</td>
-                            </tr>
-                            <tr>
-                                <td>счет:&nbsp;{$settings.bank_account_number}</td>
-                                <td>инн:&nbsp;{$settings.inn}</td>
-                                <td>кпп:&nbsp;{$settings.kpp}</td>
-                            </tr>
-                            <tr>
-                                <td colspan=3>Наименование банка:&nbsp;{$settings.bank_name}</td>
-                            </tr>
-                            <tr>
-                                <td>кор.&nbsp;счет:&nbsp;{$settings.bank_kor_number}</td>
-                                <td colspan=2>бик:&nbsp;{$settings.bik}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <table cellspacing=0 cellpadding=2 width="100%" border=0>
-                        <tbody>
-                            {if !empty($order.billing_address.address)}
-                            <tr>
-                                <td><strong>Плательщик</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="inline_edit">{$order.billing_address.name|default:$order.contact_name|escape}</td>
-                            </tr>
-                            <tr>
-                                <td class="inline_edit">{$order.billing_address.address|escape}</td>
-                            </tr>
-                            {else}
-
-                            <tr>
-                                <td><strong>Плательщик</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="inline_edit">{$order.shipping_address.name|default:$order.contact_name|escape}</td>
-                            </tr>
-                            <tr>
-                                <td class="inline_edit">{$order.shipping_address.address|escape}</td>
-                            </tr>
-                            {/if}
-                        </tbody>
-                    </table>
-                    <br>
-                    <table cellspacing=0 cellpadding=2 width="100%" border=1>
-                        <tbody>
-=======
     <table cellpadding="8" cellspacing="0" width="680" border="0" style="border-collapse: collapse; margin: auto;">
         <tr>
             <td style="vertical-align: bottom; width: 30%; border: 2px solid #000; text-align: right;">
@@ -99,7 +28,6 @@
             <td style="width: 70%; border: 2px solid #000;">
                 {capture name='row'}
                     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
->>>>>>> upstream/master
                         <tr>
                             <td style="vertical-align: top;">
                                 <table cellpadding="4" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
@@ -193,10 +121,6 @@
             </td>
         </tr>
     </table>
-<<<<<<< HEAD
-</div>
-=======
->>>>>>> upstream/master
 
 </body>
 </html>

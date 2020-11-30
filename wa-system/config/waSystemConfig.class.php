@@ -24,7 +24,8 @@ class waSystemConfig
 
     protected static $system_options = array(
         'backend_url' => 'webasyst',
-        'mod_rewrite' => true
+        'mod_rewrite' => true,
+        'cache_versioning' => true,
     );
 
     public static $time = null;
@@ -36,77 +37,35 @@ class waSystemConfig
 
     public function __construct($environment = null, $root_path = null)
     {
-        self::$time = microtime(true);
+        if (empty(self::$time)) {
+            self::$time = microtime(true);
+        }
         if (self::$active == null || $this instanceof waAppConfig) {
             self::$active = $this;
         }
 
-
         if ($root_path === null) {
-            $this->root_path = realpath(dirname(__FILE__).'/../..');
-        } else {
-            $this->root_path = realpath($root_path);
+            $root_path = dirname(__FILE__).'/../..';
         }
-        $this->setPath($this->root_path);
+        $this->root_path = realpath($root_path);
+        if (!waConfig::has('wa_path_root')) {
+            $this->setPath($this->root_path);
+        }
 
         if (!self::$helpers) {
             self::$helpers = true;
             include($this->getRootPath()."/wa-system/helper/load.php");
         }
 
+        $this->environment = $environment;
         $this->configure();
         $this->init();
 
-        if ($environment === null) {
+        if ($this->environment === null) {
             $url = explode("/", $this->getRequestUrl(true, true));
             $url = $url[0];
-
             $this->environment = $url === $this->getSystemOption('backend_url') ? 'backend' : 'frontend';
-        } else {
-            $this->environment = $environment;
         }
-
-        $url = $this->getRequestUrl();
-        if ($url === 'robots.txt' || $url === 'favicon.ico' || $url == 'apple-touch-icon.png') {
-            $this->responseStatic($url);
-        }
-    }
-
-    protected function responseStatic($file)
-    {
-        $domain = waRequest::server('HTTP_HOST');
-        $u = trim($this->getRootUrl(false, true), '/');
-        if ($u) {
-            $domain .= '/'.$u;
-        }
-        $path = waConfig::get('wa_path_data').'/public/site/data/'.$domain.'/'.$file;
-        if (!file_exists($path)) {
-            if (substr($domain, 0, 4) == 'www.') {
-                $domain2 = substr($domain, 4);
-            } else {
-                $domain2 = 'www.'.$domain;
-            }
-            $path = waConfig::get('wa_path_data').'/public/site/data/'.$domain2.'/'.$file;
-        }
-
-        // check alias
-        if (!file_exists($path)) {
-            $routes = $this->getConfigFile('routing');
-            if (!empty($routes[$domain]) && is_string($routes[$domain])) {
-                $path = waConfig::get('wa_path_data').'/public/site/data/'.$routes[$domain].'/'.$file;
-            } elseif (!empty($routes[$domain2]) && is_string($routes[$domain2])) {
-                $path = waConfig::get('wa_path_data').'/public/site/data/'.$routes[$domain2].'/'.$file;
-            }
-        }
-
-        if (file_exists($path)) {
-            $file_type = waFiles::getMimeType($file);
-            header("Content-type: {$file_type}");
-            @readfile($path);
-        } else {
-            header("HTTP/1.0 404 Not Found");
-        }
-        exit;
     }
 
     public static function getTime($diff = true)
@@ -148,7 +107,7 @@ class waSystemConfig
     {
         $url = waRequest::server('REQUEST_URI', '/');
         if ($without_root) {
-            $url = substr($url, strlen($this->getRootUrl()));
+            $url = (string) substr($url, strlen($this->getRootUrl()));
         }
         if (!$this->getSystemOption('mod_rewrite')) {
             if (substr($url, 0, 9) == 'index.php') {
@@ -167,14 +126,21 @@ class waSystemConfig
     public function getRootUrl($absolute = false, $script = false)
     {
         if (!self::$root_url) {
-            if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME']) {
-                self::$root_url = $_SERVER['SCRIPT_NAME'];
-            } elseif (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF']) {
-                self::$root_url = $_SERVER['PHP_SELF'];
-            } else {
+            if ($this->environment !== 'cli') {
+                if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME']) {
+                    self::$root_url = $_SERVER['SCRIPT_NAME'];
+                } elseif (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF']) {
+                    self::$root_url = $_SERVER['PHP_SELF'];
+                }
+                self::$root_url = '/'.ltrim(self::$root_url, '/');
+                self::$root_url = preg_replace('!/[^/]*$!', '/', self::$root_url);
+            }
+            if (!self::$root_url) {
+                self::$root_url = $this->systemOption('default_root_url');
+            }
+            if (!self::$root_url) {
                 self::$root_url = '/';
             }
-            self::$root_url = preg_replace('!/[^/]*$!', '/', self::$root_url);
         }
         if ($absolute) {
             $url = $this->getHostUrl();
@@ -186,12 +152,14 @@ class waSystemConfig
     public function getHostUrl()
     {
         if (waRequest::isHttps()) {
-            $url = 'https://';
+            $proto = 'https://';
         } else {
-            $url = 'http://';
+            $proto = 'http://';
         }
-        $url .= waRequest::server('HTTP_HOST');
-        return $url;
+
+        $host = waRequest::server('HTTP_HOST', $this->systemOption('default_host_domain'), 'string');
+        $host = ifempty($host, 'localhost');
+        return $proto.$host;
     }
 
     public function getDomain()
@@ -212,6 +180,29 @@ class waSystemConfig
         @mb_internal_encoding('UTF-8');
         @ini_set('default_charset', 'utf-8');
 
+        // Make sure setlocale() is set to something utf8-compatible if at all possible
+        $sysloc = setlocale(LC_COLLATE, 0);
+        if (false === stripos($sysloc, 'utf-8') && false === stripos($sysloc, 'utf8')) {
+            $sysloc = explode('.', $sysloc, 2);
+            if (count($sysloc) < 2) {
+                $loc = 'en_US';
+            } else {
+                $loc = $sysloc[0];
+            }
+
+            $possible_locales = array();
+            $lang = preg_replace('~_.*~', '', $loc);
+            foreach(array($loc, $lang, 'en_US') as $locale) {
+                foreach(array('utf8','utf-8','UTF8','UTF-8') as $enc) {
+                    $possible_locales[] = $locale.'.'.$enc;
+                }
+            }
+            setlocale(LC_ALL, $possible_locales);
+        }
+
+        // Always use dot separator when formatting floats
+        setlocale(LC_NUMERIC, 'C');
+
         @ini_set('register_globals', 'off');
         // magic quotes
         @ini_set("magic_quotes_runtime", 0);
@@ -219,7 +210,7 @@ class waSystemConfig
             @set_magic_quotes_runtime(false);
         }
         // IIS
-        if (!isset($_SERVER['REQUEST_URI'])) {
+        if ($this->environment !== 'cli' && !isset($_SERVER['REQUEST_URI'])) {
             $_SERVER['REQUEST_URI'] = $_SERVER['PHP_SELF'];
             if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING'])) {
                 $_SERVER['REQUEST_URI'] .= '?'.$_SERVER['QUERY_STRING'];
@@ -227,7 +218,7 @@ class waSystemConfig
             self::$system_options['mod_rewrite'] = false;
         }
 
-        if (!get_magic_quotes_gpc()) {
+        if (!ini_get('magic_quotes_gpc')) {
             return;
         }
 
@@ -244,11 +235,15 @@ class waSystemConfig
 
     public function init()
     {
-        $file_path = $this->root_path.'/wa-config/config.php';
+        $file_path = $this->getPath('config').'/config.php';
         if (file_exists($file_path)) {
             $config = include($file_path);
             foreach ($config as $name => $value) {
                 self::$system_options[$name] = $value;
+            }
+
+            if (!empty(self::$system_options['cache_versioning'])) {
+                $this->enableCacheVersioning();
             }
         }
     }
@@ -285,6 +280,38 @@ class waSystemConfig
         ));
     }
 
+    protected function enableCacheVersioning()
+    {
+        $wa_cache = waConfig::get('wa_path_cache_root');
+        if (!$wa_cache) {
+            $wa_cache = waConfig::get('wa_path_cache', $this->root_path.DIRECTORY_SEPARATOR.'wa-cache');
+            waConfig::set('wa_path_cache_root', $wa_cache);
+        }
+        $wa_cache .= DIRECTORY_SEPARATOR;
+
+        $versioning_file = $wa_cache.'versioning';
+        if (file_exists($versioning_file)) {
+            $filemtime = filemtime($versioning_file);
+        } else {
+            waFiles::create($wa_cache, true);
+            if (touch($versioning_file)) {
+                $filemtime = time();
+            } else {
+                self::$system_options['cache_versioning'] = false;
+                $filemtime = false;
+            }
+        }
+        waConfig::set('wa_path_cache', $wa_cache.$this->getVersionedCacheDir($filemtime));
+    }
+
+    protected function getVersionedCacheDir($reset_time)
+    {
+        if (!$reset_time) {
+            return '';
+        }
+        return substr(dechex($reset_time), -6);
+    }
+
     public function getPath($name, $file = null)
     {
         $path = waConfig::get('wa_path_'.$name);
@@ -311,7 +338,11 @@ class waSystemConfig
     {
         $path = $this->getPath('config', $file);
         if (file_exists($path)) {
-            return include($path);
+            $result = include($path);
+            if ($result === 1) {
+                return $default;
+            }
+            return $result;
         } else {
             return $default;
         }
@@ -327,7 +358,8 @@ class waSystemConfig
             waFiles::create($path);
             return $path;
         } else {
-            return $this->getPath('apps').'/'.$app.'/lib/config/'.$name;
+            $path_name = ($app == 'webasyst') ? 'system' : 'apps';
+            return $this->getPath($path_name).'/'.$app.'/lib/config/'.$name;
         }
     }
 
@@ -336,6 +368,39 @@ class waSystemConfig
         return $this->getConfigFile('routing');
     }
 
+    public function getSms()
+    {
+        return $this->getConfigFile('sms');
+    }
+
+    public function setSms($data)
+    {
+        if (waConfig::get('is_template')) {
+            return false;
+        }
+        $path = $this->getPath('config', 'sms');
+        if (waUtils::varExportToFile($data, $path)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getMail()
+    {
+        return $this->getConfigFile('mail');
+    }
+
+    public function setMail($data)
+    {
+        if (waConfig::get('is_template')) {
+            return false;
+        }
+        $path = $this->getPath('config', 'mail');
+        if (waUtils::varExportToFile($data, $path)) {
+            return true;
+        }
+        return false;
+    }
 
     public function getAuth()
     {
@@ -349,8 +414,23 @@ class waSystemConfig
         }
     }
 
+    public function getBackendAuth()
+    {
+        $cache = new waRuntimeCache('wa-config/backend_auth');
+        if ($cache->isCached()) {
+            return $cache->get();
+        } else {
+            $data = $this->getConfigFile('backend_auth');
+            $cache->set($data);
+            return $data;
+        }
+    }
+
     public function setAuth($data)
     {
+        if (waConfig::get('is_template')) {
+            return false;
+        }
         $path = $this->getPath('config', 'auth');
         if (waUtils::varExportToFile($data, $path)) {
             $cache = new waRuntimeCache('wa-config/auth');
@@ -360,6 +440,19 @@ class waSystemConfig
         return false;
     }
 
+    public function setBackendAuth($data)
+    {
+        if (waConfig::get('is_template')) {
+            return false;
+        }
+        $path = $this->getPath('config', 'backend_auth');
+        if (waUtils::varExportToFile($data, $path)) {
+            $cache = new waRuntimeCache('wa-config/backend_auth');
+            $cache->set($data);
+            return true;
+        }
+        return false;
+    }
 
     public function getRootPath()
     {
@@ -447,4 +540,68 @@ class waSystemConfig
         return waLocale::getAll($type);
     }
 
+    public function clearCache()
+    {
+        $new_cache_dir = $old_cache_dir = waConfig::get('wa_path_cache');
+        $wa_cache = waConfig::get('wa_path_cache_root');
+        if (!$wa_cache) {
+            self::$system_options['cache_versioning'] = false;
+            $wa_cache = $old_cache_dir;
+        }
+
+        // When cache versioning is enabled, switch to new cache directory
+        if (!empty(self::$system_options['cache_versioning'])) {
+            if (touch($wa_cache.DIRECTORY_SEPARATOR.'versioning')) {
+                $filemtime = time();
+            } else {
+                self::$system_options['cache_versioning'] = false;
+                $filemtime = false;
+            }
+
+            $new_cache_dir = $wa_cache.DIRECTORY_SEPARATOR.$this->getVersionedCacheDir($filemtime);
+            waConfig::set('wa_path_cache', $new_cache_dir);
+        }
+
+        // Delete all dirs inside wa-cache
+        $clean = true;
+        foreach (waFiles::listdir($wa_cache) as $path) {
+            $path = $wa_cache.DIRECTORY_SEPARATOR.$path;
+            if (!waSystemConfig::isDebug() && !empty(self::$system_options['cache_versioning']) && ($old_cache_dir == $path || $new_cache_dir == $path)) {
+                // When cache versioning is enabled, do not delete current (both old and new) cache dirs.
+                // Old because there might still be scripts running. New because it is supposed to be empty.
+                continue;
+            }
+            if (!is_dir($path)) {
+                continue;
+            }
+            try {
+                waFiles::delete($path, true);
+            } catch (waException $ex) {
+                if (empty(self::$system_options['cache_versioning'])) {
+                    // we only care about leftovers here
+                    // if cache versioning is disabled
+                    $clean = false;
+                }
+            }
+        }
+
+        // Clear non-file-based app caches
+        $apps = wa()->getApps(true);
+        foreach ($apps as $app_id => $app) {
+            try {
+                $cache = wa()->getCache('default', $app_id);
+                if ($cache) $cache->deleteAll();
+            } catch (waException $ex) {
+                $clean = false;
+            }
+        }
+
+        // Make sure opcache and filesystem are aware of changes
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+        @clearstatcache();
+
+        return $clean;
+    }
 }

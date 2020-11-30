@@ -21,6 +21,7 @@ class waInstallerApps
     private static $locale;
     private static $cache_ttl;
     private $license;
+    private $token;
     private $identity_hash;
     private $beta;
     private $promo_id;
@@ -118,6 +119,20 @@ class waInstallerApps
             $signature['os'] = constant('PHP_OS');
         }
 
+        try {
+            if (class_exists('waDbConnector')) {
+                $adapter = waDbConnector::getConnection();
+                $signature['sql_adapter'] = strtolower(preg_replace('@^waDb(.+)Adapter$@', '$1', get_class($adapter)));
+                if ($result = $adapter->query('SELECT @@version')) {
+                    if ($version = $adapter->fetch($result)) {
+                        $signature['sql'] = preg_replace('@([^0-9\\.].*)$@', '', reset($version));
+                    }
+                }
+            }
+        } catch (Exception $ex) {
+
+        }
+
         return $raw ? $signature : base64_encode(json_encode($signature));
     }
 
@@ -170,6 +185,7 @@ class waInstallerApps
             }
         }
         if (!$raw && $d) {
+            $d = array_slice($d, 0, 10);
             $d = implode(':', $d);
         }
 
@@ -223,10 +239,11 @@ class waInstallerApps
         self::init();
     }
 
-    public function __construct($license = null, $locale = null, $ttl = 600, $force = false)
+    public function __construct($license = null, $locale = null, $ttl = 600, $force = false, $token = null)
     {
         self::init();
         $this->license = $license;
+        $this->token = $token;
         /* identity hash */
         $this->identity_hash = self::getGenericConfig('identity_hash');
         $this->beta = self::getGenericConfig('beta');
@@ -261,6 +278,10 @@ class waInstallerApps
                 }
                 unset($enabled);
             }
+        }
+
+        if (!file_exists(self::$root_path.self::CONFIG_SOURCES) && class_exists('waSystem')) {
+            wa('installer')->event('sources_not_found');
         }
         if (file_exists(self::$root_path.self::CONFIG_SOURCES)) {
             $this->sources = include(self::$root_path.self::CONFIG_SOURCES);
@@ -454,14 +475,14 @@ class waInstallerApps
     /**
      *
      * Enumerate local items
-     * @since 2.0
-     * @param string $path wa-apps/[%app_id%/(themes|plugins)/] or wa-plugins/(payment|shipping|sms)
+     * @param string $path wa-apps/[%app_id%/(themes|plugins|widgets)/] or wa-plugins/(payment|shipping|sms)
      *
      * @param array $options
      *
      * @param array [string]array $options['items']
      * @param array [string]boolean $options['plugins']
      * @param array [string]boolean $options['themes']
+     * @param array [string]boolean $options['widgets']
      * @param array [string]boolean $options['list']
      *
      * @param array $filter
@@ -470,6 +491,7 @@ class waInstallerApps
      * @param array [string]boolean $options['plugins']
      * @param array [string]boolean $options['themes']
      * @return array
+     * @since 2.0
      */
     protected function enumerate($path, $options = array(), $filter = array())
     {
@@ -669,10 +691,10 @@ class waInstallerApps
     }
 
     /**
-     * @since 2.0
      * @param string $vendor
      * @param boolean $check_updates
      * @return array[string]
+     * @since 2.0
      * @todo filter vendor
      */
     public function getVersions($vendor = null, $check_updates = false)
@@ -696,7 +718,7 @@ class waInstallerApps
             foreach (array('plugins', 'themes', 'widgets') as $type) {
                 if (!empty($app[$type])) {
                     foreach ($app[$type] as $item) {
-                        $versions[$item['slug']] = $item['installed']['version'];
+                        $versions[$item['slug']] = ifempty($item, 'installed', 'version', '');
                     }
                 }
 
@@ -710,9 +732,8 @@ class waInstallerApps
                     unset($versions[$slug]);
                 }
             }
-        } else {
-
         }
+
         return $versions;
     }
 
@@ -908,7 +929,6 @@ class waInstallerApps
         $enum_options = array();
         if (isset($options['status'])) {
             $installed_apps = self::getConfig(self::CONFIG_APPS);
-            $installed_apps = self::getInstalledApps();
             if ($options['status'] === true) {
                 $enum_options['items'] = $installed_apps;
             } elseif ($options['status'] === false) {
@@ -1030,12 +1050,12 @@ class waInstallerApps
     }
 
     /**
-     * @since 2.0
      * @param $app
      * @param $type
      * @param array $options
      * @return array
      * @throws Exception
+     * @since 2.0
      */
     public function getExtras($app, $type, $options = array())
     {
@@ -1199,11 +1219,11 @@ class waInstallerApps
     }
 
     /**
-     * @since 2.0
      * @param $slug
      * @param array $options
-     * @throws Exception
      * @return array();
+     * @throws Exception
+     * @since 2.0
      */
     public function getItemInfo($slug, $options = array())
     {
@@ -1350,6 +1370,12 @@ class waInstallerApps
                 if ($this->identity_hash) {
                     $query = $query.($query ? '&' : '').'hash='.$this->identity_hash;
                 }
+                if ($identity_hash = $this->getGenericConfig('previous_hash')) {
+                    $query = $query.($query ? '&' : '').'previous_hash='.$identity_hash;
+                }
+                if (!empty($this->token)) {
+                    $query = $query.($query ? '&' : '').'token='.$this->token;
+                }
                 if ($this->promo_id) {
                     $query = $query.($query ? '&' : '').'promo_id='.$this->promo_id;
                 }
@@ -1386,8 +1412,7 @@ class waInstallerApps
                                 }
                             }
                         }
-                        $callback = create_function('$a', 'return strpos($a,"/")===false;');
-                        if ($apps = array_filter(array_keys($raw['v']), $callback)) {
+                        if ($apps = array_filter(array_keys($raw['v']), array($this, 'buildUrlCallback'))) {
                             $query = $query.($query ? '&' : '').self::getDomains($apps);
                         }
                     }
@@ -1404,6 +1429,11 @@ class waInstallerApps
             }
         }
         return $is_url;
+    }
+
+    private function buildUrlCallback($a)
+    {
+        return strpos($a, "/") === false;
     }
 
     private function originalUrl($url)
@@ -1426,11 +1456,11 @@ class waInstallerApps
 
     /**
      *
-     * @todo rename and use corrected names
      * @param array $item
      * @param string $id
      * @param array $fields
      * @param bool $no_translate
+     * @todo rename and use corrected names
      */
     private static function fixItemCurrent(&$item, $id = null, $fields = array(), $no_translate = false)
     {
@@ -1530,8 +1560,8 @@ class waInstallerApps
             }
             if (file_exists($build_path) && ($build = include($build_path))) {
                 $item['installed']['version'] .= ".{$build}";
-            } elseif (preg_match('/((^|\\.)[\\d]+){3}$/', $item['installed']['version'])) {
-                $item['installed']['version'] .= ".0";
+            } elseif (preg_match('/((^|\\.)[\\d]+){2,3}$/', $item['installed']['version'])) {
+                $item['installed']['version'] .= ".p";
             }
         }
     }
@@ -1655,6 +1685,16 @@ class waInstallerApps
                 }
             }
         }
+
+        // Build parent theme slug
+        if (!empty($config['parent_theme_id'])) {
+            $parent = $config['parent_theme_id'];
+            list($app_id, $parent_theme_id) = explode(':', $parent);
+            if (!empty($app_id) && !empty($parent_theme_id)) {
+                $config['parent_theme_slug'] = "{$app_id}/themes/{$parent_theme_id}";
+            }
+        }
+
         foreach ($ml_fields as $field) {
             if (isset($config[$field]) && is_array($config[$field])) {
                 $key = array_intersect(array(self::$locale, 'en_US',), array_keys($config[$field]));
@@ -1688,6 +1728,10 @@ class waInstallerApps
         @flock($fp, LOCK_UN);
         @fclose($fp);
         self::$configs[$path] = $config;
+
+        if (function_exists('opcache_invalidate')) {
+            @opcache_invalidate($path, true);
+        }
         return $config;
     }
 
@@ -1721,11 +1765,11 @@ class waInstallerApps
 
     /**
      *
-     * @throws Exception
      * @param $app_id string
      * @param $plugin_id string
      * @param $enabled boolean or null to remove
      * @return array
+     * @throws Exception
      */
     public function updateAppPluginsConfig($app_id, $plugin_id, $enabled = true)
     {
@@ -1773,11 +1817,11 @@ class waInstallerApps
 
     /**
      *
-     * @throws Exception
      * @param $app_id string
      * @param $routing array
      * @param $domain string
-     * @return string
+     * @return string|string[]
+     * @throws Exception
      */
     private function updateRoutingConfig($app_id = 'default', $routing = array(), $domain = null)
     {
@@ -1787,7 +1831,7 @@ class waInstallerApps
             foreach ($current_routing as $domain => & $routes) {
                 if (is_array($routes)) {
                     foreach ($routes as $route_id => $route) {
-                        if (is_array($route)) { //route is array
+                        if (is_array($route)) {
                             if (isset($route['app']) && ($route['app'] == $app_id)) {
                                 unset($routes[$route_id]);
                             }
@@ -1828,6 +1872,10 @@ class waInstallerApps
 
             if (!isset($current_routing[$domain])) {
                 $current_routing[$domain] = array();
+            } elseif (!is_array($current_routing[$domain])) {
+                // When routing is a string, it's domain of redirect-type.
+                // Nothing to update!
+                return $domain;
             }
 
             $root_owned = false;
@@ -1871,10 +1919,10 @@ class waInstallerApps
 
     /**
      * Update database settings
-     * @throws Exception
      * @param $config array
      * @param $id
      * @return void
+     * @throws Exception
      */
     public function updateDbConfig($config = array(), $id = 'default')
     {
@@ -1887,8 +1935,8 @@ class waInstallerApps
      * Update database settings
      *
      * @param $config array
+     * @return array
      * @internal param $id
-     * @return void
      */
     private static function updateGenericConfig($config = array())
     {
@@ -1896,8 +1944,33 @@ class waInstallerApps
             'debug'         => false,
             'identity_hash' => md5(__FILE__.(function_exists('php_uname') ? php_uname() : '').phpversion().rand(0, time())),
         );
-        $config = array_merge($default, self::getConfig(self::CONFIG_GENERIC), $config);
-        self::setConfig(self::CONFIG_GENERIC, $config);
+        $current = self::getConfig(self::CONFIG_GENERIC);
+        if (isset($config['identity_hash'])) {
+            $log = array(
+                'Regenerate identity hash procedure.',
+            );
+            if ($config['identity_hash']) {
+                if (!empty($current['previous_hash'])) {
+                    $log[] = sprintf('Hold previous change %s->%s.', $current['previous_hash'], $current['identity_hash']);
+                } else {
+                    $config['previous_hash'] = $current['identity_hash'];
+                    $log[] = sprintf('Change hash %s->%s.', $current['identity_hash'], $default['identity_hash']);
+                    unset($current['identity_hash']);
+                }
+            } elseif (!empty($current['previous_hash'])) {
+                $log[] = sprintf('Remove obsolete hash %s.', $current['previous_hash']);
+                unset($current['previous_hash']);
+            } else {
+                $log[] = 'Attempt to remove deleted obsolete hash.';
+                unset($current['previous_hash']);
+            }
+            if (class_exists('waLog')) {
+                //waLog::log(implode("\n", $log), 'installer/identity_hash.log');
+            }
+            unset($config['identity_hash']);
+        }
+        $config = array_merge($default, $current, $config);
+        return self::setConfig(self::CONFIG_GENERIC, $config);
     }
 
     /**
@@ -1930,8 +2003,8 @@ class waInstallerApps
      * @param $slug
      * @param $domain string domain ID fo
      * @param bool|string $edition string application edition
-     * @throws Exception
      * @return void
+     * @throws Exception
      */
     public function installWebAsystItem($slug, $domain = null, $edition = true)
     {
@@ -1974,6 +2047,11 @@ class waInstallerApps
                 'locale' => self::$locale,
             );
             if (!empty($config['routing_params']) && is_array($config['routing_params'])) {
+                foreach ($config['routing_params'] as $routing_param => $routing_param_value) {
+                    if (is_callable($routing_param_value)) {
+                        $config['routing_params'][$routing_param] = call_user_func($routing_param_value);
+                    }
+                }
                 $routing = array_merge($routing, $config['routing_params']);
             }
             $domain = $this->updateRoutingConfig($app_id, $routing, $domain);
@@ -2021,8 +2099,17 @@ class waInstallerApps
                 $robots[] .= "# wa ".$app_id."\n";
                 $robots[] = "\n";
             }
-            $robots_path = "wa-data/public/site/data/{$domain}/robots.txt";
-            self::mkdir("wa-data/public/site/data/{$domain}");
+            if (class_exists('waConfig')) {
+                $robots_path = waConfig::get('wa_path_data')."/public/site/data/{$domain}";
+                $robots_path = substr($robots_path, strlen(waSystem::getInstance()->getConfig()->getRootPath()) + 1);
+            } else {
+                $robots_path = "wa-data/public/site/data/{$domain}";
+            }
+
+            self::mkdir($robots_path);
+
+            $robots_path .= '/robots.txt';
+
             if ($fp = @fopen(self::$root_path.$robots_path, 'a')) {
                 fwrite($fp, "\n".implode("", $robots));
                 fclose($fp);
@@ -2034,22 +2121,22 @@ class waInstallerApps
 
     private static function mkdir($target_path, $mode = 0777)
     {
-        if (!file_exists(self::$root_path.$target_path)) {
-            if (!mkdir(self::$root_path.$target_path, $mode & 0777, true)) {
-                throw new Exception("Error occurred while creating a directory {$target_path}");
+        if (!@file_exists(self::$root_path.$target_path)) {
+            if (!@mkdir(self::$root_path.$target_path, $mode & 0777, true)) {
+                throw new Exception("Error occurred while creating a directory {$target_path} at ".self::$root_path);
             }
-        } elseif (!is_dir(self::$root_path.$target_path)) {
+        } elseif (!@is_dir(self::$root_path.$target_path)) {
             throw new Exception("Error occurred while creating a directory {$target_path} - it's a file");
 
-        } elseif (!is_writable(self::$root_path.$target_path)) {
+        } elseif (!@is_writable(self::$root_path.$target_path)) {
             throw new Exception("Directory {$target_path} unwritable");
         }
         if (preg_match('@^/?(wa-data/protected|wa-log|wa-cache|wa-config)(/|$)@', $target_path, $matches)) {
             $htaccess_path = $matches[1].'/.htaccess';
-            if (!file_exists(self::$root_path.$htaccess_path)) {
+            if (!@file_exists(self::$root_path.$htaccess_path)) {
                 if ($fp = @fopen(self::$root_path.$htaccess_path, 'w')) {
-                    fwrite($fp, "Deny from all\n");
-                    fclose($fp);
+                    @fwrite($fp, "Deny from all\n");
+                    @fclose($fp);
                 } else {
                     throw new Exception("Error while trying to protect a directory {$target_path} with htaccess");
                 }
@@ -2099,35 +2186,31 @@ class waInstallerApps
     /**
      *
      * Query to updates server
-     * @since 2.0
      * @param string $query
      * @param string $vendor
      * @param boolean $values return simple array or with keys
      * @return bool|mixed|string
+     * @since 2.0
      */
     private function query($query, $vendor = self::VENDOR_SELF, $values = false)
     {
-        /**
-         * @var $file waInstallerFile
-         */
+        /** @var waInstallerFile $file */
         static $file;
         $result = false;
-        $sources = $this->getSources(self::LIST_APPS, $vendor);
-        if (!empty($sources[$vendor])) {
-            /**
-             * @todo temporal hack with replace
-             */
-            if (strpos($query, '?') !== false) {
-                $query .= '&server_data=1';
-            } else {
-                $query .= '?server_data=1';
+
+        $updates_url = $this->buildUpdatesUrl('2.0', $vendor);
+        $url = $updates_url.$query;
+        if ($this->buildUrl($url)) {
+            if (!$file) {
+                $file = new waInstallerFile();
             }
-            $url = preg_replace('@apps/list/$@', '2.0/', $sources[$vendor]).$query;
-            if ($this->buildUrl($url)) {
-                if (!$file) {
-                    $file = new waInstallerFile();
-                }
-                $result = $file->getData($url, 'json', $values);
+            $result = $file->getData($url, 'json', $values);
+            $headers = $file->getHeaders();
+            if (isset($headers['identity_hash'])) {
+                $config = array(
+                    'identity_hash' => intval($headers['identity_hash']),
+                );
+                self::updateGenericConfig($config);
             }
         }
         return $result;
@@ -2190,19 +2273,78 @@ class waInstallerApps
         return $path;
     }
 
-    private static function getInstalledApps(){
-        $installed_apps = self::getConfig(self::CONFIG_APPS);
-        $result = array();
-        foreach ($installed_apps as $app_id => $info){
-            if(is_array($info)){
-                if(isset($info['app'])){
-                    $result[$info['app']] = 1;
-                }
-            }
-            else{
-                $result[$app_id] = 1;
-            }
+    /**
+     * Build url to remote updates server
+     * @param string $version
+     * @param string $vendor
+     * @param null|string $api_method
+     * @return false|string
+     * @throws Exception
+     * @since 3.0
+     */
+    private function buildUpdatesUrl($version = '3.0', $vendor = self::VENDOR_SELF, $api_method = null)
+    {
+        $result = false;
+        $sources = $this->getSources(self::LIST_APPS, $vendor);
+        if (!empty($sources[$vendor])) {
+            $result = preg_replace('@apps/list/$@', "{$version}/", $sources[$vendor]);
         }
+
+        if ($api_method && is_string($api_method)) {
+            $result .= $api_method.'/';
+        }
+
         return $result;
+    }
+
+    /**
+     * Get the address with the information to initialize the Installer app
+     * @return string
+     * @throws Exception
+     * @since 3.0
+     */
+    public function getInstallerInitUrl()
+    {
+        try {
+            return $this->buildUpdatesUrl('3.0', self::VENDOR_SELF, 'installer/init');
+        } catch (Exception $e) {
+            throw new Exception('Installer app cannot be initialized');
+        }
+    }
+
+    public function getInstallerTokenUrl()
+    {
+        try {
+            return $this->buildUpdatesUrl('3.0', self::VENDOR_SELF, 'installer/token');
+        } catch (Exception $e) {
+            throw new Exception('Unable to build URL to get token');
+        }
+    }
+
+    public function getInstallerFactUrl()
+    {
+        try {
+            return $this->buildUpdatesUrl('3.0', self::VENDOR_SELF, 'installer/fact');
+        } catch (Exception $e) {
+            throw new Exception('Unable to build URL to send changes to the inst package');
+        }
+    }
+
+    public function getStoreReviewCoreUrl()
+    {
+        try {
+            return $this->buildUpdatesUrl('3.0', self::VENDOR_SELF, 'installer/review/core.init.djs');
+        } catch (Exception $e) {
+            throw new Exception('Unable to build URL to Store Product rate JS API');
+        }
+    }
+
+    public function getInstallerAnnounceUrl()
+    {
+        try {
+            return $this->buildUpdatesUrl('3.0', self::VENDOR_SELF, 'installer/announce');
+        } catch (Exception $e) {
+            throw new Exception('Unable to build URL to get announcements');
+        }
     }
 }

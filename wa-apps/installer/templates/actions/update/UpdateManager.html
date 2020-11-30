@@ -1,5 +1,5 @@
 
-{wa_js file="js/installer.min.js"}
+{wa_js}
 {$wa_url}wa-content/js/jquery-plugins/jquery.tmpl.min.js
 {$wa_app_static_url}js/installer.js
 {/wa_js}
@@ -23,6 +23,8 @@ $(document).ready( function() {
             {/foreach}
             ],
             install:{if $install}true{else}false{/if},
+            trial:{if $trial}true{else}false{/if},
+            trial_dir:{if $trial}{waTheme::getTrialUrl()|json_encode}{else}null{/if},
             logMode:'raw'
         },'{$thread_id|escape:'js'}');
     });
@@ -78,7 +80,7 @@ $(document).ready( function() {
             {{if ($value) && (!$value.skipped) && (!$value.update) && ($value.subject == 'app')}}
             <li id="wa-app-${$value.slug}">
                 <a href="{/literal}{wa_backend_url()}{literal}${$value.slug}/">
-                    {{if $value.icon}}<img alt="" src="${$value.icon}">{{/if}}
+                    {{if $value.icon}}<img alt="" src="${$value.icon}" style="width: 48px; height: 48px;">{{/if}}
                     ${$value.name}
                 </a>
             </li>

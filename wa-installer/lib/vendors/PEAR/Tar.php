@@ -199,7 +199,7 @@ class Archive_Tar extends PEAR
      *                   is required.  For compatibility reason the
      *                   boolean value 'true' means 'gz'.
      * @access public
-     * @return self
+     * @return self|false
      */
     function __construct($p_tarname, $p_compress = null)
     {
@@ -654,7 +654,7 @@ class Archive_Tar extends PEAR
         }
 
         // ----- Get the arguments
-        $v_att_list = &func_get_args();
+        $v_att_list = func_get_args();
 
         // ----- Read the attributes
         $i=0;
@@ -1649,6 +1649,10 @@ class Archive_Tar extends PEAR
           return false;
       }
 
+    if ($pos0 = strpos($v_header['filename'], "\0")) {
+        $v_header['filename'] = substr($v_header['filename'], 0, $pos0);
+    }
+
       if ((!$v_extract_all) && (is_array($p_file_list))) {
         // ----- By default no unzip if the file is not found
         $v_extract_file = false;
@@ -1675,9 +1679,6 @@ class Archive_Tar extends PEAR
         $v_extract_file = TRUE;
       }
 
-      if ($pos0 = strpos($v_header['filename'], "\0")) {
-          $v_header['filename'] = substr($v_header['filename'], 0, $pos0);
-      }
       // ----- Look if this file need to be extracted
       if (($v_extract_file) && (!$v_listing))
       {
@@ -1794,7 +1795,6 @@ class Archive_Tar extends PEAR
         $v_end_of_file = @feof($this->_file);
         */
 
-            //TODO check list and partial modes
             if ($v_listing) {
         // ----- Log extracted files
         if (($v_file_dir = dirname($v_header['filename']))
@@ -1807,10 +1807,6 @@ class Archive_Tar extends PEAR
         if (is_array($p_file_list) && (count($p_list_detail) == count($p_file_list))) {
             return true;
         }
-            }elseif($p_file_list&&is_array($p_file_list)){
-                if ( ++$v_nb == count($p_file_list)) {
-                    return true;
-      }
     }
         }
 

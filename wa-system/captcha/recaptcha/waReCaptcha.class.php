@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class waReCaptcha extends waAbstractCaptcha
 {
@@ -9,23 +9,58 @@ class waReCaptcha extends waAbstractCaptcha
     );
 
     const SITE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
-    
+
+    // for invisible captcha only - save success result in session
+    // if user pass captcha test once in this session consider user is not a robot
+    // need to prevent problem where there is multiple captcha instances in page
+    const SESSION_KEY = 'recaptcha_passed';
+
     public function getHtml()
     {
-        $html = <<<HTML
-<div class="wa-captcha wa-recaptcha">
-    <script src='https://www.google.com/recaptcha/api.js' async></script>
-    <div class="g-recaptcha" data-sitekey="{$this->options['sitekey']}"></div>
-</div>
-HTML;
-        return $html;
+        $wrapper_class = ifempty($this->options, 'wrapper_class', 'wa-captcha');
+        $sitekey = ifset($this->options['sitekey']);
+        $invisible = ifset($this->options['invisible']);
+
+        $view = wa('webasyst')->getView();
+        $view->assign(array(
+            'wrapper_class'    => $wrapper_class,
+            'sitekey'          => $sitekey,
+            'recaptcha_passed' => $invisible && wa()->getStorage()->get(self::SESSION_KEY),
+        ));
+
+        $template = wa()->getConfig()->getRootPath() .'/wa-system/captcha/recaptcha/templates/recaptcha.html';
+        if ($invisible) {
+            $template = wa()->getConfig()->getRootPath() .'/wa-system/captcha/recaptcha/templates/recaptcha_invisible.html';
+        }
+        return $view->fetch($template);
     }
-    
+
     public function isValid($code = null, &$error = '')
+    {
+        if ($code) {
+            return $this->verify($code, $error);
+        }
+
+        $code = waRequest::cookie('g-recaptcha-response');
+        $invisible = ifset($this->options['invisible']);
+        if ($invisible && wa()->getStorage()->get(self::SESSION_KEY)) {
+            return true;
+        }
+
+        $is_valid = $this->verify($code, $error);
+        if ($invisible && $is_valid) {
+            wa()->getStorage()->set(self::SESSION_KEY, true);
+        }
+
+        return $is_valid;
+    }
+
+    protected function verify($code = null, &$error = '')
     {
         if ($code === null) {
             $code = waRequest::post('g-recaptcha-response');
         }
+
         $handle = curl_init(self::SITE_VERIFY_URL);
         $options = array(
             CURLOPT_POST => true,

@@ -26,16 +26,15 @@ class installerAppsEnableController extends waJsonController
 
             foreach ((array)$app_ids as $app_id) {
                 if (isset($app_list[$app_id])) {
-                    $config = ifset($app_list[$app_id]['installed']);
-                    $routing = false;
-                    if (!empty($config['frontend'])) {
-                        $routing = array(
-                            'url'    => $app_id.'/*',
-                            'app'    => $app_id,
-                            'module' => 'frontend',
-                        );
-                    }
-                    installerHelper::getInstaller()->updateAppConfig($app_id, true, $routing);
+                    installerHelper::getInstaller()->installWebAsystApp($app_id);
+
+                    $params = array(
+                        'type' => 'apps',
+                        'id'   => $app_id,
+                        'ip'   => waRequest::getIp(),
+                    );
+
+                    $this->logAction('item_enable', $params);
                 }
             }
 

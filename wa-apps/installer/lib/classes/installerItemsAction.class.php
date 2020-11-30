@@ -3,206 +3,109 @@
 abstract class installerItemsAction extends waViewAction
 {
     protected $module = null;
-    protected $redirect = false;
-    protected $update_counter = 0;
 
-    protected function getAppOptions()
-    {
-        return array(
-            'installed' => true,
-        );
-    }
+    protected $store_path;
 
-    protected function getExtrasOptions()
-    {
-        return array(
-            'local'  => false,
-            'apps'   => false,
-            'filter' => (array)waRequest::get('filter'),
-        );
-    }
-
-    protected function extendApplications(&$applications)
-    {
-        $apps = wa()->getApps();
-        foreach ($applications as $app_id => &$app) {
-            if (isset($apps[$app_id])) {
-                $app['name'] = $apps[$app_id]['name'];
-            } else {
-                $app['name'] = _wd($app_id, $app['name']);
-            }
-            unset($app);
-        }
-    }
-
-    protected function getTags()
-    {
-        return array();
-    }
+    abstract protected function buildStorePath($params);
 
     public function execute()
     {
-        if (!waRequest::get('_') && false) {
-            $this->setLayout(new installerBackendLayout());
-        }
-        $this->view->assign('action', 'update');
+        $filters = array();
 
-        $this->view->assign('error', false);
-        $messages = installerMessage::getInstance()->handle(waRequest::get('msg'));
-        $filter = array();
-        if ($this->module) {
-            if ($this->module != 'widgets') {
-                $filter['extras'] = $this->module;
+        $slug = $this->getSlug();
+        $tag = $this->getFilters('tag');
+
+        // System plugins
+        if (preg_match('~^wa-plugins/~', $slug)) {
+            $filters['type'] = 'plugin';
+            $filters['category'] = 'plugins:' . preg_replace('~^wa-plugins/~', '', $slug);
+        } else {
+            $filters['app'] = $slug;
+
+            // For not-themes to pass the product type
+            if ($this->module != 'theme') {
+                $filters['type'] = $this->module;
+            }
+
+            if ($tag) {
+                $filters['tag'] = $tag;
             }
         }
 
+        $params = array(
+            'filters'    => $filters,
+            'in_app'     => true,
+            //'return_url' => $this->getReturnUrl(), TODO: Remove later @ No longer pass return_url to the Store, but pass it to the Installer template (see wa-apps/installer/js/store.js, method productInstall)
+        );
 
-        $app_options = $this->getAppOptions();
+        $this->store_path = $this->buildStorePath($params);
+    }
 
-        try {
+    public function display($clear_assign = true)
+    {
+        $this->preExecute();
+        $this->execute();
+        $this->afterExecute();
 
-            $applications = installerHelper::getInstaller()->getApps($app_options, $filter);
-            $this->extendApplications($applications);
-            $subject = waRequest::get('subject');
+        $store_params = array(
+            'store_path' => $this->store_path,
+            'in_app'     => true,
+            'return_url' => $this->getReturnUrl(),
+        );
 
-            if (empty($subject)) {
-                $extras = array();
-                $search = array();
-
-                $options = $this->getExtrasOptions();
-
-
-                $slug = waRequest::get('slug');
-                if (!empty($options['filter']['slug'])) {
-                    $slug = $options['filter']['slug'];
-                    unset($options['filter']['slug']);
-                }
-
-                if ($slug === 'all') {
-                    $search['slug'] = array_keys($applications);
-                } else {
-                    $search['slug'] = array_filter(array_map('trim', explode(',', $slug)), 'strlen');
-                }
-
-                if (in_array($this->module, array('themes', 'widgets'))) {
-                    if (empty($search['slug'])) {
-                        $search['slug'] = array_keys($applications);
-                    }
-                } else {
-                    foreach ($search['slug'] as $id) {
-                        if (isset($applications[$id]) && !empty($applications[$id]['system_plugins'])) {
-                            $search['slug'] = array_unique(array_merge($search['slug'], $applications[$id]['system_plugins']));
-                        }
-                    }
-                }
-
-                if ((!$this->redirect || !empty($search['slug']))
-                    &&
-                    (($keys = installerHelper::search($applications, $search, true)) !== null)
-                ) {
-                    $slug = array();
-                    foreach ($keys as $id => $key) {
-                        $slug[$id] = $applications[$key]['slug'];
-                    }
-                    $vendor_name = null;
-                    foreach ((array)$this->module as $module) {
-
-                        $extras = installerHelper::getInstaller()->getExtras($slug, $module, $options);
-
-                        foreach ($extras as $app_id => $app_item) {
-
-                            if (!empty($app_item[$module])) {
-                                foreach ($app_item[$module] as $extras_id => $extras_item) {
-                                    if (!empty($extras_item['vendor_name']) && !empty($options['filter']['vendor']) && empty($vendor_name)) {
-                                        $vendor_name = $extras_item['vendor_name'];
-                                    }
-
-                                    if (in_array($app_id, $keys) !== false) {
-                                        $app = &$applications[$app_id];
-                                        if (!isset($app[$module])) {
-                                            $app[$module] = array();
-                                        }
-                                        $app[$module][$extras_id] = $extras_item;
-                                        unset($app);
-
-                                    } elseif (!empty($extras_item['inherited'])) {
-                                        foreach (array_keys($extras_item['inherited']) as $app_id) {
-                                            if (in_array($app_id, $keys) !== false) {
-                                                $app = &$applications[$app_id];
-                                                if (!isset($app[$module])) {
-                                                    $app[$module] = array();
-                                                }
-                                                $app[$module][$extras_id] = $extras_item;
-                                                unset($app);
-                                            }
-                                        }
-                                    } elseif ($app_id == 'webasyst') {
-                                        $alias_id = 'installer';
-                                        $app = &$applications[$alias_id];
-
-                                        if (!isset($app[$module])) {
-                                            $app[$module] = array();
-                                            $app['slug'] = 'webasyst';
-                                        }
-                                        $app[$module][$extras_id] = $extras_item;
-                                        unset($app);
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-
-                    foreach ($keys as $id => $key) {
-                        $empty = true;
-                        foreach ((array)$this->module as $module) {
-                            if (!empty($applications[$key][$module])) {
-                                $empty = false;
-
-                            }
-                        }
-                        if ($empty) {
-                            unset($slug[$id]);
-                        }
-                    }
-
-
-                    $this->view->assign('vendor_name', $vendor_name);
-                } else {
-                    reset($applications);
-                    $app = current($applications);
-                    if ($app) {
-                        $redirect = array(
-                            'module' => $this->module,
-                            'slug'   => $app['slug'],
-                            'vendor' => $app['vendor'],
-                        );
-                        $this->redirect($redirect);
-                    }
-
-                }
-
-
-                $this->view->assign('slug', $search['slug']);
-                //$this->view->assign('vendor', $search['vendor']);
-                $this->view->assign('extras', $extras);
-            }
-
-            $this->view->assign('tags', $this->getTags());
-            $this->view->assign('apps', $applications);
-        } catch (Exception $ex) {
-            $message = $ex->getMessage();
-            waLog::log($message, 'installer.log');
-            if (preg_match('@\b(https?://[^\s]+)\b@', $message, $matches)) {
-                $message = str_replace($matches[1], parse_url($matches[1], PHP_URL_HOST), $message);
-            }
-            $messages[] = array('text' => $message, 'result' => 'fail');
+        $options = $this->getOptions();
+        if (!empty($options)) {
+            $store_params['options'] = $options;
         }
 
-        installerHelper::checkUpdates($messages);
-        $model = new waAppSettingsModel();
-        $this->view->assign('update_counter', $model->get($this->getApp(), 'update_counter'));
-        $this->view->assign('messages', $messages);
-        $this->view->assign('title', _w('Installer'));
+        $store_action = new installerStoreAction($store_params);
+        return $store_action->display($clear_assign);
+    }
+
+    protected function getFilters($filter = null, $default = null)
+    {
+        $filters = waRequest::get('filter', array(), waRequest::TYPE_ARRAY_TRIM);
+        if ($filter) {
+            return ifempty($filters, $filter, $default);
+        }
+        return $filters;
+    }
+
+    protected function getSlug()
+    {
+        $slug = waRequest::get('slug', null, waRequest::TYPE_STRING_TRIM);
+        if (!$slug) {
+            $slug = $this->getFilters('slug');
+        }
+
+        return $slug;
+    }
+
+    /*
+     * In the options, applications can pass such a parameter.
+     * Ex: how to skip the confirm when installing a free product in the in_app product list.
+     */
+    protected function getOptions($option = null, $default = null)
+    {
+        $options = waRequest::get('options', null, waRequest::TYPE_ARRAY_TRIM);
+        if ($option) {
+            return ifempty($options, $option, $default);
+        }
+        return $options;
+    }
+
+    /**
+     * This param is used in the in_app lists of plugins and design themes.
+     * It is transmitted to the Store as a get-parameter and is added as a data attribute to the "Install" button for free products.
+     * @return string
+     */
+    protected function getReturnUrl()
+    {
+        $url = waRequest::get('return_url', waRequest::server('HTTP_REFERER'));
+        $hash = preg_replace('@^#@', '', waRequest::get('return_hash'));
+        if ($hash) {
+            $url .= '#'.$hash;
+        }
+        return $url;
     }
 }

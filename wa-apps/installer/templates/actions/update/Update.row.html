@@ -86,38 +86,51 @@
     <td class="i-update-button">
     
         {* UPDATE BUTTON *}
-    
-        {if !empty($item.applicable)}
+
+        {if !empty($item.applicable) && in_array($item.action, [
+        waInstallerApps::ACTION_UPDATE,
+        waInstallerApps::ACTION_CRITICAL_UPDATE,
+        waInstallerApps::ACTION_INSTALL
+        ], true) }
             {if !empty($item.commercial) && empty($item.purchased)}
 
-            {* not allowed to install the app, i.e. expired *}
+                {* not allowed to install the app, i.e. expired *}
+
+                <p class="small red">[`License is either expired or not valid for this installation`]</p>
+
                 {if $item_type eq 'app'}
-                    {$link="apps/`$item.id`"}
+                    {$link="app/`$item.id`"}
                 {elseif $item_type eq 'theme'}
-                    {$link="themes/`$item.id`"}
-                {elseif $item_type eq 'plugin'}
-                    {$link="plugins/`$item.app`/`$item.id`"}
+                    {$link="theme/`$item.id`"}
                 {elseif $item_type eq 'widget'}
-                    {$link="widgets/`$item.app`/`$item.id`"}
+                    {$link="widget/`$item.app`/`$item.id`"}
+                {elseif $item_type eq 'plugin'}
+                    {if strpos($item.slug,'wa-plugins/') === 0}
+                        {$_plugins_slug = str_replace('wa-plugins/','',$item.slug|escape)}
+                        {$_plugins_slug = str_replace('plugins/','',$_plugins_slug)}
+                        {$link = "plugin/{$_plugins_slug}"}
+                    {else}
+                        {$link = "plugin/{$item.app|default:''}/{$item.id|escape}/"}
+                    {/if}
                 {/if}
-                {if !empty($item.domains) && count($item.domains)>1}
-                    <p class="small red bold">{sprintf('[`To get the update, you need to have separate %s app license for every individual domain the app is used on: %s`]', $item.name,implode(', ',(array)$item.domains))}</p>
-                {else}
-                    {if !empty($item.domains)}{$_domain=reset($item.domains)}{else}{$_domain=$domain}{/if}
-                    <p class="small red">{sprintf('[`License for this app is either expired or not valid for this domain (%s)`]',$_domain)}</p>
-                {/if}
-                <input type="button" onClick="javascript:window.location.href='{$wa_backend_url}installer/#/{$link}/';" value="[`Get license`]">
+
+                <a href="{$wa_app_url}store/{$link}/" {*class="button2 white small"*}>[`Get license`]</a>
+
             {elseif !empty($item.inbuilt)}
+
                 <p class="hint">{sprintf("[`This widget will be updated automatically when you update %s app.`]",$app.name|default:$item.app|default:''|escape)}</p>
+
                 <input type="hidden" name="app_id[{$item.slug}]"
-                       value="{$item.vendor}{if isset($item.edition) && $item.edition}:{$item.edition}{/if}"
-                       id="checkbox_{$item.slug|replace:'/':'___'}" data-app="{$item.app|default:''|escape}">
+                    value="{$item.vendor}{if isset($item.edition) && $item.edition}:{$item.edition}{/if}"
+                    id="checkbox_{$item.slug|replace:'/':'___'}" data-app="{$item.app|default:''|escape}">
+
             {else}
-                <!-- ok to update -->
+
                 <input type="hidden" name="app_id[{$item.slug}]"
                        value="{$item.vendor}{if isset($item.edition) && $item.edition}:{$item.edition}{/if}"
                        id="checkbox_{$item.slug|replace:'/':'___'}">
-                <input type="submit" id="update_{$item.slug|replace:'/':'___'}" value="[`Install update`]">
+                <input {*class="button2 small"*} type="submit" id="update_{$item.slug|replace:'/':'___'}" value="[`Install update`]">
+
             {/if}
         {/if}
 

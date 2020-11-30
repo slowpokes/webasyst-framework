@@ -14,8 +14,18 @@ class installerPluginsDisableController extends waJsonController
             $installer = new waInstallerApps();
             //TODO check that plugin a exists
             $installer->updateAppPluginsConfig($app_id, $plugin_id, false);
-            $this->response['message'] = _w('Cache cleared');
+
+            $params = array(
+                'type' => 'plugins',
+                'id'   => sprintf('%s/%s', $app_id, $plugin_id),
+                'ip'   => waRequest::getIp(),
+            );
+
+            $this->logAction('item_disable', $params);
+
             $errors = installerHelper::flushCache();
+
+            $this->response['message'] = _w('Cache cleared');
             if ($errors) {
                 $this->response['message'] .= "<br>"._w('But with errors:')."<br>".implode("<br>", $errors);
             }

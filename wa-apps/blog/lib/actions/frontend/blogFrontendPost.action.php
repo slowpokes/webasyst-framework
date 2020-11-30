@@ -54,6 +54,10 @@ class blogFrontendPostAction extends blogViewAction
             throw new waException(_w('Post not found'), 404);
         }
 
+        // The update_datetime field can be empty if the post was created before the introduction of this field and has not been updated
+        $update_datetime = ifempty($post['update_datetime'], $post['datetime']);
+        $this->getResponse()->setLastModified($update_datetime);
+
         if ($post['status'] != blogPostModel::STATUS_PUBLISHED) {
 
             $hash = base64_decode($hash);
@@ -203,6 +207,8 @@ class blogFrontendPostAction extends blogViewAction
         $text = preg_replace('/<img src="([^"]*)"\s*\/?>/', '<div class="fixed-container"><amp-img layout="fill" class="contain" src="$1"></amp-img></div>', $text);
         $this->view->assign('amp_text', $text);
         //VADIM CODE END
+        $canonical_url = $post['link'];
+        $this->getResponse()->setCanonical($canonical_url);
     }
 
     /**

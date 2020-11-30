@@ -40,13 +40,13 @@ class waLayout extends waController
             }
             if ($utm) {
                 // save utm to cookie
-                wa()->getResponse()->setCookie('utm', json_encode($utm), time() + 30 * 86400, null, '', false, true);
+                wa()->getResponse()->setCookie('utm', json_encode($utm), time() + 90 * 86400, null, '', false, true);
             }
             // save referer
             if ($ref = waRequest::server('HTTP_REFERER')) {
                 $ref_host = @parse_url($ref, PHP_URL_HOST);
                 if ($ref_host != waRequest::server('HTTP_HOST')) {
-                    wa()->getResponse()->setCookie('referer', waRequest::server('HTTP_REFERER'), time() + 30 * 86400, null, '', false, true);
+                    wa()->getResponse()->setCookie('referer', waRequest::server('HTTP_REFERER'), time() + 90 * 86400, null, '', false, true);
                 }
             }
             // save landing page
@@ -142,12 +142,15 @@ class waLayout extends waController
             (waRequest::param('theme') != waRequest::param('theme_mobile'))) {
             wa()->getResponse()->addHeader('Vary', 'User-Agent');
         }
-        wa()->getResponse()->sendHeaders();
         $this->view->cache(false);
         if ($this->view->autoescape() && $this->view instanceof waSmarty3View) {
             $this->view->smarty->loadFilter('pre', 'content_nofilter');
         }
-        $this->view->display($this->getTemplate());
+
+        // fetch() is slightly slower because of output filtering,
+        // but it allows to modify page headers from inside theme templates.
+        $html = $this->view->fetch($this->getTemplate());
+        wa()->getResponse()->sendHeaders();
+        echo $html;
     }
 }
-

@@ -38,9 +38,9 @@
     
             </div>
             <div class="value">
-                <label>{$p->_w('City name')}: <input name="{$namespace|escape}[rate_zone][city]" value="{ifset($values.rate_zone.city)}" type="text"></label>
+                <label>{$p->_w('Locality name')}: <input name="{$namespace|escape}[rate_zone][city]" value="{ifset($values.rate_zone.city)}" type="text"></label>
     
-                <p class="hint">{$p->_w('If courier shipping is provided only within specific cities, enter the city names separated by comma so that customer is not be prompted to enter city name when this shipping option is selected; a city name will be automatically fetched as you specify it here. If this field is left blank, a customer will be prompted to enter a city name.')}</p>
+                <p class="hint">{$p->_w('If courier shipping is provided only within specific localities, enter the locality names separated by comma so that customer is not be prompted to enter a locality name when this shipping option is selected; a locality name will be automatically fetched as you specify it here. If this field is left blank, a customer will be prompted to enter a locality name.')}</p>
             </div>
             <br><br>
         </div>
@@ -61,9 +61,73 @@
             <div class="value"><label><input type="checkbox" name="{$namespace|escape}[contact_fields][region]" value="region" {if !empty($values.contact_fields.region)||!empty($values.rate_zone.region)} checked="checked"{/if} {if !empty($values.rate_zone.region)} disabled="disabled"{/if}>&nbsp;[s`State`]</label></div>
             <div class="value"><label><input type="checkbox" name="{$namespace|escape}[contact_fields][city]" value="city" {if !empty($values.contact_fields.city)||!empty($values.rate_zone.city)} checked="checked"{/if}{if !empty($values.rate_zone.city)} disabled="disabled"{/if}>&nbsp;[s`City`]</label></div>
             <div class="value"><label><input type="checkbox" name="{$namespace|escape}[contact_fields][street]" value="street" {if !empty($values.contact_fields.street)} checked="checked"{/if}>&nbsp;[s`Street address`]</label></div>
+            <div class="value"><label><input type="checkbox" name="{$namespace|escape}[contact_fields][zip]" value="zip" {if !empty($values.contact_fields.zip)}checked="checked"{/if}>&nbsp;[s`ZIP`]</label></div>
             <div class="value hint">{$p->_w('Enable shipping address fields which must always be filled by a client during checkout.')}<br>
 	            {$p->_w('Should some of the enabled fields be filled on the contact info step, then they will not be displayed on courier shipping selection.')}<br>
                 {$p->_w('Disabled can be only fields that are not completed in the above setting “Shipping region”.')}</div>
+            <br><br>
+        </div>
+
+        {if !empty($map_adapters)}
+            <div class="field">
+                <div class="name">[s`Maps`]</div>
+                {foreach $map_adapters as $a}
+                    {$adapter_id = $a->getId() }
+                    <div class="value no-shift">
+                        <label>
+                            <input type="radio" name="{$namespace|escape}[map]" {if $values.map==$adapter_id}checked{/if} value="{$adapter_id}">&nbsp;{$a->getName()}
+                        </label>
+
+        <div class="field js-additional-address-fields">
+            <div class="name">{$p->_w('Additional address fields')}</div>
+
+            {$_string_subfield_count = count($address_oneline_string_subfields)}
+
+            {function _shipping_courier_additional_subfield_select_options selected=''}
+                {foreach $address_oneline_string_subfields as $_subfield_id => $_subfield}
+                    <option value="{$_subfield_id}" {if $selected == $_subfield_id}selected="selected"{/if}>{$_subfield->getName()}</option>
+                {/foreach}
+            {/function}
+
+
+            {foreach $additional_address_field_ids as $_field_id => $_label}
+
+                {$_real_subfield_id = $values.additional_address_fields[$_field_id]|default:''}
+                {if !isset($address_oneline_string_subfields[$_real_subfield_id])}
+                    {$_real_subfield_id = ''}
+                {/if}
+
+                {$_checkbox_is_disabled = $_string_subfield_count == 0}
+                {$_checkbox_is_selected = !$_checkbox_is_disabled && $_real_subfield_id}
+
+                <div class="value">
+                    <label>
+                        <input type="checkbox" data-field-id="{$_field_id}"
+                            {if $_checkbox_is_disabled}disabled="disabled"{/if}
+                            {if $_checkbox_is_selected}checked="checked"{/if}>&nbsp;{$_label}
+                    </label>
+                </div>
+                <div class="value js-select-wrapper" {if !$_checkbox_is_selected}style="display: none"{/if}>
+                    {* to reset value if select is disabled *}
+                    <input type="hidden" name="{$namespace|escape}[additional_address_fields][{$_field_id}]" value="">
+                    <select name="{$namespace|escape}[additional_address_fields][{$_field_id}]" data-field-id="{$_field_id}" {if !$_checkbox_is_selected}disabled="disabled"{/if}>
+                        {_shipping_courier_additional_subfield_select_options selected=$_real_subfield_id}
+                    </select>
+                </div>
+            {/foreach}
+
+            <div class="value hint">
+                {if $_string_subfield_count == 0}
+                    <div>
+                        {$_link_url = "{$webasyst_app_url}settings/field/"}
+                        <i class="icon16 exclamation"></i>
+                        {sprintf($p->_w('Add extra subfields of “<em>Text (input)</em>” type for the “Address” field via <a href="%s">Settings</a> app to enable these additional address fields.'), $_link_url)}
+                    </div>
+                {/if}
+                <div>{$p->_w('Enable extra address fields which you want to be offered for completion to customers during checkout.')}</div>
+                <div class="js-additional-address-fields-errors errormsg" style="display: none"></div>
+            </div>
+
             <br><br>
         </div>
 
@@ -81,10 +145,11 @@
                     {$map_adapter_settings = $a->getSettingsHtml(['namespace'=>$namespace])}
                     {if !empty($map_adapter_settings)}
                         <div class="value no-shift hint js-map-adapter-settings" data-adapter-id="{$adapter_id}" style="display: none;">
-                            {'../installer/?module=settings'|string_format:$p->_w('Online map settings are available in <a href="%s">Installer</a> app.')}
+                            {'../webasyst/settings/maps/'|string_format:$p->_w('Online map settings are available in <a href="%s">Settings</a> app.')}
                         </div>
                     {/if}
                 {/foreach}
+                <div class="value hint">{$p->_w('Select an online maps service to display a map with the customer address on the printable packing list form.')}</div>
             </div>
         {/if}
     </div>
@@ -218,154 +283,22 @@
             </div>
         </div>
     </div>
-
 </div>
+
+{$js_code}
+
 <script type="text/javascript">
-    $(function () {
-        'use strict';
 
-        var container = $('#courier-pickup-settings');
+    {$_locale_strings = [
+        'additional_address_field_assign_error' => $p->_w('Please select different address fields for each additional field.')
+    ]}
 
-        container.find(':input[name$="\[map\]"]').change(function (event) {
-            var $scope = $(this).parents('div.field');
-            if (!event.originalEvent) {
-                $scope.find('div.js-map-adapter-settings').hide();
-                if (this.checked) {
-                    $scope.find('div.js-map-adapter-settings[data-adapter-id="' + this.value + '"]').show();
-                }
-            } else {
-                $scope.find('div.js-map-adapter-settings').slideUp();
-                if (this.checked) {
-                    $scope.find('div.js-map-adapter-settings[data-adapter-id="' + this.value + '"]').slideDown();
-                }
-            }
-        });
-        container.find(':input[name$="\[map\]"]:checked').trigger('change');
-
-        container.on('click', '.add-rate', function () {
-            var el = $(this);
-            var table = el.parents('table:first');
-            var last = table.find('tr.rate:last');
-            var clone = last.clone();
-
-            clone.find('input').each(function () {
-                var input = $(this);
-
-                // increase index inside input name
-                var name = input.attr('name');
-                input.attr('name', name.replace(/\[rate]\[(\d+)]/, function (str, p1) {
-                    return '[rate][' + (parseInt(p1, 10) + 1) + ']';
-                }));
-
-                input.val(0);
-            });
-
-            last.after(clone);
-
-            return false;
-        });
-
-        container.on('click', '.delete-rate', function () {
-            var el = $(this);
-            var table = el.parents('table:first');
-            if (table.find('tr.rate').length > 1) {
-                el.parents('tr:first').remove();
-            } else {
-                el.parents('tr:first').find('input').val(0);
-            }
-            return false;
-        });
-
-        container.find('input[name$="[rate_by]"]').change(function () {
-            container.find('.rate-by').children().hide().filter('.' + this.value).show();
-        });
-
-        container.find('select[name$="[currency]"]').change(function () {
-            container.find('span.currency').text(this.value);
-        });
-
-        container.find('select[name$="[weight_dimension]"]').change(function () {
-            container.find('.rate-by .weight.dimension').text(
-                $('option:selected', this).attr('data-value')
-            );
-        });
-
-        container.find(':input[name*="\[rate_zone\]"]').on('change keyup', function () {
-            var name = this.name.replace(/^.+\[rate_zone]\[(.+)]$/, '$1');
-            var checkbox = container.find('input[name$="\[contact_fields\]\[' + name + '\]"]');
-            var value = this.value;
-            /**
-             * @var HTMLInputElement checkbox
-             */
-            checkbox.attr('disabled', !!value);
-            if (value) {
-                checkbox.attr('checked', true);
-            }
-        });
-
-        (function () {
-
-            var name = '{$namespace|escape}[rate_zone][region]';
-            var target = container.find('div.region');
-            var loader = container.find('.region .loading');
-            var old_val = target.find('select, input').val();
-
-            container.find('select[name$="[country]"]').change(function () {
-                loader.show();
-                $.post('{$xhr_url}', {
-                    country: this.value
-                }, function (r) {
-                    if (
-                        r.data
-                        && r.data.options
-                        && r.data.oOrder
-                        && r.data.oOrder.length
-                    ) {
-                        var select = $(
-                            "<select name='" + name + "'>" +
-                            "<option value=''></option>" +
-                            "</select>"
-                        );
-                        var o, selected = false;
-                        for (var i = 0; i < r.data.oOrder.length; i++) {
-                            o = $('<option></option>').attr(
-                                'value', r.data.oOrder[i]
-                            ).text(
-                                r.data.options[r.data.oOrder[i]]
-                            ).attr(
-                                'disabled', r.data.oOrder[i] === ''
-                            );
-                            if (!selected && old_val === r.data.oOrder[i]) {
-                                o.attr('selected', true);
-                                selected = true;
-                            }
-                            select.append(o);
-                        }
-                        target.html(select);
-                    } else {
-                        target.html("<input name='" + name + "' value='0' type='hidden'>");
-                    }
-                    loader.hide();
-                }, 'json');
-            });
-
-            container.on('change', 'select[name="' + name + '"]', function () {
-                old_val = this.value;
-            });
-
-            var rate_name = '{$namespace|escape}[rate]';
-            container.on('change keyup', 'input[name^="' + rate_name + '"][name$="[limit]"]', function () {
-                this.value = this.value.replace(',', '.').replace(/[^\d\\.]+/, '');
-                if (parseFloat(this.value) < 0) {
-                    this.value = 0;
-                }
-                var td = $(this).parents('tr').find('td:first');
-                if (parseFloat(this.value) == 0) {
-                    td.text('≥');
-                } else {
-                    td.text('>');
-                }
-            });
-        })();
+    new waCourierShippingPluginSettings({
+        $wrapper: $('#courier-pickup-settings'),
+        locale_strings: {$_locale_strings|json_encode},
+        namespace: {$namespace|escape|json_encode},
+        xhr_url: {$xhr_url|json_encode},
+        js_validate: true
     });
+
 </script>

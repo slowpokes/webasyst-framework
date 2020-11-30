@@ -3,30 +3,32 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>{$wa->title()|escape}</title>
-	<meta name="Keywords" content="{$wa->meta('keywords')|escape}" />
-	<meta name="Description" content="{$wa->meta('description')|escape}" />
+	<meta name="keywords" content="{$wa->meta('keywords')|escape}" />
+	<meta name="description" content="{$wa->meta('description')|escape}" />
 	<meta name="viewport" content="width=device-width, initial-scale=1{if $wa->isMobile()}, maximum-scale=1, user-scalable=0{/if}" />
 
     {if !empty($canonical)}<link rel="canonical" href="{$canonical}"/>{/if}
+    <link rel="icon" href="/favicon.ico"/>
     <link rel="shortcut icon" href="/favicon.ico"/>
     {if $wa->blog}
         <!-- rss -->
         {$rss=$wa->blog->rssUrl()}
         {if $rss}<link rel="alternate" type="application/rss+xml" title="[s`RSS`] &mdash; {$wa->accountName()}" href="{$rss}">{/if}
     {/if}
-    
+
 	<!-- css -->
 	<link href="{$wa_theme_url}custom.css?v{$wa_theme_version}" rel="stylesheet" type="text/css"/>
     {if $wa->shop && $wa->shop->currency() == 'RUB'} <link href="{$wa_url}wa-content/font/ruble/arial/fontface.css" rel="stylesheet" type="text/css">{/if}
 	{$wa->css()} {* links active plugins CSS *}
-	
+
 	<!-- js -->
-    <script type="text/javascript" src="{$wa_static_url}wa-content/js/jquery/jquery-1.8.2.min.js"></script>
-    <script type="text/javascript" src="{$wa_theme_url}custom.js?v{$wa_theme_version}"></script>    
+    <script src="{$wa_static_url}wa-content/js/jquery/jquery-1.11.1.min.js" ></script>
+    <script src="{$wa_static_url}wa-content/js/jquery/jquery-migrate-1.2.1.min.js"></script>
+    <script src="{$wa_theme_url}custom.js?v{$wa_theme_version}"></script>
     {$wa->js()} {* links active plugins JS *}
-    
+
     {include file="`$wa_active_theme_path`/head.html" inline}
-    
+
     {$wa->head()} {* links Google Analytics tracking code and current site's custom JS (Site app) *}
 
     <!--[if lt IE 9]>
@@ -42,14 +44,14 @@
     document.createElement('menu');
     </script>
     <![endif]-->
-    
+
     <!-- custom theme settings styles -->
     <style>
         {if !empty($theme_settings.bg_image)}
             html, body { background: url('{$wa_theme_url}{$theme_settings.bg_image}'); }
         {/if}
     </style>
-    
+
 </head>
 <body id="{$wa_app}">
 
@@ -63,7 +65,7 @@
 
 	<div class="custom-margins">
 		<div class="container paper">
-		
+
 			<!-- HEADER -->
 			<div id="header" role="navigation">
 
@@ -72,11 +74,39 @@
         			{$cart_total = $wa->shop->cart->total()}
 					{$cart_count = $wa->shop->cart->count()}
    		     		<div id="cart" class="float-right{if !$cart_count} empty{/if}">
-   		     			<a href="{$wa->getUrl('shop/frontend/cart')}">
+
+                        {$_cart_url = $wa->getUrl('shop/frontend/cart')}
+                        {if method_exists($wa->shop, 'checkout')}
+                            {$_cart_url = $wa->shop->checkout()->cartUrl()}
+                        {/if}
+
+   		     			<a href="{$_cart_url}">
    		     				<i class="icon16 cart{if !$cart_count} empty{/if}"></i>
    		     				[s`Shopping cart`]:
    		     				<strong class="cart-total">{wa_currency_html($cart_total, $wa->shop->currency())}</strong>
    		     			</a>
+
+                        {strip}
+                        {capture assign="_loading_template"}
+                            <div class="s-loading-section">
+                                <div class="s-loading-content">
+                                    <i class="icon16 loading"></i>
+                                </div>
+                            </div>
+                        {/capture}
+                        {/strip}
+
+                        <script>
+                            ( function($) {
+                                var is_loading = false;
+                                $("#cart").on("click", "a", function() {
+                                    if (!is_loading) {
+                                        is_loading = true;
+                                        $("body").append({$_loading_template|json_encode});
+                                    }
+                                });
+                            })(jQuery);
+                        </script>
    		     		</div>
         		{/if}
         		{if $wa->isAuthEnabled()}
@@ -112,7 +142,7 @@
 	        		{/if}
                 {/if}
         		<div class="clear-both"></div>
-		
+
 				<!-- website logo/title -->
 				<h2><a href="{$wa_url}">{$wa->accountName()}</a></h2>
 				<!-- main website sections -->
@@ -120,22 +150,22 @@
         			{foreach $wa->apps() as $a}
         				<li{if $a.url==$wa_app_url} class="selected"{/if}><a href="{$a.url}">{$a.name}</a></li>
         			{/foreach}
-        
+
       			</ul>
       			<div class="clear-both"></div>
-      			
+
       		</div>
-      		
+
       		<!-- MAIN CONTENT -->
 			<div id="main">
 				{include file="`$wa_active_theme_path`/content.html" inline}
-			</div>  
-			
+			</div>
+
 			<div class="clear-both"></div>
-			
+
 		</div>
 	</div>
-	
+
 	<!-- FOOTER -->
 	<div class="custom-margins">
 		<div class="container" id="footer">
@@ -155,6 +185,11 @@
         		</ul>
       		</div>
 			-->
+
+            {if !empty($theme_settings.footer_notice)}
+                <div style="clear: both"></div>
+                <div class="s-footer-notice">{$theme_settings.footer_notice}</div>
+            {/if}
     	</div>
 	</div>
 </body>

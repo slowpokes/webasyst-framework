@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class siteViewHelper extends waAppViewHelper
 {
@@ -18,7 +18,7 @@ class siteViewHelper extends waAppViewHelper
 
             if (wa()->getApp() == 'site') {
                 $route = wa()->getRouting()->getRoute('url');
-                $url = $this->wa->getAppUrl(null, true);
+                $url = $this->wa()->getAppUrl(null, true);
             } else {
                 $routes = wa()->getRouting()->getByApp('site', $domain['name']);
                 if ($routes) {
@@ -68,21 +68,20 @@ class siteViewHelper extends waAppViewHelper
                     unset($pages[$page_id]);
                 }
             }
+
+            /**
+             * Event for {$wa->site->pages()}
+             * @since 2.6.0
+             * @param array $pages
+             *
+             * @event view_pages
+             */
+
+            $this->wa()->event('view_pages', $pages);
+
             return $pages;
         } catch (Exception $e) {
             return array();
         }
-    }
-    
-    public function page($id)
-    {
-        $page_model = new sitePageModel();
-        $page = $page_model->getById($id);
-        $page['content'] = $this->wa->getView()->fetch('string:'.$page['content']);
-        
-        $page_params_model = new sitePageParamsModel();
-        $page += $page_params_model->getById($id);
-
-        return $page;
     }
 }

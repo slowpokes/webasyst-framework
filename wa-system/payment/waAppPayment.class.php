@@ -53,16 +53,30 @@ abstract class waAppPayment implements waiPluginApp
      *
      * Callback method handler for plugin
      * @param string $method one of Confirmation, Payment
+     * @param mixed $_ [optional] params, passed to apps
      * @throws waException
      * @return mixed
      */
-    final public function execCallbackHandler($method)
+    final public function execCallbackHandler($method, $_ = null)
     {
         $args = func_get_args();
         array_shift($args);
         $method_name = "callback".ucfirst($method)."Handler";
         if (!method_exists($this, $method_name)) {
-            throw new waException('Unsupported callback handler method '.$method);
+            if ($method == waPayment::CALLBACK_AUTH) {
+                switch ($this->app_id) {
+                    case 'shop':
+                        $method = waPayment::CALLBACK_NOTIFY;
+                        break;
+                    default:
+                        $method = waPayment::CALLBACK_PAYMENT;
+                        break;
+                }
+                $method_name = "callback".ucfirst($method)."Handler";
+            }
+            if (!method_exists($this, $method_name)) {
+                throw new waException('Unsupported callback handler method '.$method);
+            }
         }
         return call_user_func_array(array($this, $method_name), $args);
     }
@@ -139,6 +153,21 @@ abstract class waAppPayment implements waiPluginApp
     }
 
     /**
+     * @since 1.6.9 / 14.03.2017
+     * @param $name string
+     * @return mixed
+     */
+    public function getAppProperties($name = null)
+    {
+        $info = wa()->getAppInfo($this->app_id);
+        $properties = ifset($info['payment_plugins']);
+        if (!is_array($properties)) {
+            $properties = array();
+        }
+        return $name ? ifset($properties[$name]) : $properties;
+    }
+
+    /**
      *
      *
      * @param array $wa_transaction_data
@@ -193,4 +222,9 @@ abstract class waAppPayment implements waiPluginApp
      * @return array|null
      */
     abstract public function callbackConfirmationHandler($wa_transaction_data);
+
+    public function uninstall($plugin_id)
+    {
+        ;
+    }
 }

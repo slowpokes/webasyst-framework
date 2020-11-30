@@ -27,6 +27,14 @@ abstract class waAuthAdapter
         return isset($this->options[$name]) ? $this->options[$name] : $default;
     }
 
+    /**
+     * @return mixed
+     * @throws waAuthException
+     * @throws waAuthInvalidCredentialsException
+     * @throws waAuthConfirmEmailException
+     * @throws waAuthConfirmPhoneException
+     * @throws waException
+     */
     abstract public function auth();
 
     public function getId()
@@ -41,16 +49,29 @@ abstract class waAuthAdapter
         return ucfirst(substr($class, 0, -4));
     }
 
-    public function getIcon()
+    public function getIcon($prefix = 'circle', $ext = 'svg')
     {
-        return wa()->getRootUrl().'wa-content/img/auth/'.$this->getId().'.png';
+        $prefix = $prefix ? '-'.htmlspecialchars($prefix) : null;
+        $ext = $ext === 'png' ? 'png' : 'svg';
+        return wa()->getRootUrl().'wa-content/img/auth/'.$this->getId().$prefix.'.'.$ext;
     }
 
+    /**
+     * Inner url that will dispatched to OAuthController and that to auth adapter again
+     * @return string
+     * @throws waException
+     */
     public function getUrl()
     {
         return wa()->getRootUrl(false, true).'oauth.php?app='.wa()->getApp().'&amp;provider='.$this->getId();
     }
 
+    /**
+     * Callback url - url of controller that will process response from oauth provider service
+     * @param bool $absolute
+     * @return string
+     * @throws waException
+     */
     public function getCallbackUrl($absolute = true)
     {
         return wa()->getRootUrl($absolute, true).'oauth.php?provider='.$this->getId();

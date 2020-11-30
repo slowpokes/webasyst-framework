@@ -20,17 +20,23 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data {
     /**
      * fetches a rendered Smarty template
      *
-     * @param string $template          the resource handle of the template file or template object
-     * @param mixed  $cache_id          cache id to be used with this template
-     * @param mixed  $compile_id        compile id to be used with this template
-     * @param object $parent            next higher level of Smarty variables
-     * @param bool   $display           true: display, false: fetch
-     * @param bool   $merge_tpl_vars    if true parent template variables merged in to local scope
-     * @param bool   $no_output_filter  if true do not run output filter
+     * @param string $template the resource handle of the template file or template object
+     * @param mixed $cache_id cache id to be used with this template
+     * @param mixed $compile_id compile id to be used with this template
+     * @param object $parent next higher level of Smarty variables
+     * @param bool $display true: display, false: fetch
+     * @param bool $merge_tpl_vars if true parent template variables merged in to local scope
+     * @param bool $no_output_filter if true do not run output filter
      * @return string rendered template output
+     * @throws SmartyException
+     * @throws waException
      */
     public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false)
     {
+        $advanced_security = wa()->getConfig()->systemOption('advanced_security');
+        if (preg_match('~^\Astring:{1,}~', $template) && $advanced_security) {
+            $this->dumpLog($template);
+        }
         if ($template === null && $this instanceof $this->template_class) {
             $template = $this;
         }
@@ -804,6 +810,19 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data {
         }
         // must be unknown
         throw new SmartyException("Call of unknown method '$name'.");
+    }
+
+    private function dumpLog($template)
+    {
+        $current_url = 'http'.(waRequest::isHttps()? 's' : '').'://';
+        $current_url .= waRequest::server('HTTP_HOST') . waRequest::server('REQUEST_URI');
+        $data = array(
+            'current_url' => $current_url,
+            'ip'          => waRequest::getIp(),
+            'post'        => waRequest::post(),
+            'template'    => $template,
+        );
+        waLog::dump($data, 'render_template.log');
     }
 
 }

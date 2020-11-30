@@ -109,8 +109,8 @@ return array(
     => '%1$s version %3$s%4$s is required (installed version is %2$s).',
     'extension %s has %s version but recommended is %s %s'
     => 'Recommended %1$s version is %3$s%4$s (installed version is %2$s).',
-    'extension %s not loaded'
-    => 'Extension “%s” is not loaded.',
+    'PHP extension %s is required'
+    => 'PHP extension %s is required.',
     'curl'
     => 'cURL',
 

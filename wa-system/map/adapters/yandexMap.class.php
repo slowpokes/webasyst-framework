@@ -20,80 +20,243 @@ class yandexMap extends waMapAdapter
         return 'Яндекс.Карты';
     }
 
-    private function getBaseHTML($id, $script, $options)
+    protected function buildUrl()
     {
-        $width = ifset($options['width'], '100%');
-        $height = ifset($options['height'], '400px');
+        $url = 'https://api-maps.yandex.ru/2.1/';
+        $params = array(
+            'lang' => wa()->getLocale(),
+        );
+        if ($key = $this->getSettings('apikey')) {
+            $params['apikey'] = $key;
+        }
 
-        $html = <<<HTML
-<div id="yandex-map-{$id}" class="map" style="width:{$width}; height: {$height}"></div>
-<script type="text/javascript">
-    $(function () {
-        var init = function () {
-            {$script}
-        }
-        if (!(window.ymaps)) {
-            $.getScript('https://api-maps.yandex.ru/2.1/?lang=ru_RU', init)
-        } else {
-            init();
-        }
-    })
-</script>
-HTML;
-        return $html;
+        $url .= '?' . http_build_query($params);
+
+        return $url;
     }
 
+    /**
+     * @param array|string $address
+     * @param array $options
+     *   string  $options['on_error'] [optional]         What to do on error
+     *     - 'show' - show error as it right on map html block
+     *     - 'function(e) { ... }' - anonymous js function
+     *     - any other NOT EMPTY string that is javascript function name in global scope (for example, console.log)
+     *     - <empty> - not handle map error
+     *
+     * @return string
+     * @throws waException
+     */
     protected function getByAddress($address, $options = array())
     {
-        $id = uniqid();
-        $address = json_encode($address);
-        $zoom = ifset($options['zoom'], 10);
+        $options = is_array($options) ? $options : array();
 
-        $script = <<<HTML
-ymaps.ready(function () {
-    ymaps.geocode({$address}, {
-        results: 1
-    }).then(function (res) {
-        var map = new ymaps.Map('yandex-map-{$id}', {
-            center: [55.753994, 37.622093],
-            zoom: {$zoom},
-            controls: [
-                'zoomControl',
-                'fullscreenControl'
-            ]
-        });
-        var firstGeoObject = res.geoObjects.get(0),
-            coords = firstGeoObject.geometry.getCoordinates(),
-            bounds = firstGeoObject.properties.get('boundedBy');
-        map.geoObjects.add(firstGeoObject);
-        map.setCenter(coords);
-        /*
-        map.setBounds(bounds, {
-            checkZoomRange: true
-        });
-        */
-    });
-});
-HTML;
-        return $this->getBaseHTML($id, $script, $options);
+        $id = uniqid();
+
+        $template = waConfig::get('wa_path_system') . '/map/templates/yandex/map.html';
+
+        $options['width'] = ifset($options['width'], '100%');
+        $options['height'] = ifset($options['height'], '400px');
+        $options['zoom'] = ifset($options['zoom'], 10);
+
+        $this->typecastOnErrorOption($options);
+
+        return $this->renderTemplate($template, array(
+            'id' => $id,
+            'address' => $address,
+            'options' => $options,
+            'url' => $this->buildUrl(),
+            'type' => 'address'
+        ));
     }
 
+    /**
+     * @param float $lat
+     * @param float $lng
+     * @param array $options
+     *   string  $options['on_error'] [optional]         What to do on error
+     *     - 'show' - show error as it right on map html block
+     *     - 'function(e) { ... }' - anonymous js function
+     *     - any other NOT EMPTY string that is javascript function name in global scope (for example, console.log)
+     *     - <empty> - not handle map error
+     * @return string
+     */
     protected function getByLatLng($lat, $lng, $options = array())
     {
-        $id = uniqid();
-        $zoom = ifset($options['zoom'], 10);
-        $center = json_encode(array($lat, $lng));
+        $options = is_array($options) ? $options : array();
 
-        $script = <<<HTML
-ymaps.ready(function () {
-    var map = new ymaps.Map('yandex-map-{$id}', {
-        center: {$center},
-        zoom: {$zoom},
-        controls: ['smallMapDefaultSet']
-    });
-});
+        $id = uniqid();
+
+        $template = waConfig::get('wa_path_system') . '/map/templates/yandex/map.html';
+
+        $options['width'] = ifset($options['width'], '100%');
+        $options['height'] = ifset($options['height'], '400px');
+        $options['zoom'] = ifset($options['zoom'], 10);
+
+        $this->typecastOnErrorOption($options);
+
+        return $this->renderTemplate($template, array(
+            'id' => $id,
+            'center' => array($lat, $lng),
+            'options' => $options,
+            'url' => $this->buildUrl(),
+            'type' => 'coords'
+        ));
+    }
+
+    public function getJs($html = true)
+    {
+        $url = $this->buildUrl();
+
+        if ($html) {
+            return <<<HTML
+<script type="text/javascript" src="{$url}"></script>
 HTML;
-        return $this->getBaseHTML($id, $script, $options);
+
+        } else {
+            return $url;
+        }
+    }
+
+    public function geocode($address)
+    {
+        $data = array();
+        if ($this->geocodingAllowed()) {
+            if ($response = $this->sendGeoCodingRequest($address)) {
+                $this->geocodingAllowed(true);
+                if (!empty($response['metaDataProperty']['GeocoderResponseMetaData']['found'])) {
+                    if ($response['metaDataProperty']['GeocoderResponseMetaData']['found'] == 1) {
+                        $member = reset($response['featureMember']);
+                        if (!empty($member['GeoObject']['Point']['pos'])) {
+                            $data += self::parse($member['GeoObject']['Point']['pos']);
+                        }
+                    } else {
+                        foreach ($response['featureMember'] as $member) {
+                            $precision = ifset($member['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision']);
+                            if (!empty($member['GeoObject']['Point']) && ($precision == 'exact')) {
+                                $data += self::parse($member['GeoObject']['Point']['pos']);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                $this->geocodingAllowed(false);
+            }
+        }
+        return $data;
+    }
+
+    private static function parse($point)
+    {
+        $data = array();
+        if (strpos($point, ' ')) {
+            $data = array(
+                'lat' => '',
+                'lng' => '',
+            );
+            list($data['lng'], $data['lat']) = explode(' ', $point, 2);
+        }
+        return $data;
+    }
+
+    protected function sendGeoCodingRequest($address)
+    {
+        $response = null;
+        if ($address) {
+            $address = preg_replace('@российская\s+федерация@ui', 'Россия', $address);
+            /**
+             * Geocoder doc
+             * @link https://tech.yandex.ru/maps/doc/geocoder/desc/concepts/About-docpage/
+             */
+            $url = 'https://geocode-maps.yandex.ru/1.x/';
+
+            /**
+             * Params doc
+             * @link https://tech.yandex.ru/maps/doc/geocoder/desc/concepts/input_params-docpage/
+             */
+            $params = array(
+                'format'  => 'json',
+                'geocode' => $address,
+            );
+
+            if ($key = $this->getSettings('apikey')) {
+                $params['apikey'] = $key;
+            }
+
+            $options = array(
+                'format'  => waNet::FORMAT_JSON,
+                'timeout' => 9,
+            );
+            $net = new waNet($options);
+            try {
+                $result = $net->query($url, $params);
+                $response = ifset($result['response']['GeoObjectCollection'], array());
+            } catch (waException $ex) {
+                waLog::log(get_class($this).": ".$ex->getMessage()."\n".$ex->getFullTraceAsString(), 'geocode.log');
+                return array();
+            }
+        }
+        return $response;
+    }
+
+    protected function initControls()
+    {
+        parent::initControls(); // TODO: Change the autogenerated stub
+        $this->controls['apikey'] = array(
+            'title'        => _ws('API key'),
+            'description'  => _ws('Obtain an API key on the <a href="https://developer.tech.yandex.ru/" target="_blank">developer dashboard</a>. Select “<strong>JavaScript API, Geocoding API</strong>” option.'),
+            'control_type' => waHtmlControl::INPUT,
+        );
+    }
+
+    /**
+     * Inner helper
+     * Find 'on_error' option in options array and convert value to array with keys
+     *   - string 'type' - with possible values: 'show', '', 'callback'
+     *   - string 'callback' - js callback or empty string (for 'show' and '' types)
+     * @param array &$options
+     *
+     */
+    private function typecastOnErrorOption(&$options)
+    {
+        $options = is_array($options) ? $options : array();
+
+        $on_error_type = trim(ifset($options['on_error'], ''));
+
+        if (preg_match('/^function\s*\(/', $on_error_type)) {
+            $on_error_type = 'callback';
+            $on_error_callback = $options['on_error'];
+        } elseif ($on_error_type === 'show') {
+            $on_error_type = 'show';
+            $on_error_callback = '';
+        } else if ($on_error_type) {
+            $on_error_type = 'callback';
+            $on_error_callback = $options['on_error'];
+        } else {
+            $on_error_type = '';
+            $on_error_callback = '';
+        }
+
+        $options['on_error'] = array(
+            'type' => $on_error_type,
+            'callback' => $on_error_callback
+        );
+    }
+
+    protected function renderTemplate($template, $assign = array())
+    {
+        if (!is_scalar($template) || !file_exists($template)) {
+            return '';
+        }
+        $view = wa()->getView();
+        $old_vars = $view->getVars();
+        $view->clearAllAssign();
+        $view->assign($assign);
+        $html = $view->fetch($template);
+        $view->clearAllAssign();
+        $view->assign($old_vars);
+        return $html;
     }
 
     public function getJs($html = true)

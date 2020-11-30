@@ -2,9 +2,9 @@
     {foreach $messages as $message}
         <div class="block double-padded i-message-{$message.result}">
             {if $message.result == 'success'}
-                <i class="icon16 yes"></i>
+                <i class="fas fa-check-circle"></i>
             {elseif $message.result == 'fail'}
-                <i class="icon16 no"></i>
+                <i class="fas fa-times-circle"></i>
             {/if}
             {$message.text|escape}
         </div>

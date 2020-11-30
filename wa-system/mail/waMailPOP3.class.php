@@ -30,6 +30,7 @@ class waMailPOP3
         foreach ($options as $k => $v) {
             $this->options[$k] = $v;
         }
+
         $this->server = ($this->getOption('ssl') ? 'ssl://' : '').$this->getOption('server');
         $this->port = $this->getOption('port');
         $this->user = $this->getOption('user');
@@ -48,21 +49,71 @@ class waMailPOP3
 
     public function connect()
     {
+        $error = '';
+        if (!$this->server) {
+            $error = _ws('Server address is required');
+        } elseif (!$this->port || !wa_is_int($this->port)) {
+            $error = _ws('Port is required');
+        }
+        if ($error) {
+            throw new waException($error);
+        }
+        $this->tryToConnect();
+    }
+
+    protected function tryToConnect()
+    {
+        // extra options for stream context
+        $stream_context_options = $this->getOption('stream_context_options');
+
+
         // try open socket
         if ($this->getOption('tls')) {
-            $this->handler = @stream_socket_client('tcp://'.$this->server.':'.$this->port, $errno, $errstr, $this->getOption('timeout', 10));
+
+            $remote_socket = 'tcp://' . $this->server . ':' . $this->port;
+            $timeout = $this->getOption('timeout', 10);
+
+            if ($stream_context_options) {
+                $stream_context = stream_context_create($stream_context_options);
+                $this->handler = stream_socket_client($remote_socket, $errno,$errstr, $timeout, STREAM_CLIENT_CONNECT, $stream_context);
+            } else {
+                $this->handler = @stream_socket_client($remote_socket, $errno,$errstr, $timeout);
+            }
             if ($this->handler) {
                 stream_socket_enable_crypto($this->handler, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
             }
+
         } else {
-            $this->handler = @fsockopen($this->server, $this->port, $errno, $errstr, $this->getOption('timeout', 10));
+
+            $timeout = $this->getOption('timeout', 10);
+
+            if ($stream_context_options) {
+                $remote_socket = $this->server . ':' . $this->port;
+                $stream_context = stream_context_create($stream_context_options);
+                $this->handler = @stream_socket_client($remote_socket, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $stream_context);
+            } else {
+                $this->handler = @fsockopen($this->server, $this->port, $errno, $errstr, $timeout);
+            }
         }
+
         if ($this->handler) {
             // read welcome
             $this->read();
             // auth
             $this->auth();
         } else {
+
+            // Not error number - try get error another way
+            if (!$errno && !$errstr) {
+                if (function_exists('socket_last_error')) {
+                    $errno = socket_last_error();
+                    $errstr = socket_strerror($errno);
+                } else {
+                    $error = error_get_last();
+                    $errstr = is_array($error) && isset($error['message']) ? $error['message'] : '';
+                }
+            }
+
             if (!preg_match('//u', $errstr)) {
                 $tmp = @iconv('windows-1251', 'utf-8//ignore', $errstr);
                 if ($tmp) {

@@ -27,10 +27,18 @@ class waContactUrlField extends waContactStringField
 
     protected function setValue($value)
     {
-        if (is_array($value) && isset($value['value'])) {
-            $value = $value['value'];
+        if (is_array($value)) {
+            if (isset($value['value']) && is_scalar($value['value'])) {
+                $value = (string)$value['value'];
+            } else {
+                $value = '';
+            }
+        } elseif (is_scalar($value)) {
+            $value = (string)$value;
+        } else {
+            $value = '';
         }
-        $value = (string)$value;
+
         if ($value && !strpos($value, '://')) {
             $value = 'http://'.$value;
         }
@@ -58,11 +66,10 @@ class waContactUrlJsFormatter extends waContactFieldFormatter
             $href = 'http://'.$href;
         }
         $name = substr($href, strpos($href, '://') + 3);
-        $data['value'] = '<a target="_blank" href="'.addslashes($href).'">'.htmlspecialchars($name).'</a><a target="_blank" href="'.addslashes($href).'"><i class="icon16 new-window"></i></a>';
+        $data['value'] = '<a target="_blank" href="'.htmlspecialchars($href).'">'.htmlspecialchars($name).'</a><a target="_blank" href="'.htmlspecialchars($href).'"><i class="icon16 new-window"></i></a>';
         if ($url = @parse_url($href)) {
-
             if (isset($url['host']) && in_array($url['host'], array('facebook.com', 'twitter.com', 'vkontakte.ru'))) {
-                $data['value'] = '<a target="_blank" href="'.addslashes($href).'"><i class="icon16" style="background-image: url(http://'.$url['host'].'/favicon.ico)"></i>'.htmlspecialchars($name).'<i class="icon16 new-window"></i></a>';
+                $data['value'] = '<a target="_blank" href="'.htmlspecialchars($href).'"><i class="icon16" style="background-image: url(http://'.$url['host'].'/favicon.ico)"></i>'.htmlspecialchars($name).'<i class="icon16 new-window"></i></a>';
             }
         }
         return $data;

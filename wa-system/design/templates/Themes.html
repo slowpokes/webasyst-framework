@@ -47,6 +47,7 @@
 
     <h4>{$app.name|string_format:'[s`Design themes for %s app`]'|escape} <i class="icon16 loading"></i></h4>
 
+    {include file="./Themes.installed_themes.html" inline}
 </div>
 <div class="wa-themes">
     <script type="text/javascript">
@@ -105,7 +106,7 @@
                             <div class="value no-shift">
                                 <label>
                                     <input name="route" value="{$r._domain}|{$r._id}" type="radio" {if $r@first}checked{/if}>
-                                    {$r._domain}/{$r.url}
+                                    {waIdna::dec($r._domain)}/{$r.url}
                                     <span class="hint">{if isset($r.theme)}{$r.theme}{else}default{/if}</span>
                                 </label>
                             </div>

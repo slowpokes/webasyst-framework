@@ -1,0 +1,32 @@
+<div class="field">
+    <div class="name"></div>
+    <div class="value"><h3>Оплата в кредит</h3></div>
+</div>
+
+<div class="field">
+    <div class="name">
+        <label for="{$prefix}credit">Кредит</label>
+    </div>
+    <div class="value">
+        <input type="checkbox" class="js-payment-sb-credit" name="{$namespace}[credit]"
+               id="{$prefix}credit" value="1" {if ifset($settings, 'credit', '')}checked{/if}>
+        <br>
+        <span class="hint">Включение режима «Кредит» выключает обычный режим оплаты.</span>
+    </div>
+</div>
+
+<div class="field js-settings-sb-credit-type">
+    <div class="name">
+        <label for="{$prefix}credit_type">Вид кредита</label>
+    </div>
+    <div class="value">
+        <select name="{$namespace}[credit_type]" autocomplete="off" id="{$prefix}credit_type">
+            {$current_credit= ifset($settings, 'credit_type', '')}
+            {foreach $credit_types as $c_type}
+                <option value="{$c_type['value']}" {if $current_credit === {$c_type['value']}}selected{/if}>{$c_type['title']}</option>
+            {/foreach}
+        </select>
+        <br>
+        <span class="hint">Выберите подходящий вид кредита, если включён режим «Кредит».</span>
+    </div>
+</div>

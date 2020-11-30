@@ -21,10 +21,12 @@ class photosDefaultLayout extends waLayout
 
         /**
          * Extend photo toolbar in photo-page
-         * Add extra item to toolbar
+         * Add extra item to toolbar or add extra menu(s)
          * @event backend_photo_toolbar
+         * @return array[string][string]string $return[%plugin_id]['top'] insert own menu(s) in top of photo toolbar
          * @return array[string][string]string $return[%plugin_id%]['edit_menu'] Extra item for edit_menu in photo_toolbar
          * @return array[string][string]string $return[%plugin_id%]['share_menu'] Extra item for edit_menu in photo_toolbar
+         * @return array[string][string]string $return[%plugin_id]['bottom'] insert own menu(s) in bottom of photo toolbar
          */
         $this->view->assign('backend_photo_toolbar', wa()->event('backend_photo_toolbar'));
 
@@ -69,6 +71,8 @@ class photosDefaultLayout extends waLayout
         $config = $this->getConfig();
         $this->view->assign('big_size', $config->getSize('big'));
         $this->view->assign('sidebar_width', $config->getSidebarWidth());
+
+        $this->view->assign('map_options', $this->getMapOptions());
     }
 
     public static function getAppAlbums($force_app_ids=array())
@@ -115,5 +119,35 @@ class photosDefaultLayout extends waLayout
         }
 
         return $result;
+    }
+
+    protected function getMapOptions()
+    {
+        $map_options = array(
+            'type' => '',
+            'key' => '',
+            'locale' => ''
+        );
+
+        try {
+            $map = wa()->getMap();
+            if ($map->getId() === 'google') {
+                $map_options = array(
+                    'type' => $map->getId(),
+                    'key' => $map->getSettings('key'),
+                    'locale' => wa()->getLocale()
+                );
+            } elseif ($map->getId() === 'yandex') {
+                $map_options = array(
+                    'type' => $map->getId(),
+                    'key' => $map->getSettings('apikey'),
+                    'locale' => wa()->getLocale()
+                );
+            }
+        } catch (waException $e) {
+
+        }
+
+        return $map_options;
     }
 }

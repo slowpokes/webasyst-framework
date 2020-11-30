@@ -61,6 +61,7 @@ class waAppConfig extends SystemConfig
                     $options = $cache_config[$type];
                     $cache_type = $options['type'];
                     $cache_class = 'wa'.ucfirst($cache_type).'CacheAdapter';
+
                     try {
                         $cache_adapter = new $cache_class($options);
                         $this->cache = new waCache($cache_adapter, wa()->replaceName($this->application));//VADIM CODE
@@ -112,20 +113,20 @@ class waAppConfig extends SystemConfig
             }
         }
         if ($page_ids) {
-            $class_name = $this->application . 'PageModel';
-            /**
-             * @var waPageModel $model
-             */
-            $model = new $class_name();
-            $pages = $model->query('SELECT id, name FROM '.$model->getTableName().' WHERE id IN (i:ids)', array('ids' => $page_ids))->fetchAll('id', true);
-            $app_url = wa()->getConfig()->getBackendUrl(true).$l['app_id'].'/';
-            foreach ($logs as &$l) {
-                if (in_array($l['action'], array('page_add', 'page_edit', 'page_move')) && isset($pages[$l['params']])) {
-                    $l['params_html'] = '<div class="activity-target"><a href="'.$app_url.'#/pages/'.$l['params'].'">'.
-                        htmlspecialchars($pages[$l['params']]).'</a></div>';
+            $class_name = $this->application.'PageModel';
+            if (class_exists($class_name)) {
+                /** @var waPageModel $model */
+                $model = new $class_name();
+                $pages = $model->query('SELECT id, name FROM '.$model->getTableName().' WHERE id IN (i:ids)', array('ids' => $page_ids))->fetchAll('id', true);
+                $app_url = wa()->getConfig()->getBackendUrl(true).$this->application.'/';
+                foreach ($logs as &$l) {
+                    if (in_array($l['action'], array('page_add', 'page_edit', 'page_move')) && isset($pages[$l['params']])) {
+                        $l['params_html'] = '<div class="activity-target"><a href="'.$app_url.'#/pages/'.$l['params'].'">'.
+                            htmlspecialchars($pages[$l['params']]).'</a></div>';
+                    }
                 }
+                unset($l);
             }
-            unset($l);
         }
         return $logs;
     }
@@ -188,6 +189,9 @@ class waAppConfig extends SystemConfig
             $actions['logout'] = array(
                 'name' => _ws('logged out')
             );
+            $actions['login_failed'] = array(
+                'name' => _ws('login failed')
+            );
             $actions['signup'] = array(
                 'name' => _ws('signed up')
             );
@@ -242,12 +246,15 @@ class waAppConfig extends SystemConfig
         }
 
         $this->info = include($this->getAppPath().'/lib/config/app.php');
-        if ($this->environment == 'backend' && !empty($this->info['csrf']) && waRequest::method() == 'post') {
-            if (waRequest::post('_csrf') != waRequest::cookie('_csrf')) {
-                throw new waException('CSRF Protection', 403);
-            }
-        }
         waAutoload::getInstance()->add($this->getClasses());
+
+        if (!empty($this->info['payment_plugins'])) {
+            waAutoload::getInstance()->add(waPayment::getClasses());
+        }
+
+        if (!empty($this->info['shipping_plugins'])) {
+            waAutoload::getInstance()->add(waShipping::getClasses());
+        }
 
         if (file_exists($this->getAppPath().'/lib/config/factories.php')) {
             $this->factories = include($this->getAppPath().'/lib/config/factories.php');
@@ -266,14 +273,14 @@ class waAppConfig extends SystemConfig
         } catch (waDbException $e) {
             // 1146 = Table doesn't exist
             if ($e->getCode() == 1146 && $this->application == 'webasyst') {
-                // First launch of the wramework with working db.php setup.
+                // First launch of the framework with working db.php setup.
                 // $this->install() call below will create wa_* tables, then we'll be able
                 // to create and use models.
             } elseif ($e->getCode() == 1146 && $this->application != 'webasyst' && $this->environment == 'frontend') {
                 // 'webasyst' system app is not automatically started in frontend (as opposed to backend).
                 // When framework is first launched via frontend, wa_* tables do not exist yet.
                 // So we launch the app to give it a chance to install properly.
-                wa('webasyst');
+                $this->initWebasystApp();
                 $app_settings_model = new waAppSettingsModel();
             } else {
                 throw $e;
@@ -290,63 +297,79 @@ class waAppConfig extends SystemConfig
         if (!empty($app_settings_model)) {
             $time = $app_settings_model->get($this->application, 'update_time', null);
         }
+
+        // Install the app and remember to skip all updates
+        // if this is the first launch.
+        $is_first_launch = false;
+        $is_from_template = waConfig::get('is_template');
         if (empty($time)) {
+            $time = null;
+            $is_first_launch = true;
+
             try {
+                waConfig::set('is_template', null);
                 $this->install();
+                waConfig::set('is_template', $is_from_template);
             } catch (waException $e) {
                 waLog::log("Error installing application ".$this->application." at first run:\n".$e->getMessage()." (".$e->getCode().")\n".$e->getTraceAsString());
+                waConfig::set('is_template', $is_from_template);
                 throw $e;
             }
-            $ignore_all = true;
-            $time = null;
+
             if (empty($app_settings_model)) {
                 $app_settings_model = new waAppSettingsModel();
             }
-        } else {
-            $ignore_all = false;
         }
 
+        // Use cache to skip slow filesystem-based scanning for updates
         if (!self::isDebug()) {
-            $cache = new waVarExportCache('updates', 0, $this->application);
-            if ($cache->isCached() && $cache->get() <= $time) {
+            $cache = new waVarExportCache('updates', -1, $this->application);
+            if ($time && $cache->isCached() && $cache->get() <= $time) {
                 return;
             }
         }
-        $path = $this->getAppPath().'/lib/updates';
-        $cache_database_dir = $this->getPath('cache').'/db';
-        if (file_exists($path)) {
-            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-            $files = array();
-            foreach ($iterator as $file) {
-                /**
-                 * @var SplFileInfo $file
-                 */
-                if ($file->isFile() && preg_match('/^[0-9]+\.php$/', $file->getFilename())) {
-                    $t = substr($file->getFilename(), 0, -4);
-                    if ($t > $time) {
-                        $files[$t] = $file->getPathname();
-                    }
-                }
+
+        // Scan for app updates
+        $files = $this->getUpdateFiles($this->getAppPath().'/lib/updates', $time);
+        if ($files) {
+            $keys = array_keys($files);
+            $last_update_ts = end($keys);
+        } else {
+            $last_update_ts = 1;
+        }
+
+        // Remember last update file in cache
+        if (!empty($cache)) {
+            $cache->set($last_update_ts);
+        }
+
+        if (empty($app_settings_model)) {
+            $app_settings_model = new waAppSettingsModel();
+        }
+
+        if ($is_first_launch) {
+            // Updates are all skipped on app's first launch with install.php
+            $app_settings_model->set($this->application, 'update_time', $last_update_ts);
+        } elseif ($files) {
+            if (!$this->loaded_locale) {
+                // Force load locale
+                $this->setLocale(wa()->getLocale());
             }
-            ksort($files);
-            if (!self::isDebug()) {
-                // get last time
-                if ($files) {
-                    $keys = array_keys($files);
-                    $cache->set(end($keys));
-                } else {
-                    $cache->set($time ? $time : 1);
-                }
-            }
+            waConfig::set('is_template', null);
+            waConfig::get('disable_exception_log', true);
+            $cache_database_dir = $this->getPath('cache').'/db';
             foreach ($files as $t => $file) {
                 try {
-                    if (!$ignore_all) {
-                        $this->includeUpdate($file);
-                        waFiles::delete($cache_database_dir);
-                        $app_settings_model->set($this->application, 'update_time', $t);
-                    }
-                } catch (Exception $e) {
+
                     if (waSystemConfig::isDebug()) {
+                        waLog::dump(sprintf('Try include file %s by app %s', $file, $this->application), 'meta_update.log');
+                    }
+
+                    $this->includeUpdate($file);
+                    waFiles::delete($cache_database_dir, true);
+                    $app_settings_model->set($this->application, 'update_time', $t);
+                } catch (Exception $e) {
+                    if (self::isDebug()) {
                         echo $e;
                     }
                     // log errors
@@ -354,28 +377,40 @@ class waAppConfig extends SystemConfig
                     break;
                 }
             }
-        } else {
-            $t = 1;
-        }
-        if ($ignore_all) {
-            if (!isset($t) || !$t) {
-                $t = 1;
-            }
-            if (!isset($app_settings_model)) {
-                $app_settings_model = new waAppSettingsModel();
-            }
-            $app_settings_model->set($this->application, 'update_time', $t);
+            waConfig::get('disable_exception_log', false);
+            waConfig::set('is_template', $is_from_template);
         }
 
-        if (isset($this->info['edition']) && $this->info['edition']) {
-            if (!isset($app_settings_model)) {
-                $app_settings_model = new waAppSettingsModel();
-            }
-            if (!$app_settings_model->get($this->application, 'edition')) {
-                $app_settings_model->set($this->application, 'edition', $this->info['edition']);
-            }
+    }
+
+    protected function initWebasystApp()
+    {
+        wa('webasyst');
+    }
+
+    protected function getUpdateFiles($path, $time)
+    {
+        if (!file_exists($path)) {
+            return array();
         }
 
+        $files = array();
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($iterator as $file) {
+            /** @var SplFileInfo $file */
+            if (!$file->isFile()) {
+                continue;
+            }
+            $filename = $file->getFilename();
+            if (preg_match('/^[0-9]+\.php$/', $filename)) {
+                $t = substr($filename, 0, -4);
+                if ($t > $time) {
+                    $files[$t] = $file->getPathname();
+                }
+            }
+        }
+        ksort($files);
+        return $files;
     }
 
     private function includeUpdate($file)
@@ -385,15 +420,34 @@ class waAppConfig extends SystemConfig
 
     public function install()
     {
+        // Create database scheme
         $file_db = $this->getAppPath('lib/config/db.php');
         if (file_exists($file_db)) {
             $schema = include($file_db);
             $model = new waModel();
             $model->createSchema($schema);
         }
+
+        // Mark localization files as recently changed.
+        // This forces use of PHP localization adapter that does not get stuck in apache cache.
+        $locale_path = $this->getAppPath('locale');
+        if (file_exists($locale_path)) {
+            $all_files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($locale_path));
+            $po_files = new RegexIterator($all_files, '~(\.po)$~i');
+            foreach ($po_files as $f) {
+                @touch($f->getPathname());
+            }
+        }
+
+        // Installation script of the app
         $file = $this->getAppConfigPath('install');
         if (file_exists($file)) {
+            if (!$this->loaded_locale) {
+                // Force load locale
+                $this->setLocale(wa()->getLocale());
+            }
             $app_id = $this->application;
+            /** @var string $app_id */
             include($file);
         }
     }
@@ -418,9 +472,11 @@ class waAppConfig extends SystemConfig
         // Remove all app settings
         $app_settings_model = new waAppSettingsModel();
         $app_settings_model->del($this->application);
-
         $contact_settings_model = new waContactSettingsModel();
         $contact_settings_model->deleteByField('app_id', $this->application);
+        // Remove app tokens
+        $app_tokens_model = new waAppTokensModel();
+        $app_tokens_model->deleteByField('app_id', $this->application);
         // Remove all rights to app
         $contact_rights_model = new waContactRightsModel();
         $contact_rights_model->deleteByField('app_id', $this->application);
@@ -442,10 +498,28 @@ class waAppConfig extends SystemConfig
         }
     }
 
+    public static function clearAutoloadCache($app_id)
+    {
+        $cache_file = waConfig::get('wa_path_cache').'/apps/'.$app_id.'/config/autoload.php';
+        if (file_exists($cache_file)) {
+            @unlink($cache_file);
+        }
+    }
+
     public function getClasses()
     {
         $cache_file = waConfig::get('wa_path_cache').'/apps/'.$this->application.'/config/autoload.php';
-        if (self::isDebug() || !file_exists($cache_file)) {
+
+        $result = null;
+
+        if (!self::isDebug() && file_exists($cache_file)) {
+            $result = @include($cache_file);
+            if (!is_array($result)) {
+                $result = null;
+            }
+        }
+
+        if ($result === null) {
             waFiles::create(waConfig::get('wa_path_cache').'/apps/'.$this->application.'/config');
             $paths = array($this->getAppPath().'/lib/');
             // plugins
@@ -478,9 +552,16 @@ class waAppConfig extends SystemConfig
             foreach ($paths as $path) {
                 $files = $this->getPHPFiles($path);
                 foreach ($files as $file) {
+                    if (strpos($file, '/lib/config/data/')) {
+                        continue;
+                    }
                     $class = $this->getClassByFilename(basename($file));
-
                     if ($class) {
+                        // Classes in dir named /custom/ have priority.
+                        // This allows to override code without modifications to the original.
+                        if (isset($result[$class]) && false !== stripos(str_replace('\\', '/', $result[$class]), '/custom/')) {
+                            continue;
+                        }
                         $result[$class] = substr($file, $length + 1);
                     }
                 }
@@ -491,9 +572,10 @@ class waAppConfig extends SystemConfig
             } else {
                 waFiles::delete($cache_file);
             }
-            return $result;
+
         }
-        return include($cache_file);
+
+        return $result;
     }
 
     protected function getPHPFiles($path)
@@ -525,21 +607,8 @@ class waAppConfig extends SystemConfig
 
     protected function getClassByFilename($filename)
     {
-        $file_parts = explode('.', $filename);
-        if (count($file_parts) <= 2) {
-            return false;
-        }
-        $class = null;
-        switch ($file_parts[1]) {
-            case 'class':
-                return $file_parts[0];
-            default:
-                $result = $file_parts[0];
-                for ($i = 1; $i < count($file_parts) - 1; $i++) {
-                    $result .= ucfirst($file_parts[$i]);
-                }
-                return $result;
-        }
+        $class = waAutoload::getInstance()->getClassByFilename($filename, $this->application);
+        return $class;
     }
 
     /**
@@ -586,17 +655,73 @@ class waAppConfig extends SystemConfig
     public function getRouting($route = array())
     {
         if ($this->routes === null) {
-            $path = $this->getConfigPath('routing.php', true, $this->application);
-            if (!file_exists($path)) {
-                $path = $this->getConfigPath('routing.php', false, $this->application);
-            }
-            if (file_exists($path)) {
-                $this->routes = include($path);
-            } else {
-                $this->routes = array();
-            }
+            $this->routes = $this->getRoutingRules();
         }
         return $this->routes;
+    }
+
+    protected function getRoutingRules($route = array())
+    {
+        $routes = array();
+        if ($this->getEnvironment() === 'backend') {
+            $path = $this->getRoutingPath('backend');
+            if (file_exists($path)) {
+                $routes = array_merge($routes, include($path));
+            }
+        }
+
+        $path = $this->getRoutingPath('frontend');
+        if (file_exists($path)) {
+            $routes = array_merge($routes, include($path));
+        }
+        return $routes;
+    }
+
+    protected function getRoutingPath($type)
+    {
+        if ($type === null) {
+            $type = $this->getEnvironment();
+        }
+        $filename = ($type === 'backend') ? 'routing.backend.php' : 'routing.php';
+        $path = $this->getConfigPath($filename, true, $this->application);
+        if (!file_exists($path)) {
+            $path = $this->getConfigPath($filename, false, $this->application);
+        }
+        return $path;
+    }
+
+    /**
+     * TODO: The method that we will ever learn to use.
+     */
+    protected function getPluginRoutes($route)
+    {
+        /**
+         * Extend routing via plugin routes
+         * @event routing
+         * @param array $routes
+         * @return array $routes routes collected for every plugin
+         */
+        $result = wa()->event(array($this->application, 'routing'), $route);
+        $all_plugins_routes = array();
+        foreach ($result as $plugin_id => $routing_rules) {
+            if (!$routing_rules) {
+                continue;
+            }
+            $plugin = str_replace('-plugin', '', $plugin_id);
+            foreach ($routing_rules as $url => & $route) {
+                if (!is_array($route)) {
+                    list($route_ar['module'], $route_ar['action']) = explode('/', $route) + array(1 => '');
+                    $route = $route_ar;
+                }
+                if (!array_key_exists('plugin', $route)) {
+                    $route['app'] = $this->application;
+                    $route['plugin'] = $plugin;
+                }
+                $all_plugins_routes[$url] = $route;
+            }
+            unset($route);
+        }
+        return $all_plugins_routes;
     }
 
     public function getPrefix()
@@ -671,7 +796,7 @@ class waAppConfig extends SystemConfig
         if ($this->widgets === null) {
             $locale = wa()->getLocale();
             $file = waConfig::get('wa_path_cache')."/apps/".$this->application.'/config/widgets.'.$locale.'.php';
-            if (!file_exists($file) || SystemConfig::isDebug()) {
+            if (!file_exists($file) || self::isDebug()) {
                 $this->widgets = array();
                 if ($this->application == 'webasyst') {
                     $path = $this->getRootPath().'/wa-widgets';
@@ -726,7 +851,7 @@ class waAppConfig extends SystemConfig
                     }
                     $this->widgets[$widget_id] = $widget_info;
                 }
-                if (!SystemConfig::isDebug()) {
+                if (!self::isDebug()) {
                     waUtils::varExportToFile($this->widgets, $file);
                 } else {
                     waFiles::delete($file);
@@ -748,7 +873,7 @@ class waAppConfig extends SystemConfig
         if ($this->plugins === null) {
             $locale = wa()->getLocale();
             $file = waConfig::get('wa_path_cache')."/apps/".$this->application.'/config/plugins.'.$locale.'.php';
-            if (!file_exists($file) || SystemConfig::isDebug()) {
+            if (!file_exists($file) || self::isDebug()) {
                 waFiles::create(waConfig::get('wa_path_cache')."/apps/".$this->application.'/config');
                 // read plugins from file wa-config/[APP_ID]/plugins.php
                 $path = $this->getConfigPath('plugins.php', true, wa()->getAppFake());//VADIM CODE
@@ -785,10 +910,14 @@ class waAppConfig extends SystemConfig
                             $plugin_info['img'] = 'wa-apps/'.$this->application.'/plugins/'.$plugin_id.'/'.$plugin_info['img'];
                         }
                         if (isset($plugin_info['rights']) && $plugin_info['rights']) {
-                            $plugin_info['handlers']['rights.config'] = 'rightsConfig';
+                            if (!isset($plugin_info['handlers']['rights.config'])) {
+                                $plugin_info['handlers']['rights.config'] = 'rightsConfig';
+                            }
                         }
                         if (isset($plugin_info['frontend']) && $plugin_info['frontend']) {
-                            $plugin_info['handlers']['routing'] = 'routing';
+                            if (!isset($plugin_info['handlers']['routing'])) {
+                                $plugin_info['handlers']['routing'] = 'routing';
+                            }
                         }
                         if (!empty($plugin_info[$this->application.'_settings'])) {
                             $plugin_info['custom_settings'] = $plugin_info[$this->application.'_settings'];
@@ -796,7 +925,7 @@ class waAppConfig extends SystemConfig
                         $this->plugins[$plugin_id] = $plugin_info;
                     }
                 }
-                if (!SystemConfig::isDebug()) {
+                if (!self::isDebug()) {
                     waUtils::varExportToFile($this->plugins, $file);
                 } else {
                     waFiles::delete($file);
@@ -814,6 +943,7 @@ class waAppConfig extends SystemConfig
      * Update general plugin sort
      * @param string $plugin plugin id
      * @param int $sort 0 is first
+     * @throws waException
      */
     public function setPluginSort($plugin, $sort)
     {
@@ -841,6 +971,14 @@ class waAppConfig extends SystemConfig
         return true;
     }
 
+    /**
+     * The method returns a counter to show in backend header near applications' icons.
+     * Three types of response are allowed.
+     * @return string|int - A prime number in the form of a int or string
+     * @return array - Array with keys 'count' - the value of the counter and 'url' - icon url
+     * @return array - An associative array in which the key is the object key from app.php, from the header_items.
+     *                 The value must be identical to the value described in one of the previous types of response.
+     */
     public function onCount()
     {
         return null;
@@ -849,7 +987,7 @@ class waAppConfig extends SystemConfig
     /**
      * Sets or clears the value of app's indicator displayed next to its icon in main backend menu.
      *
-     * @param mixed Indicator value. If empty value is specified, indicator value is cleared.
+     * @param mixed $n Indicator value. If empty value is specified, indicator value is cleared.
      */
     public function setCount($n = null)
     {
@@ -864,5 +1002,18 @@ class waAppConfig extends SystemConfig
             unset($count[$this->application]);
             wa()->getStorage()->set('apps-count', $count);
         }
+    }
+
+    public function dispatchAppToken($data)
+    {
+        $m = new waAppTokensModel();
+        $m->deleteById($data['token']);
+    }
+
+    public function throwFrontControllerDispatchException()
+    {
+        // Called when route is not found in backend routing, see waFrontController.
+        // Overriden in webasystConfig because of backend dashboard logic.
+        throw new waException('Page not found', 404);
     }
 }

@@ -5,6 +5,7 @@
  * @var string $backend_url
  * @var array $app
  * @var array $url
+ * @var array $message
  */
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -20,7 +21,7 @@
 <body>
     <div id="wa-recovery">
         <img id="wa-recovery-stretched-background" />
-        <div class="dialog width500px height300px" id="wa-recovery-dialog">
+        <div class="dialog width500px height350px" id="wa-recovery-dialog">
             <div class="dialog-background"></div>
             <div class="dialog-window">
                 <div class="dialog-content">
@@ -39,11 +40,11 @@
                         </p>
                         <h2><?php echo $message; ?></h2>
                         <p>
-                        <?php if ($app) {?>
-                        Please contact app developer.
-                        <?php } else {?>
-                        Please contact server administrator.
-                        <?php }?>
+                        <?php if ($app) {
+                            echo _ws("To learn more details about this error, enable the debug mode in Settings app, or change '<code>debug</code>' parameter to <code>true</code> in <em style=\"white-space: nowrap\">wa-config/config.php</em> file, and reload this page.");
+                        } else {
+                            echo _ws('Please contact server administrator.');
+                        }?>
                         </p>
                     </div>
                 </div>

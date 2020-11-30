@@ -236,7 +236,7 @@
   opacity: 0.33;
   width: 2.5rem;
   height: 2.5rem;
-  background: transparent url("../../../site/themes/mobile/img/icons/arrow-child.png") 50% no-repeat;
+  background: transparent url("./img/icons/arrow-child.png") 50% no-repeat;
   background-size: 1em;
 }
 .wa-photo-wrapper .photo-page-wrapper .plugin-wrapper .comments .comment {

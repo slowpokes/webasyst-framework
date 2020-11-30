@@ -20,22 +20,46 @@ class webasystLoginFirstAction extends waViewAction
         }
         if (waRequest::getMethod() == 'post') {
             $errors = array();
+
             $login = waRequest::post('login');
-            $validator = new waLoginValidator();
-            if (!$validator->isValid($login)) {
-                $errors['login'] = implode("<br />", $validator->getErrors());
+            $login = is_scalar($login) ? (string)$login : '';
+
+            if (strlen($login) <= 0) {
+                $errors['login'] = _ws('Login is required');
+            } else {
+                $validator = new waLoginValidator();
+                if (!$validator->isValid($login)) {
+                    $login_errors = $validator->getErrors();
+                    if ($login_errors) {
+                        $errors['login'] = implode("<br />", $login_errors);
+                    }
+                }
             }
             $password = waRequest::post('password');
+            $password = is_scalar($password) ? (string)$password : '';
             $password_confirm = waRequest::post('password_confirm');
+            $password_confirm = is_scalar($password_confirm) ? (string)$password_confirm : '';
 
-            if ($password !== $password_confirm) {
-                $errors['password'] = _w('Passwords do not match');
+            if (strlen($password) <= 0) {
+                $errors['password'] = _ws("Password required");
+            } elseif ($password !== $password_confirm) {
+                $errors['password'] = _ws('Passwords do not match');
+            } elseif (strlen($password) > waAuth::PASSWORD_MAX_LENGTH) {
+                $errors['password'] = _ws('Specified password is too long.');
             }
 
             $email = waRequest::post('email');
-            $validator = new waEmailValidator();
-            if (!$validator->isValid($email)) {
-                $errors['email'] = implode("<br />", $validator->getErrors());
+            $email = is_scalar($email) ? (string)$email : '';
+            if (strlen($email) <= 0) {
+                $errors['email'] = _ws('Email is required');
+            } else {
+                $validator = new waEmailValidator();
+                if (!$validator->isValid($email)) {
+                    $email_errors = $validator->getErrors();
+                    if ($email_errors) {
+                        $errors['email'] = implode("<br />", $email_errors);
+                    }
+                }
             }
 
             if ($errors) {
@@ -90,6 +114,12 @@ class webasystLoginFirstAction extends waViewAction
                                 );
 
                                 if (!empty($app['routing_params']) && is_array($app['routing_params'])) {
+                                    wa($app_id);
+                                    foreach ($app['routing_params'] as $routing_param => $routing_param_value) {
+                                        if (is_callable($routing_param_value)) {
+                                            $app['routing_params'][$routing_param] = call_user_func($routing_param_value);
+                                        }
+                                    }
                                     $routing = array_merge($routing, $app['routing_params']);
                                 }
                                 $data[$domain][] = $routing;

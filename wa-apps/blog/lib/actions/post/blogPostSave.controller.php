@@ -41,7 +41,7 @@ class blogPostSaveController extends waJsonController
     {
         $post = array(
             'id'                 => waRequest::post('post_id', null, waRequest::TYPE_INT),
-            'title'              => substr(waRequest::post('title', '', waRequest::TYPE_STRING_TRIM), 0, 255),
+            'title'              => mb_substr(waRequest::post('title', '', waRequest::TYPE_STRING_TRIM), 0, 255),
             'text'               => waRequest::post('text'),
             'blog_id'            => waRequest::post('blog_id'),
             'contact_id'         => waRequest::post('contact_id'),
@@ -179,12 +179,13 @@ class blogPostSaveController extends waJsonController
 
     private function save($post)
     {
-        $options = array();
+        $options = array(
+            // IF no settlements for blog, we must have unique URL, but silently (without validation error about uniqueness of url)
+            'update_url_on_error' => !wa()->getRouteUrl('blog/')
+        );
+
         if (waRequest::post('transliterate', null)) {
             $options['transliterate'] = true;
-        }
-        if (waRequest::post('update_url_on_error')) {
-            $options['update_url_on_error'] = true;
         }
 
         $this->validate_messages = $this->post_model->validate($post, $options);

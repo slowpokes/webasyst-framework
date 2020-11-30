@@ -16,19 +16,29 @@ class installerHelper
     private static $counter;
 
     /**
-     *
      * @return waInstallerApps
+     * @throws waException
      */
-    public static function &getInstaller()
+    public static function getInstaller()
     {
         if (!self::$model) {
             self::$model = new waAppSettingsModel();
         }
         if (!self::$installer) {
             $license = self::$model->get('webasyst', 'license', false);
+            $token = null;
+            if ($token_data = self::$model->get('installer', 'token_data', false)) {
+                $token_data = waUtils::jsonDecode($token_data, true);
+                if (!empty($token_data['token'])) {
+                    $token = $token_data['token'];
+                }
+            }
             $ttl = 600;
             $locale = wa()->getSetting('locale', wa()->getLocale(), 'webasyst');
-            self::$installer = new waInstallerApps($license, $locale, $ttl, !!waRequest::get('refresh'));
+            self::$installer = new waInstallerApps($license, $locale, $ttl, !!waRequest::get('refresh'), $token);
+        }
+        if (waConfig::get('is_template')) {
+            throw new waException('installerHelper::getInstaller() is not allowed in template context');
         }
         return self::$installer;
     }
@@ -59,47 +69,38 @@ class installerHelper
      */
     public static function getDomain()
     {
-        return self::getInstaller()->getDomain();
+        return self::getSafeInstaller()->getDomain();
     }
 
-    public static function flushCache($apps = array())
+    public static function flushCache()
     {
         $path_cache = waConfig::get('wa_path_cache');
-        waFiles::protect($path_cache);
 
-        $caches = array();
-        $paths = waFiles::listdir($path_cache);
-        foreach ($paths as $path) {
-            #skip long action & data path
-            if ($path != 'temp') {
+        $errors = array();
+        if (!waSystemConfig::systemOption('cache_versioning')) {
+            $paths = waFiles::listdir($path_cache);
+            $root_path = wa()->getConfig()->getRootPath().DIRECTORY_SEPARATOR;
+            foreach ($paths as $path) {
                 $path = $path_cache.'/'.$path;
                 if (is_dir($path)) {
-                    $caches[] = $path;
+                    try {
+                        waFiles::delete($path);
+                    } catch (Exception $ex) {
+                        $errors[] = str_replace($root_path, '', $ex->getMessage());
+                    }
                 }
             }
         }
 
-        if ($apps) {
-            $app_path = waConfig::get('wa_path_apps');
-            foreach ($apps as $app) {
-                if (!empty($app['installed'])) {
-                    $caches[] = $app_path.'/'.$app['slug'].'/js/compiled';
-                }
+        if (!wa()->getConfig()->clearCache()) {
+            if ($errors) {
+                return $errors;
+            } else {
+                return array(_ws('Unable to delete certain files'));
             }
+        } else {
+            return array(); // went fine the second time
         }
-
-        $caches[] = $path_cache.'/temp';
-        $root_path = wa()->getConfig()->getRootPath();
-        $errors = array();
-        foreach ($caches as $path) {
-            try {
-                waFiles::delete($path);
-            } catch (Exception $ex) {
-                $errors[] = str_replace($root_path.DIRECTORY_SEPARATOR, '', $ex->getMessage());
-                waFiles::delete($path, true);
-            }
-        }
-        return $errors;
     }
 
     public static function checkUpdates(&$messages)
@@ -123,15 +124,15 @@ class installerHelper
     }
 
     /**
-     *
+     * @param array $options
      * @param array $filter
      * @param array [string]string $filter['extras'] select apps with specified extras type
      * @return array
      * @throws Exception
      */
-    public static function getApps($filter = array())
+    public static function getApps($options, $filter = array())
     {
-        return self::getInstaller()->getApps(array(), $filter);
+        return self::getInstaller()->getApps($options, $filter);
     }
 
     public static function getUpdatesCounter($field = 'total')
@@ -156,15 +157,22 @@ class installerHelper
             $errors = (array)json_decode($app_settings_model->get('installer', 'errors', '[]'));
             $items = self::getInstaller()->getUpdates($vendor);
             $changed = false;
+            $actions = array(
+                waInstallerApps::ACTION_UPDATE,
+                waInstallerApps::ACTION_CRITICAL_UPDATE,
+                waInstallerApps::ACTION_INSTALL,
+            );
             foreach ($items as $id => &$item) {
                 if (isset($item['version'])) {
-                    ++self::$counter['total'];
-                    if (!empty($item['applicable'])) {
-                        ++self::$counter['applicable'];
-                    }
+                    if (in_array($item['action'], $actions, true)) {
+                        ++self::$counter['total'];
+                        if (!empty($item['applicable']) && (empty($item['commercial']) || !empty($item['purchased']))) {
+                            ++self::$counter['applicable'];
+                        }
 
-                    if (!empty($item['commercial']) && empty($item['purchased'])) {
-                        ++self::$counter['payware'];
+                        if (!empty($item['commercial']) && empty($item['purchased'])) {
+                            ++self::$counter['payware'];
+                        }
                     }
                 }
 
@@ -197,10 +205,10 @@ class installerHelper
                                 if (empty($item['applicable'])) {
                                     --self::$counter['total'];
                                     unset($item[$extras][$extras_id]);
-                                } elseif (!empty($extras_item['applicable'])) {
+                                } elseif (!empty($extras_item['applicable']) && (empty($extras_item['commercial']) || !empty($extras_item['purchased']))) {
                                     ++self::$counter['applicable'];
                                 }
-                            } elseif (!empty($extras_item['applicable'])) {
+                            } elseif (!empty($extras_item['applicable']) && (empty($extras_item['commercial']) || !empty($extras_item['purchased']))) {
                                 ++self::$counter['applicable'];
                             }
                         }
@@ -238,7 +246,9 @@ class installerHelper
 
     public static function isDeveloper()
     {
-        return false;
+        if (waSystemConfig::systemOption('installer_in_developer_mode')) {
+            return false;
+        }
         $result = false;
         $paths = array();
         $paths[] = dirname(__FILE__).'/.svn';
@@ -260,7 +270,7 @@ class installerHelper
      * Search first entry condition
      * @param array $items
      * @param array $filter
-     * @param bool $return_key
+     * @param bool  $return_key
      * @return mixed
      */
     public static function &search($items, $filter, $return_key = false)
@@ -327,7 +337,7 @@ class installerHelper
 
     /**
      * @param Exception $ex
-     * @param array $messages
+     * @param array     $messages
      * @throws Exception
      */
     public static function handleException($ex, &$messages)
@@ -346,5 +356,42 @@ class installerHelper
                 'result' => 'fail',
             );
         }
+    }
+
+    public static function getOneStringKey($dkim_pub_key)
+    {
+        $one_string_key = trim(preg_replace('/^\-{5}[^\-]+\-{5}(.+)\-{5}[^\-]+\-{5}$/s', '$1', trim($dkim_pub_key)));
+        //$one_string_key = str_replace('-----BEGIN PUBLIC KEY-----', '', $dkim_pub_key);
+        //$one_string_key = trim(str_replace('-----END PUBLIC KEY-----', '', $one_string_key));
+        $one_string_key = preg_replace('/\s+/s', '', $one_string_key);
+        return $one_string_key;
+    }
+
+    public static function getDkimSelector($email)
+    {
+        $e = explode('@', $email);
+        return trim(preg_replace('/[^a-z0-9]/i', '', $e[0])).'wamail';
+    }
+
+    public static function getDesignUrl($app_id)
+    {
+        $url = null;
+        $class_name = sprintf('%sDesignActions', $app_id);
+        wa($app_id);
+        if (class_exists($class_name)) {
+            /** @var waDesignActions $instance */
+            $instance = new $class_name();
+            $url = $instance->getDesignUrl();
+        }
+        return $url;
+    }
+
+    private static function getSafeInstaller()
+    {
+        try {
+            self::getInstaller();
+        } catch (waException $e) {
+        }
+        return self::$installer;
     }
 }

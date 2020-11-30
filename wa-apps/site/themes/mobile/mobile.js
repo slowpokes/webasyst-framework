@@ -1,3 +1,5 @@
+$.ajaxSetup({ cache: false });
+
 /**
  * User Script for Mobile Theme
  * */
@@ -158,14 +160,10 @@ var UserTouch = ( function() {
         });
 
         // Закрываем меню
-        $(".hidden-menu-wrapper").on( "click", function() {
-            hideHiddenMenu();
-            return false;
-        });
+        $(".hidden-menu-wrapper").on( "click", function(event) {
+            var is_wrapper = (event.target === this);
 
-        // Блокируем всплытие кликов у меню-контейнера
-        $(".menu-block-wrapper").on( "click", function(event) {
-            event.stopPropagation();
+            if (is_wrapper) { hideHiddenMenu(); }
         });
 
         // Клик по ссылке в меню
@@ -311,33 +309,4 @@ var UserTouch = ( function() {
         bindEvents();
     });
 
-})(jQuery);
-
-// Show Catalog Filter JS
-( function($) {
-    var bindEvents = function() {
-        $(".show-filter-content-link").on( "click", function() {
-            toggleFilterContent( $(this) );
-            return false;
-        });
-    };
-
-    var toggleFilterContent = function($link) {
-        var $wrapper = $link.closest(".catalog-filter-wrapper"),
-            activeClass = "is-shown";
-
-        // Change Link Text
-        if ($wrapper.hasClass(activeClass)) {
-            $link.text( $link.data("hide-text") )
-        } else {
-            $link.text( $link.data("show-text") )
-        }
-
-        // Toggle Content
-        $wrapper.toggleClass(activeClass);
-    };
-
-    $(document).ready( function() {
-        bindEvents();
-    });
 })(jQuery);

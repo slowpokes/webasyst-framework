@@ -124,11 +124,24 @@ abstract class waRightConfig
 
     /**
      * Set default access for given contact and return access rights to set up in system access storage.
+     * Called after contact has been granted Limited access to the app.
      *
      * @param int $contact_id
      * @return array access key => value
      */
     public function setDefaultRights($contact_id)
+    {
+        return $this->getDefaultRights($contact_id);
+    }
+
+    /**
+     * Return access rights to set in access control dialog by default
+     * for a contact without any rights yet.
+     *
+     * @param int $contact_id
+     * @return array access key => value
+     */
+    public function getDefaultRights($contact_id)
     {
         return array();
     }
@@ -190,14 +203,16 @@ abstract class waRightConfig
         if ($addScriptForSelect) {
             $html .= '
                 // Change resulting column for selects
-                var updateIndicator = function() {
+                var updateIndicatorForSelect = function() {
                     var self = $(this);
                     var tr = self.closest("table.c-access-app tr");
-                    var result = Math.max(self.val()-0, tr.find("input.g-value").val()-0);
+                    var group_value = tr.find("input.g-value").val()-0;
+                    var personal_value = self.val()-0;
+                    var result = group_value ? Math.max(personal_value, group_value) : personal_value;
                     var name = self.find("option[value=\""+result+"\"]").text();
                     tr.find("strong").text(name);
                 };
-                $("table.c-access-app select").change(updateIndicator);';
+                $("table.c-access-app select").change(updateIndicatorForSelect);';
         }
 
         if ($addScriptForCB) {
@@ -225,7 +240,7 @@ abstract class waRightConfig
                         .find("select[name^=\""+cb.attr("name").replace(/\.all]/,"")+"\"]").each(function (k,cb2) {
                             cb2 = $(cb2);
                             cb2.val(cb.val());
-                            updateIndicator.call(cb2[0]);
+                            updateIndicatorForSelect.call(cb2[0]);
                         });
                     }
                 };
@@ -283,12 +298,9 @@ HTML;
                 if (!isset($params['options']) || !$params['options']) {
                     return '';
                 }
-                if (!$group) {
-                    $group = 0;
-                }
-                if (!$own) {
-                    $own = 0;
-                }
+                $own = ifempty($own, 0);
+                $group = ifempty($group, 0);
+                $max = $group ? max($own, $group) : $own;
 
                 $o = $params['options'];
                 $oHTML = array();
@@ -296,9 +308,15 @@ HTML;
                     $oHTML[] = '<option value="'.$val.'"'.($own==$val ? ' selected' : '').'>'.htmlspecialchars($opt).'</option>';
                 }
                 $oHTML = implode('', $oHTML);
+
+                // corner case when option of this key (group) not exists
+                if (!isset($o[$group])) {
+                    $group = key($o);
+                }
+
                 return '<tr'.($params['cssclass'] ? ' class="'.$params['cssclass'].'"' : '').'>'.
                             '<td><div>'.$label.'</div></td>'.
-                            ($inherited !== null ? '<td><strong>'.$o[max($own, $group)].'</strong></td>' : '').
+                            ($inherited !== null ? '<td><strong>'.$o[$max].'</strong></td>' : '').
                             '<td><input type="hidden" name="app['.$name.']" value="0">'.
                                 '<select name="app['.$name.']">'.$oHTML.'</select>'.
                             '</td>'.
@@ -311,6 +329,16 @@ HTML;
                             '<td><input type="hidden" name="app['.$name.']" value="0"><input type="checkbox" name="app['.$name.']" value="'.(isset($params['value']) ? $params['value'] : 1).'"'.($own ? ' checked="checked"' : '').'></td>'.
                             ($inherited !== null ? '<td><input type="checkbox"'.($group ? ' checked="checked"' : '').' disabled="disabled"></td>' : '').
                         '</tr>';
+            case 'always_enabled':
+                if ($inherited !== null) {
+                    $html = '<td><div>'.$label.'</div></td>'.
+                            '<td><i class="icon10 yes"></i></td>'.
+                            '<td></td><td></td>';
+                } else {
+                    $html = '<td><div>'.$label.'</div></td>'.
+                            '<td><i class="icon10 yes"></i></td>';
+                }
+                return '<tr'.($params['cssclass'] ? ' class="'.$params['cssclass'].'"' : '').'>'.$html.'</tr>';
             case 'list':
                 $indicator = '';
                 if (isset($params['hint1']) && $params['hint1'] == 'all_checkbox') {

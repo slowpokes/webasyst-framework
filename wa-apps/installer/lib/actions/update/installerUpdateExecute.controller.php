@@ -21,8 +21,12 @@ class installerUpdateExecuteController extends waJsonController
      */
     private $model;
 
+    private $is_trial = false;
+
     public function execute()
     {
+        $this->is_trial = (bool)waRequest::request('trial', false);
+
         try {
             $this->thread_id = preg_replace('@[^a-zA-Z0-9]+@', '', waRequest::get('thread_id', '', 'string'));
             if ($this->thread_id) {
@@ -47,11 +51,28 @@ class installerUpdateExecuteController extends waJsonController
 
                         $this->getStorage()->close();
                         $this->urls = $updater->update($this->urls);
-                        if (waRequest::request('install')) {
+                        $install = waRequest::request('install');
+                        if ($install) {
                             $this->install();
                         }
 
-                        $this->response['sources'] = $this->getResult();
+                        $this->logItems($install);
+
+                        $result = $this->getResult();
+                        if ($this->is_trial) {
+                            // Get theme for site app
+                            if (wa()->appExists('site')) {
+                                foreach ($result as $source) {
+                                    if (!empty($source['real_slug']) && preg_match('~^site/themes/(\w+)$~', $source['real_slug'], $match)) {
+                                        $this->response['design_redirect'] = wa()->getConfig()->getBackendUrl(true).'site/#/design/theme='.$match[1];
+                                    }
+                                }
+                            }
+                        } else {
+                            $this->updateFactProducts($result);
+                        }
+
+                        $this->response['sources'] = $result;
                         $this->response['current_state'] = $updater->getState();
                         $this->response['state'] = $updater->getFullState(waRequest::get('mode', 'apps'));
 
@@ -84,6 +105,9 @@ class installerUpdateExecuteController extends waJsonController
                     }
                     $ob = ob_get_clean();
                     if ($ob) {
+
+                        $ob = preg_replace('@([\?&](hash|previous_hash|token)=)([^&\?]+)@', '$1*hash*', $ob);
+
                         $this->response['warning'] = $ob;
                         waLog::log('Output at '.__METHOD__.': '.$ob);
                     }
@@ -98,6 +122,38 @@ class installerUpdateExecuteController extends waJsonController
         } catch (Exception $ex) {
             throw $ex;
             //TODO use redirect/errors
+        }
+    }
+
+    private function logItems($install)
+    {
+        $action = $install ? 'item_install' : 'item_update';
+        $ip = waRequest::getIp();
+        foreach ($this->urls as $target => $url) {
+            if (empty($url['skipped'])) {
+                $params = null;
+                if (preg_match('@^wa-apps/([^/]+)$@', $target, $matches)) {
+                    $params = array(
+                        'type' => 'apps',
+                        'id'   => $matches[1],
+                        'ip'   => $ip,
+                    );
+                } elseif (preg_match('@^wa-apps/([^/]+)/(plugins|themes|widgets)/([^/]+)$@', $target, $matches)) {
+                    $params = array(
+                        'type' => $matches[2],
+                        'id'   => sprintf('%s/%s', $matches[1], $matches[3]),
+                        'ip'   => $ip,
+                    );
+                } elseif (preg_match('@^wa-plugins/(payment|shipping|sms)/([^/]+)$@', $target, $matches)) {
+                    $params = array(
+                        'type' => 'plugins',
+                        'id'   => sprintf('wa-plugins/%s/%s', $matches[1], $matches[2]),
+                        'ip'   => $ip,
+                    );
+                }
+
+                $this->logAction($action, $params);
+            }
         }
     }
 
@@ -116,9 +172,15 @@ class installerUpdateExecuteController extends waJsonController
             //TODO workaround exceptions
             if (empty($url['skipped']) && preg_match('@^wa-apps/@', $target)) {
                 try {
-                    $apps->installWebAsystItem(preg_replace('@^wa-apps/@', '', $target), null, isset($url['edition']) ? $url['edition'] : true);
+                    $slug = preg_replace('@^wa-apps/@', '', $target);
+                    $apps->installWebAsystItem($slug, null, isset($url['edition']) ? $url['edition'] : true);
                 } catch (Exception $e) {
-                    waLog::log($e->getMessage());
+                    $message = sprintf(
+                        'Error occurred during install %s: %s',
+                        $target,
+                        $e->getMessage()
+                    );
+                    waLog::log($message);
                     $url['skipped'] = true;
                 }
                 $this->model->ping();
@@ -134,18 +196,8 @@ class installerUpdateExecuteController extends waJsonController
 
     private function cleanup()
     {
-        $apps = array();
-        foreach ($this->urls as $url) {
-            if (!isset($url['skipped']) || !$url['skipped']) {
-                if (preg_match('@^wa-apps/[^/]+$@', $url['target'])) {
-                    $apps[] = array(
-                        'installed' => true,
-                        'slug'      => $url['target'],
-                    );
-                }
-            }
-        }
-        installerHelper::flushCache($apps);
+        $this->model->ping();
+        installerHelper::flushCache();
         $this->model->ping();
     }
 
@@ -162,5 +214,24 @@ class installerUpdateExecuteController extends waJsonController
             unset($result_url);
         }
         return $result_urls;
+    }
+
+    /**
+     * Informs the remote update server about changes to the installation package
+     * @param $list
+     */
+    private function updateFactProducts($list)
+    {
+        $updated_slugs = array();
+        foreach ($list as $item) {
+            if (empty($item['skipped']) && !empty($item['real_slug'])) {
+                $updated_slugs[] = $item['real_slug'];
+            }
+        }
+
+        if (!empty($updated_slugs)) {
+            $sender = new installerUpdateFact(installerUpdateFact::ACTION_ADD, $updated_slugs);
+            $sender->query();
+        }
     }
 }

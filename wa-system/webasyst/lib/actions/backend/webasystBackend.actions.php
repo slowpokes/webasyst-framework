@@ -83,7 +83,9 @@ class webasystBackendActions extends waViewActions
         } else {
             $user_filters = array();
         }
-        $activity = $activity_action->getLogs(array(), $count);
+        $activity = $activity_action->getLogs(array(
+            'app_id' => ifempty($user_filters),
+        ), $count);
         $activity_load_more = $count == 50;
 
         $is_admin = wa()->getUser()->isAdmin('webasyst');
@@ -179,5 +181,20 @@ class webasystBackendActions extends waViewActions
             }
         }
     }
+
+    public function run($params = null)
+    {
+        $action = $params;
+        if (!$action) {
+            $action = 'default';
+        }
+
+        wa('webasyst')->event('backend_dashboard_before_action', ref([
+            'action' => $action,
+        ]));
+
+        return parent::run($action);
+    }
+
 }
 

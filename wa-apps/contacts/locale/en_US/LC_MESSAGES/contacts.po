@@ -1605,3 +1605,9 @@ msgstr[1] ""
 #: /wa-apps/contacts/lib/config/logs.php:62
 msgid "created a new signup form"
 msgstr ""
+
+#: /wa-apps/contacts/lib/handlers/shop.backend_customers_list.handler.php:38
+#: /wa-apps/contacts/lib/handlers/shop.backend_customers_list.handler.php:43
+#: /wa-apps/contacts/lib/handlers/shop.backend_customers_list.handler.php:48
+msgid "Open in Contacts"
+msgstr ""

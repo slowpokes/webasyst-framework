@@ -4,6 +4,7 @@ class waInstallerFile
 {
     private static $cache_ttl = 600;
     private static $timeout = 10;
+    private $headers = array();
 
     public function __construct()
     {
@@ -15,8 +16,8 @@ class waInstallerFile
      * @param string $path URI
      * @param string $encoding
      * @param bool $values
-     * @throws Exception
      * @return array|null
+     * @throws Exception
      */
     public function getData($path, $encoding = 'base64', $values = true)
     {
@@ -55,18 +56,30 @@ class waInstallerFile
         return $values ? array_values($data) : $data;
     }
 
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
     public function getContent($path, $allow_caching = false)
     {
         //TODO enable caching
+        $this->headers = array();
         $is_url = preg_match('@^https?://@', $path);
         if ($is_url && ($ch = self::getCurl($path))) {
             try {
                 if (session_id()) {
                     session_write_close();
                 }
-                $content = curl_exec($ch);
+
+                $response = curl_exec($ch);
+                $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+                $response_headers = substr($response, 0, $header_size);
+                $content = substr($response, $header_size);
+                $response_headers = array_Filter(preg_split('@[\r\n]+@', $response_headers), 'strlen');
 
                 $err_no = curl_errno($ch);
+                unset($response);
                 if ($err_no) {
                     $message = "Curl error: {$err_no}# ".curl_error($ch)." at [{$path}]";
                     throw new Exception($message);
@@ -81,6 +94,12 @@ class waInstallerFile
                         throw new Exception(sprintf($message, parse_url($path, PHP_URL_HOST), parse_url($redirect, PHP_URL_HOST)));
                     } else {
                         throw new Exception("Invalid server response with code {$response_code} while request {$path}\n\t(cUrl used)");
+                    }
+                } else {
+                    foreach ($response_headers as $header) {
+                        if (preg_match('@^X-Webasyst-(\w+):\s+(.+)$@ui', $header, $matches)) {
+                            $this->headers[$matches[1]] = urldecode($matches[2]);
+                        }
                     }
                 }
             } catch (Exception $ex) {
@@ -130,6 +149,8 @@ class waInstallerFile
                         $response_code = (int)$matches[1];
                         $hint = " Hint: {$matches[2]}";
                         break;
+                    } elseif (preg_match('@^X-Webasyst-(\w+):\s+(.+)$@ui', $header, $matches)) {
+                        $this->headers[$matches[1]] = urldecode($matches[2]);
                     }
                 }
             }
@@ -169,8 +190,9 @@ class waInstallerFile
                 $curl_options = array();
             }
             $curl_default_options = array(
-                CURLOPT_HEADER            => 0,
+                CURLOPT_HEADER            => 1,
                 CURLOPT_RETURNTRANSFER    => 1,
+                //CURLOPT_VERBOSE           => 1,
                 CURLOPT_TIMEOUT           => self::$timeout,
                 CURLOPT_CONNECTTIMEOUT    => self::$timeout,
                 CURLE_OPERATION_TIMEOUTED => self::$timeout,

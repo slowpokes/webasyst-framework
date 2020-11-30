@@ -1,0 +1,251 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wa-plugins/shipping/boxberry\n"
+"POT-Creation-Date: 2019-08-26 09:21+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: wa-plugins/shipping/boxberry\n"
+"Language-Team: wa-plugins/shipping/boxberry\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-Basepath: .\n"
+"Language: ru_RU\n"
+"X-Generator: Poedit 2.0.6\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: .\n"
+
+msgid "Real-time shipping quotes with <a href=\"https://boxberry.ru/en/\">Boxberry</a> service."
+msgstr "Расчет стоимости доставки сервисом <a href=\"https://boxberry.ru/\">Boxberry</a>."
+
+msgid "Shipping cost"
+msgstr "Стоимость доставки"
+
+msgid "Minimum order cost for free delivery"
+msgstr "Минимальная стоимость заказа для бесплатной доставки"
+
+msgid "Shipping rates provided by Boxberry service are ignored when free shipping is applied."
+msgstr "Стоимость доставки, рассчитанная сервисом Boxberry, игнорируется, когда применяется бесплатная доставка."
+
+msgid "Declared value for prepaid delivery (insurance cost)"
+msgstr "Объявленная стоимость для отправлений с предоплатой (страховая стоимость)"
+
+msgid "Set up markup costs in your Boxberry account."
+msgstr "Настройте стоимость наценок в своем личном кабинете Boxberry."
+
+msgid "Shipping options"
+msgstr "Варианты доставки"
+
+msgid "Select values corresponding to your contract’s conditions."
+msgstr "Выберите значения в соответствии с условиями своего договора."
+
+msgid "If “With prepayment only” option is selected, then in Shop-Script, with “In-cart checkout” mode enabled, only prepayment options are available after shipping option selection."
+msgstr "Если выбран вариант «Только предоплата», то в приложении Shop-Script в режиме «Оформление заказа в корзине» после выбора варианта доставки будут доступны только варианты предоплаты."
+
+msgid "If “All” option is selected, then in Shop-Script, with “In-cart checkout” mode enabled, minimum shipping cost for prepayment is displayed by default. Once a shipping and a payment option are selected, the displayed shipping cost is updated accordingly."
+msgstr "Если выбран вариант «Все», то в приложении Shop-Script в режиме «Оформление заказа в корзине» по умолчанию будет показана минимальная стоимость доставки с расчетом на предоплату, а после выбора вариантов доставки и оплаты стоимость доставки будет уточнена."
+
+msgid "Pickup points"
+msgstr "Пункты выдачи заказов"
+
+msgid "Courier delivery"
+msgstr "Курьерская доставка"
+
+msgid "Courier name"
+msgstr "Название курьера"
+
+msgid "Russian Federation"
+msgstr "Российская Федерация"
+
+msgid "Availability settings"
+msgstr "Условия доступности"
+
+msgid "Country"
+msgstr "Страна"
+
+msgid "Region"
+msgstr "Регион"
+
+msgid "Shipping will be restricted to the selected region."
+msgstr "Доставка будет ограничена выбранным регионом."
+
+msgid "Localities"
+msgstr "Населенные пункты"
+
+msgid "Separate locality names with a comma."
+msgstr "Разделяйте названия населенных пунктов запятой."
+
+msgid "Max weight"
+msgstr "Максимальный вес"
+
+msgid "g"
+msgstr "г"
+
+msgid "Max length"
+msgstr "Максимальная длина"
+
+msgid "Max width"
+msgstr "Максимальная ширина"
+
+msgid "Max height"
+msgstr "Максимальная высота"
+
+msgid "Max dimensions"
+msgstr "Максимальные размеры"
+
+msgid "Basic settings"
+msgstr "Основные настройки"
+
+msgid "Service name"
+msgstr "Название службы"
+
+msgid "API URL"
+msgstr "Адрес API"
+
+msgid "Token"
+msgstr "Токен"
+
+msgid "Parcel office city"
+msgstr "Город приема посылок"
+
+msgid "Start typing a city name"
+msgstr "Начните искать город"
+
+msgid "To select a parcel office, please enter a token and save the settings."
+msgstr "Чтобы выбрать пункт приема посылок, введите токен и сохраните настройки."
+
+msgid "There are no parcel offices in your city."
+msgstr "В вашем городе нет пункта приема посылок."
+
+msgid "Parcel office"
+msgstr "Пункт приема посылок"
+
+msgid "Default weight"
+msgstr "Вес по умолчанию"
+
+msgid "Default length"
+msgstr "Длина по умолчанию"
+
+msgid "m"
+msgstr "м"
+
+msgid "Default width"
+msgstr "Ширина по умолчанию"
+
+msgid "Default height"
+msgstr "Высота по умолчанию"
+
+msgid "Used only if order dimensions have not been calculated by a special plugin. If no value is specified, shipping rate and terms will not be calulated."
+msgstr "Используется, только если габариты заказа не были рассчитаны специальным плагином. Если значение не указано, то сроки и стоимость доставки в пункт выдачи заказов не рассчитываются."
+
+msgid "Integration settings"
+msgstr "Настройки интеграции"
+
+msgid "Upon checkout, a dellivery draft is created in your Boxberry account. Should you edit an order in your Webasyst backend, the corresponding draft is updated automatically."
+msgstr "После оформления заказа в вашем личном кабинете Boxberry создается посылка (черновик отгрузки). В случае редактирования заказа в бекенде Webasyst этот черновик автоматически обновляется."
+
+msgid "Type of parcel delivery"
+msgstr "Вид выдачи посылок"
+
+msgid "If nothing is selected, a default value from the store profile’s “Services” section of your Boxberry account is used."
+msgstr "Если ничего не выбрано, то используется значение по умолчанию, установленное в разделе «Услуги» профиля магазина в вашем личном кабинете Boxberry."
+
+msgid "Store name for SMS and email notifications"
+msgstr "Наименование магазина для SMS- и email-оповещений"
+
+msgid "Notifications are sent by Boxberry service."
+msgstr "Оповещения отправляются сервисом Boxberry."
+
+msgid "Delivery is not available. Please check the shipping address and the selected payment type."
+msgstr "Доставка недоступна. Проверьте адрес доставки и выбранный вариант оплаты."
+
+msgid "Do not use"
+msgstr "Не использовать"
+
+msgid "All"
+msgstr "Все"
+
+msgid "With prepayment only"
+msgstr "Только с предоплатой"
+
+msgid "Delivery without parcel opening"
+msgstr "Выдача без вскрытия"
+
+msgid "Delivery with parcel opening and completeness check"
+msgstr "Выдача со вскрытием и проверкой комплектности"
+
+msgid "Delivery of a parcel part"
+msgstr "Выдача части вложения"
+
+msgid "from"
+msgstr "oт"
+
+msgid "Delivery is not available for specified ZIP code."
+msgstr "Доставка для указаного индекса недоступна."
+
+msgid "Courier"
+msgstr "Курьер"
+
+msgid "The sum of length, width, and height values must not exceed 2.5 m."
+msgstr "Сумма значений длины, ширины и высоты не должна превышать 2,5 м."
+
+msgid "Specify either a fixed value expressed in a currency or percentage of the order total, or their sum or difference."
+msgstr "Укажите фиксированную стоимость в валюте или долю от суммы заказа в процентах, либо их сумму или разность."
+
+msgid "Examples:"
+msgstr "Примеры:"
+
+msgid "Declared value must not exceed 300,000 rubles."
+msgstr "Объявленная стоимость не может превышать 300 000 рублей."
+
+msgid "To switch to the test mode, request a test API address and token from Boxberry support team."
+msgstr "Чтобы переключиться в тестовый режим, запросите тестовый адрес API и токен у службы поддержки Boxberry."
+
+msgid "Error during automatic shipment creation. Please create a shipment manually in your personal account on Boxberry website. See detailed error-related information in log file <em>wa-log/wa-plugins/shipping/boxberry/api_requests.log</em>."
+msgstr "Ошибка при автоматическом создании отправления. Создайте отправление вручную в личном кабинете на сайте Boxberry. Подробную информацию об ошибке смотрите в лог-файле <em>wa-log/wa-plugins/shipping/boxberry/api_requests.log</em>."
+
+msgid "In case of payment on delivery, the declared value passed to the shipping service is equal to the order total less the shipping cost, i.e. pure cost of delivered items with discount applied."
+msgstr "В случае оплаты заказа при получении в службу доставки передается объявленная стоимость отправления, равная стоимости заказа за вычетом стоимости доставки, т. е. стоимость товаров с учетом скидки."
+
+msgid "Edit"
+msgstr "Редактировать"
+
+msgid "Shipping will be available for selected regions only"
+msgstr "Доставка будет доступна только в выбранные регионы"
+
+msgid "Regions"
+msgstr "Регионы"
+
+msgid "All regions"
+msgstr "Все регионы"
+
+msgid "Selected regions only"
+msgstr "Только выбранные регионы"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Select all"
+msgstr "Выбрать все"
+
+msgid "No region selected in country settings"
+msgstr "В настройках страны не выбран ни один регион"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "or"
+msgstr "или"
+
+msgid "cancel"
+msgstr "отмена"
+
+msgid "Countries"
+msgstr "Страны"
+
+msgid "All countries"
+msgstr "Все страны"
+
+msgid "Selected countries only"
+msgstr "Только выбранные страны"

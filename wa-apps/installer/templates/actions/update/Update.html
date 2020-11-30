@@ -1,3 +1,4 @@
+<section class="i-update">
 <div class="shadowed">
     {if $error}
         <div class="ui-error"><i class="icon16 error"></i>{$error}</div>
@@ -6,9 +7,9 @@
         {foreach $messages as $message}
             <div class="block double-padded i-message-{$message.result}">
                 {if $message.result == 'success'}
-                    <i class="icon16 yes"></i>
+                    <i class="fas fa-check-circle"></i>
                 {elseif $message.result == 'fail'}
-                    <i class="icon16 no"></i>
+                    <i class="fas fa-times-circle"></i>
                 {/if}
                 {$message.text|escape}
             </div>
@@ -23,7 +24,8 @@
         {/if}
     {/foreach}
 
-    <form action="?module=update&amp;action=manager" method="POST">
+    <form action="?module=update&amp;action=manager" method="post">
+        {$wa->csrf()}
         <input type="hidden" name="additional_updates" value="{if $update_counter_payware || ($update_counter_applicable<$update_counter) }1{else}0{/if}">
         <table class="zebra i-updates">
             <thead>
@@ -31,8 +33,9 @@
                 <tr class="i-top-extra-row">
                     <td colspan="3"></td>
                     <td class="i-update-button">
-                        <input type="submit" value="[`Install all updates`] ({$update_counter_applicable})"
-                               id="update_all" class="bold large">
+                        <div class="block" style="padding-left: 0;">
+                            <input type="submit" value="[`Install all updates`] ({$update_counter_applicable})" id="update_all" class="bold">
+                        </div>
                     </td>
                 </tr>
             {/if}
@@ -89,8 +92,11 @@
         </table>
     </form>
 </div>
+</section>
 
-<script type="text/javascript">
+<script>
+    document.title = {$title|json_encode};
+
     {literal}
     $(document).ready(function () {
         $('input:hidden[name^=app_id]').each(function () {

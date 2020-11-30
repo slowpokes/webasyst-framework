@@ -9,11 +9,15 @@ return array(
     'server'                        => array(),
     'php'                           => array(
         'strict'  => true,
-        'version' => '>=5.2.5',
+        'version' => '>=5.6.25',
     ),
     'php.curl'                      => array(
         'description' => 'Get updates information from update servers',
         'strict'      => false,
+    ),
+    'php.ctype'                      => array(
+        'description' => 'String type function',
+        'strict'      => true,
     ),
     'php.json'                      => array(
         'description' => 'JavaScript data format support',
