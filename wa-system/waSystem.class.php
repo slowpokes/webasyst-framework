@@ -93,9 +93,7 @@ class waSystem
                  */
                 $system = self::$instances[self::$current];
                 $locale = $set_current ? $system->getLocale() : null;
-                if (self::$apps === null || !empty(self::$apps[$name])) {
-                    $config = SystemConfig::getAppConfig($name, $system->getEnv(), $system->config->getRootPath(), $locale);
-                }
+                $config = SystemConfig::getAppConfig($name, $system->getEnv(), $system->config->getRootPath(), $locale);
             }
             if ($config) {
                 self::$instances[$name] = new self($config);
@@ -848,8 +846,22 @@ class waSystem
                 self::$apps = array();
                 foreach ($all_apps as $app => $enabled) {
                     if ($enabled) {
+                        // VADIM CODE START
+                        $fake_name = $app;
+                        $title = '';
+                        $db = '';
+                        if(is_array($enabled)){
+                            $app = $enabled['app'];
+                            $title = $enabled['title'];
+                            $db = $enabled['db'];
+                        }
+                        // VADIM CODE END
+                        waLocale::loadByDomain($app, $locale);
                         $app_config = $this->getAppPath('lib/config/app.php', $app);
                         if (!file_exists($app_config)) {
+                            if (false && SystemConfig::isDebug()) {
+                                throw new waException("Config not found. Create config by path ".$app_config);
+                            }
                             continue;
                         }
                         $app_info = include($app_config);
@@ -864,18 +876,6 @@ class waSystem
                             }
                         }
                         $app_info['id'] = $app;
-                         // VADIM CODE START
-                         $fake_name = $app;
-                         $title = '';
-                         $db = '';
-                         if(is_array($enabled)){
-                             $app = $enabled['app'];
-                             $title = $enabled['title'];
-                             $db = $enabled['db'];
-                         }
-                         // VADIM CODE END
-
-                        waLocale::loadByDomain($app, $locale);
                         $app_info['name'] = _wd($app, $app_info['name']);
                         //VADIM CODE START
                         if($title) $app_info['name'] = $title;
