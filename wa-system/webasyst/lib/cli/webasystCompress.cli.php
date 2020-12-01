@@ -80,9 +80,7 @@ Optional parameters:
         all          Skip all above.
         none         (default choice) Do not skip anything.
     -php /path/to/php/bin Option to specify custom path to check php syntax
-
 Hint: use wa-config/developer.php to setup common defaults e.g. style, skip, php
-
 HELP;
         if ($this->default_params) {
             $help .= "Current default values at developer.php:\n";
@@ -321,6 +319,7 @@ HELP;
                 'extension' => $this->extension_id,
             )
         );
+
         return $this->filter($this->files, $blacklist, $whitelist);
     }
 
@@ -530,8 +529,6 @@ HELP;
                     if (!is_array($config)) {
                         $this->tracef('ERROR: Invalid or empty config %s', $name);
                         $config = false;
-                    } else {
-                        //TODO check icon path #51.795
                     }
                 }
             } else {
@@ -1006,15 +1003,13 @@ HELP;
     {
         $paths = array();
 
-        if ($this->execAvailable()) {
-
-            if (defined('PHP_BINARY')) {
-                $php_bin = constant('PHP_BINARY');
-            } elseif (defined('PHP_BINDIR')) {
-                $php_bin = constant('PHP_BINDIR');
-            } else {
-                $php_bin = 'php';
-            }
+        if (defined('PHP_BINARY')) {
+            $php_bin = constant('PHP_BINARY');
+        } elseif (defined('PHP_BINDIR')) {
+            $php_bin = constant('PHP_BINDIR');
+        } else {
+            $php_bin = 'php';
+        }
 
         $version = $this->getPhpVersion($php_bin);
         if (($version === false) && ($php_bin != 'php')) {

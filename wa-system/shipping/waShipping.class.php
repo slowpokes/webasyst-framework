@@ -159,11 +159,6 @@ abstract class waShipping extends waSystemPlugin
         return $html;
     }
 
-    protected function initControls()
-    {
-        $this->registerControl('DeliveryIntervalControl');
-        parent::initControls();
-    }
 
     /**
      *
